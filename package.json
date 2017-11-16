@@ -25,6 +25,6 @@
   },
   "dependencies": {
     "jayson": "^2.0.4",
-    "dash-schema": "git+https://github.com/dashevo/dash-schema.git"
+    "dash-schema": "git+ssh://github.com/dashevo/dash-schema.git"
   }
 }
