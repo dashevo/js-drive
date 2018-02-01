@@ -1,8 +1,11 @@
 {
-  "name": "dashdrive-api",
+  "name": "dashdrive",
   "version": "0.0.1",
-  "description": "DashDrive API",
+  "description": "DashDrive",
   "main": "index.js",
+  "engines": {
+    "node": "~8"
+  },
   "scripts": {
     "test": "mocha"
   },
@@ -20,8 +23,9 @@
   "homepage": "https://github.com/dashevo/dashdrive-api",
   "devDependencies": {
     "chai": "^4.1.2",
+    "mocha": "^4.0.1",
     "eslint": "^4.11.0",
-    "mocha": "^4.0.1"
+    "eslint-config-airbnb-base": "12.1.0"
   },
   "dependencies": {
     "jayson": "^2.0.4",
