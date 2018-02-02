@@ -7,8 +7,9 @@
     "node": ">=8"
   },
   "scripts": {
+    "rpc": "node scripts/rpc",
     "lint": "eslint **/*.js",
-    "test": "mocha"
+    "test": "mocha test/**/*.spec.js"
   },
   "pre-commit": [
     "lint",
@@ -31,11 +32,16 @@
     "eslint": "^4.16.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
+    "go-ipfs-dep": "^0.4.13",
+    "ipfsd-ctl": "^0.27.3",
     "mocha": "^4.0.1",
     "pre-commit": "^1.2.2"
   },
   "dependencies": {
-    "jayson": "^2.0.4",
-    "dash-schema": "git+ssh://github.com/dashevo/dash-schema.git"
+    "@dashevo/dash-schema": "git+ssh://git@github.com/dashevo/dash-schema.git",
+    "cbor": "^3.0.3",
+    "dotenv": "^5.0.0",
+    "ipfs-api": "^17.5.0",
+    "jayson": "^2.0.5"
   }
 }
