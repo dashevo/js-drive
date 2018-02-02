@@ -1,7 +1,7 @@
 {
-  "name": "dashdrive",
+  "name": "dashdrive-api",
   "version": "0.0.1",
-  "description": "DashDrive",
+  "description": "DashDrive API",
   "main": "index.js",
   "engines": {
     "node": ">=8"
