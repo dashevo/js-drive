@@ -1,1 +1,1 @@
-// TODO: Implement internal gRPC API
+// TODO: Implement internal gRPC API server
