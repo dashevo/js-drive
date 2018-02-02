@@ -1,0 +1,1 @@
+// TODO: Implement sync with blockchain. Listen events from DashCore and update storage (IPFS) and state view.

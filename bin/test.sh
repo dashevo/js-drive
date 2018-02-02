@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+# TODO: Obsolete
+
 curl -i -X POST -H "Content-Type: application/json; indent=4" \
 -d '{
 "jsonrpc": "2.0",
