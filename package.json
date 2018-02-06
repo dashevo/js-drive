@@ -9,7 +9,7 @@
   "scripts": {
     "rpc": "node scripts/rpc",
     "lint": "eslint **/*.js",
-    "test": "mocha"
+    "test": "mocha test/**/*.test.js"
   },
   "repository": {
     "type": "git",
