@@ -1,26 +1,32 @@
 {
-  "name": "dashdrive-api",
+  "name": "dashdrive",
   "version": "0.0.1",
-  "description": "DashDrive API",
+  "description": "DashDrive",
   "main": "index.js",
+  "engines": {
+    "node": ">=8"
+  },
   "scripts": {
+    "lint": "eslint **/*.js",
     "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dashevo/dashdrive-api.git"
+    "url": "git+https://github.com/dashevo/dashdrive.git"
   },
   "authors": [
     "Nathan Marley"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dashevo/dashdrive-api/issues"
+    "url": "https://github.com/dashevo/dashdrive/issues"
   },
-  "homepage": "https://github.com/dashevo/dashdrive-api",
+  "homepage": "https://github.com/dashevo/dashdrive",
   "devDependencies": {
     "chai": "^4.1.2",
-    "eslint": "^4.11.0",
+    "eslint": "^4.16.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
     "mocha": "^4.0.1"
   },
   "dependencies": {
