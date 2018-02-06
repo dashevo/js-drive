@@ -1,1 +1,1 @@
-TODO: Define HTTP API handlers
+TODO: Define Public HTTP API handlers
