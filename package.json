@@ -7,6 +7,7 @@
     "node": ">=8"
   },
   "scripts": {
+    "rpc": "node scripts/rpc",
     "lint": "eslint **/*.js",
     "test": "mocha"
   },
@@ -30,7 +31,7 @@
     "mocha": "^4.0.1"
   },
   "dependencies": {
-    "jayson": "^2.0.4",
-    "dash-schema": "git+ssh://github.com/dashevo/dash-schema.git"
+    "dash-schema": "git+ssh://github.com/dashevo/dash-schema.git",
+    "jayson": "^2.0.5"
   }
 }
