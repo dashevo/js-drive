@@ -2,10 +2,10 @@
 
 const jayson = require('jayson/promise');
 
-const host = 'localhost';
+const host = '127.0.0.1';
 const port = 9998;
-const username = 'developer';
-const password = 'Ijdsklfndskjyew7rghjb&Tyghf';
+const username = 'dashrpc';
+const password = 'password';
 
 const realm = Buffer.from([username, password].join(':')).toString('base64');
 
