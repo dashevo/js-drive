@@ -7,9 +7,8 @@
     "node": ">=8"
   },
   "scripts": {
-    "rpc": "node scripts/rpc",
     "lint": "eslint **/*.js",
-    "test": "mocha test/**/*.spec.js"
+    "test": "mocha test/**/*.test.js"
   },
   "pre-commit": [
     "lint",
@@ -36,7 +35,13 @@
     "pre-commit": "^1.2.2"
   },
   "dependencies": {
-    "dash-schema": "git+ssh://github.com/dashevo/dash-schema.git",
-    "jayson": "^2.0.5"
+    "@dashevo/dash-schema": "git+ssh://github.com/dashevo/dash-schema.git",
+    "cids": "^0.5.2",
+    "go-ipfs-dep": "^0.4.13",
+    "ipfs-api": "^17.5.0",
+    "ipfs-unixfs-engine": "^0.24.2",
+    "ipfsd-ctl": "^0.27.3",
+    "jayson": "^2.0.4",
+    "pull-stream": "^3.6.1"
   }
 }
