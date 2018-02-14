@@ -36,8 +36,8 @@
     "pre-commit": "^1.2.2"
   },
   "dependencies": {
+    "@dashevo/dash-schema": "git+ssh://git@github.com/dashevo/dash-schema.git",
     "bitcoind-rpc-dash": "^1.0.1",
-    "dash-schema": "git+ssh://github.com/dashevo/dash-schema.git",
     "jayson": "^2.0.5"
   }
 }
