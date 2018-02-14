@@ -3,10 +3,8 @@ const rpcHandlers = require('../lib/api/rpc');
 
 const server = jayson.server(rpcHandlers);
 
-server.http().listen(
-  process.env.API_RPC_PORT,
-  process.env.API_RPC_HOST || '0.0.0.0',
-);
+const bindHost = process.env.BIND_HOST || '0.0.0.0';
+server.http().listen(5001, bindHost);
 
 // break on ^C
 process.on('SIGINT', () => {
