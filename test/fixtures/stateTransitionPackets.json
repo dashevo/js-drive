@@ -87,7 +87,7 @@
             "agreetscs": 1
           },
           "meta": {
-            "id": "b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75"
+            "id": "809jofm2309fj23ifj23oifwonfwiof32oif3if23ij3ijf3ij3dgyf32ijf23ij"
           }
         }
       ]
@@ -117,7 +117,24 @@
             "agreetscs": 1
           },
           "meta": {
-            "id": "b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75"
+            "id": "8ij2nr89whf23f2983hfwonf2398f3298hf23f3308fj2308r208foijfowifwio"
+          }
+        },
+        {
+          "description": "valid Contact object by Alice referencing to someone else",
+          "data": {
+            "pver": 1,
+            "objtype": "DashPayContact",
+            "dapid": "b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75",
+            "actn": 0,
+            "revn": 0,
+            "leafn": 1,
+            "relation": "0komwdhinrj23nwdg2e37eiudn2398hrf983h893hrf23ij32jd23j32oijdio23",
+            "hdextpubkey": "xpub6A9c92Lqxd2Y4bhq91YcWoE2BbUWSBKur1MjeMjkMkEKL7orgkD4k45a3rRq2o5cSk48wDb8SE7iAGbpjSCskrk6R7tSqEJ86nRfLr3Jifa",
+            "agreetscs": 1
+          },
+          "meta": {
+            "id": "jn3oir328jiweonfoiwjfio23jfiownfoskdnf223df3830u902klkn34323iojf"
           }
         }
       ]
