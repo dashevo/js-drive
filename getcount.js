@@ -1,22 +1,18 @@
 /* eslint-disable no-console */
 
-const jayson = require('jayson/promise');
+const util = require('util');
+const RpcClient = require('bitcoind-rpc-dash');
 
-const host = '127.0.0.1';
-const port = 9998;
-const username = 'dashrpc';
-const password = 'password';
+const client = new RpcClient({
+  protocol: 'http',
+  user: 'dashrpc',
+  pass: 'password',
+});
 
-const realm = Buffer.from([username, password].join(':')).toString('base64');
-
-const headers = {
-  Authorization: `Basic ${realm}`,
-};
-
-const client = jayson.client.http({ host, port, headers });
+const getBlockCount = util.promisify(client.getBlockCount).bind(client);
 
 async function main() {
-  const response = await client.request('getblockcount', []);
+  const response = await getBlockCount();
 
   console.log('The current block count is: %d', response.result);
 }
