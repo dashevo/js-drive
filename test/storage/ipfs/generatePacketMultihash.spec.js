@@ -23,10 +23,12 @@ describe('Storage', () => {
 
         const packets = packetsData.map(packetData => new StateTransitionPacket(packetData));
 
+        // Add packets from fixtures to IPFS
         const addPacketPromises = packets.map(addStateTransitionPacket.bind(null, ipfsApi));
 
         const packetMultihashesFromIPFS = await Promise.all(addPacketPromises);
 
+        // Generate IPFS multihashes from fixtures' packets
         const generateMultihashesPromises = packets.map(generatePacketMultihash);
 
         const packetMultihashes = await Promise.all(generateMultihashesPromises);
