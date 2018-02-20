@@ -10,14 +10,14 @@ const startIPFSInstance = require('../../../lib/test/startIPFSInstance');
 
 describe('Storage', () => {
   describe('IPFS', () => {
-    describe('addStateTransitionPacket', () => {
+    describe('generatePacketMultihash', () => {
       let ipfsApi;
 
       startIPFSInstance().then((_ipfsApi) => {
         ipfsApi = _ipfsApi;
       });
 
-      it('should add packets to storage and returns hash', async () => {
+      it('should generate the same multihash as IPFS', async () => {
         const packetsJSON = fs.readFileSync(path.join(__dirname, '/../../fixtures/stateTransitionPackets.json'));
         const packetsData = JSON.parse(packetsJSON);
 
