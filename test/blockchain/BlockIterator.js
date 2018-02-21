@@ -9,15 +9,21 @@ const sinonChai = require('sinon-chai');
 
 use(sinonChai);
 
-const RpcClient = require('bitcoind-rpc-dash');
-
 const BlockIterator = require('../../lib/blockchain/BlockIterator');
 
 const blocksJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/blocks.json'));
 const blocks = JSON.parse(blocksJSON);
 
+const rpcClientMock = {
+  getBlockHash(height, callback) {
+    callback(null, { result: blocks[0].hash });
+  },
+  getBlock(hash, callback) {
+    callback(null, { result: blocks.find(block => block.hash === hash) });
+  },
+};
+
 describe('BlockIterator', () => {
-  let rpcClient;
   let getBlockHashStub;
   let getBlockStub;
 
@@ -28,24 +34,15 @@ describe('BlockIterator', () => {
       this.sinon.restore();
     }
 
-    rpcClient = new RpcClient();
-
-    getBlockHashStub = this.sinon.stub(rpcClient, 'getBlockHash');
-    getBlockHashStub.callsFake((height, callback) => {
-      callback(null, { result: blocks[0].hash });
-    });
-
-    getBlockStub = this.sinon.stub(rpcClient, 'getBlock');
-    getBlockStub.callsFake((hash, callback) => {
-      callback(null, { result: blocks.find(block => block.hash === hash) });
-    });
+    getBlockHashStub = this.sinon.spy(rpcClientMock, 'getBlockHash');
+    getBlockStub = this.sinon.spy(rpcClientMock, 'getBlock');
   });
 
   it('should iterate over blocks from blockchain', async () => {
     const fromBlockHeight = 1;
     const obtainedBlocks = [];
 
-    const blockIterator = new BlockIterator(rpcClient, fromBlockHeight);
+    const blockIterator = new BlockIterator(rpcClientMock, fromBlockHeight);
 
     let done;
     let block;
