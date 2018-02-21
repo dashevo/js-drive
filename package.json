@@ -9,12 +9,8 @@
   "scripts": {
     "rpc": "node scripts/rpc",
     "lint": "eslint **/*.js",
-    "test": "mocha --recursive"
+    "test": "mocha './test/**/*.spec.js'"
   },
-  "pre-commit": [
-    "lint",
-    "test"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dashevo/dashdrive.git"
