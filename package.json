@@ -11,7 +11,7 @@
     "lint": "eslint **/*.js",
     "test": "mocha --recursive"
   },
-  "pre-commit": [
+  "pre-push": [
     "lint",
     "test"
   ],
@@ -35,7 +35,8 @@
     "go-ipfs-dep": "^0.4.13",
     "ipfsd-ctl": "^0.27.3",
     "mocha": "^4.0.1",
-    "multihashes": "^0.4.13"
+    "multihashes": "^0.4.13",
+    "pre-push": "^0.1.1"
   },
   "dependencies": {
     "@dashevo/dash-schema": "git+ssh://git@github.com/dashevo/dash-schema.git",
