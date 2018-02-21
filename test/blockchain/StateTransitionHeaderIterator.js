@@ -11,7 +11,7 @@ const StateTransitionHeader = require('../../lib/blockchain/StateTransitionHeade
 const blocksJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/blocks.json'));
 const blocks = JSON.parse(blocksJSON);
 
-const transitionHeadersJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/transitionHeaders.json'));
+const transitionHeadersJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/stateTransitionHeaders.json'));
 const transitionHeaders = JSON.parse(transitionHeadersJSON);
 
 let currentBlockIndex = 0;
