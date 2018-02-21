@@ -20,8 +20,13 @@ describe('Util', () => {
       expect(promisifiedObject).to.respondTo('testMethod1');
       expect(promisifiedObject).to.respondTo('testMethod2');
 
-      expect(promisifiedObject.testMethod1()).to.be.a('Promise');
-      expect(promisifiedObject.testMethod2()).to.be.a('Promise');
+      const promise1 = promisifiedObject.testMethod1();
+      const promise2 = promisifiedObject.testMethod2();
+
+      expect(promise1).to.be.a('Promise');
+      expect(promise2).to.be.a('Promise');
+
+      promise2.catch(() => true);
     });
   });
 });
