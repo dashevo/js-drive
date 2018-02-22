@@ -24,8 +24,8 @@ const rpcClientMock = {
 };
 
 describe('BlockIterator', () => {
-  let getBlockHashStub;
-  let getBlockStub;
+  let getBlockHashSpy;
+  let getBlockSpy;
 
   beforeEach(function beforeEach() {
     if (!this.sinon) {
@@ -34,8 +34,8 @@ describe('BlockIterator', () => {
       this.sinon.restore();
     }
 
-    getBlockHashStub = this.sinon.spy(rpcClientMock, 'getBlockHash');
-    getBlockStub = this.sinon.spy(rpcClientMock, 'getBlock');
+    getBlockHashSpy = this.sinon.spy(rpcClientMock, 'getBlockHash');
+    getBlockSpy = this.sinon.spy(rpcClientMock, 'getBlock');
   });
 
   it('should iterate over blocks from blockchain', async () => {
@@ -55,8 +55,8 @@ describe('BlockIterator', () => {
       obtainedBlocks.push(block);
     }
 
-    expect(getBlockHashStub).to.be.calledOnce.and.calledWith(fromBlockHeight);
-    expect(getBlockStub).has.callCount(blocks.length);
+    expect(getBlockHashSpy).to.be.calledOnce.and.calledWith(fromBlockHeight);
+    expect(getBlockSpy).has.callCount(blocks.length);
     expect(obtainedBlocks).to.be.deep.equal(blocks);
   });
 });
