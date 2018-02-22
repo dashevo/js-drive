@@ -12,34 +12,11 @@ use(sinonChai);
 const StateTransitionHeaderIterator = require('../../lib/blockchain/StateTransitionHeaderIterator');
 const StateTransitionHeader = require('../../lib/blockchain/StateTransitionHeader');
 
-const blocksJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/blocks.json'));
-const blocks = JSON.parse(blocksJSON);
-
-const transitionHeadersJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/stateTransitionHeaders.json'));
-const transitionHeaders = JSON.parse(transitionHeadersJSON);
-
-let currentBlockIndex = 0;
-const blockIteratorMock = {
-  rpcClient: {
-    getTransitionHeader(tsid, callback) {
-      callback(null, { result: transitionHeaders.find(header => header.tsid === tsid) });
-    },
-  },
-  async next() {
-    if (!blocks[currentBlockIndex]) {
-      return Promise.resolve({ done: true });
-    }
-
-    const currentBlock = blocks[currentBlockIndex];
-
-    currentBlockIndex++;
-
-    return Promise.resolve({ done: false, value: currentBlock });
-  },
-};
-
 
 describe('StateTransitionHeaderIterator', () => {
+  let blocks;
+  let transitionHeaders;
+  let blockIteratorMock;
   let getTransitionHeaderSpy;
   let nextSpy;
 
@@ -49,6 +26,32 @@ describe('StateTransitionHeaderIterator', () => {
     } else {
       this.sinon.restore();
     }
+
+    const blocksJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/blocks.json'));
+    blocks = JSON.parse(blocksJSON);
+
+    const transitionHeadersJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/stateTransitionHeaders.json'));
+    transitionHeaders = JSON.parse(transitionHeadersJSON);
+
+    let currentBlockIndex = 0;
+    blockIteratorMock = {
+      rpcClient: {
+        getTransitionHeader(tsid, callback) {
+          callback(null, { result: transitionHeaders.find(header => header.tsid === tsid) });
+        },
+      },
+      async next() {
+        if (!blocks[currentBlockIndex]) {
+          return Promise.resolve({ done: true });
+        }
+
+        const currentBlock = blocks[currentBlockIndex];
+
+        currentBlockIndex++;
+
+        return Promise.resolve({ done: false, value: currentBlock });
+      },
+    };
 
     getTransitionHeaderSpy = this.sinon.spy(blockIteratorMock.rpcClient, 'getTransitionHeader');
     nextSpy = this.sinon.spy(blockIteratorMock, 'next');

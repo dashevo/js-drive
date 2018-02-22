@@ -11,19 +11,9 @@ use(sinonChai);
 
 const BlockIterator = require('../../lib/blockchain/BlockIterator');
 
-const blocksJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/blocks.json'));
-const blocks = JSON.parse(blocksJSON);
-
-const rpcClientMock = {
-  getBlockHash(height, callback) {
-    callback(null, { result: blocks[0].hash });
-  },
-  getBlock(hash, callback) {
-    callback(null, { result: blocks.find(block => block.hash === hash) });
-  },
-};
-
 describe('BlockIterator', () => {
+  let blocks;
+  let rpcClientMock;
   let getBlockHashSpy;
   let getBlockSpy;
 
@@ -33,6 +23,19 @@ describe('BlockIterator', () => {
     } else {
       this.sinon.restore();
     }
+
+    const blocksJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/blocks.json'));
+    blocks = JSON.parse(blocksJSON);
+
+    rpcClientMock = {
+      getBlockHash(height, callback) {
+        callback(null, { result: blocks[0].hash });
+      },
+      getBlock(hash, callback) {
+        callback(null, { result: blocks.find(block => block.hash === hash) });
+      },
+    };
+
 
     getBlockHashSpy = this.sinon.spy(rpcClientMock, 'getBlockHash');
     getBlockSpy = this.sinon.spy(rpcClientMock, 'getBlock');
