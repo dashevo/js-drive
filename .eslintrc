@@ -7,10 +7,6 @@
       "always"
     ],
     "no-await-in-loop": "off",
-    "no-cond-assign": [
-      "error",
-      "except-parens"
-    ],
     "no-restricted-syntax": [
       "error",
       {
