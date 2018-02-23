@@ -1,5 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-
 const fs = require('fs');
 const path = require('path');
 const { expect } = require('chai');
@@ -46,13 +44,10 @@ describe('addStateTransitionPacket', () => {
     expect(packetData).to.deep.equal(packetDataFromIPFS);
 
     // 3. Objects contained in corresponding packets should be available in IPFS with correct data
-
-    // eslint-disable-next-line no-restricted-syntax
     for (const [i, packet] of packetsFromIPFS.entries()) {
       // eslint-disable-next-line no-loop-func
       const objectPromisesFromIPFS = packet.links.map(link => ipfsApi.block.get(link.multihash));
 
-      // eslint-disable-next-line no-await-in-loop
       const objectsFromIPFS = await Promise.all(objectPromisesFromIPFS);
 
       const objectDataFromIPFS = objectsFromIPFS.map(object => cbor.decodeFirstSync(object.data));
