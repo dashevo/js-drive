@@ -102,4 +102,19 @@ describe('BlockIterator', () => {
 
     expect(firstBlock).to.be.equal(secondBlock);
   });
+
+  it('should iterate since new blockHeight', async () => {
+    const blockIterator = new BlockIterator(rpcClientMock);
+
+    const { value: firstBlock } = await blockIterator.next();
+
+    blockIterator.blockHeight = 1;
+
+    const { value: secondBlock } = await blockIterator.next();
+    const { value: thirdBlock } = await blockIterator.next();
+
+    expect(firstBlock).to.be.equal(secondBlock);
+
+    expect(blockIterator.blockHeight).to.be.equal(thirdBlock.height);
+  });
 });
