@@ -49,6 +49,9 @@ describe('StateTransitionHeaderIterator', () => {
 
         return Promise.resolve({ done: false, value: currentBlock });
       },
+      reset() {
+        currentBlockIndex = 0;
+      },
     };
 
     getTransitionHeaderSpy = this.sinon.spy(blockIteratorMock.rpcClient, 'getTransitionHeader');
@@ -77,5 +80,17 @@ describe('StateTransitionHeaderIterator', () => {
 
     const transitionHeaderObjects = transitionHeaders.map(h => new StateTransitionHeader(h));
     expect(obtainedHeaders).to.be.deep.equal(transitionHeaderObjects);
+  });
+
+  it('should iterate from begging when "reset" method is called', async () => {
+    const stateTransitionHeaderIterator = new StateTransitionHeaderIterator(blockIteratorMock);
+
+    const { value: firstHeader } = await stateTransitionHeaderIterator.next();
+
+    stateTransitionHeaderIterator.reset();
+
+    const { value: secondHeader } = await stateTransitionHeaderIterator.next();
+
+    expect(firstHeader).to.be.deep.equal(secondHeader);
   });
 });
