@@ -45,6 +45,7 @@ describe('addStateTransitionsFromBlockchain', () => {
         getTransitionHeader() {
         },
       },
+      reset() { },
     };
     stateTransitionHeaderIteratorMock = new StateTransitionHeaderIterator(blockIteratorMock);
 

@@ -74,9 +74,7 @@ describe('BlockIterator', () => {
   });
 
   it('should should throws error if blocks sequence is wrong (e.g. reorg)', async () => {
-    const fromBlockHeight = 1;
-
-    const blockIterator = new BlockIterator(rpcClientMock, fromBlockHeight);
+    const blockIterator = new BlockIterator(rpcClientMock);
 
     await blockIterator.next();
 
@@ -91,5 +89,17 @@ describe('BlockIterator', () => {
     }
 
     throw new Error('should throws WrongBlocksSequenceError');
+  });
+
+  it('should iterate from begging when "reset" method is called', async () => {
+    const blockIterator = new BlockIterator(rpcClientMock);
+
+    const { value: firstBlock } = await blockIterator.next();
+
+    blockIterator.reset();
+
+    const { value: secondBlock } = await blockIterator.next();
+
+    expect(firstBlock).to.be.equal(secondBlock);
   });
 });
