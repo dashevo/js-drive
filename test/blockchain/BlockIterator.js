@@ -8,6 +8,7 @@ const sinonChai = require('sinon-chai');
 use(sinonChai);
 
 const BlockIterator = require('../../lib/blockchain/BlockIterator');
+const WrongBlocksSequenceError = require('../../lib/blockchain/WrongBlocksSequenceError');
 
 describe('BlockIterator', () => {
   let blocks;
@@ -26,14 +27,24 @@ describe('BlockIterator', () => {
     blocks = JSON.parse(blocksJSON);
 
     rpcClientMock = {
+      getBlockReturnValue: null,
+
       getBlockHash(height, callback) {
-        callback(null, { result: blocks[0].hash });
+        const block = blocks.find(b => b.height === height);
+        callback(null, { result: block ? block.hash : null });
       },
       getBlock(hash, callback) {
-        callback(null, { result: blocks.find(block => block.hash === hash) });
+        let block = this.getBlockReturnValue;
+        if (!block) {
+          block = blocks.find(b => b.hash === hash);
+        }
+
+        callback(null, { result: block });
+      },
+      setGetBlockReturnValue(value) {
+        this.getBlockReturnValue = value;
       },
     };
-
 
     getBlockHashSpy = this.sinon.spy(rpcClientMock, 'getBlockHash');
     getBlockSpy = this.sinon.spy(rpcClientMock, 'getBlock');
@@ -60,5 +71,25 @@ describe('BlockIterator', () => {
     expect(getBlockHashSpy).to.be.calledOnce.and.calledWith(fromBlockHeight);
     expect(getBlockSpy).has.callCount(blocks.length);
     expect(obtainedBlocks).to.be.deep.equal(blocks);
+  });
+
+  it('should should throws error if blocks sequence is wrong (e.g. reorg)', async () => {
+    const fromBlockHeight = 1;
+
+    const blockIterator = new BlockIterator(rpcClientMock, fromBlockHeight);
+
+    await blockIterator.next();
+
+    rpcClientMock.setGetBlockReturnValue(blocks[2]);
+
+    try {
+      await blockIterator.next();
+    } catch (e) {
+      if (e instanceof WrongBlocksSequenceError) {
+        return;
+      }
+    }
+
+    throw new Error('should throws WrongBlocksSequenceError');
   });
 });
