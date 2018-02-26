@@ -47,6 +47,7 @@
     "ipfs-api": "^17.5.0",
     "ipld-dag-pb": "^0.13.0",
     "jayson": "^2.0.5",
-    "multihashing-async": "^0.4.7"
+    "multihashing-async": "^0.4.7",
+    "zeromq": "^4.6.0"
   }
 }
