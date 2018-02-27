@@ -27,7 +27,6 @@ describe('addStateTransitionsFromBlockchain', () => {
 
     // Mock IPFS API
     class IpfsAPI {
-
     }
 
     ipfsAPIMock = new IpfsAPI();
