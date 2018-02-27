@@ -1,4 +1,3 @@
-const proxyquire = require('proxyquire');
 const { expect, use } = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
@@ -7,14 +6,13 @@ use(sinonChai);
 
 const StateTransitionHeaderIterator = require('../../lib/blockchain/StateTransitionHeaderIterator');
 const getTransitionHeaderFixtures = require('../../lib/test/fixtures/getTransitionHeaderFixtures');
+const addStateTransitionsFromBlockchain = require('../../lib/storage/addStateTransitionsFromBlockchain');
 
 describe('addStateTransitionsFromBlockchain', () => {
   let transitionHeaders;
   let ipfsAPIMock;
   let stateTransitionHeaderIteratorMock;
   let nextStab;
-  let addSTPacketByHeaderStub;
-  let addStateTransitionsFromBlockchain;
 
   beforeEach(function beforeEach() {
     if (!this.sinon) {
@@ -27,10 +25,13 @@ describe('addStateTransitionsFromBlockchain', () => {
 
     // Mock IPFS API
     class IpfsAPI {
-
+      constructor() {
+        this.pin = {};
+      }
     }
 
     ipfsAPIMock = new IpfsAPI();
+    ipfsAPIMock.pin.add = this.sinon.spy();
 
     // Mock StateTransitionHeaderIterator
     const blockIteratorMock = {
@@ -54,13 +55,6 @@ describe('addStateTransitionsFromBlockchain', () => {
 
       return Promise.resolve({ done: false, value: currentHeader });
     });
-
-    addSTPacketByHeaderStub = this.sinon.stub();
-    addSTPacketByHeaderStub.returns(Promise.resolve());
-
-    addStateTransitionsFromBlockchain = proxyquire('../../lib/storage/addStateTransitionsFromBlockchain', {
-      '../../lib/storage/addSTPacketByHeader': addSTPacketByHeaderStub,
-    });
   });
 
   it('should pin ST packets by hash from ST headers from blockchain', async () => {
@@ -71,7 +65,7 @@ describe('addStateTransitionsFromBlockchain', () => {
     expect(ipfsAPIMock.pin.add).has.callCount(transitionHeaders.length);
 
     transitionHeaders.forEach((header) => {
-      expect(addSTPacketByHeaderStub).to.be.calledWith(ipfsAPIMock, header);
+      expect(ipfsAPIMock.pin.add).to.be.calledWith(header.getStorageHash(), { recursive: true });
     });
   });
 });
