@@ -26,8 +26,7 @@ describe('addStateTransitionsFromBlockchain', () => {
     transitionHeaders = getTransitionHeaderFixtures();
 
     // Mock IPFS API
-    class IpfsAPI {
-    }
+    class IpfsAPI { }
 
     ipfsAPIMock = new IpfsAPI();
 
@@ -58,7 +57,7 @@ describe('addStateTransitionsFromBlockchain', () => {
     addSTPacketByHeaderStub.returns(Promise.resolve());
 
     addStateTransitionsFromBlockchain = proxyquire('../../lib/storage/addStateTransitionsFromBlockchain', {
-      '../../lib/storage/addSTPacketByHeader': addSTPacketByHeaderStub,
+      './addSTPacketByHeader': addSTPacketByHeaderStub,
     });
   });
 
@@ -67,7 +66,7 @@ describe('addStateTransitionsFromBlockchain', () => {
 
     expect(nextStab).has.callCount(transitionHeaders.length + 1);
 
-    expect(ipfsAPIMock.pin.add).has.callCount(transitionHeaders.length);
+    expect(addSTPacketByHeaderStub).has.callCount(transitionHeaders.length);
 
     transitionHeaders.forEach((header) => {
       expect(addSTPacketByHeaderStub).to.be.calledWith(ipfsAPIMock, header);
