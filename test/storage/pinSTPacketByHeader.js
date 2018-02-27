@@ -4,10 +4,10 @@ const sinonChai = require('sinon-chai');
 
 use(sinonChai);
 
-const addSTPacketByHeader = require('../../lib/storage/addSTPacketByHeader');
+const pinSTPacketByHeader = require('../../lib/storage/pinSTPacketByHeader');
 const getTransitionHeaderFixtures = require('../../lib/test/fixtures/getTransitionHeaderFixtures');
 
-describe('addSTPacketByHeader', () => {
+describe('pinSTPacketByHeader', () => {
   let transitionHeaders;
   let ipfsAPIMock;
 
@@ -33,7 +33,7 @@ describe('addSTPacketByHeader', () => {
 
   it('should pin ST packet using storageHash from ST header', async () => {
     const transitionHeader = transitionHeaders[0];
-    await addSTPacketByHeader(ipfsAPIMock, transitionHeader);
+    await pinSTPacketByHeader(ipfsAPIMock, transitionHeader);
 
     expect(ipfsAPIMock.pin.add).to.be.calledWith(
       transitionHeader.getStorageHash(),

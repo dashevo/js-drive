@@ -8,13 +8,13 @@ use(sinonChai);
 const StateTransitionHeaderIterator = require('../../lib/blockchain/StateTransitionHeaderIterator');
 const getTransitionHeaderFixtures = require('../../lib/test/fixtures/getTransitionHeaderFixtures');
 
-describe('addStateTransitionsFromBlockchain', () => {
+describe('pinSTPacketsSinceBlock', () => {
   let transitionHeaders;
   let ipfsAPIMock;
   let stateTransitionHeaderIteratorMock;
   let nextStab;
-  let addSTPacketByHeaderStub;
-  let addStateTransitionsFromBlockchain;
+  let pinSTPacketByHeaderStub;
+  let pinSTPacketsSinceBlock;
 
   beforeEach(function beforeEach() {
     if (!this.sinon) {
@@ -53,23 +53,23 @@ describe('addStateTransitionsFromBlockchain', () => {
       return Promise.resolve({ done: false, value: currentHeader });
     });
 
-    addSTPacketByHeaderStub = this.sinon.stub();
-    addSTPacketByHeaderStub.returns(Promise.resolve());
+    pinSTPacketByHeaderStub = this.sinon.stub();
+    pinSTPacketByHeaderStub.returns(Promise.resolve());
 
-    addStateTransitionsFromBlockchain = proxyquire('../../lib/storage/addStateTransitionsFromBlockchain', {
-      './addSTPacketByHeader': addSTPacketByHeaderStub,
+    pinSTPacketsSinceBlock = proxyquire('../../lib/storage/pinSTPacketsSinceBlock', {
+      './pinSTPacketByHeader': pinSTPacketByHeaderStub,
     });
   });
 
   it('should pin ST packets by hash from ST headers from blockchain', async () => {
-    await addStateTransitionsFromBlockchain(ipfsAPIMock, stateTransitionHeaderIteratorMock);
+    await pinSTPacketsSinceBlock(ipfsAPIMock, stateTransitionHeaderIteratorMock);
 
     expect(nextStab).has.callCount(transitionHeaders.length + 1);
 
-    expect(addSTPacketByHeaderStub).has.callCount(transitionHeaders.length);
+    expect(pinSTPacketByHeaderStub).has.callCount(transitionHeaders.length);
 
     transitionHeaders.forEach((header) => {
-      expect(addSTPacketByHeaderStub).to.be.calledWith(ipfsAPIMock, header);
+      expect(pinSTPacketByHeaderStub).to.be.calledWith(ipfsAPIMock, header);
     });
   });
 });
