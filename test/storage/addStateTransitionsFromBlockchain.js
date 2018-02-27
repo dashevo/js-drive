@@ -1,22 +1,20 @@
-const fs = require('fs');
-const path = require('path');
-
+const proxyquire = require('proxyquire');
 const { expect, use } = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 
 use(sinonChai);
 
-const addStateTransitionsFromBlockchain = require('../../lib/storage/addStateTransitionsFromBlockchain');
-const TransitionHeader = require('bitcore-lib-dash/lib/stateTransition/transitionHeader');
 const StateTransitionHeaderIterator = require('../../lib/blockchain/StateTransitionHeaderIterator');
-
+const getTransitionHeaderFixtures = require('../../lib/test/fixtures/getTransitionHeaderFixtures');
 
 describe('addStateTransitionsFromBlockchain', () => {
   let transitionHeaders;
   let ipfsAPIMock;
   let stateTransitionHeaderIteratorMock;
   let nextStab;
+  let addSTPacketByHeaderStub;
+  let addStateTransitionsFromBlockchain;
 
   beforeEach(function beforeEach() {
     if (!this.sinon) {
@@ -25,27 +23,14 @@ describe('addStateTransitionsFromBlockchain', () => {
       this.sinon.restore();
     }
 
-    const transitionHeadersJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/stateTransitionHeaders.json'));
-    const transitionHeadersData = JSON.parse(transitionHeadersJSON);
-    transitionHeaders = transitionHeadersData.map((header) => {
-      const headerInstance = new TransitionHeader(header);
-
-      // TODO: Remove when getStorageHash will be implemented in bitcore-lib
-      headerInstance.getStorageHash = this.sinon.stub();
-      headerInstance.getStorageHash.returns(header.storageHash);
-
-      return headerInstance;
-    });
+    transitionHeaders = getTransitionHeaderFixtures();
 
     // Mock IPFS API
     class IpfsAPI {
-      constructor() {
-        this.pin = {};
-      }
+
     }
 
     ipfsAPIMock = new IpfsAPI();
-    ipfsAPIMock.pin.add = this.sinon.spy();
 
     // Mock StateTransitionHeaderIterator
     const blockIteratorMock = {
@@ -69,6 +54,13 @@ describe('addStateTransitionsFromBlockchain', () => {
 
       return Promise.resolve({ done: false, value: currentHeader });
     });
+
+    addSTPacketByHeaderStub = this.sinon.stub();
+    addSTPacketByHeaderStub.returns(Promise.resolve());
+
+    addStateTransitionsFromBlockchain = proxyquire('../../lib/storage/addStateTransitionsFromBlockchain', {
+      '../../lib/storage/addSTPacketByHeader': addSTPacketByHeaderStub,
+    });
   });
 
   it('should pin ST packets by hash from ST headers from blockchain', async () => {
@@ -79,7 +71,7 @@ describe('addStateTransitionsFromBlockchain', () => {
     expect(ipfsAPIMock.pin.add).has.callCount(transitionHeaders.length);
 
     transitionHeaders.forEach((header) => {
-      expect(ipfsAPIMock.pin.add).to.be.calledWith(header.getStorageHash(), { recursive: true });
+      expect(addSTPacketByHeaderStub).to.be.calledWith(ipfsAPIMock, header);
     });
   });
 });
