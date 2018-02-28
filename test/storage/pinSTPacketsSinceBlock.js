@@ -1,4 +1,3 @@
-const proxyquire = require('proxyquire');
 const { expect, use } = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
@@ -7,14 +6,13 @@ use(sinonChai);
 
 const StateTransitionHeaderIterator = require('../../lib/blockchain/StateTransitionHeaderIterator');
 const getTransitionHeaderFixtures = require('../../lib/test/fixtures/getTransitionHeaderFixtures');
+const pinSTPacketsSinceBlock = require('../../lib/storage/pinSTPacketsSinceBlock');
 
 describe('pinSTPacketsSinceBlock', () => {
   let transitionHeaders;
   let ipfsAPIMock;
   let stateTransitionHeaderIteratorMock;
   let nextStab;
-  let pinSTPacketByHeaderStub;
-  let pinSTPacketsSinceBlock;
 
   beforeEach(function beforeEach() {
     if (!this.sinon) {
@@ -26,7 +24,14 @@ describe('pinSTPacketsSinceBlock', () => {
     transitionHeaders = getTransitionHeaderFixtures();
 
     // Mock IPFS API
-    class IpfsAPI { }
+    const sinonSandbox = this.sinon;
+    class IpfsAPI {
+      constructor() {
+        this.pin = {
+          add: sinonSandbox.stub(),
+        };
+      }
+    }
 
     ipfsAPIMock = new IpfsAPI();
 
@@ -52,13 +57,6 @@ describe('pinSTPacketsSinceBlock', () => {
 
       return Promise.resolve({ done: false, value: currentHeader });
     });
-
-    pinSTPacketByHeaderStub = this.sinon.stub();
-    pinSTPacketByHeaderStub.returns(Promise.resolve());
-
-    pinSTPacketsSinceBlock = proxyquire('../../lib/storage/pinSTPacketsSinceBlock', {
-      './pinSTPacketByHeader': pinSTPacketByHeaderStub,
-    });
   });
 
   it('should pin ST packets by hash from ST headers from blockchain', async () => {
@@ -66,10 +64,13 @@ describe('pinSTPacketsSinceBlock', () => {
 
     expect(nextStab).has.callCount(transitionHeaders.length + 1);
 
-    expect(pinSTPacketByHeaderStub).has.callCount(transitionHeaders.length);
+    expect(ipfsAPIMock.pin.add).has.callCount(transitionHeaders.length);
 
     transitionHeaders.forEach((header) => {
-      expect(pinSTPacketByHeaderStub).to.be.calledWith(ipfsAPIMock, header);
+      expect(ipfsAPIMock.pin.add).to.be.calledWith(
+        header.getStorageHash(),
+        { recursive: true },
+      );
     });
   });
 });
