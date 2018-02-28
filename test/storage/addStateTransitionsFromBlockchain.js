@@ -20,7 +20,7 @@ describe('addStateTransitionsFromBlockchain', () => {
   let stateTransitionHeaderIteratorMock;
   let currentHeaderIndex;
   let nextStab;
-  let setNextStubWithErrorOnSecondBlock;
+  let setStubsWithErrorOnSecondBlock;
 
   beforeEach(function beforeEach() {
     if (!this.sinon) {
@@ -49,10 +49,11 @@ describe('addStateTransitionsFromBlockchain', () => {
     // Mock StateTransitionHeaderIterator
     const blockIteratorMock = {
       rpcClient: {
-        getTransitionHeader() {
-        },
+        getTransitionHeader: this.sinon.stub(),
       },
-      reset() { },
+      getBlockHeight: this.sinon.stub(),
+      setBlockHeight: this.sinon.stub(),
+      reset: this.sinon.stub(),
     };
     stateTransitionHeaderIteratorMock = new StateTransitionHeaderIterator(blockIteratorMock);
 
@@ -70,7 +71,9 @@ describe('addStateTransitionsFromBlockchain', () => {
       return Promise.resolve({ done: false, value: currentHeader });
     });
 
-    setNextStubWithErrorOnSecondBlock = function setNextStubWithError() {
+    setStubsWithErrorOnSecondBlock = function setNextStubWithError() {
+      blockIteratorMock.getBlockHeight.returns(blocks[1].height);
+
       let throwErrorOnSecondBlock = true;
       nextStab.callsFake(() => {
         if (!transitionHeaders[currentHeaderIndex]) {
@@ -111,7 +114,7 @@ describe('addStateTransitionsFromBlockchain', () => {
 
   it('should pin ST packets again since stable block if blocks sequence is wrong', async () => {
     // Stub of "next" method should throws WrongBlocksSequenceError on second block
-    setNextStubWithErrorOnSecondBlock();
+    setStubsWithErrorOnSecondBlock();
 
     await addStateTransitionsFromBlockchain(ipfsAPIMock, stateTransitionHeaderIteratorMock);
 

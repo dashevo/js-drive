@@ -108,13 +108,13 @@ describe('BlockIterator', () => {
 
     const { value: firstBlock } = await blockIterator.next();
 
-    blockIterator.blockHeight = 1;
+    blockIterator.setBlockHeight(1);
 
     const { value: secondBlock } = await blockIterator.next();
     const { value: thirdBlock } = await blockIterator.next();
 
     expect(firstBlock).to.be.equal(secondBlock);
 
-    expect(blockIterator.blockHeight).to.be.equal(thirdBlock.height);
+    expect(blockIterator.getBlockHeight()).to.be.equal(thirdBlock.height);
   });
 });

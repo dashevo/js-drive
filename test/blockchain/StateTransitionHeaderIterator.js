@@ -38,6 +38,9 @@ describe('StateTransitionHeaderIterator', () => {
           callback(null, { result: transitionHeaders.find(header => header.tsid === tsid) });
         },
       },
+      getBlockHeight() {
+        return blocks[currentBlockIndex].height;
+      },
       async next() {
         if (!blocks[currentBlockIndex]) {
           return Promise.resolve({ done: true });
