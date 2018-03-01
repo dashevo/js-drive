@@ -67,10 +67,7 @@ describe('pinSTPacketsSinceBlock', () => {
     expect(ipfsAPIMock.pin.add).has.callCount(transitionHeaders.length);
 
     transitionHeaders.forEach((header) => {
-      expect(ipfsAPIMock.pin.add).to.be.calledWith(
-        header.getStorageHash(),
-        { recursive: true },
-      );
+      expect(ipfsAPIMock.pin.add).to.be.calledWith(header.getStorageHash(), { recursive: true });
     });
   });
 });
