@@ -7,10 +7,10 @@ use(sinonChai);
 const StateTransitionHeaderIterator = require('../../lib/blockchain/StateTransitionHeaderIterator');
 const getTransitionHeaderFixtures = require('../../lib/test/fixtures/getTransitionHeaderFixtures');
 const getBlockFixtures = require('../../lib/test/fixtures/getBlockFixtures');
-const addStateTransitionsFromBlockchain = require('../../lib/storage/addStateTransitionsFromBlockchain');
+const pinSTPacketsSinceBlock = require('../../lib/storage/pinSTPacketsSinceBlock');
 const WrongBlocksSequenceError = require('../../lib/blockchain/WrongBlocksSequenceError');
 
-describe('addStateTransitionsFromBlockchain', () => {
+describe('pinSTPacketsSinceBlock', () => {
   let blocks;
   let transitionHeaders;
   let ipfsAPIMock;
@@ -30,14 +30,16 @@ describe('addStateTransitionsFromBlockchain', () => {
     transitionHeaders = getTransitionHeaderFixtures();
 
     // Mock IPFS API
+    const sinonSandbox = this.sinon;
     class IpfsAPI {
       constructor() {
-        this.pin = {};
+        this.pin = {
+          add: sinonSandbox.stub(),
+        };
       }
     }
 
     ipfsAPIMock = new IpfsAPI();
-    ipfsAPIMock.pin.add = this.sinon.spy();
 
     // Mock StateTransitionHeaderIterator
     const blockIteratorMock = {
@@ -94,7 +96,7 @@ describe('addStateTransitionsFromBlockchain', () => {
   });
 
   it('should pin ST packets by hash from ST headers from blockchain', async () => {
-    await addStateTransitionsFromBlockchain(ipfsAPIMock, stateTransitionHeaderIteratorMock);
+    await pinSTPacketsSinceBlock(ipfsAPIMock, stateTransitionHeaderIteratorMock);
 
     expect(nextStab).has.callCount(transitionHeaders.length + 1);
 
