@@ -1,10 +1,10 @@
 // TODO: Remove it later
-const dotevn = require('dotenv');
+const dotenv = require('dotenv');
 const { expect } = require('chai');
 const connectToMongoDb = require('../lib/test/connectToMongoDb');
 
 // Will be called in bootstrap
-dotevn.config();
+dotenv.config();
 
 // Will be set once in bootstrap
 connectToMongoDb.setUrl(process.env.STORAGE_MONGODB_URL)
