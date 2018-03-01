@@ -1,7 +1,9 @@
 const { expect, use } = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
+const chaiAsPromised = require('chai-as-promised');
 
+use(chaiAsPromised);
 use(sinonChai);
 
 const BlockIterator = require('../../lib/blockchain/BlockIterator');
@@ -77,15 +79,7 @@ describe('BlockIterator', () => {
 
     rpcClientMock.setGetBlockReturnValue(blocks[2]);
 
-    try {
-      await blockIterator.next();
-    } catch (e) {
-      if (e instanceof WrongBlocksSequenceError) {
-        return;
-      }
-    }
-
-    throw new Error('should throws WrongBlocksSequenceError');
+    expect(blockIterator.next()).to.be.rejectedWith(WrongBlocksSequenceError);
   });
 
   it('should iterate from begging when "reset" method is called', async () => {
