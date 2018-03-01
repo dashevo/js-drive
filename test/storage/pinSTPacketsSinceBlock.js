@@ -111,7 +111,7 @@ describe('pinSTPacketsSinceBlock', () => {
     // Stub of "next" method should throws WrongBlocksSequenceError on second block
     setStubsWithErrorOnSecondBlock();
 
-    await addStateTransitionsFromBlockchain(ipfsAPIMock, stateTransitionHeaderIteratorMock);
+    await pinSTPacketsSinceBlock(ipfsAPIMock, stateTransitionHeaderIteratorMock);
 
     // nextStab calls transitionHeaders.length + from from first block + error + last one empty
     expect(nextStab).has.callCount(transitionHeaders.length + blocks[0].ts.length + 2);
