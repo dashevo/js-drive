@@ -1,24 +1,27 @@
 // TODO: Remove it later
+const dotevn = require('dotenv');
 const { expect } = require('chai');
+const connectToMongoDb = require('../lib/test/connectToMongoDb');
 
-const { MongoClient } = require('mongodb');
+dotevn.config();
+
+connectToMongoDb.setUrl(process.env.STORAGE_MONGODB_URL)
+  .setDbName(process.env.STORAGE_MONGODB_DB);
 
 describe('MongoDB', () => {
-  let client;
+  let mongoDb;
+  connectToMongoDb().then((db) => {
+    mongoDb = db;
+  });
 
   it('should ', async () => {
-    const dbName = 'test';
     const expectedData = { test: 1 };
 
-    // Use connect method to connect to the Server
-    client = await MongoClient.connect(`mongodb://localhost:27017/${dbName}`);
-    const collection = client.db(dbName).collection('testCollection');
+    const collection = mongoDb.collection('testCollection');
 
     await collection.insertOne(expectedData);
     const [actualData] = await collection.find({}).toArray();
 
     expect(actualData).to.be.deep.equal(expectedData);
-
-    await client.close();
   });
 });
