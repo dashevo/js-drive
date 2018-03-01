@@ -1,17 +1,14 @@
-const fs = require('fs');
-const path = require('path');
-
 const { expect, use } = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 
 use(sinonChai);
 
-const addStateTransitionsFromBlockchain = require('../../lib/storage/addStateTransitionsFromBlockchain');
-const StateTransitionHeader = require('../../lib/blockchain/StateTransitionHeader');
 const StateTransitionHeaderIterator = require('../../lib/blockchain/StateTransitionHeaderIterator');
+const getTransitionHeaderFixtures = require('../../lib/test/fixtures/getTransitionHeaderFixtures');
+const getBlockFixtures = require('../../lib/test/fixtures/getBlockFixtures');
+const addStateTransitionsFromBlockchain = require('../../lib/storage/addStateTransitionsFromBlockchain');
 const WrongBlocksSequenceError = require('../../lib/blockchain/WrongBlocksSequenceError');
-
 
 describe('addStateTransitionsFromBlockchain', () => {
   let blocks;
@@ -29,12 +26,8 @@ describe('addStateTransitionsFromBlockchain', () => {
       this.sinon.restore();
     }
 
-    const blocksJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/blocks.json'));
-    blocks = JSON.parse(blocksJSON);
-
-    const transitionHeadersJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/stateTransitionHeaders.json'));
-    const transitionHeadersData = JSON.parse(transitionHeadersJSON);
-    transitionHeaders = transitionHeadersData.map(header => new StateTransitionHeader(header));
+    blocks = getBlockFixtures();
+    transitionHeaders = getTransitionHeaderFixtures();
 
     // Mock IPFS API
     class IpfsAPI {
@@ -108,7 +101,7 @@ describe('addStateTransitionsFromBlockchain', () => {
     expect(ipfsAPIMock.pin.add).has.callCount(transitionHeaders.length);
 
     transitionHeaders.forEach((header) => {
-      expect(ipfsAPIMock.pin.add).to.be.calledWith(header.storageHash, { recursive: true });
+      expect(ipfsAPIMock.pin.add).to.be.calledWith(header.getStorageHash(), { recursive: true });
     });
   });
 

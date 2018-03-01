@@ -1,6 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-
 const { expect, use } = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
@@ -9,6 +6,7 @@ use(sinonChai);
 
 const BlockIterator = require('../../lib/blockchain/BlockIterator');
 const WrongBlocksSequenceError = require('../../lib/blockchain/WrongBlocksSequenceError');
+const getBlockFixtures = require('../../lib/test/fixtures/getBlockFixtures');
 
 describe('BlockIterator', () => {
   let blocks;
@@ -23,8 +21,7 @@ describe('BlockIterator', () => {
       this.sinon.restore();
     }
 
-    const blocksJSON = fs.readFileSync(path.join(__dirname, '/../fixtures/blocks.json'));
-    blocks = JSON.parse(blocksJSON);
+    blocks = getBlockFixtures();
 
     rpcClientMock = {
       getBlockReturnValue: null,
