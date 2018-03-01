@@ -14,7 +14,7 @@ describe('MongoDB', () => {
     mongoDb = db;
   });
 
-  it('should ', async () => {
+  it('should work :)', async () => {
     const expectedData = { test: 1 };
 
     const collection = mongoDb.collection('testCollection');
