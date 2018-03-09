@@ -108,7 +108,7 @@ describe('STHeadersReader', () => {
     });
   });
 
-  it('should read from previous block if blocks sequence is wrong', async function it() {
+  it("should emit 'wrongSequence' read from previous block if blocks sequence is wrong", async function it() {
     // 4th block will be wrong on first iteration
     const wrongBlock = setWrongBlockOnCall(this.sinon, 1);
 
