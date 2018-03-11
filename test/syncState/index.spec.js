@@ -1,5 +1,5 @@
 /* eslint-disable global-require */
-describe('Storage', () => {
+describe('Sync state', () => {
   require('./attachStoreSyncStateHandler');
   require('./SyncStateRepository');
 });
