@@ -59,7 +59,7 @@ async function main() {
     inSync = false;
   }).catch(handleError));
 
-  zmqSocket.subscribe('zmqpubhashblock');
+  zmqSocket.subscribe('hashblock');
 }
 
 main().catch(handleError);
