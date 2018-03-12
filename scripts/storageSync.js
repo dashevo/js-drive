@@ -27,9 +27,9 @@ async function main() {
     user: process.env.DASHCORE_JSON_RPC_USER,
     pass: process.env.DASHCORE_JSON_RPC_PASS,
   });
-  const blockIterator = new BlockIterator(rpcClient, process.env.EVO_GENESIS_BLOCK_HEIGHT);
+  const blockIterator = new BlockIterator(rpcClient, process.env.SYNC_EVO_START_BLOCK_HEIGHT);
   const stHeaderIterator = new StateTransitionHeaderIterator(blockIterator);
-  const readerState = new STHeadersReaderState();
+  const readerState = new STHeadersReaderState([], process.env.SYNC_STATE_BLOCKS_LIMIT);
   const stHeaderReader = new STHeadersReader(stHeaderIterator, readerState);
 
   attachPinSTPacketHandler(ipfsAPI, stHeaderReader);
