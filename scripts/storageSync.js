@@ -8,7 +8,7 @@ const RpcClient = require('bitcoind-rpc-dash');
 const { MongoClient } = require('mongodb');
 
 const SyncStateRepository = require('../lib/syncState/SyncStateRepository');
-const BlockIterator = require('../lib/blockchain/BlockIterator');
+const RpcBlockIterator = require('../lib/blockchain/RpcBlockIterator');
 const StateTransitionHeaderIterator = require('../lib/blockchain/StateTransitionHeaderIterator');
 const STHeadersReader = require('../lib/blockchain/STHeadersReader');
 
@@ -30,8 +30,8 @@ async function main() {
     user: process.env.DASHCORE_JSON_RPC_USER,
     pass: process.env.DASHCORE_JSON_RPC_PASS,
   });
-  const blockIterator = new BlockIterator(rpcClient, process.env.EVO_GENESIS_BLOCK_HEIGHT);
-  const stHeaderIterator = new StateTransitionHeaderIterator(blockIterator);
+  const blockIterator = new RpcBlockIterator(rpcClient, process.env.EVO_GENESIS_BLOCK_HEIGHT);
+  const stHeaderIterator = new StateTransitionHeaderIterator(blockIterator, rpcClient);
 
   const mongoClient = await MongoClient.connect(process.env.STORAGE_MONGODB_URL);
   const mongoDb = mongoClient.db(process.env.STORAGE_MONGODB_DB);
