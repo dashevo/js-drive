@@ -10,6 +10,7 @@ const { MongoClient } = require('mongodb');
 const SyncStateRepository = require('../lib/syncState/SyncStateRepository');
 const RpcBlockIterator = require('../lib/blockchain/RpcBlockIterator');
 const StateTransitionHeaderIterator = require('../lib/blockchain/StateTransitionHeaderIterator');
+const STHeadersReaderState = require('../lib/blockchain/STHeadersReaderState');
 const STHeadersReader = require('../lib/blockchain/STHeadersReader');
 
 const attachPinSTPacketHandler = require('../lib/storage/attachPinSTPacketHandler');
@@ -30,14 +31,16 @@ async function main() {
     user: process.env.DASHCORE_JSON_RPC_USER,
     pass: process.env.DASHCORE_JSON_RPC_PASS,
   });
-  const blockIterator = new RpcBlockIterator(rpcClient, process.env.EVO_GENESIS_BLOCK_HEIGHT);
+  const blockIterator = new RpcBlockIterator(rpcClient, process.env.SYNC_EVO_GENESIS_BLOCK_HEIGHT);
   const stHeaderIterator = new StateTransitionHeaderIterator(blockIterator, rpcClient);
+  const stHeadersReaderState = new STHeadersReaderState([], process.env.SYNC_STATE_BLOCKS_LIMIT);
 
   const mongoClient = await MongoClient.connect(process.env.STORAGE_MONGODB_URL);
   const mongoDb = mongoClient.db(process.env.STORAGE_MONGODB_DB);
   const syncStateRepository = new SyncStateRepository(mongoDb);
+  syncStateRepository.populate(stHeadersReaderState);
 
-  const stHeaderReader = new STHeadersReader(stHeaderIterator, syncStateRepository.fetch());
+  const stHeaderReader = new STHeadersReader(stHeaderIterator, stHeadersReaderState);
 
   attachPinSTPacketHandler(stHeaderReader, ipfsAPI);
   attachStoreSyncStateHandler(stHeaderReader, syncStateRepository);
@@ -59,7 +62,7 @@ async function main() {
     inSync = false;
   }).catch(handleError));
 
-  zmqSocket.subscribe('zmqpubhashblock');
+  zmqSocket.subscribe('hashblock');
 }
 
 main().catch(handleError);
