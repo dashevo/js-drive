@@ -57,6 +57,9 @@ async function main() {
       return;
     }
 
+    blockIterator.setBlockHeight(blockIterator.getBlockHeight() + 1);
+    stHeaderIterator.reset(false);
+
     await stHeaderReader.read();
 
     inSync = false;
