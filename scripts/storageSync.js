@@ -10,6 +10,7 @@ const { MongoClient } = require('mongodb');
 const SyncStateRepository = require('../lib/syncState/SyncStateRepository');
 const BlockIterator = require('../lib/blockchain/BlockIterator');
 const StateTransitionHeaderIterator = require('../lib/blockchain/StateTransitionHeaderIterator');
+const STHeadersReaderState = require('../lib/blockchain/STHeadersReaderState');
 const STHeadersReader = require('../lib/blockchain/STHeadersReader');
 
 const attachPinSTPacketHandler = require('../lib/storage/attachPinSTPacketHandler');
@@ -30,7 +31,7 @@ async function main() {
     user: process.env.DASHCORE_JSON_RPC_USER,
     pass: process.env.DASHCORE_JSON_RPC_PASS,
   });
-  const blockIterator = new BlockIterator(rpcClient, process.env.EVO_GENESIS_BLOCK_HEIGHT);
+  const blockIterator = new BlockIterator(rpcClient, process.env.SYNC_EVO_START_BLOCK_HEIGHT);
   const stHeaderIterator = new StateTransitionHeaderIterator(blockIterator);
 
   const mongoClient = await MongoClient.connect(process.env.STORAGE_MONGODB_URL);
