@@ -33,12 +33,14 @@ async function main() {
   });
   const blockIterator = new BlockIterator(rpcClient, process.env.SYNC_EVO_START_BLOCK_HEIGHT);
   const stHeaderIterator = new StateTransitionHeaderIterator(blockIterator);
+  const stHeadersReaderState = new STHeadersReaderState([], process.env.SYNC_STATE_BLOCKS_LIMIT);
 
   const mongoClient = await MongoClient.connect(process.env.STORAGE_MONGODB_URL);
   const mongoDb = mongoClient.db(process.env.STORAGE_MONGODB_DB);
   const syncStateRepository = new SyncStateRepository(mongoDb);
+  syncStateRepository.populate(stHeadersReaderState);
 
-  const stHeaderReader = new STHeadersReader(stHeaderIterator, syncStateRepository.fetch());
+  const stHeaderReader = new STHeadersReader(stHeaderIterator, stHeadersReaderState);
 
   attachPinSTPacketHandler(stHeaderReader, ipfsAPI);
   attachStoreSyncStateHandler(stHeaderReader, syncStateRepository);

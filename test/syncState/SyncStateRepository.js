@@ -15,6 +15,7 @@ connectToMongoDb.setUrl(process.env.STORAGE_MONGODB_URL)
 describe('SyncStateRepository', () => {
   let mongoDb;
   let mongoCollection;
+  let stateBlocks;
   let blocks;
   let syncStateRepository;
   let stateMock;
@@ -29,8 +30,11 @@ describe('SyncStateRepository', () => {
     blocks = getBlockFixtures();
 
     stateMock = {
+      setBlocks(b) {
+        stateBlocks = b;
+      },
       getBlocks() {
-        return blocks;
+        return stateBlocks;
       },
     };
 
@@ -38,6 +42,8 @@ describe('SyncStateRepository', () => {
   });
 
   it('should store state', async () => {
+    stateMock.setBlocks(blocks);
+
     await syncStateRepository.store(stateMock);
 
     const { blocks: blocksFromMongoDb } =
@@ -46,15 +52,16 @@ describe('SyncStateRepository', () => {
     expect(blocksFromMongoDb).to.be.deep.equals(blocks);
   });
 
-  it('should fetch state', async () => {
+  it('should populate state', async () => {
     await mongoCollection.updateOne(
       SyncStateRepository.mongoDbCondition,
       { $set: { blocks } },
       { upsert: true },
     );
 
-    const stateFromMongo = await syncStateRepository.fetch();
+    const stateFromMongo = await syncStateRepository.populate(stateMock);
 
+    expect(stateFromMongo).to.be.equals(stateMock);
     expect(stateFromMongo.getBlocks()).to.be.deep.equals(blocks);
   });
 });
