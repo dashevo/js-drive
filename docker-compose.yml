@@ -1,5 +1,32 @@
-version: '3'
+version: '3.3'
 services:
+  api:
+    build:
+      args:
+        - NODE_ENV=development
+        - RUN_SCRIPT=api
+        - EXPOSE_PORTS=80 9229
+      context: .
+      dockerfile: docker/node/Dockerfile
+    image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive/api
+    depends_on:
+      - mongodb
+    environment:
+      - STORAGE_MONGODB_URL=mongodb://mongodb
+
+  sync:
+    build:
+      args:
+        - NODE_ENV=development
+        - RUN_SCRIPT=sync
+      context: .
+      dockerfile: docker/node/Dockerfile
+    image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive/sync
+    depends_on:
+      - mongodb
+    environment:
+      - STORAGE_MONGODB_URL=mongodb://mongodb
+
   mongodb:
     image: mongo:3.6
     volumes:
@@ -8,5 +35,5 @@ services:
       - 27017:27017
 
 volumes:
+  node_modules:
   mongodb:
-    driver: local
