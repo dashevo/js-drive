@@ -1,5 +1,61 @@
-version: '3'
+version: '3.3'
 services:
+  api:
+    build:
+      args:
+        - NODE_ENV=development
+        - RUN_SCRIPT=api
+        - EXPOSE_PORTS=80 9229
+      context: .
+      dockerfile: docker/node/Dockerfile
+    image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive/api
+    working_dir: ${PWD}
+    depends_on:
+      - mongodb
+      - dashcore
+      - ipfs
+    volumes:
+      - .:${PWD}:delegated
+      # this is a workaround to prevent host node_modules from accidentally getting mounted in container
+      # in case you want to use node/npm both outside container for test/lint etc. and also inside container
+      # this will overwrite the default node_modules dir in container so it won't conflict with our
+      # /node_modules location.
+      - node_modules:${PWD}/node_modules
+    ports:
+      - 80:80
+      - 9229:9229
+
+  sync:
+    build:
+      args:
+        - NODE_ENV=development
+        - RUN_SCRIPT=sync
+      context: .
+      dockerfile: docker/node/Dockerfile
+    image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive/sync
+    working_dir: ${PWD}
+    depends_on:
+      - mongodb
+      - dashcore
+      - ipfs
+    volumes:
+      - .:${PWD}:delegated
+      # this is a workaround to prevent host node_modules from accidentally getting mounted in container
+      # in case you want to use node/npm both outside container for test/lint etc. and also inside container
+      # this will overwrite the default node_modules dir in container so it won't conflict with our
+      # /node_modules location.
+      - node_modules:${PWD}/node_modules
+    ports:
+      - 9230:9229
+
+  dashcore:
+    image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashcore:develop
+    restart: always
+    volumes:
+      - ./docker/dashcore/dash.conf:/root/.dashcore/dash.conf # Make dash-cli inside the container work
+      - dashcore:/data
+    command: dashd -conf=/root/.dashcore/dash.conf -datadir=/data -regtest=1
+
   mongodb:
     image: mongo:3.6
     volumes:
@@ -7,6 +63,19 @@ services:
     ports:
       - 27017:27017
 
+  ipfs:
+    image: jbenet/go-ipfs:latest
+    command: daemon --migrate=true --offline --enable-pubsub-experiment
+    volumes:
+      - ipfs:/data/ipfs
+    ports:
+      - 5001:5001
+
 volumes:
+  node_modules:
+  dashcore:
   mongodb:
-    driver: local
+  ipfs:
+
+
+
