@@ -9,14 +9,14 @@ docker build --build-arg NODE_ENV=development \
              --build-arg RUN_SCRIPT=api \
              --build-arg EXPOSE_PORTS="80 9229" \
              -f ${DOCKER_FILE_PATH} \
-             -t ${IMAGE_TAG_PREFIX}-api \
+             -t ${IMAGE_TAG_PREFIX}/api \
              .
 
 docker build --build-arg NODE_ENV=development \
              --build-arg RUN_SCRIPT=sync \
              -f ${DOCKER_FILE_PATH} \
-             -t ${IMAGE_TAG_PREFIX}-sync \
+             -t ${IMAGE_TAG_PREFIX}/sync \
              .
 
-docker-compose push ${IMAGE_TAG_PREFIX}-api
-docker-compose push ${IMAGE_TAG_PREFIX}-sync
+docker-compose push ${IMAGE_TAG_PREFIX}/api
+docker-compose push ${IMAGE_TAG_PREFIX}/sync
