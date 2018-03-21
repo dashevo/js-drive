@@ -40,3 +40,9 @@ install:
 script:
   - npm run lint
   - npm run test
+
+deploy:
+  provider: script
+  script: bash bin/build_docker_images.sh
+  on:
+    branch: 89-automate-builds

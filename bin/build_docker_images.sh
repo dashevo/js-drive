@@ -19,5 +19,5 @@ docker build --build-arg NODE_ENV=development \
              -t ${IMAGE_TAG_PREFIX}/sync \
              .
 
-#docker-compose push ${IMAGE_TAG_PREFIX}/api
-#docker-compose push ${IMAGE_TAG_PREFIX}/sync
+docker-compose push ${IMAGE_TAG_PREFIX}/api
+docker-compose push ${IMAGE_TAG_PREFIX}/sync
