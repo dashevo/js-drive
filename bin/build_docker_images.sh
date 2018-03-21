@@ -7,7 +7,7 @@ DOCKER_FILE_PATH="docker/node/Dockerfile"
 
 docker build --build-arg NODE_ENV=development \
              --build-arg RUN_SCRIPT=api \
-             --build-arg EXPOSE_PORTS=80 9229 \
+             --build-arg EXPOSE_PORTS="80 9229" \
              -f ${DOCKER_FILE_PATH} \
              -t ${IMAGE_TAG_PREFIX}-api \
              .
