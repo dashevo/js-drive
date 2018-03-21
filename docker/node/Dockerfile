@@ -6,8 +6,6 @@ LABEL description="DashDrive Node.JS"
 RUN apk update && \
     apk --no-cache upgrade && \
     apk add --no-cache bash \
-                       file \
-                       libunwind-dev \
                        git \
                        openssh-client \
                        python \
