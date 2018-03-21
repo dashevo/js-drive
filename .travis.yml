@@ -22,15 +22,15 @@ before_install:
   - nvm use 8
 
   # Login to docker registry
-#  - pip install --user awscli
-#  - eval $(aws ecr get-login --no-include-email)
+  - pip install --user awscli
+  - eval $(aws ecr get-login --no-include-email)
 
   # Install and start docker compose
   - sudo rm /usr/local/bin/docker-compose
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
-  - docker-compose run -d mongodb
+  - docker-compose up -d
   - docker ps
 
 install:
