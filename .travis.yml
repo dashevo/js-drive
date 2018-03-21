@@ -23,7 +23,7 @@ before_install:
 
   # Login to docker registry
   - pip install --user awscli
-  - aws ecr get-login --no-include-email
+  - eval $(aws ecr get-login --no-include-email)
 
   # Install and start docker compose
   - sudo rm /usr/local/bin/docker-compose
