@@ -22,6 +22,7 @@ before_install:
   - nvm use 8
 
   # Login to docker registry
+  - pip install --user awscli
   - aws ecr get-login --no-include-email
 
   # Install and start docker compose
