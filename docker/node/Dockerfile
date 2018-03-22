@@ -12,13 +12,18 @@ RUN apk update && \
                        alpine-sdk \
                        zeromq-dev
 
+# Install dependencies first, in a different location
+# for easier app bind mounting for local development
+WORKDIR /
+COPY package.json package-lock.json ./
+ENV npm_config_zmq_external=true
+RUN npm install
+ENV PATH /node_modules/.bin:$PATH
+
 # Copy project files
 WORKDIR /usr/src/app
 COPY . /usr/src/app
 RUN mv .env.example .env
-
-ENV npm_config_zmq_external=true
-RUN npm install
 
 ARG NODE_ENV=production
 ARG RUN_SCRIPT
