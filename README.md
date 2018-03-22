@@ -30,7 +30,7 @@ npm run sync
 ### Start API
 
 ```bash
-npm run sync
+npm run api
 ```
 
 ### Run tests
