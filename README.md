@@ -24,13 +24,13 @@ docker-compose up -d
 ### Start sync process
 
 ```bash
-npm run sync
+npm run storageSync
 ```
 
 ### Start API
 
 ```bash
-npm run api
+npm run rpc
 ```
 
 ### Run tests
