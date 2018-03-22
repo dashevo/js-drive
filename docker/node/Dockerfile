@@ -15,7 +15,7 @@ RUN apk update && \
 # Copy project files
 WORKDIR /usr/src/app
 COPY . /usr/src/app
-COPY .env.example /usr/src/app/.env
+RUN mv .env.example .env
 
 ENV npm_config_zmq_external=true
 RUN npm install
