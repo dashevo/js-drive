@@ -51,6 +51,18 @@ describe('isSynced', () => {
     rpcClientMock = new RpcClientMock(this.sinon);
   });
 
+  it('should return state if IsBlockchainSynced and last block in chain is synced ', async () => {
+    const state = new SyncState(rpcClientMock.blocks, new Date());
+    syncStateRepositoryMock.fetch.returns(state);
+
+    rpcClientMock.mnsync.onCall(0).returns(Promise.resolve({ IsBlockchainSynced: false }));
+    rpcClientMock.mnsync.onCall(1).returns(Promise.resolve({ IsBlockchainSynced: true }));
+
+    const syncedState = await isSynced(rpcClientMock, changeListenerMock);
+
+    expect(state).to.be.equals(syncedState);
+  }).timeout(10000);
+
   it('should return state if last block in chain is synced', async () => {
     const state = new SyncState(rpcClientMock.blocks, new Date());
     syncStateRepositoryMock.fetch.returns(state);
@@ -106,6 +118,4 @@ describe('isSynced', () => {
       done();
     });
   });
-
-  it('should handle blockchain initial sync');
 });
