@@ -51,7 +51,7 @@ describe('isSynced', () => {
     rpcClientMock = new RpcClientMock(this.sinon);
   });
 
-  it('should return state if IsBlockchainSynced and last block in chain is synced ', async () => {
+  it('should return state if blockchain initial sync is completed and the last block in the chain is synced', async () => {
     const state = new SyncState(rpcClientMock.blocks, new Date());
     syncStateRepositoryMock.fetch.returns(state);
 
