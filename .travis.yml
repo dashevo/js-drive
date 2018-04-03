@@ -21,9 +21,8 @@ before_install:
   - nvm install 8
   - nvm use 8
 
-  # Login to docker registry
+  # Install AWS cli
   - pip install --user awscli
-  - eval $(aws ecr get-login --no-include-email)
 
   # Add token for @dashevo private npm registry
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
@@ -48,4 +47,4 @@ deploy:
   provider: script
   script: bash bin/build_docker_images.sh
   on:
-    branch: master
+    branch: 89-automate-builds
