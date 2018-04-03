@@ -15,6 +15,13 @@ RUN apk update && \
 # Install dependencies first, in a different location
 # for easier app bind mounting for local development
 WORKDIR /
+
+# Save NPM_TOKEN for allowing access to private npm organization
+ARG NPM_TOKEN
+ENV NPM_TOKEN ${NPM_TOKEN}
+RUN echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+
+# Install packages
 COPY package.json package-lock.json ./
 ENV npm_config_zmq_external=true
 RUN npm install
