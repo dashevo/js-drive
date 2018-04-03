@@ -1,23 +1,13 @@
 #!/usr/bin/env bash
 
-# source .env
 # eval $(aws ecr get-login --no-include-email)
 
-IMAGE_TAG_PREFIX="103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive"
-DOCKER_FILE_PATH="docker/node/Dockerfile"
+VERSION="0.0.1"
+REPO_URL="103738324493.dkr.ecr.us-west-2.amazonaws.com"
+IMAGE_NAME="dashevo/dashdrive"
 
 docker build --build-arg NODE_ENV=development \
-             --build-arg RUN_SCRIPT=api \
-             --build-arg EXPOSE_PORTS=80 9229 \
-             -f ${DOCKER_FILE_PATH} \
-             -t ${IMAGE_TAG_PREFIX}/api \
+             -t "${REPO_URL}/${IMAGE_NAME}" \
              .
 
-docker build --build-arg NODE_ENV=development \
-             --build-arg RUN_SCRIPT=sync \
-             -f ${DOCKER_FILE_PATH} \
-             -t ${IMAGE_TAG_PREFIX}/sync \
-             .
-
-#docker-compose push ${IMAGE_TAG_PREFIX}/api
-#docker-compose push ${IMAGE_TAG_PREFIX}/sync
+docker push "${REPO_URL}/${IMAGE_NAME}"
