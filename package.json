@@ -8,7 +8,7 @@
   "scripts": {
     "api": "node scripts/api",
     "sync": "node scripts/sync",
-    "lint": "eslint **/*.js",
+    "lint": "eslint .",
     "test": "mocha './test/**/*.spec.js'"
   },
   "repository": {
@@ -31,7 +31,7 @@
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
     "go-ipfs-dep": "^0.4.13",
-    "ipfsd-ctl": "^0.27.3",
+    "ipfsd-ctl": "^0.31.0",
     "mocha": "^4.0.1",
     "mocha-sinon": "^2.0.0",
     "multihashes": "^0.4.13",
@@ -40,8 +40,8 @@
     "sinon-chai": "^2.14.0"
   },
   "dependencies": {
+    "@dashevo/bitcoind-rpc-dash": "^1.0.1",
     "@dashevo/dash-schema": "git+ssh://git@github.com/dashevo/dash-schema.git",
-    "bitcoind-rpc-dash": "^1.0.1",
     "bitcore-lib-dash": "git+ssh://git@github.com/dashevo/bitcore-lib-dash-private.git#develop",
     "cbor": "^3.0.3",
     "cids": "^0.5.2",

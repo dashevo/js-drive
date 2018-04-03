@@ -4,7 +4,7 @@ const connect = require('connect');
 const jayson = require('jayson/promise');
 
 const { MongoClient } = require('mongodb');
-const RpcClient = require('bitcoind-rpc-dash');
+const RpcClient = require('@dashevo/bitcoind-rpc-dash/promise');
 
 const SyncStateRepository = require('../lib/sync/state/repository/SyncStateRepository');
 const SyncStateRepositoryChangeListener = require('../lib/sync/state/repository/SyncStateRepositoryChangeListener');
@@ -37,6 +37,7 @@ const rpcHandlers = require('../lib/api/rpc');
     isSynced,
     rpcClient,
     repositoryChangeListener,
+    process.env.SYNC_CHAIN_CHECK_INTERVAL,
   );
 
   const rpc = jayson.server(rpcHandlers);
