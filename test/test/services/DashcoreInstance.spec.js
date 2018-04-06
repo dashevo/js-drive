@@ -59,6 +59,7 @@ describe('DashcoreInstance', function main() {
         `-rpcuser=${DashcoreInstance.DEFAULT_OPTIONS.RPC.user}`,
         `-rpcpassword=${DashcoreInstance.DEFAULT_OPTIONS.RPC.password}`,
         '-rpcallowip=0.0.0.0/0',
+        '-regtest=1',
         `-rpcport=${DashcoreInstance.DEFAULT_OPTIONS.RPC.port}`,
         `-zmqpubhashblock=tcp://0.0.0.0:${DashcoreInstance.DEFAULT_OPTIONS.ZMQ.port}`,
       ]);
