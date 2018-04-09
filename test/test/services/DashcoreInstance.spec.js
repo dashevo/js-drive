@@ -22,37 +22,6 @@ describe('DashcoreInstance', function main() {
   before(async () => stopRunningContainers());
   afterEach(() => sandbox.restore());
 
-  describe('instance', () => {
-    it('should create an instance with the default options', () => {
-      const instance = new DashcoreInstance();
-      expect(instance.options).to.deep.equal(DashcoreInstance.DEFAULT_OPTIONS);
-    });
-
-    it('should create an instance with custom RPC options', () => {
-      const options = {
-        RPC: {
-          port: 20002,
-          user: 'test',
-          password: 'integration',
-        },
-      };
-      const instance = new DashcoreInstance(options);
-      const expected = Object.assign({}, DashcoreInstance.DEFAULT_OPTIONS, options);
-      expect(instance.options).to.deep.equal(expected);
-    });
-
-    it('should create an instance with custom ZMQ options', () => {
-      const options = {
-        ZMQ: {
-          port: 50002,
-        },
-      };
-      const instance = new DashcoreInstance(options);
-      const expected = Object.assign({}, DashcoreInstance.DEFAULT_OPTIONS, options);
-      expect(instance.options).to.deep.equal(expected);
-    });
-  });
-
   describe('usage', () => {
     const instance = new DashcoreInstance();
 
@@ -60,12 +29,12 @@ describe('DashcoreInstance', function main() {
       await instance.start();
       const { Args } = await instance.container.inspect();
       expect(Args).to.deep.equal([
-        `-rpcuser=${DashcoreInstance.DEFAULT_OPTIONS.RPC.user}`,
-        `-rpcpassword=${DashcoreInstance.DEFAULT_OPTIONS.RPC.password}`,
+        `-rpcuser=${instance.options.RPC.user}`,
+        `-rpcpassword=${instance.options.RPC.password}`,
         '-rpcallowip=0.0.0.0/0',
         '-regtest=1',
-        `-rpcport=${DashcoreInstance.DEFAULT_OPTIONS.RPC.port}`,
-        `-zmqpubhashblock=tcp://0.0.0.0:${DashcoreInstance.DEFAULT_OPTIONS.ZMQ.port}`,
+        `-rpcport=${instance.options.RPC.port}`,
+        `-zmqpubhashblock=tcp://0.0.0.0:${instance.options.ZMQ.port}`,
       ]);
     });
 
@@ -84,6 +53,25 @@ describe('DashcoreInstance', function main() {
       await instance.start();
       const { State } = await instance.container.inspect();
       expect(State.Status).to.equal('running');
+    });
+
+    it('should return ZMQ sockets configuration', () => {
+      const zmqPort = instance.options.ZMQ.port;
+      const zmqSockets = instance.getZmqSockets();
+      expect(zmqSockets).to.deep.equal({
+        hashblock: `tcp://127.0.0.1:${zmqPort}`
+      });
+    });
+
+    it('should return RPC client', () => {
+      const rpcPort = instance.options.RPC.port;
+      const rpcClient = instance.getApi();
+      expect(rpcClient.host).to.be.equal('127.0.0.1');
+      expect(rpcClient.port).to.be.equal(rpcPort);
+    });
+
+    it('should return container IP', () => {
+      expect(instance.getIp()).to.be.equal(instance.containerIp);
     });
 
     it('should clean the instance', async () => {
@@ -115,6 +103,8 @@ describe('DashcoreInstance', function main() {
     });
 
     it('should retry start container with another port if it is busy', async () => {
+      instanceTwo.options = instanceOne.options;
+      instanceThree.options = instanceOne.options;
       const instanceThreeSpy = sandbox.spy(instanceThree, 'createContainer');
 
       await instanceOne.start();
@@ -135,7 +125,8 @@ describe('DashcoreInstance', function main() {
 
       return new Promise((resolve) => {
         setTimeout(async () => {
-          const { result } = await instance.rpcClient.getinfo();
+          const rpcClient = instance.getApi();
+          const { result } = await rpcClient.getinfo();
           expect(result.version).to.equal(120300);
           resolve();
         }, 5000);
@@ -149,7 +140,8 @@ describe('DashcoreInstance', function main() {
 
       return new Promise((resolve) => {
         setTimeout(async () => {
-          const { result } = await instance.rpcClient.getinfo();
+          const rpcClient = instance.getApi();
+          const { result } = await rpcClient.getinfo();
           expect(result.version).to.equal(120300);
           resolve();
         }, 5000);
