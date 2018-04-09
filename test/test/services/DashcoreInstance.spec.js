@@ -150,15 +150,4 @@ describe('DashcoreInstance', function main() {
       });
     });
   });
-
-  describe('ZMQ', () => {
-    const instance = new DashcoreInstance();
-
-    after(async () => instance.clean());
-
-    it('should be subscribe after starting', async () => {
-      await instance.start();
-      expect(instance.zmqClient.type).to.equal('sub');
-    });
-  });
 });
