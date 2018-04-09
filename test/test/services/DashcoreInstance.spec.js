@@ -1,3 +1,4 @@
+const sinon = require('sinon');
 const { expect } = require('chai');
 const Docker = require('dockerode');
 
@@ -16,7 +17,10 @@ async function stopRunningContainers() {
 describe('DashcoreInstance', function main() {
   this.timeout(20000);
 
+  const sandbox = sinon.sandbox.create();
+
   before(async () => stopRunningContainers());
+  afterEach(() => sandbox.restore());
 
   describe('instance', () => {
     it('should create an instance with the default options', () => {
@@ -97,25 +101,27 @@ describe('DashcoreInstance', function main() {
     });
   });
 
-  describe('errors', () => {
+  describe('container ports', () => {
     const instanceOne = new DashcoreInstance();
     const instanceTwo = new DashcoreInstance();
+    const instanceThree = new DashcoreInstance();
 
     after(async () => {
       await Promise.all([
         instanceOne.clean(),
         instanceTwo.clean(),
+        instanceThree.clean(),
       ]);
     });
 
-    it('should throw exception if 2 instance start with the same options (ports)', async () => {
-      try {
-        await instanceOne.start();
-        await instanceTwo.start();
-      } catch (error) {
-        expect(error.statusCode).to.equal(500);
-        expect(error.reason).to.equal('server error');
-      }
+    it('should retry start container with another port if it is busy', async () => {
+      const instanceThreeSpy = sandbox.spy(instanceThree, 'createContainer');
+
+      await instanceOne.start();
+      await instanceTwo.start();
+      await instanceThree.start();
+
+      expect(instanceThreeSpy.callCount).to.be.equal(2);
     });
   });
 
