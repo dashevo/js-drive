@@ -4,6 +4,11 @@ const Docker = require('dockerode');
 
 const DashcoreInstance = require('../../../lib/test/services/DashcoreInstance');
 
+async function pruneNetworks() {
+  const docker = new Docker();
+  await docker.pruneNetworks();
+}
+
 async function stopRunningContainers() {
   const docker = new Docker();
   const containers = await docker.listContainers();
@@ -17,13 +22,21 @@ async function stopRunningContainers() {
 describe('DashcoreInstance', function main() {
   this.timeout(20000);
 
-  const sandbox = sinon.sandbox.create();
-
+  before(async () => pruneNetworks());
   before(async () => stopRunningContainers());
-  afterEach(() => sandbox.restore());
 
   describe('usage', () => {
     const instance = new DashcoreInstance();
+
+    it('should start an instance with a bridge dash_test_network', async () => {
+      await instance.start();
+      const { Driver } = await instance.network.inspect();
+      const { NetworkSettings: { Networks } } = await instance.container.inspect();
+      const networks = Object.keys(Networks);
+      expect(Driver).to.equal('bridge');
+      expect(networks.length).to.equal(1);
+      expect(networks[0]).to.equal('dash_test_network');
+    });
 
     it('should start an instance with the default options', async () => {
       await instance.start();
@@ -59,7 +72,7 @@ describe('DashcoreInstance', function main() {
       const zmqPort = instance.options.ZMQ.port;
       const zmqSockets = instance.getZmqSockets();
       expect(zmqSockets).to.deep.equal({
-        hashblock: `tcp://127.0.0.1:${zmqPort}`
+        hashblock: `tcp://127.0.0.1:${zmqPort}`,
       });
     });
 
@@ -94,6 +107,9 @@ describe('DashcoreInstance', function main() {
     const instanceTwo = new DashcoreInstance();
     const instanceThree = new DashcoreInstance();
 
+    const sandbox = sinon.sandbox.create();
+
+    afterEach(() => sandbox.restore());
     after(async () => {
       await Promise.all([
         instanceOne.clean(),
