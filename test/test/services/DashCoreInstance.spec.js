@@ -2,7 +2,7 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 const Docker = require('dockerode');
 
-const DashcoreInstance = require('../../../lib/test/services/DashcoreInstance');
+const DashCoreInstance = require('../../../lib/test/services/DashCoreInstance');
 
 async function pruneNetworks() {
   const docker = new Docker();
@@ -19,14 +19,14 @@ async function stopRunningContainers() {
   }
 }
 
-describe('DashcoreInstance', function main() {
+describe('DashCoreInstance', function main() {
   this.timeout(20000);
 
   before(async () => pruneNetworks());
   before(async () => stopRunningContainers());
 
   describe('usage', () => {
-    const instance = new DashcoreInstance();
+    const instance = new DashCoreInstance();
 
     it('should start an instance with a bridge dash_test_network', async () => {
       await instance.start();
@@ -105,9 +105,9 @@ describe('DashcoreInstance', function main() {
   });
 
   describe('container ports', () => {
-    const instanceOne = new DashcoreInstance();
-    const instanceTwo = new DashcoreInstance();
-    const instanceThree = new DashcoreInstance();
+    const instanceOne = new DashCoreInstance();
+    const instanceTwo = new DashCoreInstance();
+    const instanceThree = new DashCoreInstance();
 
     const sandbox = sinon.sandbox.create();
 
@@ -134,7 +134,7 @@ describe('DashcoreInstance', function main() {
   });
 
   describe('RPC', () => {
-    const instance = new DashcoreInstance();
+    const instance = new DashCoreInstance();
 
     after(async () => instance.clean());
 

@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const Docker = require('dockerode');
 
-const startDashcoreInstance = require('../../lib/test/startDashcoreInstance');
+const startDashCoreInstance = require('../../lib/test/startDashCoreInstance');
 
 async function stopRunningContainers() {
   const docker = new Docker();
@@ -13,7 +13,7 @@ async function stopRunningContainers() {
   }
 }
 
-describe('startDashcoreInstance', function main() {
+describe('startDashCoreInstance', function main() {
   this.timeout(20000);
 
   before(async () => stopRunningContainers());
@@ -22,7 +22,7 @@ describe('startDashcoreInstance', function main() {
     let instance;
 
     before(async () => {
-      instance = await startDashcoreInstance();
+      instance = await startDashCoreInstance();
     });
     after(async () => {
       await instance.clean();
@@ -46,7 +46,7 @@ describe('startDashcoreInstance', function main() {
     let instances;
 
     before(async () => {
-      instances = await startDashcoreInstance.many(3);
+      instances = await startDashCoreInstance.many(3);
     });
     after(async () => {
       const promises = instances.map(instance => instance.clean());
