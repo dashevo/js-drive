@@ -30,7 +30,9 @@ describe('DashcoreInstance', function main() {
 
     it('should start an instance with a bridge dash_test_network', async () => {
       await instance.start();
-      const { Driver } = await instance.network.inspect();
+
+      const network = new Docker().getNetwork('dash_test_network');
+      const { Driver } = await network.inspect();
       const { NetworkSettings: { Networks } } = await instance.container.inspect();
       const networks = Object.keys(Networks);
       expect(Driver).to.equal('bridge');
