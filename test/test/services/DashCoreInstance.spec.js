@@ -4,6 +4,10 @@ const Docker = require('dockerode');
 
 const DashCoreInstance = require('../../../lib/test/services/DashCoreInstance');
 
+async function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function pruneNetworks() {
   const docker = new Docker();
   await docker.pruneNetworks();
@@ -30,7 +34,6 @@ describe('DashCoreInstance', function main() {
 
     it('should start an instance with a bridge dash_test_network', async () => {
       await instance.start();
-
       const network = new Docker().getNetwork('dash_test_network');
       const { Driver } = await network.inspect();
       const { NetworkSettings: { Networks } } = await instance.container.inspect();
@@ -44,6 +47,7 @@ describe('DashCoreInstance', function main() {
       await instance.start();
       const { Args } = await instance.container.inspect();
       expect(Args).to.deep.equal([
+        `-port=${instance.options.CORE.port}`,
         `-rpcuser=${instance.options.RPC.user}`,
         `-rpcpassword=${instance.options.RPC.password}`,
         '-rpcallowip=0.0.0.0/0',
@@ -104,7 +108,48 @@ describe('DashCoreInstance', function main() {
     });
   });
 
-  describe('container ports', () => {
+  describe('networking', () => {
+    const instanceOne = new DashCoreInstance();
+    const instanceTwo = new DashCoreInstance();
+
+    before(async () => {
+      await Promise.all([
+        instanceOne.start(),
+        instanceTwo.start(),
+      ]);
+    });
+
+    it('should be connected each other', async () => {
+      await instanceOne.connect(instanceTwo);
+      await wait(2000);
+
+      const { result: peersInstanceOne } = await instanceOne.rpcClient.getPeerInfo();
+      const { result: peersInstanceTwo } = await instanceTwo.rpcClient.getPeerInfo();
+      const peerInstanceOneIp = peersInstanceOne[0].addr.split(':')[0];
+      const peerInstanceTwoIp = peersInstanceTwo[0].addr.split(':')[0];
+
+      expect(peersInstanceOne.length).to.equal(1);
+      expect(peersInstanceTwo.length).to.equal(1);
+      expect(peerInstanceOneIp).to.equal(instanceTwo.getIp());
+      expect(peerInstanceTwoIp).to.equal(instanceOne.getIp());
+    });
+
+    it('should propagate block from one instance to the other', async () => {
+      const { result: blocksInstanceOne } = await instanceOne.rpcClient.getBlockCount();
+      const { result: blocksInstanceTwo } = await instanceTwo.rpcClient.getBlockCount();
+      expect(blocksInstanceOne).to.equal(0);
+      expect(blocksInstanceTwo).to.equal(0);
+
+      await instanceOne.rpcClient.generate(2);
+
+      const { result: blocksOne } = await instanceOne.rpcClient.getBlockCount();
+      const { result: blocksTwo } = await instanceTwo.rpcClient.getBlockCount();
+      expect(blocksOne).to.equal(2);
+      expect(blocksTwo).to.equal(2);
+    });
+  });
+
+  describe('ports', () => {
     const instanceOne = new DashCoreInstance();
     const instanceTwo = new DashCoreInstance();
     const instanceThree = new DashCoreInstance();
