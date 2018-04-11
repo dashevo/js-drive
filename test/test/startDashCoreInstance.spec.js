@@ -3,6 +3,10 @@ const Docker = require('dockerode');
 
 const startDashCoreInstance = require('../../lib/test/startDashCoreInstance');
 
+async function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function stopRunningContainers() {
   const docker = new Docker();
   const containers = await docker.listContainers();
@@ -60,14 +64,19 @@ describe('startDashCoreInstance', function main() {
       }
     });
 
-    it('should have RPCs connected', async () => new Promise((resolve) => {
-      setTimeout(async () => {
-        for (let i = 0; i < 3; i++) {
-          const { result } = await instances[i].rpcClient.getinfo();
-          expect(result.version).to.equal(120300);
-        }
-        resolve();
-      }, 10000);
-    }));
+    it('should propagate blocks between instances', async () => {
+      for (let i = 0; i < 3; i++) {
+        const { result: blocks } = await instances[i].rpcClient.getBlockCount();
+        expect(blocks).to.equal(0);
+      }
+
+      await instances[0].rpcClient.generate(2);
+      await wait(10000);
+
+      for (let i = 0; i < 3; i++) {
+        const { result: blocks } = await instances[i].rpcClient.getBlockCount();
+        expect(blocks).to.equal(2);
+      }
+    });
   });
 });
