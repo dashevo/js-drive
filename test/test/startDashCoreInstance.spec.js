@@ -37,13 +37,10 @@ describe('startDashCoreInstance', function main() {
       expect(State.Status).to.equal('running');
     });
 
-    it('should has RPC connected', async () => new Promise((resolve) => {
-      setTimeout(async () => {
-        const { result } = await instance.rpcClient.getinfo();
-        expect(result.version).to.equal(120300);
-        resolve();
-      }, 5000);
-    }));
+    it('should has RPC connected', async () => {
+      const { result } = await instance.rpcClient.getInfo();
+      expect(result.version).to.equal(120300);
+    });
   });
 
   describe('Three instances', () => {

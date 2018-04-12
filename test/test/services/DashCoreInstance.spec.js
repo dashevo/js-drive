@@ -30,13 +30,14 @@ describe('DashCoreInstance', function main() {
   before(async () => stopRunningContainers());
 
   describe('before start', () => {
+    const instance = new DashCoreInstance();
+
     it('should throw an error if connect', async () => {
-      const instanceOne = new DashCoreInstance();
       const instanceTwo = new DashCoreInstance();
 
       let error;
       try {
-        await instanceOne.connect(instanceTwo);
+        await instance.connect(instanceTwo);
       } catch (err) {
         error = err;
       }
@@ -44,35 +45,29 @@ describe('DashCoreInstance', function main() {
     });
 
     it('should not crash if stop', async () => {
-      const instance = new DashCoreInstance();
       await instance.stop();
     });
 
     it('should not crash if clean', async () => {
-      const instance = new DashCoreInstance();
       await instance.clean();
     });
 
     it('should return null if getIp', () => {
-      const instance = new DashCoreInstance();
       const ip = instance.getIp();
       expect(ip).to.equal(null);
     });
 
     it('should return null if getAddress', () => {
-      const instance = new DashCoreInstance();
       const address = instance.getAddress();
       expect(address).to.equal(null);
     });
 
     it('should return empty object if getApi', () => {
-      const instance = new DashCoreInstance();
       const api = instance.getApi();
       expect(api).to.deep.equal({});
     });
 
     it('should return empty object if getZmqSocket', () => {
-      const instance = new DashCoreInstance();
       const config = instance.getZmqSockets();
       expect(config).to.deep.equal({});
     });
@@ -81,7 +76,7 @@ describe('DashCoreInstance', function main() {
   describe('usage', () => {
     const instance = new DashCoreInstance();
 
-    after();
+    after(async () => instance.clean());
 
     it('should start an instance with a bridge dash_test_network', async () => {
       await instance.start();
@@ -147,15 +142,14 @@ describe('DashCoreInstance', function main() {
     it('should clean the instance', async () => {
       await instance.clean();
 
-      return new Promise(async (resolve) => {
-        try {
-          await instance.container.inspect();
-        } catch (error) {
-          expect(error.statusCode).to.equal(404);
-          expect(error.reason).to.equal('no such container');
-          resolve();
-        }
-      });
+      let error;
+      try {
+        await instance.container.inspect();
+      } catch (err) {
+        error = err;
+      }
+      expect(error.statusCode).to.equal(404);
+      expect(error.reason).to.equal('no such container');
     });
   });
 
@@ -167,6 +161,12 @@ describe('DashCoreInstance', function main() {
       await Promise.all([
         instanceOne.start(),
         instanceTwo.start(),
+      ]);
+    });
+    after(async () => {
+      await Promise.all([
+        instanceOne.clean(),
+        instanceTwo.clean(),
       ]);
     });
 
@@ -185,7 +185,7 @@ describe('DashCoreInstance', function main() {
       expect(peerInstanceTwoIp).to.equal(instanceOne.getIp());
     });
 
-    it('should propagate block from one instance to the other', async () => {
+    it('should propagate blocks from one instance to the other', async () => {
       const { result: blocksInstanceOne } = await instanceOne.rpcClient.getBlockCount();
       const { result: blocksInstanceTwo } = await instanceTwo.rpcClient.getBlockCount();
       expect(blocksInstanceOne).to.equal(0);
@@ -237,14 +237,9 @@ describe('DashCoreInstance', function main() {
     it('should work after starting the instance', async () => {
       await instance.start();
 
-      return new Promise((resolve) => {
-        setTimeout(async () => {
-          const rpcClient = instance.getApi();
-          const { result } = await rpcClient.getinfo();
-          expect(result.version).to.equal(120300);
-          resolve();
-        }, 5000);
-      });
+      const rpcClient = instance.getApi();
+      const { result } = await rpcClient.getInfo();
+      expect(result.version).to.equal(120300);
     });
 
     it('should work after restarting the instance', async () => {
@@ -252,14 +247,9 @@ describe('DashCoreInstance', function main() {
       await instance.stop();
       await instance.start();
 
-      return new Promise((resolve) => {
-        setTimeout(async () => {
-          const rpcClient = instance.getApi();
-          const { result } = await rpcClient.getinfo();
-          expect(result.version).to.equal(120300);
-          resolve();
-        }, 5000);
-      });
+      const rpcClient = instance.getApi();
+      const { result } = await rpcClient.getInfo();
+      expect(result.version).to.equal(120300);
     });
   });
 });
