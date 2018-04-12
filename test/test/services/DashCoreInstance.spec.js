@@ -153,6 +153,44 @@ describe('DashCoreInstance', function main() {
     });
   });
 
+  describe('containers removal', () => {
+    const instanceOne = new DashCoreInstance();
+    const instanceTwo = new DashCoreInstance();
+    const instanceThree = new DashCoreInstance();
+    const sandbox = sinon.sandbox.create();
+
+    afterEach(() => sandbox.restore());
+    after(async () => {
+      await Promise.all([
+        instanceOne.clean(),
+        instanceTwo.clean(),
+        instanceThree.clean(),
+      ]);
+    });
+
+    it('should call createContainer only once when start/stop/start', async () => {
+      const createContainerSpy = sandbox.spy(instanceOne, 'createContainer');
+
+      await instanceOne.start();
+      await instanceOne.stop();
+      await instanceOne.start();
+
+      expect(createContainerSpy.callCount).to.equal(1);
+    });
+
+    it('should remove container if port if busy before creating a new one', async () => {
+      instanceTwo.options = instanceOne.options;
+      instanceThree.options = instanceOne.options;
+      const removeContainerSpy = sandbox.spy(instanceThree, 'removeContainer');
+
+      await instanceOne.start();
+      await instanceTwo.start();
+      await instanceThree.start();
+
+      expect(removeContainerSpy.callCount).to.be.equal(1);
+    });
+  });
+
   describe('networking', () => {
     const instanceOne = new DashCoreInstance();
     const instanceTwo = new DashCoreInstance();
@@ -192,6 +230,7 @@ describe('DashCoreInstance', function main() {
       expect(blocksInstanceTwo).to.equal(0);
 
       await instanceOne.rpcClient.generate(2);
+      await wait(2000);
 
       const { result: blocksOne } = await instanceOne.rpcClient.getBlockCount();
       const { result: blocksTwo } = await instanceTwo.rpcClient.getBlockCount();
