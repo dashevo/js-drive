@@ -2,7 +2,7 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 const Docker = require('dockerode');
 
-const DashCoreInstance = require('../../../lib/test/services/DashCoreInstance');
+const DashCoreInstance = require('../../../../lib/test/services/dashCore/DashCoreInstance');
 
 async function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));

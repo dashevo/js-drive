@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const Docker = require('dockerode');
 
-const startDashCoreInstance = require('../../lib/test/startDashCoreInstance');
+const startDashCoreInstance = require('../../../../lib/test/services/dashCore/startDashCoreInstance');
 
 async function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
