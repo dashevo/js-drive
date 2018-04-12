@@ -6,7 +6,7 @@ const cbor = require('cbor');
 const addStateTransitionPacket = require('../../lib/storage/addStateTransitionPacket');
 const StateTransitionPacket = require('../../lib/storage/StateTransitionPacket');
 
-const startIPFSInstance = require('../../lib/test/startIPFSInstance');
+const startIPFSInstance = require('../../lib/test/services/IPFS/startIPFSInstance');
 
 describe('addStateTransitionPacket', () => {
   let ipfsApi;
