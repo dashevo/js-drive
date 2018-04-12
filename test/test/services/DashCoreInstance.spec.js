@@ -29,8 +29,59 @@ describe('DashCoreInstance', function main() {
   before(async () => pruneNetworks());
   before(async () => stopRunningContainers());
 
+  describe('before start', () => {
+    it('should throw an error if connect', async () => {
+      const instanceOne = new DashCoreInstance();
+      const instanceTwo = new DashCoreInstance();
+
+      let error;
+      try {
+        await instanceOne.connect(instanceTwo);
+      } catch (err) {
+        error = err;
+      }
+      expect(error.message).to.equal('Instance should be started before!');
+    });
+
+    it('should not crash if stop', async () => {
+      const instance = new DashCoreInstance();
+      await instance.stop();
+    });
+
+    it('should not crash if clean', async () => {
+      const instance = new DashCoreInstance();
+      await instance.clean();
+    });
+
+    it('should return null if getIp', () => {
+      const instance = new DashCoreInstance();
+      const ip = instance.getIp();
+      expect(ip).to.equal(null);
+    });
+
+    it('should return null if getAddress', () => {
+      const instance = new DashCoreInstance();
+      const address = instance.getAddress();
+      expect(address).to.equal(null);
+    });
+
+    it('should return empty object if getApi', () => {
+      const instance = new DashCoreInstance();
+      const api = instance.getApi();
+      expect(api).to.deep.equal({});
+    });
+
+    it('should return empty object if getZmqSocket', () => {
+      const instance = new DashCoreInstance();
+      const config = instance.getZmqSockets();
+      expect(config).to.deep.equal({});
+    });
+  });
+
   describe('usage', () => {
     const instance = new DashCoreInstance();
+
+    after();
 
     it('should start an instance with a bridge dash_test_network', async () => {
       await instance.start();
