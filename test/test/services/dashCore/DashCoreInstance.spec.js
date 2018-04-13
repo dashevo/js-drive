@@ -1,5 +1,9 @@
 const sinon = require('sinon');
-const { expect } = require('chai');
+const { expect, use } = require('chai');
+const dirtyChai = require('dirty-chai');
+
+use(dirtyChai);
+
 const Docker = require('dockerode');
 
 const DashCoreInstance = require('../../../../lib/test/services/dashCore/DashCoreInstance');
@@ -54,12 +58,12 @@ describe('DashCoreInstance', function main() {
 
     it('should return null if getIp', () => {
       const ip = instance.getIp();
-      expect(ip).to.equal(null);
+      expect(ip).to.be.null();
     });
 
     it('should return null if getAddress', () => {
       const address = instance.getAddress();
-      expect(address).to.equal(null);
+      expect(address).to.be.null();
     });
 
     it('should return empty object if getApi', () => {
