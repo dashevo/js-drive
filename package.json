@@ -10,7 +10,7 @@
     "rpc": "node scripts/rpc",
     "storageSync": "node scripts/storageSync",
     "lint": "eslint .",
-    "test": "mocha './test/**/*.spec.js'"
+    "test": "mocha --file ./lib/test/bootstrap.js './test/**/*.spec.js'"
   },
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "eslint-plugin-import": "^2.8.0",
     "go-ipfs-dep": "^0.4.13",
     "ipfsd-ctl": "^0.31.0",
-    "mocha": "^4.0.1",
+    "mocha": "^5.1.0",
     "mocha-sinon": "^2.0.0",
     "multihashes": "^0.4.13",
     "proxyquire": "^1.8.0",
