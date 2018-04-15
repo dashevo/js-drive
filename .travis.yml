@@ -21,9 +21,6 @@ before_install:
   - nvm install 8
   - nvm use 8
 
-  # Install AWS cli
-  - pip install --user awscli
-
   # Add token for @dashevo private npm registry
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
@@ -42,6 +39,9 @@ install:
 script:
   - npm run lint
   - npm run test
+
+before_deploy:
+  - pip install --user awscli
 
 deploy:
   provider: script
