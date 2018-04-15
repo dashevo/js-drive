@@ -5,8 +5,7 @@ LABEL description="DashDrive Node.JS"
 
 RUN apk update && \
     apk --no-cache upgrade && \
-    apk add --no-cache bash \
-                       git \
+    apk add --no-cache git \
                        openssh-client \
                        python \
                        alpine-sdk \
@@ -15,11 +14,6 @@ RUN apk update && \
 # Install dependencies first, in a different location
 # for easier app bind mounting for local development
 WORKDIR /
-
-# Save NPM_TOKEN for allowing access to private npm organization
-ARG NPM_TOKEN
-ENV NPM_TOKEN ${NPM_TOKEN}
-RUN echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
 # Install packages
 COPY package.json package-lock.json ./
@@ -35,6 +29,4 @@ RUN mv .env.example .env
 ARG NODE_ENV=production
 ENV NODE_ENV ${NODE_ENV}
 
-EXPOSE 80 9229
-
-CMD node
+EXPOSE 6000 9229
