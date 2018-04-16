@@ -49,7 +49,7 @@ before_deploy:
   - cd ..
   - sudo rm -rf amazon-ecr-credential-helper
   - mkdir -p ~/.docker
-  - "echo '{ \"credsStore\": \"ecr-login\", \"auths\": { \"103738324493.dkr.ecr.us-west-2.amazonaws.com\": { } }' > ~/.docker/config.json"
+  - "echo '{ \"credsStore\": \"ecr-login\", \"auths\": { \"103738324493.dkr.ecr.us-west-2.amazonaws.com\": { } } }' > ~/.docker/config.json"
 
 deploy:
   provider: script
