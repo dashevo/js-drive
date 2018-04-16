@@ -49,10 +49,10 @@ before_deploy:
   - cd ..
   - sudo rm -rf amazon-ecr-credential-helper
   - mkdir -p ~/.docker
-  - echo '{ "credsStore": "ecr-login" }' > ~/.docker/config.json
+  - "echo '{ \"credsStore\": \"ecr-login\" }' > ~/.docker/config.json"
 
 deploy:
   provider: script
   script: bash bin/build_docker_images.sh
-  on:
-    branch: 89-add-credential-helper
+#  on:
+#    branch: master
