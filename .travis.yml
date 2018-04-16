@@ -54,5 +54,7 @@ before_deploy:
 deploy:
   provider: script
   script: bash bin/build_docker_images.sh
+
+
 #  on:
 #    branch: master
