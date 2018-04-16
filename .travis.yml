@@ -56,4 +56,4 @@ deploy:
   provider: script
   script: bash bin/build_docker_images.sh
   on:
-    branch: 89-add-credential-helper
+    branch: master
