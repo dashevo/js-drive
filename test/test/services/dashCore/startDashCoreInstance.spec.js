@@ -1,5 +1,3 @@
-const Docker = require('dockerode');
-
 const startDashCoreInstance = require('../../../../lib/test/services/dashCore/startDashCoreInstance');
 
 async function wait(ms) {
