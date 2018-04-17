@@ -1,9 +1,3 @@
-const sinon = require('sinon');
-const { expect, use } = require('chai');
-const dirtyChai = require('dirty-chai');
-
-use(dirtyChai);
-
 const Docker = require('dockerode');
 
 const DashCoreInstance = require('../../../../lib/test/services/dashCore/DashCoreInstance');
@@ -161,9 +155,11 @@ describe('DashCoreInstance', function main() {
     const instanceOne = new DashCoreInstance();
     const instanceTwo = new DashCoreInstance();
     const instanceThree = new DashCoreInstance();
-    const sandbox = sinon.sandbox.create();
+    let sandbox;
 
-    afterEach(() => sandbox.restore());
+    before(function before() {
+      sandbox = this.sinon;
+    });
     after(async () => {
       await Promise.all([
         instanceOne.clean(),
@@ -248,9 +244,11 @@ describe('DashCoreInstance', function main() {
     const instanceTwo = new DashCoreInstance();
     const instanceThree = new DashCoreInstance();
 
-    const sandbox = sinon.sandbox.create();
+    let sandbox;
 
-    afterEach(() => sandbox.restore());
+    before(function before() {
+      sandbox = this.sinon;
+    });
     after(async () => {
       await Promise.all([
         instanceOne.clean(),
