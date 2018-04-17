@@ -1,5 +1,3 @@
-const { expect } = require('chai');
-
 const startIPFSInstance = require('../../../../lib/test/services/IPFS/startIPFSInstance');
 
 describe('Test', () => {
