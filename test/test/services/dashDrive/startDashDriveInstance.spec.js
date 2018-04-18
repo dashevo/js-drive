@@ -430,7 +430,7 @@ class DashDriveInstance {
 }
 
 describe('DashDriveInstance', function main() {
-  this.timeout(40000);
+  this.timeout(90000);
 
   describe('before start', () => {
     const instance = new DashDriveInstance();
