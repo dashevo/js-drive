@@ -206,6 +206,9 @@ describe('DashCoreInstance', function main() {
     });
 
     it('should propagate blocks from one instance to the other', async () => {
+      await instanceOne.connect(instanceTwo);
+      await wait(2000);
+
       const { result: blocksInstanceOne } = await instanceOne.rpcClient.getBlockCount();
       const { result: blocksInstanceTwo } = await instanceTwo.rpcClient.getBlockCount();
       expect(blocksInstanceOne).to.equal(0);
