@@ -1,166 +1,29 @@
 const Docker = require('dockerode');
 
-class MongoDbInstance {
+const BaseInstance = require('../../../../lib/test/services/BaseInstance');
+
+class MongoDbInstance extends BaseInstance {
   constructor() {
+    super();
+
     this.options = this.createOptions();
-    this.image = 'mongo:3.6';
-    this.container = null;
-    this.containerIp = null;
-    this.isInitialized = false;
-  }
-
-  async start() {
-    if (this.isInitialized) {
-      return;
-    }
-    if (this.container) {
-      await this.container.start();
-      this.isInitialized = true;
-      return;
-    }
-
-    await this.createNetwork();
-    this.container = await this.createContainer();
-    const { NetworkSettings: { Networks } } = await this.container.inspect();
-    this.containerIp = Networks[this.options.NETWORK.name].IPAddress;
-
-    this.isInitialized = true;
-  }
-
-  async stop() {
-    if (!this.isInitialized) {
-      return;
-    }
-
-    await this.container.stop();
-
-    this.isInitialized = false;
-  }
-
-  async clean() {
-    if (!this.isInitialized) {
-      return;
-    }
-
-    await this.stop();
-    await this.removeContainer(this.container);
-  }
-
-  getIp() {
-    return this.containerIp;
-  }
-
-  getAddress() {
-    if (!this.isInitialized) {
-      return null;
-    }
-
-    return `${this.containerIp}:${this.options.MONGODB.port}`;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  isNetworkAlreadyCreated(error) {
-    return error.message.includes('already exists');
-  }
-
-  async removeContainer(container) {
-    await container.remove();
-    this.isInitialized = false;
-  }
-
-  async createNetwork() {
-    try {
-      const docker = new Docker();
-      await docker.createNetwork({
-        Name: this.options.NETWORK.name,
-        Driver: 'bridge',
-        CheckDuplicate: true,
-      });
-    } catch (error) {
-      if (!this.isNetworkAlreadyCreated(error)) {
-        throw error;
-      }
-    }
-  }
-
-  async pullImage() {
-    return new Promise(async (resolve, reject) => {
-      const { image } = this;
-      const docker = new Docker();
-
-      try {
-        const stream = await docker.pull(image);
-        return docker.modem.followProgress(stream, resolve);
-      } catch (error) {
-        return reject(error);
-      }
-    });
-  }
-
-  async createContainer() {
-    const { port } = this.options.MONGODB;
-
-    const ExposedPorts = {};
-    ExposedPorts[`${port}/tcp`] = {};
-
-    const PortBindings = {};
-    PortBindings[`${port}/tcp`] = [{ HostPort: port.toString() }];
-
-    const EndpointsConfig = {};
-    EndpointsConfig[this.options.NETWORK.name] = {};
-
-    await this.pullImage();
-
-    const docker = new Docker();
-    let container = await docker.createContainer({
-      Image: 'mongo:3.6',
-      ExposedPorts,
-      HostConfig: {
-        PortBindings,
-      },
-      NetworkingConfig: {
-        EndpointsConfig,
-      },
-    });
-
-    try {
-      await container.start();
-    } catch (error) {
-      if (!this.isPortAllocated(error)) {
-        throw error;
-      }
-      await this.removeContainer(container);
-      this.options = this.createOptions();
-      container = await this.createContainer(this.options);
-    }
-
-    return container;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  isPortAllocated(error) {
-    const messages = [
-      'already allocated',
-      'already in use',
-    ];
-    const errors = messages.filter(message => error.message.includes(message));
-    return errors.length;
-  }
-
-  createOptions() {
-    return {
-      MONGODB: {
-        port: this.getRandomPort(40002, 49998),
-      },
-      NETWORK: {
-        name: 'dash_test_network',
-      },
+    this.image = {
+      name: 'mongo:3.6',
     };
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  getRandomPort(min, max) {
-    return Math.floor((Math.random() * ((max - min) + 1)) + min);
+  createOptions() {
+    const mainPort = this.getRandomPort(40002, 49998);
+
+    return {
+      PORTS: {
+        MAIN_PORT: mainPort,
+      },
+      NETWORK: {
+        name: 'dash_test_network',
+        driver: 'bridge',
+      },
+    };
   }
 }
 
@@ -235,7 +98,7 @@ describe('MongoDbInstance', function main() {
     });
 
     it('should return container address', () => {
-      expect(instance.getAddress()).to.be.equal(`${instance.containerIp}:${instance.options.MONGODB.port}`);
+      expect(instance.getAddress()).to.be.equal(`${instance.containerIp}:${instance.options.PORTS.MAIN_PORT}`);
     });
 
     it('should clean the instance', async () => {
@@ -253,179 +116,27 @@ describe('MongoDbInstance', function main() {
   });
 });
 
-const ECR = require('aws-sdk/clients/ecr');
 
-class DashDriveInstance {
+class DashDriveInstance extends BaseInstance {
   constructor({ ENV = {} } = {}) {
+    super();
+
     this.options = this.createOptions();
     this.options.ENV = ENV;
-    this.image = '103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive';
-    this.container = null;
-    this.containerIp = null;
-    this.isInitialized = false;
-  }
-
-  async start() {
-    if (this.isInitialized) {
-      return;
-    }
-    if (this.container) {
-      await this.container.start();
-      this.isInitialized = true;
-      return;
-    }
-
-    await this.createNetwork();
-    this.container = await this.createContainer();
-    const { NetworkSettings: { Networks } } = await this.container.inspect();
-    this.containerIp = Networks[this.options.NETWORK.name].IPAddress;
-
-    this.isInitialized = true;
-  }
-
-  async stop() {
-    if (!this.isInitialized) {
-      return;
-    }
-
-    await this.container.stop();
-
-    this.isInitialized = false;
-  }
-
-  async clean() {
-    if (!this.isInitialized) {
-      return;
-    }
-
-    await this.stop();
-    await this.removeContainer(this.container);
-  }
-
-  getIp() {
-    return this.containerIp;
-  }
-
-  getAddress() {
-    if (!this.isInitialized) {
-      return null;
-    }
-
-    return `${this.containerIp}`;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  isNetworkAlreadyCreated(error) {
-    return error.message.includes('already exists');
-  }
-
-  async removeContainer(container) {
-    await container.remove();
-    this.isInitialized = false;
-  }
-
-  async createNetwork() {
-    try {
-      const docker = new Docker();
-      await docker.createNetwork({
-        Name: this.options.NETWORK.name,
-        Driver: 'bridge',
-        CheckDuplicate: true,
-      });
-    } catch (error) {
-      if (!this.isNetworkAlreadyCreated(error)) {
-        throw error;
-      }
-    }
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  async getAuthorizationToken() {
-    return new Promise((resolve, reject) => {
-      const ecr = new ECR({
-        region: process.env.AWS_DEFAULT_REGION,
-      });
-      ecr.getAuthorizationToken((error, authorization) => {
-        if (error) {
-          return reject(error);
-        }
-        const {
-          authorizationToken,
-          proxyEndpoint: serveraddress,
-        } = authorization.authorizationData[0];
-        const creds = Buffer.from(authorizationToken, 'base64').toString();
-        const [username, password] = creds.split(':');
-        return resolve({ username, password, serveraddress });
-      });
-    });
-  }
-
-  async pullImage() {
-    return new Promise(async (resolve, reject) => {
-      const { image } = this;
-      const docker = new Docker();
-
-      try {
-        const authorization = await this.getAuthorizationToken();
-        const stream = await docker.pull(image, { authconfig: authorization });
-        return docker.modem.followProgress(stream, resolve);
-      } catch (error) {
-        return reject(error);
-      }
-    });
-  }
-
-  async createContainer() {
-    const EndpointsConfig = {};
-    EndpointsConfig[this.options.NETWORK.name] = {};
-
-    await this.pullImage();
-
-    const docker = new Docker();
-    let container = await docker.createContainer({
-      Image: this.image,
-      Env: this.options.ENV,
-      NetworkingConfig: {
-        EndpointsConfig,
-      },
-    });
-
-    try {
-      await container.start();
-    } catch (error) {
-      if (!this.isPortAllocated(error)) {
-        throw error;
-      }
-      await this.removeContainer(container);
-      this.options = this.createOptions();
-      container = await this.createContainer(this.options);
-    }
-
-    return container;
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  isPortAllocated(error) {
-    const messages = [
-      'already allocated',
-      'already in use',
-    ];
-    const errors = messages.filter(message => error.message.includes(message));
-    return errors.length;
+    this.image = {
+      name: '103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive',
+      authorization: true,
+    };
   }
 
   // eslint-disable-next-line class-methods-use-this
   createOptions() {
     return {
+      PORTS: {},
       NETWORK: {
         name: 'dash_test_network',
       },
     };
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  getRandomPort(min, max) {
-    return Math.floor((Math.random() * ((max - min) + 1)) + min);
   }
 }
 

@@ -91,13 +91,13 @@ describe('DashCoreInstance', function main() {
       await instance.start();
       const { Args } = await instance.container.inspect();
       expect(Args).to.deep.equal([
-        `-port=${instance.options.CORE.port}`,
+        `-port=${instance.options.PORTS.MAIN_PORT}`,
         `-rpcuser=${instance.options.RPC.user}`,
         `-rpcpassword=${instance.options.RPC.password}`,
         '-rpcallowip=0.0.0.0/0',
         '-regtest=1',
-        `-rpcport=${instance.options.RPC.port}`,
-        `-zmqpubhashblock=tcp://0.0.0.0:${instance.options.ZMQ.port}`,
+        `-rpcport=${instance.options.PORTS.RPC}`,
+        `-zmqpubhashblock=tcp://0.0.0.0:${instance.options.PORTS.ZMQ}`,
       ]);
     });
 
@@ -119,7 +119,7 @@ describe('DashCoreInstance', function main() {
     });
 
     it('should return ZMQ sockets configuration', () => {
-      const zmqPort = instance.options.ZMQ.port;
+      const zmqPort = instance.options.PORTS.ZMQ;
       const zmqSockets = instance.getZmqSockets();
       expect(zmqSockets).to.deep.equal({
         hashblock: `tcp://127.0.0.1:${zmqPort}`,
@@ -127,7 +127,7 @@ describe('DashCoreInstance', function main() {
     });
 
     it('should return RPC client', () => {
-      const rpcPort = instance.options.RPC.port;
+      const rpcPort = instance.options.PORTS.RPC;
       const rpcClient = instance.getApi();
       expect(rpcClient.host).to.be.equal('127.0.0.1');
       expect(rpcClient.port).to.be.equal(rpcPort);
