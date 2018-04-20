@@ -54,7 +54,7 @@ describe('DashDriveInstance', function main() {
       await instance.start();
       const network = new Docker().getNetwork('dash_test_network');
       const { Driver } = await network.inspect();
-      const { NetworkSettings: { Networks } } = await instance.container.inspect();
+      const { NetworkSettings: { Networks } } = await instance.container.details();
       const networks = Object.keys(Networks);
       expect(Driver).to.equal('bridge');
       expect(networks.length).to.equal(1);
@@ -68,7 +68,7 @@ describe('DashDriveInstance', function main() {
 
     it('should start an instance with custom environment variables', async () => {
       await instance.start();
-      const { Config: { Env } } = await instance.container.inspect();
+      const { Config: { Env } } = await instance.container.details();
 
       const instanceEnv = Env.filter(variable => ENV.includes(variable));
       expect(ENV.length).to.deep.equal(instanceEnv.length);
@@ -76,19 +76,19 @@ describe('DashDriveInstance', function main() {
 
     it('should start an instance with the default options', async () => {
       await instance.start();
-      const { Args } = await instance.container.inspect();
+      const { Args } = await instance.container.details();
       expect(Args).to.deep.equal(['run', 'sync']);
     });
 
     it('should stop the instance', async () => {
       await instance.stop();
-      const { State } = await instance.container.inspect();
+      const { State } = await instance.container.details();
       expect(State.Status).to.equal('exited');
     });
 
     it('should start after stop', async () => {
       await instance.start();
-      const { State } = await instance.container.inspect();
+      const { State } = await instance.container.details();
       expect(State.Status).to.equal('running');
     });
 
@@ -105,7 +105,7 @@ describe('DashDriveInstance', function main() {
 
       let error;
       try {
-        await instance.container.inspect();
+        await instance.container.details();
       } catch (err) {
         error = err;
       }

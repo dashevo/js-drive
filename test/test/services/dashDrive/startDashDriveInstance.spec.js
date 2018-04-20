@@ -11,17 +11,17 @@ describe('startDashDriveInstance', function main() {
     });
 
     it('should has MongoDb container running', async () => {
-      const { State } = await instance.mongoDb.container.inspect();
+      const { State } = await instance.mongoDb.container.details();
       expect(State.Status).to.equal('running');
     });
 
     it('should has DashDrive container running', async () => {
-      const { State } = await instance.dashDrive.container.inspect();
+      const { State } = await instance.dashDrive.container.details();
       expect(State.Status).to.equal('running');
     });
 
     it('should has DashDrive container has the right MongoDb address', async () => {
-      const { Config: { Env } } = await instance.dashDrive.container.inspect();
+      const { Config: { Env } } = await instance.dashDrive.container.details();
       const expectedEnv = `STORAGE_MONGODB_URL=mongodb://${instance.mongoDb.getAddress()}`;
       const mongoAddressVariable = Env.filter(variable => variable === expectedEnv);
       expect(mongoAddressVariable.length).to.equal(1);
@@ -30,10 +30,10 @@ describe('startDashDriveInstance', function main() {
     it('should be on the same network (DashDrive and MongoDb)', async () => {
       const {
         NetworkSettings: dashDriveNetworkSettings,
-      } = await instance.dashDrive.container.inspect();
+      } = await instance.dashDrive.container.details();
       const {
         NetworkSettings: mongoDbNetworkSettings,
-      } = await instance.mongoDb.container.inspect();
+      } = await instance.mongoDb.container.details();
 
       expect(Object.keys(dashDriveNetworkSettings.Networks)).to.deep.equal(['dash_test_network']);
       expect(Object.keys(mongoDbNetworkSettings.Networks)).to.deep.equal(['dash_test_network']);
@@ -49,14 +49,14 @@ describe('startDashDriveInstance', function main() {
 
     it('should have MongoDb containers running', async () => {
       for (let i = 0; i < 3; i++) {
-        const { State } = await instances[i].mongoDb.container.inspect();
+        const { State } = await instances[i].mongoDb.container.details();
         expect(State.Status).to.equal('running');
       }
     });
 
     it('should have DashDrive containers running', async () => {
       for (let i = 0; i < 3; i++) {
-        const { State } = await instances[i].dashDrive.container.inspect();
+        const { State } = await instances[i].dashDrive.container.details();
         expect(State.Status).to.equal('running');
       }
     });
