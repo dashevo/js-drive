@@ -37,7 +37,7 @@ describe('DashCoreInstance', function main() {
       expect(ip).to.be.null();
     });
 
-    xit('should return null if getAddress', () => {
+    it('should return null if getAddress', () => {
       const address = instance.getAddress();
       expect(address).to.be.null();
     });
@@ -139,7 +139,7 @@ describe('DashCoreInstance', function main() {
     const instanceThree = new DashCoreInstance();
     let sandbox;
 
-    before(function before() {
+    beforeEach(function before() {
       sandbox = this.sinon;
     });
     after(async () => {
@@ -150,8 +150,8 @@ describe('DashCoreInstance', function main() {
       ]);
     });
 
-    xit('should call createContainer only once when start/stop/start', async () => {
-      const createContainerSpy = sandbox.spy(instanceOne, 'createContainer');
+    it('should call createContainer only once when start/stop/start', async () => {
+      const createContainerSpy = sandbox.spy(instanceOne.container, 'create');
 
       await instanceOne.start();
       await instanceOne.stop();
@@ -160,10 +160,10 @@ describe('DashCoreInstance', function main() {
       expect(createContainerSpy.callCount).to.equal(1);
     });
 
-    xit('should remove container if port if busy before creating a new one', async () => {
-      instanceTwo.options = instanceOne.options;
-      instanceThree.options = instanceOne.options;
-      const removeContainerSpy = sandbox.spy(instanceThree, 'removeContainer');
+    it('should remove container if port if busy before creating a new one', async () => {
+      instanceTwo.container.options = instanceOne.container.options;
+      instanceThree.container.options = instanceOne.container.options;
+      const removeContainerSpy = sandbox.spy(instanceThree.container, 'removeContainer');
 
       await instanceOne.start();
       await instanceTwo.start();
@@ -190,7 +190,7 @@ describe('DashCoreInstance', function main() {
       ]);
     });
 
-    xit('should be connected each other', async () => {
+    it('should be connected each other', async () => {
       await instanceOne.connect(instanceTwo);
       await wait(2000);
 
@@ -206,9 +206,6 @@ describe('DashCoreInstance', function main() {
     });
 
     it('should propagate blocks from one instance to the other', async () => {
-      await instanceOne.connect(instanceTwo);
-      await wait(2000);
-
       const { result: blocksInstanceOne } = await instanceOne.rpcClient.getBlockCount();
       const { result: blocksInstanceTwo } = await instanceTwo.rpcClient.getBlockCount();
       expect(blocksInstanceOne).to.equal(0);
@@ -231,7 +228,7 @@ describe('DashCoreInstance', function main() {
 
     let sandbox;
 
-    before(function before() {
+    beforeEach(function before() {
       sandbox = this.sinon;
     });
     after(async () => {
@@ -242,10 +239,10 @@ describe('DashCoreInstance', function main() {
       ]);
     });
 
-    xit('should retry start container with another port if it is busy', async () => {
-      instanceTwo.options = instanceOne.options;
-      instanceThree.options = instanceOne.options;
-      const instanceThreeSpy = sandbox.spy(instanceThree, 'createContainer');
+    it('should retry start container with another port if it is busy', async () => {
+      instanceTwo.container.options = instanceOne.container.options;
+      instanceThree.container.options = instanceOne.container.options;
+      const instanceThreeSpy = sandbox.spy(instanceThree.container, 'create');
 
       await instanceOne.start();
       await instanceTwo.start();

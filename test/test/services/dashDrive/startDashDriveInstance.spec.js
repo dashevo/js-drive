@@ -2,21 +2,37 @@ const Docker = require('dockerode');
 
 const BaseInstance = require('../../../../lib/test/services/BaseInstance');
 
+function getRandomPort(min, max) {
+  return Math.floor((Math.random() * ((max - min) + 1)) + min);
+}
+
+class MongoDbInstanceOptions {
+  constructor() {
+    this.image = {
+      name: 'mongo:3.6',
+      authorization: false,
+    };
+    this.cmd = [];
+    this.ports = {
+      MAIN_PORT: getRandomPort(50002, 59998),
+    };
+    this.network = {
+      name: 'dash_test_network',
+      driver: 'brigde',
+    };
+  }
+
+  generate() {
+    this.ports = {
+      MAIN_PORT: getRandomPort(50002, 59998),
+    };
+    return this;
+  }
+}
+
 class MongoDbInstance extends BaseInstance {
   constructor() {
-    const options = {
-      ports: {
-        MAIN_PORT: 40002,
-      },
-      image: {
-        name: 'mongo:3.6',
-      },
-      network: {
-        name: 'dash_test_network',
-        driver: 'bridge',
-      },
-    };
-    super(options);
+    super(new MongoDbInstanceOptions());
   }
 }
 
@@ -34,12 +50,12 @@ describe('MongoDbInstance', function main() {
       await instance.clean();
     });
 
-    xit('should return null if getIp', () => {
+    it('should return null if getIp', () => {
       const ip = instance.getIp();
       expect(ip).to.be.null();
     });
 
-    xit('should return null if getAddress', () => {
+    it('should return null if getAddress', () => {
       const address = instance.getAddress();
       expect(address).to.be.null();
     });
@@ -109,21 +125,33 @@ describe('MongoDbInstance', function main() {
   });
 });
 
+class DashDriveInstanceOptions {
+  constructor({ envs }) {
+    this.image = {
+      name: '103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive',
+      authorization: true,
+    };
+    this.envs = envs;
+    this.cmd = [
+      'npm',
+      'run',
+      'sync',
+    ];
+    this.ports = {};
+    this.network = {
+      name: 'dash_test_network',
+      driver: 'brigde',
+    };
+  }
+
+  generate() {
+    return this;
+  }
+}
 
 class DashDriveInstance extends BaseInstance {
   constructor({ ENV = {} } = {}) {
-    const options = {
-      cmd: ['npm', 'run', 'sync'],
-      envs: ENV,
-      network: {
-        name: 'dash_test_network',
-      },
-      image: {
-        name: '103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive',
-        authorization: true,
-      },
-    };
-    super(options);
+    super(new DashDriveInstanceOptions({ envs: ENV }));
   }
 }
 
@@ -141,12 +169,12 @@ describe('DashDriveInstance', function main() {
       await instance.clean();
     });
 
-    xit('should return null if getIp', () => {
+    it('should return null if getIp', () => {
       const ip = instance.getIp();
       expect(ip).to.be.null();
     });
 
-    xit('should return null if getAddress', () => {
+    it('should return null if getAddress', () => {
       const address = instance.getAddress();
       expect(address).to.be.null();
     });
