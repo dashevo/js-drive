@@ -96,10 +96,6 @@ describe('DashDriveInstance', function main() {
       expect(instance.getIp()).to.be.equal(instance.container.getIp());
     });
 
-    it('should return container address', () => {
-      expect(instance.getAddress()).to.be.equal(`${instance.container.getIp()}`);
-    });
-
     it('should clean the instance', async () => {
       await instance.clean();
 

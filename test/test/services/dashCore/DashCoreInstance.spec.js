@@ -37,11 +37,6 @@ describe('DashCoreInstance', function main() {
       expect(ip).to.be.null();
     });
 
-    it('should return null if getAddress', () => {
-      const address = instance.getAddress();
-      expect(address).to.be.null();
-    });
-
     it('should return empty object if getApi', () => {
       const api = instance.getApi();
       expect(api).to.deep.equal({});
