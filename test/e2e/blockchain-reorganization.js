@@ -25,8 +25,4 @@ describe('Blockchain reorganization', function() {
       // TODO: wait until data is synced with the first node
     });
   });
-
-  after('cleanup', function() {
-    // TODO: probably we should clean after test?
-  });
 });

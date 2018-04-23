@@ -23,8 +23,4 @@ describe('Replication', function() {
       // TODO: check data is same?
     });
   });
-
-  after('cleanup', function() {
-    // TODO: probably we should clean after test?
-  });
 });

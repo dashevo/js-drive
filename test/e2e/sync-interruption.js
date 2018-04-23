@@ -19,8 +19,4 @@ describe('Sync interruption and resume', function() {
       // TODO: check sync started from saved state
     });
   });
-
-  after('cleanup', function() {
-    // TODO: probably we should clean after test?
-  });
 });

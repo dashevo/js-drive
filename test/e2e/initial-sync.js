@@ -25,8 +25,4 @@ describe('Initial sync', function() {
       // TODO: check if data is correct
     });
   });
-
-  after('cleanup', function() {
-    // TODO: probably we should clean after test?
-  });
 });
