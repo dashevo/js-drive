@@ -4,19 +4,17 @@ describe('Sync interruption and resume', function() {
     // TODO: start master node #1
   });
 
-  describe('Dash Drive [Master Node #1]', function() {
-    it('should save sync state and continue from saved point after resume', function() {
-      // TODO: generate some blocks
+  it('Dash Drive should save sync state and continue from saved point after resume', function() {
+    // TODO: generate some blocks
 
-      // TODO: wait until Dash Drive start sync
+    // TODO: wait until Dash Drive start sync
 
-      // TODO: save current state
+    // TODO: save current state
 
-      // TODO: kill sync process
+    // TODO: kill sync process
 
-      // TODO: resume sync process
+    // TODO: resume sync process
 
-      // TODO: check sync started from saved state
-    });
+    // TODO: check sync started from saved state
   });
 });
