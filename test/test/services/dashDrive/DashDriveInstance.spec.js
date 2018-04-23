@@ -20,11 +20,6 @@ describe('DashDriveInstance', function main() {
       const ip = instance.getIp();
       expect(ip).to.be.null();
     });
-
-    it('should return null if getAddress', () => {
-      const address = instance.getAddress();
-      expect(address).to.be.null();
-    });
   });
 
   describe('usage', () => {
