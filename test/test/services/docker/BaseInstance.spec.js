@@ -2,6 +2,7 @@ const Docker = require('dockerode');
 
 const DashCoreInstanceOptions = require('../../../../lib/test/services/dashCore/DashCoreInstanceOptions');
 const Network = require('../../../../lib/test/services/docker/Network');
+const EcrRegistry = require('../../../../lib/test/services/docker/EcrRegistry');
 const Image = require('../../../../lib/test/services/docker/Image');
 const Container = require('../../../../lib/test/services/docker/Container');
 const BaseInstance = require('../../../../lib/test/services/docker/BaseInstance');
@@ -13,7 +14,8 @@ describe('BaseInstance', function main() {
 
   describe('usage', () => {
     const network = new Network(options);
-    const image = new Image(options);
+    const registry = new EcrRegistry(process.env.AWS_DEFAULT_REGION);
+    const image = new Image(options, registry);
     const container = new Container(options);
     const instance = new BaseInstance(network, image, container);
 
