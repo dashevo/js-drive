@@ -1,6 +1,9 @@
 const Docker = require('dockerode');
 
 const DashCoreInstanceOptions = require('../../../../lib/test/services/dashCore/DashCoreInstanceOptions');
+const Network = require('../../../../lib/test/services/docker/Network');
+const Image = require('../../../../lib/test/services/docker/Image');
+const Container = require('../../../../lib/test/services/docker/Container');
 const BaseInstance = require('../../../../lib/test/services/docker/BaseInstance');
 
 describe('BaseInstance', function main() {
@@ -9,14 +12,17 @@ describe('BaseInstance', function main() {
   const options = new DashCoreInstanceOptions();
 
   describe('usage', () => {
-    const instance = new BaseInstance(options);
+    const network = new Network(options);
+    const image = new Image(options);
+    const container = new Container(options);
+    const instance = new BaseInstance(network, image, container);
 
     after(async () => instance.clean());
 
     it('should start a BaseInstance with DashCoreInstanceOptions network options', async () => {
       await instance.start();
-      const network = new Docker().getNetwork(options.getNetworkName());
-      const { Driver } = await network.inspect();
+      const dockerNetwork = new Docker().getNetwork(options.getNetworkName());
+      const { Driver } = await dockerNetwork.inspect();
       const { NetworkSettings: { Networks } } = await instance.container.details();
       const networks = Object.keys(Networks);
       expect(Driver).to.equal(options.getNetworkDriver());

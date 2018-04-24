@@ -1,8 +1,8 @@
 const Docker = require('dockerode');
 
-const DashDriveInstance = require('../../../../lib/test/services/dashDrive/DashDriveInstance');
+const DashDriveInstanceFactory = require('../../../../lib/test/services/dashDrive/DashDriveInstanceFactory');
 
-describe('DashDriveInstance', function main() {
+describe('DashDriveInstanceFactory', function main() {
   this.timeout(90000);
 
   describe('usage', () => {
@@ -22,7 +22,7 @@ describe('DashDriveInstance', function main() {
       'SYNC_STATE_CHECK_INTERVAL=10',
       'SYNC_CHAIN_CHECK_INTERVAL=5',
     ];
-    const instance = new DashDriveInstance({
+    const instance = DashDriveInstanceFactory.create({
       ENV,
     });
 

@@ -1,19 +1,19 @@
 const Docker = require('dockerode');
 
-const DashCoreInstance = require('../../../../lib/test/services/dashCore/DashCoreInstance');
+const DashCoreInstanceFactory = require('../../../../lib/test/services/dashCore/DashCoreInstanceFactory');
 
 async function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-describe('DashCoreInstance', function main() {
+describe('DashCoreInstanceFactory', function main() {
   this.timeout(40000);
 
   describe('before start', () => {
-    const instance = new DashCoreInstance();
+    const instance = DashCoreInstanceFactory.create();
 
     it('should throw an error if connect', async () => {
-      const instanceTwo = new DashCoreInstance();
+      const instanceTwo = DashCoreInstanceFactory.create();
 
       let error;
       try {
@@ -36,7 +36,7 @@ describe('DashCoreInstance', function main() {
   });
 
   describe('usage', () => {
-    const instance = new DashCoreInstance();
+    const instance = DashCoreInstanceFactory.create();
 
     after(async () => instance.clean());
 
@@ -55,18 +55,18 @@ describe('DashCoreInstance', function main() {
       await instance.start();
       const { Args } = await instance.container.details();
       expect(Args).to.deep.equal([
-        `-port=${instance.options.ports.MAIN_PORT}`,
-        `-rpcuser=${instance.options.rpc.user}`,
-        `-rpcpassword=${instance.options.rpc.password}`,
+        `-port=${instance.container.options.ports.MAIN_PORT}`,
+        `-rpcuser=${instance.container.options.rpc.user}`,
+        `-rpcpassword=${instance.container.options.rpc.password}`,
         '-rpcallowip=0.0.0.0/0',
         '-regtest=1',
-        `-rpcport=${instance.options.ports.RPC}`,
-        `-zmqpubhashblock=tcp://0.0.0.0:${instance.options.ports.ZMQ}`,
+        `-rpcport=${instance.container.options.ports.RPC}`,
+        `-zmqpubhashblock=tcp://0.0.0.0:${instance.container.options.ports.ZMQ}`,
       ]);
     });
 
     it('should return ZMQ sockets configuration', () => {
-      const zmqPort = instance.options.ports.ZMQ;
+      const zmqPort = instance.container.options.ports.ZMQ;
       const zmqSockets = instance.getZmqSockets();
       expect(zmqSockets).to.deep.equal({
         hashblock: `tcp://127.0.0.1:${zmqPort}`,
@@ -74,7 +74,7 @@ describe('DashCoreInstance', function main() {
     });
 
     it('should return RPC client', () => {
-      const rpcPort = instance.options.ports.RPC;
+      const rpcPort = instance.container.options.ports.RPC;
       const rpcClient = instance.getApi();
       expect(rpcClient.host).to.be.equal('127.0.0.1');
       expect(rpcClient.port).to.be.equal(rpcPort);
@@ -82,8 +82,8 @@ describe('DashCoreInstance', function main() {
   });
 
   describe('networking', () => {
-    const instanceOne = new DashCoreInstance();
-    const instanceTwo = new DashCoreInstance();
+    const instanceOne = DashCoreInstanceFactory.create();
+    const instanceTwo = DashCoreInstanceFactory.create();
 
     before(async () => {
       await Promise.all([
@@ -130,7 +130,7 @@ describe('DashCoreInstance', function main() {
   });
 
   describe('RPC', () => {
-    const instance = new DashCoreInstance();
+    const instance = DashCoreInstanceFactory.create();
 
     after(async () => instance.clean());
 

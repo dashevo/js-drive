@@ -1,11 +1,11 @@
 const Docker = require('dockerode');
-const MongoDbInstance = require('../../../../lib/test/services/mongoDb/MongoDbInstance');
+const MongoDbInstanceFactory = require('../../../../lib/test/services/mongoDb/MongoDbInstanceFactory');
 
-describe('MongoDbInstance', function main() {
+describe('MongoDbInstanceFactory', function main() {
   this.timeout(40000);
 
   describe('usage', () => {
-    const instance = new MongoDbInstance();
+    const instance = MongoDbInstanceFactory.create();
 
     after(async () => instance.clean());
 
