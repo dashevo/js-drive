@@ -1,11 +1,3 @@
-const { expect, use } = require('chai');
-const sinon = require('sinon');
-const sinonChai = require('sinon-chai');
-const dirtyChai = require('dirty-chai');
-
-use(dirtyChai);
-use(sinonChai);
-
 const RpcClientMock = require('../../../lib/test/mock/RpcClientMock');
 const RpcBlockIterator = require('../../../lib/blockchain/iterator/RpcBlockIterator');
 const StateTransitionHeaderIterator = require('../../../lib/blockchain/iterator/StateTransitionHeaderIterator');
@@ -21,20 +13,15 @@ describe('STHeadersReader', () => {
   function setWrongBlockOnCall(s, callCount) {
     const wrongBlock = Object.assign({}, rpcClientMock.blocks[3]);
     wrongBlock.previousblockhash = 'wrong';
-    const rpcMock = blockIterator.promisifiedRpcClient;
-    s.stub(rpcMock, 'getBlock');
-    rpcMock.getBlock.onCall(callCount).returns({ result: wrongBlock }).callThrough();
+    const rpcMock = blockIterator.rpcClient;
+    rpcMock.getBlock.onCall(callCount)
+      .returns(Promise.resolve({ result: wrongBlock }))
+      .callThrough();
 
     return wrongBlock;
   }
 
   beforeEach(function beforeEach() {
-    if (!this.sinon) {
-      this.sinon = sinon.sandbox.create();
-    } else {
-      this.sinon.restore();
-    }
-
     rpcClientMock = new RpcClientMock(this.sinon);
     blockIterator = new RpcBlockIterator(rpcClientMock);
     stateTransitionHeaderIterator = new StateTransitionHeaderIterator(blockIterator, rpcClientMock);
@@ -45,7 +32,7 @@ describe('STHeadersReader', () => {
     reader = new STHeadersReader(stateTransitionHeaderIterator, readerState);
   });
 
-  it("should set blockIterator's block height to last block from state + 1", () => {
+  it('should set blockIterator\'s block height to last block from state + 1', () => {
     expect(blockIterator.getBlockHeight(), reader.state.getLastBlock().height + 1);
   });
 

@@ -1,13 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-const { expect } = require('chai');
 const cbor = require('cbor');
 const crypto = require('crypto');
 const mh = require('multihashes');
 
 const generateObjectMultihash = require('../../../lib/storage/ipfs/generateObjectMultihash');
 
-const startIPFSInstance = require('../../../lib/test/startIPFSInstance');
+const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInstance');
 
 const packetsJSON = fs.readFileSync(path.join(__dirname, '/../../fixtures/stateTransitionPackets.json'));
 const packetsData = JSON.parse(packetsJSON);

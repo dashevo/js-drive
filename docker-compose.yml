@@ -76,6 +76,3 @@ volumes:
   dashcore:
   mongodb:
   ipfs:
-
-
-
