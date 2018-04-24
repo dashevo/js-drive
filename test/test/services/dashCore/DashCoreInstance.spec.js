@@ -24,19 +24,6 @@ describe('DashCoreInstance', function main() {
       expect(error.message).to.equal('Instance should be started before!');
     });
 
-    it('should not crash if stop', async () => {
-      await instance.stop();
-    });
-
-    it('should not crash if clean', async () => {
-      await instance.clean();
-    });
-
-    it('should return null if getIp', () => {
-      const ip = instance.getIp();
-      expect(ip).to.be.null();
-    });
-
     it('should return empty object if getApi', () => {
       const api = instance.getApi();
       expect(api).to.deep.equal({});
@@ -78,23 +65,6 @@ describe('DashCoreInstance', function main() {
       ]);
     });
 
-    it('should not crash if start is called multiple times', async () => {
-      await instance.start();
-      await instance.start();
-    });
-
-    it('should stop the instance', async () => {
-      await instance.stop();
-      const { State } = await instance.container.details();
-      expect(State.Status).to.equal('exited');
-    });
-
-    it('should start after stop', async () => {
-      await instance.start();
-      const { State } = await instance.container.details();
-      expect(State.Status).to.equal('running');
-    });
-
     it('should return ZMQ sockets configuration', () => {
       const zmqPort = instance.options.ports.ZMQ;
       const zmqSockets = instance.getZmqSockets();
@@ -108,63 +78,6 @@ describe('DashCoreInstance', function main() {
       const rpcClient = instance.getApi();
       expect(rpcClient.host).to.be.equal('127.0.0.1');
       expect(rpcClient.port).to.be.equal(rpcPort);
-    });
-
-    it('should return container IP', () => {
-      expect(instance.getIp()).to.be.equal(instance.container.getIp());
-    });
-
-    it('should clean the instance', async () => {
-      await instance.clean();
-
-      let error;
-      try {
-        await instance.container.details();
-      } catch (err) {
-        error = err;
-      }
-      expect(error.statusCode).to.equal(404);
-      expect(error.reason).to.equal('no such container');
-    });
-  });
-
-  describe('containers removal', () => {
-    const instanceOne = new DashCoreInstance();
-    const instanceTwo = new DashCoreInstance();
-    const instanceThree = new DashCoreInstance();
-    let sandbox;
-
-    beforeEach(function before() {
-      sandbox = this.sinon;
-    });
-    after(async () => {
-      await Promise.all([
-        instanceOne.clean(),
-        instanceTwo.clean(),
-        instanceThree.clean(),
-      ]);
-    });
-
-    it('should call createContainer only once when start/stop/start', async () => {
-      const createContainerSpy = sandbox.spy(instanceOne.container, 'create');
-
-      await instanceOne.start();
-      await instanceOne.stop();
-      await instanceOne.start();
-
-      expect(createContainerSpy.callCount).to.equal(1);
-    });
-
-    it('should remove container if port if busy before creating a new one', async () => {
-      instanceTwo.container.options = instanceOne.container.options;
-      instanceThree.container.options = instanceOne.container.options;
-      const removeContainerSpy = sandbox.spy(instanceThree.container, 'removeContainer');
-
-      await instanceOne.start();
-      await instanceTwo.start();
-      await instanceThree.start();
-
-      expect(removeContainerSpy.callCount).to.be.equal(1);
     });
   });
 
@@ -213,37 +126,6 @@ describe('DashCoreInstance', function main() {
       const { result: blocksTwo } = await instanceTwo.rpcClient.getBlockCount();
       expect(blocksOne).to.equal(2);
       expect(blocksTwo).to.equal(2);
-    });
-  });
-
-  describe('ports', () => {
-    const instanceOne = new DashCoreInstance();
-    const instanceTwo = new DashCoreInstance();
-    const instanceThree = new DashCoreInstance();
-
-    let sandbox;
-
-    beforeEach(function before() {
-      sandbox = this.sinon;
-    });
-    after(async () => {
-      await Promise.all([
-        instanceOne.clean(),
-        instanceTwo.clean(),
-        instanceThree.clean(),
-      ]);
-    });
-
-    it('should retry start container with another port if it is busy', async () => {
-      instanceTwo.container.options = instanceOne.container.options;
-      instanceThree.container.options = instanceOne.container.options;
-      const instanceThreeSpy = sandbox.spy(instanceThree.container, 'create');
-
-      await instanceOne.start();
-      await instanceTwo.start();
-      await instanceThree.start();
-
-      expect(instanceThreeSpy.callCount).to.be.equal(2);
     });
   });
 

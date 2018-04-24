@@ -5,23 +5,6 @@ const DashDriveInstance = require('../../../../lib/test/services/dashDrive/DashD
 describe('DashDriveInstance', function main() {
   this.timeout(90000);
 
-  describe('before start', () => {
-    const instance = new DashDriveInstance();
-
-    it('should not crash if stop', async () => {
-      await instance.stop();
-    });
-
-    it('should not crash if clean', async () => {
-      await instance.clean();
-    });
-
-    it('should return null if getIp', () => {
-      const ip = instance.getIp();
-      expect(ip).to.be.null();
-    });
-  });
-
   describe('usage', () => {
     const ENV = [
       'API_RPC_PORT=6000',
@@ -56,11 +39,6 @@ describe('DashDriveInstance', function main() {
       expect(networks[0]).to.equal('dash_test_network');
     });
 
-    it('should not crash if start is called multiple times', async () => {
-      await instance.start();
-      await instance.start();
-    });
-
     it('should start an instance with custom environment variables', async () => {
       await instance.start();
       const { Config: { Env } } = await instance.container.details();
@@ -73,35 +51,6 @@ describe('DashDriveInstance', function main() {
       await instance.start();
       const { Args } = await instance.container.details();
       expect(Args).to.deep.equal(['run', 'sync']);
-    });
-
-    it('should stop the instance', async () => {
-      await instance.stop();
-      const { State } = await instance.container.details();
-      expect(State.Status).to.equal('exited');
-    });
-
-    it('should start after stop', async () => {
-      await instance.start();
-      const { State } = await instance.container.details();
-      expect(State.Status).to.equal('running');
-    });
-
-    it('should return container IP', () => {
-      expect(instance.getIp()).to.be.equal(instance.container.getIp());
-    });
-
-    it('should clean the instance', async () => {
-      await instance.clean();
-
-      let error;
-      try {
-        await instance.container.details();
-      } catch (err) {
-        error = err;
-      }
-      expect(error.statusCode).to.equal(404);
-      expect(error.reason).to.equal('no such container');
     });
   });
 });
