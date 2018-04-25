@@ -55,7 +55,7 @@ describe('Container', function main() {
         '-rpcallowip=0.0.0.0/0',
         '-regtest=1',
         `-rpcport=${options.getRpcPort()}`,
-        `-zmqpubhashblock=tcp://0.0.0.0:${options.getZmqPort()}`,
+        `-zmqpubhashblock=${options.getZmqSockets().hashblock}`,
       ]);
     });
 

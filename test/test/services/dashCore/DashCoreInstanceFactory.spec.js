@@ -32,11 +32,6 @@ describe('DashCoreInstanceFactory', function main() {
       const api = instance.getApi();
       expect(api).to.deep.equal({});
     });
-
-    it('should return empty object if getZmqSocket', () => {
-      const config = instance.getZmqSockets();
-      expect(config).to.deep.equal({});
-    });
   });
 
   describe('usage', async () => {
