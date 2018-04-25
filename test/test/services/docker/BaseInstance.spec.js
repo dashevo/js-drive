@@ -7,36 +7,48 @@ const Image = require('../../../../lib/test/services/docker/Image');
 const Container = require('../../../../lib/test/services/docker/Container');
 const BaseInstance = require('../../../../lib/test/services/docker/BaseInstance');
 
+async function createInstance(options) {
+  const { name: networkName, driver } = options.getNetworkOptions();
+  const imageName = options.getImageName();
+  const containerOptions = options.getContainerOptions();
+  const network = new Network(networkName, driver);
+  const registry = new EcrRegistry(process.env.AWS_DEFAULT_REGION);
+  const authorizationToken = await registry.getAuthorizationToken();
+  const image = new Image(imageName, authorizationToken);
+  const container = new Container(networkName, imageName, containerOptions);
+  return new BaseInstance(network, image, container, options);
+}
+
 describe('BaseInstance', function main() {
   this.timeout(40000);
 
   const options = new DashCoreInstanceOptions();
 
   describe('usage', () => {
-    const network = new Network(options);
-    const registry = new EcrRegistry(process.env.AWS_DEFAULT_REGION);
-    const image = new Image(options, registry);
-    const container = new Container(options);
-    const instance = new BaseInstance(network, image, container);
+    let instance;
 
+    before(async () => {
+      instance = await createInstance(options);
+    });
     after(async () => instance.clean());
 
     it('should start a BaseInstance with DashCoreInstanceOptions network options', async () => {
       await instance.start();
-      const dockerNetwork = new Docker().getNetwork(options.getNetworkName());
+      const { name, driver } = options.getNetworkOptions();
+      const dockerNetwork = new Docker().getNetwork(name);
       const { Driver } = await dockerNetwork.inspect();
       const { NetworkSettings: { Networks } } = await instance.container.details();
       const networks = Object.keys(Networks);
-      expect(Driver).to.equal(options.getNetworkDriver());
+      expect(Driver).to.equal(driver);
       expect(networks.length).to.equal(1);
-      expect(networks[0]).to.equal(options.getNetworkName());
+      expect(networks[0]).to.equal(name);
     });
 
     it('should start an instance with the DashCoreInstanceOptions options', async () => {
       await instance.start();
       const { Args } = await instance.container.details();
       expect(Args).to.deep.equal([
-        `-port=${options.getMainPort()}`,
+        `-port=${options.getDashdPort()}`,
         `-rpcuser=${options.getRpcUser()}`,
         `-rpcpassword=${options.getRpcPassword()}`,
         '-rpcallowip=0.0.0.0/0',
@@ -78,6 +90,41 @@ describe('BaseInstance', function main() {
       }
       expect(error.statusCode).to.equal(404);
       expect(error.reason).to.equal('no such container');
+    });
+  });
+
+  describe('ports', () => {
+    let instanceOne;
+    let instanceTwo;
+    let instanceThree;
+    let sandbox;
+
+    before(async () => {
+      instanceOne = await createInstance(new DashCoreInstanceOptions());
+      instanceTwo = await createInstance(new DashCoreInstanceOptions());
+      instanceThree = await createInstance(new DashCoreInstanceOptions());
+    });
+    beforeEach(function before() {
+      sandbox = this.sinon;
+    });
+    after(async () => {
+      await Promise.all([
+        instanceOne.clean(),
+        instanceTwo.clean(),
+        instanceThree.clean(),
+      ]);
+    });
+
+    it('should retry start container with another port if it is busy', async () => {
+      instanceTwo.container.ports = [4444];
+      instanceThree.container.ports = [4444];
+      const instanceThreeSpy = sandbox.spy(instanceThree, 'start');
+
+      await instanceOne.start();
+      await instanceTwo.start();
+      await instanceThree.start();
+
+      expect(instanceThreeSpy.callCount).to.be.above(1);
     });
   });
 });

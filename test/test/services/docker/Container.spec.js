@@ -7,9 +7,12 @@ describe('Container', function main() {
   this.timeout(40000);
 
   const options = new DashCoreInstanceOptions();
+  const imageName = options.getImageName();
+  const { name: networkName } = options.getNetworkOptions();
+  const containerOptions = options.getContainerOptions();
 
   describe('before start', () => {
-    const container = new Container(options);
+    const container = new Container(networkName, imageName, containerOptions);
 
     it('should not crash if stop', async () => {
       await container.stop();
@@ -26,26 +29,27 @@ describe('Container', function main() {
   });
 
   describe('usage', () => {
-    const container = new Container(options);
+    const container = new Container(networkName, imageName, containerOptions);
 
     after(async () => container.remove());
 
-    it('should start a container with DashCoreInstanceOptions network options', async () => {
+    it('should start a BaseInstance with DashCoreInstanceOptions network options', async () => {
       await container.start();
-      const network = new Docker().getNetwork(options.getNetworkName());
-      const { Driver } = await network.inspect();
+      const { name, driver } = options.getNetworkOptions();
+      const dockerNetwork = new Docker().getNetwork(name);
+      const { Driver } = await dockerNetwork.inspect();
       const { NetworkSettings: { Networks } } = await container.details();
       const networks = Object.keys(Networks);
-      expect(Driver).to.equal(options.getNetworkDriver());
+      expect(Driver).to.equal(driver);
       expect(networks.length).to.equal(1);
-      expect(networks[0]).to.equal(options.getNetworkName());
+      expect(networks[0]).to.equal(name);
     });
 
-    it('should start a container with the DashCoreInstanceOptions options', async () => {
+    it('should start an instance with the DashCoreInstanceOptions options', async () => {
       await container.start();
       const { Args } = await container.details();
       expect(Args).to.deep.equal([
-        `-port=${options.getMainPort()}`,
+        `-port=${options.getDashdPort()}`,
         `-rpcuser=${options.getRpcUser()}`,
         `-rpcpassword=${options.getRpcPassword()}`,
         '-rpcallowip=0.0.0.0/0',
@@ -91,11 +95,10 @@ describe('Container', function main() {
   });
 
   describe('containers removal', () => {
-    const containerOne = new Container(options);
-    const containerTwo = new Container(options);
-    const containerThree = new Container(options);
-    let sandbox;
+    const containerOne = new Container(networkName, imageName, containerOptions);
+    const containerTwo = new Container(networkName, imageName, containerOptions);
 
+    let sandbox;
     beforeEach(function before() {
       sandbox = this.sinon;
     });
@@ -103,7 +106,6 @@ describe('Container', function main() {
       await Promise.all([
         containerOne.remove(),
         containerTwo.remove(),
-        containerThree.remove(),
       ]);
     });
 
@@ -117,47 +119,19 @@ describe('Container', function main() {
       expect(createContainerSpy.callCount).to.equal(1);
     });
 
-    it('should remove instance if port if busy before creating a new one', async () => {
-      containerTwo.options = containerOne.options;
-      containerThree.options = containerOne.options;
-      const removeContainerSpy = sandbox.spy(containerThree, 'removeContainer');
+    it('should remove container if port if busy', async () => {
+      containerTwo.ports = containerOne.ports;
+      const removeContainerSpy = sandbox.spy(containerTwo, 'removeContainer');
 
-      await containerOne.start();
-      await containerTwo.start();
-      await containerThree.start();
+      let error;
+      try {
+        await containerTwo.start();
+      } catch (err) {
+        error = err;
+      }
 
+      expect(error.statusCode).to.equal(500);
       expect(removeContainerSpy.callCount).to.be.equal(1);
-    });
-  });
-
-  describe('ports', () => {
-    const containerOne = new Container(options);
-    const containerTwo = new Container(options);
-    const containerThree = new Container(options);
-
-    let sandbox;
-
-    beforeEach(function before() {
-      sandbox = this.sinon;
-    });
-    after(async () => {
-      await Promise.all([
-        containerOne.remove(),
-        containerTwo.remove(),
-        containerThree.remove(),
-      ]);
-    });
-
-    it('should retry start container with another port if it is busy', async () => {
-      containerTwo.options = containerOne.options;
-      containerThree.options = containerOne.options;
-      const instanceThreeSpy = sandbox.spy(containerThree, 'create');
-
-      await containerOne.start();
-      await containerTwo.start();
-      await containerThree.start();
-
-      expect(instanceThreeSpy.callCount).to.be.equal(2);
     });
   });
 });

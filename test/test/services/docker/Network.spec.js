@@ -6,27 +6,29 @@ const Network = require('../../../../lib/test/services/docker/Network');
 describe('Image', () => {
   it('should create a network according to options', async () => {
     const options = new MongoDbInstanceOptions();
-    const network = new Network(options);
+    const { name, driver } = options.getNetworkOptions();
+    const network = new Network(name, driver);
 
     await network.create();
 
-    const dockerNetwork = new Docker().getNetwork(options.getNetworkName());
+    const dockerNetwork = new Docker().getNetwork(name);
     const { Name, Driver } = await dockerNetwork.inspect();
 
-    expect(Name).to.equal(options.getNetworkName());
-    expect(Driver).to.equal(options.getNetworkDriver());
+    expect(Name).to.equal(name);
+    expect(Driver).to.equal(driver);
   });
 
   it('should not fail creating a network that already exists', async () => {
     const options = new MongoDbInstanceOptions();
-    const network = new Network(options);
+    const { name, driver } = options.getNetworkOptions();
+    const network = new Network(name, driver);
 
     await network.create();
 
-    const dockerNetwork = new Docker().getNetwork(options.getNetworkName());
+    const dockerNetwork = new Docker().getNetwork(name);
     const { Name, Driver } = await dockerNetwork.inspect();
 
-    expect(Name).to.equal(options.getNetworkName());
-    expect(Driver).to.equal(options.getNetworkDriver());
+    expect(Name).to.equal(name);
+    expect(Driver).to.equal(driver);
   });
 });
