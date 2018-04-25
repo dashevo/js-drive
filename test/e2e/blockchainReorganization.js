@@ -1,6 +1,5 @@
-describe('Blockchain reorganization', function() {
-
-  before('having started first master node, generated STs and second master node synced with the first one', function() {
+describe('Blockchain reorganization', () => {
+  before('having started first master node, generated STs and second master node synced with the first one', () => {
     // TODO: start master node #1 and #2
 
     // TODO: generate some blocks
@@ -11,7 +10,7 @@ describe('Blockchain reorganization', function() {
   });
 
   it('Dash Drive should sync data after blockchain reorganization, removing uncessary data.' +
-     'Dash Drive on another node should sync with Dash Drive on the first node.', function() {
+     'Dash Drive on another node should sync with Dash Drive on the first node.', () => {
     // TODO: get block hash at some height and invalidate it
 
     // TODO: generate more blocks

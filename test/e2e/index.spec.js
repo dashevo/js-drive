@@ -1,6 +1,7 @@
-xdescribe('E2E Tests', function() {
-  require('./replication.js');
-  require('./blockchain-reorganization.js');
-  require('./initial-sync.js');
-  require('./sync-interruption.js');
+/* eslint-disable global-require */
+xdescribe('E2E Tests', () => {
+  require('./replication');
+  require('./blockchainReorganization');
+  require('./initialSync');
+  require('./syncInterruption');
 });
