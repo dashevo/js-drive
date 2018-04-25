@@ -5,7 +5,7 @@ const Network = require('../../../../lib/test/services/docker/Network');
 const EcrRegistry = require('../../../../lib/test/services/docker/EcrRegistry');
 const Image = require('../../../../lib/test/services/docker/Image');
 const Container = require('../../../../lib/test/services/docker/Container');
-const BaseInstance = require('../../../../lib/test/services/docker/BaseInstance');
+const DockerInstance = require('../../../../lib/test/services/docker/DockerInstance');
 
 async function createInstance(options) {
   const { name: networkName, driver } = options.getNetworkOptions();
@@ -16,10 +16,10 @@ async function createInstance(options) {
   const authorizationToken = await registry.getAuthorizationToken();
   const image = new Image(imageName, authorizationToken);
   const container = new Container(networkName, imageName, containerOptions);
-  return new BaseInstance(network, image, container, options);
+  return new DockerInstance(network, image, container, options);
 }
 
-describe('BaseInstance', function main() {
+describe('DockerInstance', function main() {
   this.timeout(40000);
 
   const options = new DashCoreInstanceOptions();
@@ -32,7 +32,7 @@ describe('BaseInstance', function main() {
     });
     after(async () => instance.clean());
 
-    it('should start a BaseInstance with DashCoreInstanceOptions network options', async () => {
+    it('should start a DockerInstance with DashCoreInstanceOptions network options', async () => {
       await instance.start();
       const { name, driver } = options.getNetworkOptions();
       const dockerNetwork = new Docker().getNetwork(name);
