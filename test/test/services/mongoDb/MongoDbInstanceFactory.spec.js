@@ -5,8 +5,11 @@ describe('MongoDbInstanceFactory', function main() {
   this.timeout(40000);
 
   describe('usage', () => {
-    const instance = MongoDbInstanceFactory.create();
+    let instance;
 
+    before(async () => {
+      instance = await MongoDbInstanceFactory.create();
+    });
     after(async () => instance.clean());
 
     it('should start an instance with a bridge dash_test_network', async () => {
