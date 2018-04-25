@@ -22,10 +22,13 @@ describe('DashDriveInstanceFactory', function main() {
       'SYNC_STATE_CHECK_INTERVAL=10',
       'SYNC_CHAIN_CHECK_INTERVAL=5',
     ];
-    const instance = DashDriveInstanceFactory.create({
-      ENV,
-    });
 
+    let instance;
+    before(async () => {
+      instance = await DashDriveInstanceFactory.create({
+        ENV,
+      });
+    });
     after(async () => instance.clean());
 
     it('should start an instance with a bridge dash_test_network', async () => {

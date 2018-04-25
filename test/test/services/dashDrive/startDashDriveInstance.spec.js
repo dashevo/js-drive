@@ -37,9 +37,9 @@ describe('startDashDriveInstance', function main() {
       const expectedEnv = [
         `DASHCORE_ZMQ_PUB_HASHBLOCK=${instance.dashCore.getZmqSockets().hashblock}`,
         `DASHCORE_JSON_RPC_HOST=${instance.dashCore.getIp()}`,
-        `DASHCORE_JSON_RPC_PORT=${instance.dashCore.container.options.getMainPort()}`,
-        `DASHCORE_JSON_RPC_USER=${instance.dashCore.container.options.getRpcUser()}`,
-        `DASHCORE_JSON_RPC_PASS=${instance.dashCore.container.options.getRpcPassword()}`,
+        `DASHCORE_JSON_RPC_PORT=${instance.dashCore.options.getRpcPort()}`,
+        `DASHCORE_JSON_RPC_USER=${instance.dashCore.options.getRpcUser()}`,
+        `DASHCORE_JSON_RPC_PASS=${instance.dashCore.options.getRpcPassword()}`,
       ];
       const envs = Env.filter(variable => expectedEnv.indexOf(variable) !== -1);
       expect(envs.length).to.equal(expectedEnv.length);
