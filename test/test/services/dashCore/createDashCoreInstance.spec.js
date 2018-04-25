@@ -1,23 +1,23 @@
 const Docker = require('dockerode');
 
-const DashCoreInstanceFactory = require('../../../../lib/test/services/dashCore/DashCoreInstanceFactory');
+const createDashCoreInstance = require('../../../../lib/test/services/dashCore/createDashCoreInstance');
 
 async function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-describe('DashCoreInstanceFactory', function main() {
+describe('createDashCoreInstance', function main() {
   this.timeout(40000);
 
   describe('before start', () => {
     let instance;
 
     before(async () => {
-      instance = await DashCoreInstanceFactory.create();
+      instance = await createDashCoreInstance();
     });
 
     it('should throw an error if connect', async () => {
-      const instanceTwo = DashCoreInstanceFactory.create();
+      const instanceTwo = createDashCoreInstance();
 
       let error;
       try {
@@ -38,7 +38,7 @@ describe('DashCoreInstanceFactory', function main() {
     let instance;
 
     before(async () => {
-      instance = await DashCoreInstanceFactory.create();
+      instance = await createDashCoreInstance();
     });
 
     after(async () => instance.clean());
@@ -86,8 +86,8 @@ describe('DashCoreInstanceFactory', function main() {
     let instanceTwo;
 
     before(async () => {
-      instanceOne = await DashCoreInstanceFactory.create();
-      instanceTwo = await DashCoreInstanceFactory.create();
+      instanceOne = await createDashCoreInstance();
+      instanceTwo = await createDashCoreInstance();
     });
     before(async () => {
       await Promise.all([
@@ -137,7 +137,7 @@ describe('DashCoreInstanceFactory', function main() {
     let instance;
 
     before(async () => {
-      instance = await DashCoreInstanceFactory.create();
+      instance = await createDashCoreInstance();
     });
     after(async () => instance.clean());
 
