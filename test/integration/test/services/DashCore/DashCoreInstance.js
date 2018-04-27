@@ -142,7 +142,8 @@ describe('DashCoreInstance', function main() {
     before(function before() {
       sandbox = this.sinon;
     });
-    after(async () => {
+    after(async function after() {
+      this.timeout(6000);
       await Promise.all([
         instanceOne.clean(),
         instanceTwo.clean(),
@@ -183,7 +184,8 @@ describe('DashCoreInstance', function main() {
         instanceTwo.start(),
       ]);
     });
-    after(async () => {
+    after(async function after() {
+      this.timeout(4000);
       await Promise.all([
         instanceOne.clean(),
         instanceTwo.clean(),
@@ -231,7 +233,8 @@ describe('DashCoreInstance', function main() {
     before(function before() {
       sandbox = this.sinon;
     });
-    after(async () => {
+    after(async function after() {
+      this.timeout(6000);
       await Promise.all([
         instanceOne.clean(),
         instanceTwo.clean(),
