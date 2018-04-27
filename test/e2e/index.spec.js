@@ -2,6 +2,5 @@
 xdescribe('E2E Tests', () => {
   require('./replication');
   require('./blockchainReorganization');
-  require('./initialSync');
-  require('./syncInterruption');
+  require('./sync');
 });
