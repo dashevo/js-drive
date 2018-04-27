@@ -9,14 +9,14 @@ describe('Image', function main() {
 
   it('should pull image without authentication', async () => {
     const options = new MongoDbInstanceOptions();
-    const imageName = options.getImageName();
+    const imageName = options.getContainerImageName();
     const image = new Image(imageName);
     await image.pull();
   });
 
   it('should pull image with authentication', async () => {
     const options = new DashCoreInstanceOptions();
-    const imageName = options.getImageName();
+    const imageName = options.getContainerImageName();
     const registry = new EcrRegistry(process.env.AWS_DEFAULT_REGION);
     const authorizationToken = await registry.getAuthorizationToken();
     const image = new Image(imageName, authorizationToken);

@@ -9,7 +9,7 @@ const DockerInstance = require('../../../../lib/test/services/docker/DockerInsta
 
 async function createInstance(options) {
   const { name: networkName, driver } = options.getNetworkOptions();
-  const imageName = options.getImageName();
+  const imageName = options.getContainerImageName();
   const containerOptions = options.getContainerOptions();
   const network = new Network(networkName, driver);
   const registry = new EcrRegistry(process.env.AWS_DEFAULT_REGION);

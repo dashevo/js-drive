@@ -7,7 +7,7 @@ describe('Container', function main() {
   this.timeout(40000);
 
   const options = new DashCoreInstanceOptions();
-  const imageName = options.getImageName();
+  const imageName = options.getContainerImageName();
   const { name: networkName } = options.getNetworkOptions();
   const containerOptions = options.getContainerOptions();
 
