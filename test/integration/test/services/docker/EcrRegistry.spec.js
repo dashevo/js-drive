@@ -1,4 +1,4 @@
-const getAwsEcrAuthorizationToken = require('../../../../lib/test/services/docker/getAwsEcrAuthorizationToken');
+const getAwsEcrAuthorizationToken = require('../../../../../lib/test/services/docker/getAwsEcrAuthorizationToken');
 
 describe('getAwsEcrAuthorizationToken', () => {
   it('should get the authorization', async () => {

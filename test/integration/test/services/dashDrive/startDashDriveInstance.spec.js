@@ -1,4 +1,4 @@
-const startDashDriveInstance = require('../../../../lib/test/services/dashDrive/startDashDriveInstance');
+const startDashDriveInstance = require('../../../../../lib/test/services/dashDrive/startDashDriveInstance');
 
 describe('startDashDriveInstance', function main() {
   this.timeout(90000);

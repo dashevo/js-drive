@@ -1,5 +1,5 @@
 const Docker = require('dockerode');
-const createMongoDbInstance = require('../../../../lib/test/services/mongoDb/createMongoDbInstance');
+const createMongoDbInstance = require('../../../../../lib/test/services/mongoDb/createMongoDbInstance');
 
 describe('createMongoDbInstance', function main() {
   this.timeout(40000);

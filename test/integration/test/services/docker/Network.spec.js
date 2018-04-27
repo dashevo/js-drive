@@ -1,7 +1,7 @@
 const Docker = require('dockerode');
 
-const MongoDbInstanceOptions = require('../../../../lib/test/services/mongoDb/MongoDbInstanceOptions');
-const Network = require('../../../../lib/test/services/docker/Network');
+const MongoDbInstanceOptions = require('../../../../../lib/test/services/mongoDb/MongoDbInstanceOptions');
+const Network = require('../../../../../lib/test/services/docker/Network');
 
 describe('Image', () => {
   it('should create a network according to options', async () => {

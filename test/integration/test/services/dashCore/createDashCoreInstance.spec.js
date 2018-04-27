@@ -1,6 +1,6 @@
 const Docker = require('dockerode');
 
-const createDashCoreInstance = require('../../../../lib/test/services/dashCore/createDashCoreInstance');
+const createDashCoreInstance = require('../../../../../lib/test/services/dashCore/createDashCoreInstance');
 
 async function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));

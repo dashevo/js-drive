@@ -1,7 +1,7 @@
-const DashCoreInstanceOptions = require('../../../../lib/test/services/dashCore/DashCoreInstanceOptions');
-const MongoDbInstanceOptions = require('../../../../lib/test/services/mongoDb/MongoDbInstanceOptions');
-const getAwsEcrAuthorizationToken = require('../../../../lib/test/services/docker/getAwsEcrAuthorizationToken');
-const Image = require('../../../../lib/test/services/docker/Image');
+const DashCoreInstanceOptions = require('../../../../../lib/test/services/dashCore/DashCoreInstanceOptions');
+const MongoDbInstanceOptions = require('../../../../../lib/test/services/mongoDb/MongoDbInstanceOptions');
+const getAwsEcrAuthorizationToken = require('../../../../../lib/test/services/docker/getAwsEcrAuthorizationToken');
+const Image = require('../../../../../lib/test/services/docker/Image');
 
 describe('Image', function main() {
   this.timeout(20000);

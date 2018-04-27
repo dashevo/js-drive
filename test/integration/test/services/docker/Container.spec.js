@@ -1,7 +1,7 @@
 const Docker = require('dockerode');
 
-const DashCoreInstanceOptions = require('../../../../lib/test/services/dashCore/DashCoreInstanceOptions');
-const Container = require('../../../../lib/test/services/docker/Container');
+const DashCoreInstanceOptions = require('../../../../../lib/test/services/dashCore/DashCoreInstanceOptions');
+const Container = require('../../../../../lib/test/services/docker/Container');
 
 describe('Container', function main() {
   this.timeout(40000);
