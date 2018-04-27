@@ -1,16 +1,16 @@
 describe('Blockchain reorganization', () => {
-  before('having started first master node, generated STs and second master node synced with the first one', () => {
-    // TODO: start master node #1 and #2
+  before('having started first Dash Drive node, generated STs and second Dash Drive node replicated data from the first one', () => {
+    // TODO: start Dash Drive node #1 and #2
 
     // TODO: generate some blocks
 
-    // TODO: wait until Dash Drive saves data on master node #1
+    // TODO: wait until Dash Drive #1 saves data
 
-    // TODO: wait until Dash Drive on master node #2 syncs data
+    // TODO: wait until Dash Drive #2 replicate data from Dash Drive #1
   });
 
   it('Dash Drive should sync data after blockchain reorganization, removing uncessary data.' +
-     'Dash Drive on another node should sync with Dash Drive on the first node.', () => {
+     'Dash Drive on another node should replicate data from the first one.', () => {
     // TODO: get block hash at some height and invalidate it
 
     // TODO: generate more blocks
@@ -19,8 +19,8 @@ describe('Blockchain reorganization', () => {
 
     // TODO: check old data has been removed
 
-    // TODO: wait until data is synced with the first node
+    // TODO: wait until data is replicated on the secod node
 
-    // TODO: check data match one on the first node
+    // TODO: check data match one of the first node
   });
 });

@@ -1,6 +1,6 @@
-describe('Sync interruption and resume', () => {
-  before('having master node #1 up and running', () => {
-    // TODO: start master node #1
+describe('Sync interruption and resume between Dash Drive and Dash Core', () => {
+  before('having Dash Drive node #1 up and running', () => {
+    // TODO: start Dash Drive node #1
   });
 
   it('Dash Drive should save sync state and continue from saved point after resume', () => {

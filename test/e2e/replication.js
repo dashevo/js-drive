@@ -1,6 +1,6 @@
-describe('Replication', () => {
-  before('having two master nodes started in "regtest" mode', () => {
-    // TODO: start master nodes here
+describe('Replication between two Dash Drive nodes', () => {
+  before('having two Dash Drive nodes started in "regtest" mode', () => {
+    // TODO: start Dash Drive nodes here
   });
 
   it('Dash Drive should receive data from Dash Core once submitted, save it and update status. ' +
@@ -13,7 +13,7 @@ describe('Replication', () => {
 
     // TODO: check latest status
 
-    // TODO: wait for data to be synced on the node #2
+    // TODO: wait for data to be replicated on the node #2
 
     // TODO: check data is same?
   });

@@ -1,14 +1,14 @@
-describe('Initial sync', () => {
-  before('having master node #1 up and ready, some amount of blocks generated and Dash Drive on node #1 fully synced', () => {
-    // TODO: start master node #1
+describe('Initial sync of Dash Drive and Dash Core', () => {
+  before('having Dash Drive node #1 up and ready, some amount of blocks generated and Dash Drive on node #1 fully synced', () => {
+    // TODO: start Dash Drive node #1
 
     // TODO: generate blocks
 
-    // TODO: wait until Dash Drive syncs
+    // TODO: wait until Dash Drive syncs with Dash Core
   });
 
   it('Dash Drive should sync the data with Dash Core upon startup', () => {
-    // TODO: start master node #2 only with Dash Core
+    // TODO: start Dash Core on the node #2
 
     // TODO: wait until Dash Core syncs
 
