@@ -6,15 +6,13 @@ describe('createDashDriveInstance', function main() {
   this.timeout(90000);
 
   describe('usage', () => {
-    const ENV = [
+    const envs = [
       'STORAGE_MONGODB_URL=mongodb://127.0.0.1',
     ];
 
     let instance;
     before(async () => {
-      instance = await createDashDriveInstance({
-        ENV,
-      });
+      instance = await createDashDriveInstance(envs);
     });
     after(async () => instance.clean());
 
