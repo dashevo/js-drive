@@ -1,5 +1,5 @@
 describe('Replication between two Dash Drive nodes', () => {
-  before('having two Dash Drive nodes started in "regtest" mode', () => {
+  before('having two Dash Drive nodes started', () => {
     // TODO: start Dash Drive nodes here
   });
 

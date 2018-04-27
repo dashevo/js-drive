@@ -2,7 +2,7 @@ describe('Blockchain reorganization', () => {
   before('having started first Dash Drive node, generated STs and second Dash Drive node replicated data from the first one', () => {
     // TODO: start Dash Drive node #1 and #2
 
-    // TODO: generate some blocks
+    // TODO: generate some STs
 
     // TODO: wait until Dash Drive #1 saves data
 
@@ -13,7 +13,7 @@ describe('Blockchain reorganization', () => {
      'Dash Drive on another node should replicate data from the first one.', () => {
     // TODO: get block hash at some height and invalidate it
 
-    // TODO: generate more blocks
+    // TODO: generate more STs
 
     // TODO: wait until data is synced
 
