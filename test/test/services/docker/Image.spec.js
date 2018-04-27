@@ -1,6 +1,6 @@
 const DashCoreInstanceOptions = require('../../../../lib/test/services/dashCore/DashCoreInstanceOptions');
 const MongoDbInstanceOptions = require('../../../../lib/test/services/mongoDb/MongoDbInstanceOptions');
-const EcrRegistry = require('../../../../lib/test/services/docker/EcrRegistry');
+const getAwsEcrAuthorizationToken = require('../../../../lib/test/services/docker/getAwsEcrAuthorizationToken');
 const Image = require('../../../../lib/test/services/docker/Image');
 
 describe('Image', function main() {
@@ -17,8 +17,7 @@ describe('Image', function main() {
   it('should pull image with authentication', async () => {
     const options = new DashCoreInstanceOptions();
     const imageName = options.getContainerImageName();
-    const registry = new EcrRegistry(process.env.AWS_DEFAULT_REGION);
-    const authorizationToken = await registry.getAuthorizationToken();
+    const authorizationToken = await getAwsEcrAuthorizationToken(process.env.AWS_DEFAULT_REGION);
     const image = new Image(imageName, authorizationToken);
     await image.pull();
   });

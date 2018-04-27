@@ -1,10 +1,8 @@
-const EcrRegistry = require('../../../../lib/test/services/docker/EcrRegistry');
+const getAwsEcrAuthorizationToken = require('../../../../lib/test/services/docker/getAwsEcrAuthorizationToken');
 
-describe('EcrRegistry', () => {
-  const registry = new EcrRegistry(process.env.AWS_DEFAULT_REGION);
-
+describe('getAwsEcrAuthorizationToken', () => {
   it('should get the authorization', async () => {
-    const authorization = await registry.getAuthorizationToken();
+    const authorization = await getAwsEcrAuthorizationToken(process.env.AWS_DEFAULT_REGION);
     expect(authorization.username).to.exist();
     expect(authorization.password).to.exist();
     expect(authorization.serveraddress).to.exist();
