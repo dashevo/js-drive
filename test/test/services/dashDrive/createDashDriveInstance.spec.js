@@ -31,8 +31,8 @@ describe('createDashDriveInstance', function main() {
       await instance.start();
       const { Config: { Env } } = await instance.container.details();
 
-      const instanceEnv = Env.filter(variable => ENV.includes(variable));
-      expect(ENV.length).to.deep.equal(instanceEnv.length);
+      const instanceEnv = Env.filter(variable => envs.includes(variable));
+      expect(envs.length).to.deep.equal(instanceEnv.length);
     });
 
     it('should start an instance with the default options', async () => {
