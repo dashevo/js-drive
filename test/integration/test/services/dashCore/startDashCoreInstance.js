@@ -13,7 +13,6 @@ describe('startDashCoreInstance', function main() {
     before(async () => {
       instance = await startDashCoreInstance();
     });
-    after(async () => cleanInstances([instance]));
 
     it('should has container running', async () => {
       const { State } = await instance.container.details();
@@ -32,7 +31,6 @@ describe('startDashCoreInstance', function main() {
     before(async () => {
       instances = await startDashCoreInstance.many(3);
     });
-    after(async () => cleanInstances(instances));
 
     it('should have containers running', async () => {
       for (let i = 0; i < 3; i++) {
