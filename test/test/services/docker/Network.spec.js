@@ -6,7 +6,7 @@ const Network = require('../../../../lib/test/services/docker/Network');
 describe('Image', () => {
   it('should create a network according to options', async () => {
     const options = new MongoDbInstanceOptions();
-    const { name, driver } = options.getNetworkOptions();
+    const { name, driver } = options.getContainerNetworkOptions();
     const network = new Network(name, driver);
 
     await network.create();
@@ -20,7 +20,7 @@ describe('Image', () => {
 
   it('should not fail creating a network that already exists', async () => {
     const options = new MongoDbInstanceOptions();
-    const { name, driver } = options.getNetworkOptions();
+    const { name, driver } = options.getContainerNetworkOptions();
     const network = new Network(name, driver);
 
     await network.create();

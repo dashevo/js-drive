@@ -8,7 +8,7 @@ describe('Container', function main() {
 
   const options = new DashCoreInstanceOptions();
   const imageName = options.getContainerImageName();
-  const { name: networkName } = options.getNetworkOptions();
+  const { name: networkName } = options.getContainerNetworkOptions();
   const containerOptions = options.getContainerOptions();
 
   describe('before start', () => {
@@ -35,7 +35,7 @@ describe('Container', function main() {
 
     it('should start a BaseInstance with DashCoreInstanceOptions network options', async () => {
       await container.start();
-      const { name, driver } = options.getNetworkOptions();
+      const { name, driver } = options.getContainerNetworkOptions();
       const dockerNetwork = new Docker().getNetwork(name);
       const { Driver } = await dockerNetwork.inspect();
       const { NetworkSettings: { Networks } } = await container.details();

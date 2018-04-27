@@ -8,7 +8,7 @@ const Container = require('../../../../lib/test/services/docker/Container');
 const DockerInstance = require('../../../../lib/test/services/docker/DockerInstance');
 
 async function createInstance(options) {
-  const { name: networkName, driver } = options.getNetworkOptions();
+  const { name: networkName, driver } = options.getContainerNetworkOptions();
   const imageName = options.getContainerImageName();
   const containerOptions = options.getContainerOptions();
   const network = new Network(networkName, driver);
@@ -34,7 +34,7 @@ describe('DockerInstance', function main() {
 
     it('should start a DockerInstance with DashCoreInstanceOptions network options', async () => {
       await instance.start();
-      const { name, driver } = options.getNetworkOptions();
+      const { name, driver } = options.getContainerNetworkOptions();
       const dockerNetwork = new Docker().getNetwork(name);
       const { Driver } = await dockerNetwork.inspect();
       const { NetworkSettings: { Networks } } = await instance.container.details();
