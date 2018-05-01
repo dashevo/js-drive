@@ -15,6 +15,7 @@ const getCheckSyncStateHttpMiddleware = require('../lib/sync/getCheckSyncHttpMid
 const errorHandler = require('../lib/util/errorHandler');
 
 const createAddSTPacketMethod = require('../lib/api/methods/createAddSTPacketMethod');
+const wrapToErrorHandler = require('../lib/api/jsonRpc/wrapToErrorHandler');
 
 (async function main() {
   const rpcClient = new RpcClient({
@@ -43,9 +44,10 @@ const createAddSTPacketMethod = require('../lib/api/methods/createAddSTPacketMet
 
   const ipfsAPI = new IpfsAPI(process.env.STORAGE_IPFS_MULTIADDR);
 
+  // Initialize API methods
   const addSTPacketMethod = createAddSTPacketMethod(ipfsAPI);
   const rpcMethods = {
-    [addSTPacketMethod.name]: addSTPacketMethod,
+    [addSTPacketMethod.name]: wrapToErrorHandler(addSTPacketMethod),
   };
 
   const rpc = jayson.server(rpcMethods);
