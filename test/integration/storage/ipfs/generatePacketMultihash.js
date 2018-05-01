@@ -7,7 +7,7 @@ const generatePacketMultihash = require('../../../../lib/storage/ipfs/generatePa
 
 const startIPFSInstance = require('../../../../lib/test/services/IPFS/startIPFSInstance');
 
-describe('generatePacketMultihash', () => {
+xdescribe('generatePacketMultihash', () => {
   let ipfsApi;
 
   before(async () => {
