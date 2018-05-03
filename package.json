@@ -37,6 +37,7 @@
     "eslint-plugin-import": "^2.8.0",
     "go-ipfs-dep": "^0.4.13",
     "ipfsd-ctl": "^0.32.1",
+    "ipld-dag-cbor": "^0.12.0",
     "mocha": "^5.1.0",
     "mocha-sinon": "^2.0.0",
     "proxyquire": "^1.8.0",
