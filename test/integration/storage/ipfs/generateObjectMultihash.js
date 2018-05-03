@@ -17,7 +17,8 @@ describe('generateObjectMultihash', () => {
   let ipfsApi;
   let multihash;
 
-  before(async () => {
+  before(async function before() {
+    this.timeout(25000);
     ipfsApi = await startIPFSInstance();
   });
 

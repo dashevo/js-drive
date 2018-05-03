@@ -2,16 +2,19 @@ const fs = require('fs');
 const path = require('path');
 const cbor = require('cbor');
 
-const addStateTransitionPacket = require('../../../lib/storage/addStateTransitionPacket');
+const addSTPacketFactory = require('../../../lib/storage/addSTPacketFactory');
 const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
 
 const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInstance');
 
-describe('addStateTransitionPacket', () => {
+describe('addSTPacket', () => {
   let ipfsApi;
+  let addSTPacket;
 
-  before(async () => {
+  before(async function before() {
+    this.timeout(25000);
     ipfsApi = await startIPFSInstance();
+    addSTPacket = addSTPacketFactory(ipfsApi);
   });
 
   it('should add packets to storage and returns hash', async () => {
@@ -21,7 +24,7 @@ describe('addStateTransitionPacket', () => {
 
     const packets = packetsData.map(packetData => new StateTransitionPacket(packetData));
 
-    const addPacketPromises = packets.map(addStateTransitionPacket.bind(null, ipfsApi));
+    const addPacketPromises = packets.map(addSTPacket);
 
     const packetMultihashes = await Promise.all(addPacketPromises);
 

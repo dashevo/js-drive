@@ -14,8 +14,10 @@ const isSynced = require('../lib/sync/isSynced');
 const getCheckSyncStateHttpMiddleware = require('../lib/sync/getCheckSyncHttpMiddleware');
 const errorHandler = require('../lib/util/errorHandler');
 
-const createAddSTPacketMethod = require('../lib/api/methods/createAddSTPacketMethod');
 const wrapToErrorHandler = require('../lib/api/jsonRpc/wrapToErrorHandler');
+
+const addSTPacketFactory = require('../lib/storage/addSTPacketFactory');
+const addSTPacketMethodFactory = require('../lib/api/methods/addSTPacketMethodFactory');
 
 (async function main() {
   const rpcClient = new RpcClient({
@@ -43,9 +45,10 @@ const wrapToErrorHandler = require('../lib/api/jsonRpc/wrapToErrorHandler');
   );
 
   const ipfsAPI = new IpfsAPI(process.env.STORAGE_IPFS_MULTIADDR);
+  const addSTPacket = addSTPacketFactory(ipfsAPI);
+  const addSTPacketMethod = addSTPacketMethodFactory(addSTPacket);
 
   // Initialize API methods
-  const addSTPacketMethod = createAddSTPacketMethod(ipfsAPI);
   const rpcMethods = {
     [addSTPacketMethod.name]: wrapToErrorHandler(addSTPacketMethod),
   };
