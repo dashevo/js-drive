@@ -1,15 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-
 const addStateTransitionPacket = require('../../../lib/storage/addStateTransitionPacket');
 const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
 
 const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInstance');
 
-function loadStateTransitionPackets() {
-  const packetsJSON = fs.readFileSync(path.join(__dirname, '/../../fixtures/stateTransitionPackets.json'));
-  return JSON.parse(packetsJSON);
-}
+const getStateTransitionPackets = require('../../fixtures/getStateTransitionPackets');
 
 describe('addStateTransitionPacket', () => {
   let ipfsApi;
@@ -17,12 +11,8 @@ describe('addStateTransitionPacket', () => {
     ipfsApi = await startIPFSInstance();
   });
 
-  let packetsData;
-  before(() => {
-    packetsData = loadStateTransitionPackets();
-  });
-
   it('should add packets to storage and returns hash', async () => {
+    const packetsData = getStateTransitionPackets();
     const packets = packetsData.map(packetData => new StateTransitionPacket(packetData));
     const addPacketsPromises = packets.map(addStateTransitionPacket.bind(null, ipfsApi));
     const packetsCids = await Promise.all(addPacketsPromises);
