@@ -1,7 +1,7 @@
 const startDashDriveInstance = require('../../../../../lib/test/services/dashDrive/startDashDriveInstance');
 
 describe('startDashDriveInstance', function main() {
-  this.timeout(90000);
+  this.timeout(120000);
 
   describe('One instance', () => {
     let instance;

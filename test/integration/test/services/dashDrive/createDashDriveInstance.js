@@ -3,7 +3,7 @@ const Docker = require('dockerode');
 const createDashDriveInstance = require('../../../../../lib/test/services/dashDrive/createDashDriveInstance');
 
 describe('createDashDriveInstance', function main() {
-  this.timeout(90000);
+  this.timeout(120000);
 
   describe('usage', () => {
     const envs = [
