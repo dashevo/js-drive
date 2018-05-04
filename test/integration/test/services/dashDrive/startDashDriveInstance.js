@@ -6,7 +6,7 @@ describe('startDashDriveInstance', function main() {
   describe('One instance', () => {
     let instance;
 
-    before(async () => {
+    beforeEach(async () => {
       instance = await startDashDriveInstance();
     });
 
@@ -74,7 +74,7 @@ describe('startDashDriveInstance', function main() {
   describe('Three instance', () => {
     let instances;
 
-    before(async () => {
+    beforeEach(async () => {
       instances = await startDashDriveInstance.many(3);
     });
 

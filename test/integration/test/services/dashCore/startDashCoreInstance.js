@@ -10,7 +10,7 @@ describe('startDashCoreInstance', function main() {
   describe('One instance', () => {
     let instance;
 
-    before(async () => {
+    beforeEach(async () => {
       instance = await startDashCoreInstance();
     });
 
@@ -28,7 +28,7 @@ describe('startDashCoreInstance', function main() {
   describe('Three instances', () => {
     let instances;
 
-    before(async () => {
+    beforeEach(async () => {
       instances = await startDashCoreInstance.many(3);
     });
 
