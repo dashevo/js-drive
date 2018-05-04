@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
-const dagCBOR = require('ipld-dag-cbor');
+const cbor = require('cbor');
 const multihashingAsync = require('multihashing-async');
 const multihashes = require('multihashes');
 const StateTransitionHeader = require('../../../lib/blockchain/StateTransitionHeader');
@@ -20,17 +20,8 @@ function loadStateTransitionHeaders() {
   return JSON.parse(headersJSON);
 }
 
-async function ipldCborSerialize(dagNode) {
-  return new Promise((resolve, reject) => {
-    dagCBOR.util.serialize(dagNode, (err, res) => {
-      if (err) { return reject(err); }
-      return resolve(res);
-    });
-  });
-}
-
 async function hashDataMerkleRoot(packet) {
-  const serializedPacket = await ipldCborSerialize(packet);
+  const serializedPacket = cbor.encodeCanonical(packet);
   const multihash = await multihashing(serializedPacket, 'sha2-256');
   const decoded = multihashes.decode(multihash);
   return decoded.digest.toString('hex');
