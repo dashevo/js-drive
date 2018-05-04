@@ -23,7 +23,7 @@ describe('addSTPacketMethod', () => {
   });
   it('should add ST Packet', async () => {
     // TODO: extract to separate method
-    const packetsJSON = fs.readFileSync(path.join(__dirname, '/../../fixtures/stateTransitionPackets.json'));
+    const packetsJSON = fs.readFileSync(path.join(__dirname, '/../../../fixtures/stateTransitionPackets.json'));
     const packetsData = JSON.parse(packetsJSON);
 
     const serializedPacket = cbor.encodeCanonical(packetsData[0]);
