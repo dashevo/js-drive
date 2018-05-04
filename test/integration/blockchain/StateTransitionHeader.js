@@ -26,7 +26,8 @@ describe('StateTransitionHeader', () => {
 
   let addSTPacket;
 
-  before(async () => {
+  before(async function before() {
+    this.timeout(25000);
     const ipfsApi = await startIPFSInstance();
     addSTPacket = addSTPacketFactory(ipfsApi);
   });
