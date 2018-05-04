@@ -1,12 +1,12 @@
 const startDashDriveInstance = require('../../../../../lib/test/services/dashDrive/startDashDriveInstance');
 
 describe('startDashDriveInstance', function main() {
-  this.timeout(90000);
+  this.timeout(120000);
 
   describe('One instance', () => {
     let instance;
 
-    before(async () => {
+    beforeEach(async () => {
       instance = await startDashDriveInstance();
     });
 
@@ -74,7 +74,7 @@ describe('startDashDriveInstance', function main() {
   describe('Three instance', () => {
     let instances;
 
-    before(async () => {
+    beforeEach(async () => {
       instances = await startDashDriveInstance.many(3);
     });
 
