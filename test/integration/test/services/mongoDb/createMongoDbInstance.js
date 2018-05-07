@@ -30,5 +30,15 @@ describe('createMongoDbInstance', function main() {
         'mongod',
       ]);
     });
+
+    it('should get Mongo db client', async () => {
+      await instance.start();
+
+      const client = await instance.getMongoClient();
+      const db = client.collection('syncState');
+      const count = await db.count({});
+
+      expect(count).to.equal(0);
+    });
   });
 });
