@@ -111,25 +111,26 @@ before(() => {
 - `startDashDriveInstance` returns instance if [DockerInstance](../lib/test/services/docker/DockerInstance.js)
 - Dash Drive process is restarted and data is cleaned up before each test
 
-### Connect to MongoDB 
+### Start MongoDB
 
 ```js
-const connectToMongoDb = require('../lib/test/connectToMongoDb');
-
-connectToMongoDb.setUrl(process.env.STORAGE_MONGODB_URL)
-  .setDbName(process.env.STORAGE_MONGODB_DB);
+const createMongoDbInstance = require('../lib/test/services/createMongoDbInstance');
 
 describe('SomeTest', () => {
+  let instance;
   let mongoDb;
 
-  connectToMongoDb().then((db) => {
-    mongoDb = db;
+  before(async () => {
+    instance = createMongoDbInstance();
+    await instance.start();
+    mongoDb = instance.getMongoClient();
   });
+  beforeEach(async () => mongoDb.dropDatabase());
+  after(async () => instance.clean());
 });
 ```
 
- - `connectToMongoDb` returns instance of [Db](https://mongodb.github.io/node-mongodb-native/api-generated/db.html)
- - Database is cleaned up before each test
+ - `instance.getMongoClient()` returns instance of [Db](https://mongodb.github.io/node-mongodb-native/api-generated/db.html)
 
 ## Fixtures
 
