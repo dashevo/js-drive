@@ -1,7 +1,7 @@
 const SyncState = require('../../../../../lib/sync/state/SyncState');
 const SyncStateRepository = require('../../../../../lib/sync/state/repository/SyncStateRepository');
 const getBlockFixtures = require('../../../../../lib/test/fixtures/getBlockFixtures');
-const createMongoDbInstance = require('../../../../../lib/test/services/mongoDb/createMongoDbInstance');
+const startMongoDbInstance = require('../../../../../lib/test/services/mongoDb/startMongoDbInstance');
 
 describe('SyncStateRepository', function main() {
   this.timeout(90000);
@@ -13,8 +13,7 @@ describe('SyncStateRepository', function main() {
   let instance;
 
   before(async () => {
-    instance = await createMongoDbInstance();
-    await instance.start();
+    instance = await startMongoDbInstance();
     mongoDb = await instance.getMongoClient();
   });
   beforeEach(async () => {
