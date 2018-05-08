@@ -1,31 +1,33 @@
 const SyncState = require('../../../../../lib/sync/state/SyncState');
 const SyncStateRepository = require('../../../../../lib/sync/state/repository/SyncStateRepository');
 const getBlockFixtures = require('../../../../../lib/test/fixtures/getBlockFixtures');
-const connectToMongoDb = require('../../../../../lib/test/connectToMongoDb');
+const createMongoDbInstance = require('../../../../../lib/test/services/mongoDb/createMongoDbInstance');
 
-// Will be set once in bootstrap
-connectToMongoDb.setUrl(process.env.STORAGE_MONGODB_URL)
-  .setDbName(process.env.STORAGE_MONGODB_DB);
+describe('SyncStateRepository', function main() {
+  this.timeout(90000);
 
-describe('SyncStateRepository', () => {
   let mongoDb;
   let mongoCollection;
   let syncStateRepository;
   let syncState;
+  let instance;
 
-  connectToMongoDb().then((db) => {
-    mongoDb = db;
+  before(async () => {
+    instance = await createMongoDbInstance();
+    await instance.start();
+    mongoDb = await instance.getMongoClient();
   });
-
-  beforeEach(() => {
+  beforeEach(async () => {
+    await mongoDb.dropDatabase();
     mongoCollection = mongoDb.collection('syncState');
 
     const blocks = getBlockFixtures();
-
     syncState = new SyncState(blocks, new Date());
 
     syncStateRepository = new SyncStateRepository(mongoDb);
   });
+  after(async () => instance.clean());
+
 
   it('should store state', async () => {
     await syncStateRepository.store(syncState);
