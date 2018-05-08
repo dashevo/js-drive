@@ -114,23 +114,22 @@ before(() => {
 ### Start MongoDB
 
 ```js
-const createMongoDbInstance = require('../lib/test/services/createMongoDbInstance');
+const startMongoDbInstance = require('../lib/test/services/mongoDb/startMongoDbInstance');
 
 describe('SomeTest', () => {
   let instance;
   let mongoDb;
 
   before(async () => {
-    instance = createMongoDbInstance();
-    await instance.start();
+    instance = startMongoDbInstance();
     mongoDb = instance.getMongoClient();
   });
   beforeEach(async () => mongoDb.dropDatabase());
-  after(async () => instance.clean());
 });
 ```
 
- - `instance.getMongoClient()` returns instance of [Db](https://mongodb.github.io/node-mongodb-native/api-generated/db.html)
+- Use `many` method to start several MongoDb instances
+- `startMongoDbInstance` returns instance if [MongoDbInstance](../lib/test/services/mongoDb/MongoDbInstance.js)
 
 ## Fixtures
 
