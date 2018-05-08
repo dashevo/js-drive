@@ -3,7 +3,7 @@ const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacke
 
 const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInstance');
 
-const getStateTransitionPackets = require('../../fixtures/getStateTransitionPackets');
+const getStateTransitionPackets = require('../../../lib/test/fixtures/getRawStateTransitionPackets');
 
 describe('addSTPacket', () => {
   let ipfsApi;
