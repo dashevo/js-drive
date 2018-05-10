@@ -6,7 +6,7 @@ const StateTransitionHeader = require('../../../lib/blockchain/StateTransitionHe
 const addSTPacketFactory = require('../../../lib/storage/addSTPacketFactory');
 const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInstance');
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getRawStateTransitionPackets');
-const getStateTransitionHeaders = require('../../../lib/test/fixtures/getRawStateTransitionHeaders');
+const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
 
 const multihashing = util.promisify(multihashingAsync);
 
@@ -21,8 +21,8 @@ describe('StateTransitionHeader', () => {
   const packets = getStateTransitionPackets();
   const packet = packets[0];
 
-  const headers = getStateTransitionHeaders();
-  const header = headers[0];
+  const headers = getTransitionHeaderFixtures();
+  const header = headers[0].toJSON();
 
   let addSTPacket;
 
