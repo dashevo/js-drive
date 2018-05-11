@@ -40,6 +40,22 @@ describe('createMongoDbInstance', function main() {
 
       expect(count).to.equal(0);
     });
+
+    it('should clean Mongo database', async () => {
+      await instance.start();
+
+      const client = await instance.getMongoClient();
+      const db = client.collection('syncState');
+      await db.insertOne({ blocks: [], lastSynced: new Date() });
+
+      const countBefore = await db.count({});
+      expect(countBefore).to.equal(1);
+
+      await instance.clean();
+
+      const countAfter = await db.count({});
+      expect(countAfter).to.equal(0);
+    });
   });
 
   describe('Mongo client', () => {
