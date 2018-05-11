@@ -1,5 +1,4 @@
 const addSTPacketFactory = require('../../../lib/storage/addSTPacketFactory');
-const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
 
 const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInstance');
 
