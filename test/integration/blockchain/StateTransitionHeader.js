@@ -18,11 +18,8 @@ async function hashDataMerkleRoot(packet) {
 }
 
 describe('StateTransitionHeader', () => {
-  const packets = getTransitionPacketFixtures();
-  const packet = packets[0];
-
-  const headers = getTransitionHeaderFixtures();
-  const header = headers[0].toJSON();
+  const packet = getTransitionPacketFixtures()[0].toJSON();
+  const header = getTransitionHeaderFixtures()[0].toJSON();
 
   let addSTPacket;
 
