@@ -10,7 +10,7 @@ describe('createMongoDbInstance', function main() {
     before(async () => {
       instance = await createMongoDbInstance();
     });
-    after(async () => instance.clean());
+    after(async () => instance.remove());
 
     it('should start an instance with a bridge dash_test_network', async () => {
       await instance.start();
@@ -48,7 +48,7 @@ describe('createMongoDbInstance', function main() {
     before(async () => {
       instance = await createMongoDbInstance();
     });
-    after(async () => instance.clean());
+    after(async () => instance.remove());
 
     it('should not fail if mongod is not running yet (MongoNetworkError)', async () => {
       await instance.start();

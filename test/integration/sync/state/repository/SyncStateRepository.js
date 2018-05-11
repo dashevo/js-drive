@@ -25,7 +25,7 @@ describe('SyncStateRepository', function main() {
 
     syncStateRepository = new SyncStateRepository(mongoDb);
   });
-  after(async () => instance.clean());
+  after(async () => instance.remove());
 
 
   it('should store state', async () => {
