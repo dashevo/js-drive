@@ -16,8 +16,7 @@ describe('addSTPacket', () => {
   });
 
   it('should add packets to storage and returns hash', async () => {
-    const packetsData = getTransitionPacketFixtures();
-    const packets = packetsData.map(packetData => new StateTransitionPacket(packetData));
+    const packets = getTransitionPacketFixtures();
     const addPacketsPromises = packets.map(addSTPacket);
     const packetsCids = await Promise.all(addPacketsPromises);
 
