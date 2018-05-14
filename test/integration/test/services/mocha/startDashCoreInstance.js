@@ -1,9 +1,5 @@
 const startDashCoreInstance = require('../../../../../lib/test/services/mocha/startDashCoreInstance');
 
-async function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 describe('startDashCoreInstance', () => {
   describe('One instance', () => {
     let instance;
