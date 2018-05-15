@@ -6,6 +6,7 @@ print_usage() {
     echo "Usage:"
     echo "  run npm"
     echo "  run mongo"
+    echo "  run mocha"
     echo "  run dash-cli"
     echo ""
 }
@@ -17,6 +18,10 @@ case "$1" in
 
     'mongo')
         docker-compose run --rm mongodb mongo --host mongodb ${@:2}
+    ;;
+
+    'mocha')
+        docker-compose run --rm api mocha ${@:2}
     ;;
 
     'dash-cli')
