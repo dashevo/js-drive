@@ -1,5 +1,5 @@
 /* eslint-disable global-require */
-describe('mocha', () => {
+describe('Mocha', () => {
   require('./startDashCoreInstance');
   require('./startDashDriveInstance');
   require('./startIPFSInstance');
