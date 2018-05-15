@@ -9,6 +9,7 @@ services:
       - dashcore
       - ipfs
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - .:${PWD}:delegated
       # this is a workaround to prevent host node_modules from accidentally getting mounted in container
       # in case you want to use node/npm both outside container for test/lint etc. and also inside container
@@ -28,6 +29,7 @@ services:
       - dashcore
       - ipfs
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - .:${PWD}:delegated
       # this is a workaround to prevent host node_modules from accidentally getting mounted in container
       # in case you want to use node/npm both outside container for test/lint etc. and also inside container
