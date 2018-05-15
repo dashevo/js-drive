@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+PROJECT_PATH="$(cd "$(dirname "$0")/.."; pwd)"
+
+print_usage() {
+    echo "Usage:"
+    echo "  run npm"
+    echo "  run mongo"
+    echo "  run dash-cli"
+    echo ""
+}
+
+case "$1" in
+    'npm')
+        docker-compose run --rm api npm ${@:2}
+    ;;
+
+    'mongo')
+        docker-compose run --rm mongodb mongo --host mongodb ${@:2}
+    ;;
+
+    'dash-cli')
+        docker-compose run --rm dashcore dash-cli -regtest \
+                                                  -rpcuser=dashrpc \
+                                                  -rpcpassword=password \
+                                                  -rpcconnect=dashcore \
+                                                  -rpcport=9998 ${@:2}
+    ;;
+
+    '--help')
+        echo "Run tools from docker containers."
+        echo ""
+        print_usage
+    ;;
+
+    *)
+        echo "Invalid command: $1"
+        echo ""
+        print_usage
+        exit 1
+    ;;
+esac
