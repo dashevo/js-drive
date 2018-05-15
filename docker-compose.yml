@@ -52,7 +52,7 @@ services:
       - 27017:27017
 
   ipfs:
-    image: ipfs/go-ipfs:4.15
+    image: ipfs/go-ipfs:v0.4.15
     command: daemon --migrate=true --offline --enable-pubsub-experiment
     volumes:
       - ipfs:/data/ipfs
