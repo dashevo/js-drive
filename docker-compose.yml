@@ -1,14 +1,8 @@
 version: '3.3'
 services:
   api:
-    build:
-      args:
-        - NODE_ENV=development
-        - RUN_SCRIPT=api
-        - EXPOSE_PORTS=80 9229
-      context: .
-      dockerfile: docker/node/Dockerfile
-    image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive/api
+    image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive
+    command: npm run api
     working_dir: ${PWD}
     depends_on:
       - mongodb
@@ -22,17 +16,12 @@ services:
       # /node_modules location.
       - node_modules:${PWD}/node_modules
     ports:
-      - 80:80
+      - 6000:6000
       - 9229:9229
 
   sync:
-    build:
-      args:
-        - NODE_ENV=development
-        - RUN_SCRIPT=sync
-      context: .
-      dockerfile: docker/node/Dockerfile
-    image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive/sync
+    image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashdrive
+    command: npm run sync
     working_dir: ${PWD}
     depends_on:
       - mongodb
@@ -52,9 +41,8 @@ services:
     image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashcore:develop
     restart: always
     volumes:
-      - ./docker/dashcore/dash.conf:/root/.dashcore/dash.conf # Make dash-cli inside the container work
       - dashcore:/data
-    command: dashd -conf=/root/.dashcore/dash.conf -datadir=/data -regtest=1
+    command: dashd -datadir=/data -regtest=1 -keypool=1 -rpcuser=dashrpc -rpcpassword=password -rpcallowip=0.0.0.0/0 -rpcport=9998 -zmqpubhashblock=tcp://0.0.0.0:29998
 
   mongodb:
     image: mongo:3.6
@@ -64,7 +52,7 @@ services:
       - 27017:27017
 
   ipfs:
-    image: jbenet/go-ipfs:latest
+    image: ipfs/go-ipfs:4.15
     command: daemon --migrate=true --offline --enable-pubsub-experiment
     volumes:
       - ipfs:/data/ipfs
