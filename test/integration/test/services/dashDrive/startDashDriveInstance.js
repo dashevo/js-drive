@@ -117,7 +117,6 @@ describe('startDashDriveInstance', function main() {
 
     it('should DashDrive api return error if initial sync in progress', (done) => {
       rpc.request('addSTPacketMethod', {}, (error, response) => {
-        console.log(error, response);
         expect(response.error.message).to.equal('Initial sync in progress');
         done();
       });
