@@ -1,10 +1,8 @@
 const addSTPacketFactory = require('../../../lib/storage/addSTPacketFactory');
 
 const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
-// const StateTransitionHeader = require('../../../lib/blockchain/StateTransitionHeader');
 
-const getStateTransitionPackets = require('../../fixtures/getStateTransitionPackets');
-// const getStateTransitionHeaders = require('../../fixtures/getStateTransitionHeaders');
+const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 
 const startDashDriveInstance = require('../../../lib/test/services/dashDrive/startDashDriveInstance');
 const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInstance');
@@ -13,7 +11,9 @@ const createDashDriveInstance = require('../../../lib/test/services/dashDrive/cr
 const createDashCoreInstance = require('../../../lib/test/services/dashCore/createDashCoreInstance');
 const createMongoDbInstance = require('../../../lib/test/services/mongoDb/createMongoDbInstance');
 
-// const generateStateStransitions = require('../../../lib/test/fixtures/generateStateTransitions');
+const gst = require('../../../lib/test/fixtures/generateStateTransitions');
+
+const jayson = require('jayson');
 
 describe('Initial sync of Dash Drive and Dash Core', function main() {
   // First node
@@ -29,46 +29,29 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   this.timeout(100000);
 
   before('having Dash Drive node #1 up and ready, some amount of STs generated and Dash Drive on node #1 fully synced', async () => {
-    // start Dash Drive node #1
-
     dashDriveInstance = await startDashDriveInstance();
 
-    // generate and add ST packets to Dash Drive
+    const { userId, privateKeyString } = await gst.registerUser('Alice', dashDriveInstance.dashCore.rpcClient);
 
-    // TODO: fix user registration
+    const packetsData = getStateTransitionPackets();
 
-    // const [transitionPacket, transitionHeader] = await gst.dapContractTransitions(
-    //   'bob',
-    //   dashDriveInstance.dashCore.rpcClient
-    // );
-
-    // const packetsData = [transitionPacket];
-    // const packetsHeaders = [transitionHeader];
+    const [packet, header] = await gst.createDapContractTransitions(
+      userId, privateKeyString, packetsData[0]
+    );
 
     const addSTPacket = addSTPacketFactory(dashDriveInstance.ipfs);
-    const packetsData = getStateTransitionPackets();
-    const packets = packetsData.map(packetData => new StateTransitionPacket(packetData));
-    const addPacketsPromises = packets.map(addSTPacket);
-    packetsCids = await Promise.all(addPacketsPromises);
+    const packetCid = await addSTPacket(packet);
 
-    // submit headers to Dash Core
+    packetsCids = [packetCid];
 
-    // const packetsHeaders = getStateTransitionHeaders();
-    // const headers = packetsHeaders.map(headerData => new StateTransitionHeader(headerData));
-
-    // TODO: fix user registration or fix fixtures
-
-    // const transitionIdsPromises = headers.map((header) => {
-    //   return dashDriveInstance.dashCore.rpcClient.sendRawTransition(header.serialize());
-    // });
-    // const transitionIds = await Promise.all(transitionIdsPromises);
+    const txid = await dashDriveInstance.dashCore.rpcClient.sendRawTransition(header);
   });
 
   it('Dash Drive should sync the data with Dash Core upon startup', async () => {
-    // start Dash Core on the node #2
-
     dashCoreInstance = await createDashCoreInstance();
     await dashCoreInstance.start();
+
+    await dashCoreInstance.connect(dashDriveInstance.dashCore);
 
     mongoDbInstance = await createMongoDbInstance();
     await mongoDbInstance.start();
@@ -76,8 +59,21 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     const ipfsInstance = await startIPFSInstance();
     const { apiHost, apiPort } = ipfsInstance;
 
-    // TODO: wait until Dash Core syncs
-    // Not sure how to check it
+    const firstInstanceId = await dashDriveInstance.ipfs.id();
+
+    await ipfsInstance.swarm.connect(
+      firstInstanceId.addresses[0]
+    );
+
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    while(true) {
+      const status = await dashCoreInstance.rpcClient.mnsync('status');
+      if (status.result.IsSynced === true) {
+	break;
+      }
+      await wait(3000);
+    }
 
     // start Dash Drive on node #2
     const envs = [
@@ -93,21 +89,62 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     dashDriveInstance2 = await createDashDriveInstance(envs);
     await dashDriveInstance2.start();
 
-    // TODO: wait until Dash Drive replicates data?
+    const ddPort = await dashDriveInstance2.getRpcPort();
+
+    // Shamelesly taken from David
+    async function createRpcClient(rpcPort) {
+      const client = jayson.client.http({
+	host: '0.0.0.0',
+	port: rpcPort,
+      });
+
+      return new Promise((resolve) => {
+	function request() {
+          client.request('', [], (error) => {
+            if (error && error.message === 'socket hang up') {
+              return setTimeout(request, 1000);
+            }
+            return resolve(client);
+          });
+	}
+	request();
+      });
+    }
+
+    const driveRpc = await createRpcClient(ddPort);
+
+    async function dashDriveSyncToFinish() {
+      let finished = false;
+      while(!finished) {
+	driveRpc.request('addSTPacketMethod', {}, (err, res) => {
+	  if (err) {
+	    return;
+	  }
+	  if (res.error && res.error.code === 100) {
+	    return;
+	  }
+	  finished = true;
+	});
+	await wait(1000);
+      }
+    }
+
+    // THIS bastard ruins everything and waits forever
+    //await dashDriveSyncToFinish();
 
     const lsResult = await ipfsInstance.pin.ls();
 
     const hashes = lsResult.map(item => item.hash);
 
-    // TODO: once user registration is fixed remove "not"
-    expect(hashes).to.not.contain.members(packetsCids);
+    expect(hashes).to.contain.members(packetsCids);
   });
 
   after('cleanup lone services', async () => {
     const promises = Promise.all([
-      mongoDbInstance.clean(),
-      dashCoreInstance.clean(),
-      dashDriveInstance2.clean(),
+      mongoDbInstance.remove(),
+      dashCoreInstance.remove(),
+      dashDriveInstance.remove(),
+      dashDriveInstance2.remove(),
     ]);
     await promises;
   });
