@@ -29,7 +29,7 @@ describe('DockerInstance', function main() {
     before(async () => {
       instance = await createInstance(options);
     });
-    after(async () => instance.clean());
+    after(async () => instance.remove());
 
     it('should start a DockerInstance with DashCoreInstanceOptions network options', async () => {
       await instance.start();
@@ -80,7 +80,7 @@ describe('DockerInstance', function main() {
     });
 
     it('should clean the instance', async () => {
-      await instance.clean();
+      await instance.remove();
 
       let error;
       try {
@@ -88,8 +88,7 @@ describe('DockerInstance', function main() {
       } catch (err) {
         error = err;
       }
-      expect(error.statusCode).to.equal(404);
-      expect(error.reason).to.equal('no such container');
+      expect(error.message).to.equal('Container not found');
     });
   });
 
@@ -109,9 +108,9 @@ describe('DockerInstance', function main() {
     });
     after(async () => {
       await Promise.all([
-        instanceOne.clean(),
-        instanceTwo.clean(),
-        instanceThree.clean(),
+        instanceOne.remove(),
+        instanceTwo.remove(),
+        instanceThree.remove(),
       ]);
     });
 

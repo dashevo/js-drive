@@ -14,7 +14,7 @@ describe('createDashDriveInstance', function main() {
     before(async () => {
       instance = await createDashDriveInstance(envs);
     });
-    after(async () => instance.clean());
+    after(async () => instance.remove());
 
     it('should start an instance with a bridge dash_test_network', async () => {
       await instance.start();
@@ -39,6 +39,11 @@ describe('createDashDriveInstance', function main() {
       await instance.start();
       const { Args } = await instance.container.details();
       expect(Args).to.deep.equal(['run', 'sync']);
+    });
+
+    it('should return DashDrive RPC port', async () => {
+      await instance.start();
+      expect(instance.getRpcPort()).to.equal(instance.options.rpc.port);
     });
   });
 });

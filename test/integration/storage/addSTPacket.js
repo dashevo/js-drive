@@ -1,23 +1,20 @@
 const addSTPacketFactory = require('../../../lib/storage/addSTPacketFactory');
-const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
 
-const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInstance');
+const startIPFSInstance = require('../../../lib/test/services/mocha/startIPFSInstance');
 
-const getStateTransitionPackets = require('../../fixtures/getStateTransitionPackets');
+const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 
 describe('addSTPacket', () => {
   let ipfsApi;
   let addSTPacket;
 
-  before(async function before() {
-    this.timeout(25000);
-    ipfsApi = await startIPFSInstance();
+  startIPFSInstance().then((_instance) => {
+    ipfsApi = _instance;
     addSTPacket = addSTPacketFactory(ipfsApi);
   });
 
   it('should add packets to storage and returns hash', async () => {
-    const packetsData = getStateTransitionPackets();
-    const packets = packetsData.map(packetData => new StateTransitionPacket(packetData));
+    const packets = getTransitionPacketFixtures();
     const addPacketsPromises = packets.map(addSTPacket);
     const packetsCids = await Promise.all(addPacketsPromises);
 
