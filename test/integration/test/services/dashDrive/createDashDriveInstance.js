@@ -38,12 +38,7 @@ describe('createDashDriveInstance', function main() {
     it('should start an instance with the default options', async () => {
       await instance.start();
       const { Args } = await instance.container.details();
-      expect(Args).to.deep.equal(['run', 'drive']);
-    });
-
-    it('should return DashDrive RPC port', async () => {
-      await instance.start();
-      expect(instance.getRpcPort()).to.equal(instance.options.rpc.port);
+      expect(Args).to.deep.equal(['-c', 'npm run sync & npm run api']);
     });
 
     it('should return DashDrive RPC port', async () => {
