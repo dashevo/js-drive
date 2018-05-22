@@ -27,7 +27,7 @@ const errorHandler = require('../lib/util/errorHandler');
   // TODO: Parse variable to int if present
   const blockIterator = new RpcBlockIterator(
     rpcClient,
-    process.env.SYNC_EVO_START_BLOCK_HEIGHT,
+    parseInt(process.env.SYNC_EVO_START_BLOCK_HEIGHT, 10),
   );
 
   const stHeaderIterator = new StateTransitionHeaderIterator(blockIterator, rpcClient);
