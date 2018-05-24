@@ -65,7 +65,12 @@ describe('createDashCoreInstance', function main() {
         '-regtest=1',
         '-keypool=1',
         `-rpcport=${instance.options.getRpcPort()}`,
-        `-zmqpubhashblock=tcp://0.0.0.0:${instance.options.getZmqPort()}`,
+        `-zmqpubrawtx=tcp://0.0.0.0:${instance.options.getZmqPorts().rawtx}`,
+        `-zmqpubrawtxlock=tcp://0.0.0.0:${instance.options.getZmqPorts().rawtxlock}`,
+        `-zmqpubhashblock=tcp://0.0.0.0:${instance.options.getZmqPorts().hashblock}`,
+        `-zmqpubhashtx=tcp://0.0.0.0:${instance.options.getZmqPorts().hashtx}`,
+        `-zmqpubhashtxlock=tcp://0.0.0.0:${instance.options.getZmqPorts().hashtxlock}`,
+        `-zmqpubrawblock=tcp://0.0.0.0:${instance.options.getZmqPorts().rawblock}`,
       ]);
     });
 
