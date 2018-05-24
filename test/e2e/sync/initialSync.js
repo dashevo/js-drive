@@ -45,6 +45,8 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     packetsCids = [packetCid];
 
     const txid = await dashDriveInstance.dashCore.rpcClient.sendRawTransition(header);
+
+    const txids = await dashDriveInstance.dashCore.rpcClient.generate(7);
   });
 
   it('Dash Drive should sync the data with Dash Core upon startup', async () => {
