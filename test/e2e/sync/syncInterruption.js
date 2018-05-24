@@ -59,6 +59,8 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     for(let i = 0; i < 50; i++) {
       const txid = await createAndSubmitST(`Alice_${i}`);
     }
+
+    const txids = await dashDriveInstance.dashCore.rpcClient.generate(60);
   });
 
   it('Dash Drive should save sync state and continue from saved point after resume', async () => {
