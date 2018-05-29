@@ -70,15 +70,14 @@ describe('createIPFSInstance', function main() {
       ]);
     });
 
-    it('should be connected each other');
-
     it('should propagate data from one instance to the other', async () => {
-      const client = instanceOne.getApi();
-      const peerBefore = await client.swarm.peers();
+      const clientOne = instanceOne.getApi();
+      const cid = await clientOne.dag.put({ name: 'world' }, { format: 'dag-cbor', hashAlg: 'sha2-256' });
 
-      await instanceOne.connect(instanceTwo);
+      const clientTwo = instanceTwo.getApi();
+      const data = await clientTwo.dag.get(cid, 'name', { format: 'dag-cbor', hashAlg: 'sha2-256' });
 
-      const peersAfter = await client.swarm.peers();
+      expect(data.value).to.equal('world');
     });
   });
 });
