@@ -30,7 +30,6 @@ describe('createIPFSInstance', function main() {
         '--',
         '/usr/local/bin/start_ipfs',
         'daemon',
-        '--migrate=true',
       ]);
     });
 
