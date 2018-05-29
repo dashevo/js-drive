@@ -34,6 +34,14 @@ describe('createIPFSInstance', function main() {
       ]);
     });
 
+    it('should get IPFS address', async () => {
+      await instance.start();
+
+      const address = instance.getIpfsAddress();
+
+      expect(address).to.equal(`/ip4/${instance.getIp()}/tcp/${instance.options.getIpfsPort()}`);
+    });
+
     it('should get IPFS client', async () => {
       await instance.start();
 
