@@ -120,22 +120,4 @@ describe('startDashDriveInstance', function main() {
       }
     });
   });
-
-  xdescribe('RPC', () => {
-    let instance;
-    let rpc;
-
-    before(async () => {
-      instance = await startDashDriveInstance();
-      rpc = await instance.dashDrive.getApi();
-    });
-    after(async () => instance.remove());
-
-    it('should DashDrive api return error if initial sync in progress', (done) => {
-      rpc.request('addSTPacketMethod', {}, (error, response) => {
-        expect(response.error.message).to.equal('Initial sync in progress');
-        done();
-      });
-    });
-  });
 });
