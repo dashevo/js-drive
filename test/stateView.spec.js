@@ -13,6 +13,12 @@ const util = require('util');
 const multihashing = util.promisify(multihashingAsync);
 
 class DapContract {
+  /**
+   * @param {string} dapId
+   * @param {string} dapName
+   * @param {string} packetHash
+   * @param {object} contract
+   */
   constructor(dapId, dapName, packetHash, contract) {
     this.dapId = dapId;
     this.dapName = dapName;
@@ -32,6 +38,11 @@ class DapContract {
     return this.contract;
   }
 
+  /**
+   * Get DapContract JSON representation
+   *
+   * @returns {{dapId: (string), dapName: (string), packetHash: (string), contract: (Object)}}
+   */
   toJSON() {
     return {
       dapId: this.dapId,
@@ -43,10 +54,19 @@ class DapContract {
 }
 
 class DapContractMongoDbRepository {
+  /**
+   * @param {Db} mongoClient
+   */
   constructor(mongoClient) {
     this.mongoClient = mongoClient.collection('dapContracts');
   }
 
+  /**
+   * Find DapContract by dapId
+   *
+   * @param {string} dapId
+   * @returns {Promise<DapContract>}
+   */
   async find(dapId) {
     const dapContractData = await this.mongoClient.findOne({ _id: dapId });
     return new DapContract(
@@ -57,6 +77,12 @@ class DapContractMongoDbRepository {
     );
   }
 
+  /**
+   * Store DapContract entity
+   *
+   * @param {DapContract} dapContract
+   * @returns {Promise}
+   */
   async store(dapContract) {
     return this.mongoClient.updateOne(
       { _id: dapContract.toJSON().dapId },
@@ -66,7 +92,19 @@ class DapContractMongoDbRepository {
   }
 }
 
+/**
+ * @param {DapContractMongoDbRepository} dapContractRepository
+ * @param {IpfsAPI} ipfs
+ * @returns {storeDapContract}
+ */
 function storeDapContractFactory(dapContractRepository, ipfs) {
+  /**
+   * Validate and store DapContract
+   *
+   * @typedef {Promise} storeDapContract
+   * @param {string} cid
+   * @retuns {object}
+   */
   return async function storeDapContract(cid) {
     const packetData = await ipfs.dag.get(cid);
     const packet = new StateTransitionPacket(JSON.parse(packetData.value));
@@ -74,7 +112,7 @@ function storeDapContractFactory(dapContractRepository, ipfs) {
     const dapName = packet.objects[0].data.dapname;
     const contract = packet.schema;
     const dapContract = new DapContract(dapId, dapName, cid, contract);
-    await dapContractRepository.store(dapContract);
+    return dapContractRepository.store(dapContract);
   };
 }
 
