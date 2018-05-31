@@ -86,14 +86,11 @@ describe('State view implementation', () => {
       const dapContract = new DapContract(dapId, packetHash, contractData);
 
       const dapContractSerialized = dapContract.toJSON();
-      expect(dapContractSerialized)
-        .to
-        .deep
-        .equal({
-          dapId,
-          packetHash,
-          contract: contractData,
-        });
+      expect(dapContractSerialized).to.deep.equal({
+        dapId,
+        packetHash,
+        contract: contractData,
+      });
     });
   });
 
@@ -128,7 +125,7 @@ describe('State view implementation', () => {
 
     let ipfsClient;
     startIPFSInstance().then((_instance) => {
-      ipfsClient = _instance;
+      ipfsClient = _instance.getApi();
     });
 
     it('should store DAP contract', async () => {
@@ -143,7 +140,7 @@ describe('State view implementation', () => {
 
       await ipfsClient.dag.put(packet.toJSON(), {
         format: 'dag-cbor',
-        hashAlg: 'sha2-256'
+        hashAlg: 'sha2-256',
       });
 
       const cid = stHeader.getPacketCID();
