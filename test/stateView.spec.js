@@ -23,7 +23,7 @@ class DapContract {
     this.dapId = dapId;
     this.dapName = dapName;
     this.packetHash = packetHash;
-    this.contract = contract;
+    this.schema = contract;
   }
 
   getDapId() {
@@ -34,21 +34,21 @@ class DapContract {
     return this.dapName;
   }
 
-  getContract() {
-    return this.contract;
+  getSchema() {
+    return this.schema;
   }
 
   /**
    * Get DapContract JSON representation
    *
-   * @returns {{dapId: (string), dapName: (string), packetHash: (string), contract: (Object)}}
+   * @returns {{dapId: (string), dapName: (string), packetHash: (string), schema: (Object)}}
    */
   toJSON() {
     return {
       dapId: this.dapId,
       dapName: this.dapName,
       packetHash: this.packetHash,
-      contract: this.contract,
+      schema: this.schema,
     };
   }
 }
@@ -73,7 +73,7 @@ class DapContractMongoDbRepository {
       dapContractData.dapId,
       dapContractData.dapName,
       dapContractData.packetHash,
-      dapContractData.contract,
+      dapContractData.schema,
     );
   }
 
@@ -110,8 +110,8 @@ function storeDapContractFactory(dapContractRepository, ipfs) {
     const packet = new StateTransitionPacket(JSON.parse(packetData.value));
     const dapId = packet.dapid;
     const dapName = packet.objects[0].data.dapname;
-    const contract = packet.schema;
-    const dapContract = new DapContract(dapId, dapName, cid, contract);
+    const schema = packet.schema;
+    const dapContract = new DapContract(dapId, dapName, cid, schema);
     return dapContractRepository.store(dapContract);
   };
 }
@@ -129,15 +129,15 @@ describe('State view implementation', () => {
       const dapId = '123456';
       const dapName = 'DashPay';
       const packetHash = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
-      const contractData = {};
-      const dapContract = new DapContract(dapId, dapName, packetHash, contractData);
+      const schema = {};
+      const dapContract = new DapContract(dapId, dapName, packetHash, schema);
 
       const dapContractSerialized = dapContract.toJSON();
       expect(dapContractSerialized).to.deep.equal({
         dapId,
         dapName,
         packetHash,
-        contract: contractData,
+        schema: schema,
       });
     });
   });
@@ -152,8 +152,8 @@ describe('State view implementation', () => {
       const dapId = '123456';
       const dapName = 'DashPay';
       const packetHash = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
-      const contractData = {};
-      const dapContract = new DapContract(dapId, dapName, packetHash, contractData);
+      const schema = {};
+      const dapContract = new DapContract(dapId, dapName, packetHash, schema);
 
       const mongoClient = await mongoDbInstance.getMongoClient();
       const dapContractRepository = new DapContractMongoDbRepository(mongoClient);
@@ -177,7 +177,7 @@ describe('State view implementation', () => {
       ipfsClient = _instance.getApi();
     });
 
-    it('should store DAP contract', async () => {
+    it('should store DAP schema', async () => {
       const packet = getTransitionPacketFixtures()[0];
       const header = getTransitionHeaderFixtures()[0].toJSON();
       header.hashDataMerkleRoot = await hashDataMerkleRoot(packet.toJSON());
@@ -200,7 +200,7 @@ describe('State view implementation', () => {
 
       expect(dapContract.getDapId()).to.equal(dapId);
       expect(dapContract.getDapName()).to.equal(packet.data.objects[0].data.dapname);
-      expect(dapContract.getContract()).to.deep.equal(packet.schema);
+      expect(dapContract.getSchema()).to.deep.equal(packet.schema);
     });
   });
 });
