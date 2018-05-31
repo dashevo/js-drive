@@ -126,7 +126,7 @@ async function hashDataMerkleRoot(packet) {
 describe('State view implementation', () => {
   describe('DapContract', () => {
     it('should serialize DapContract', () => {
-      const dapId = 123456;
+      const dapId = '123456';
       const dapName = 'DashPay';
       const packetHash = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
       const contractData = {};
@@ -149,7 +149,7 @@ describe('State view implementation', () => {
     });
 
     it('should store DapContract entity', async () => {
-      const dapId = 123456;
+      const dapId = '123456';
       const dapName = 'DashPay';
       const packetHash = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
       const contractData = {};
