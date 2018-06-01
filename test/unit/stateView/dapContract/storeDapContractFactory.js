@@ -1,7 +1,7 @@
 const getTransitionPacketFixtures = require('../../../../lib/test/fixtures/getTransitionPacketFixtures');
 const storeDapContractFactory = require('../../../../lib/stateView/dapContract/storeDapContractFactory');
 
-describe('State View', () => {
+describe('storeDapContractFactory', () => {
   let dapContractRepository;
   let ipfsClient;
   beforeEach(function beforeEach() {
