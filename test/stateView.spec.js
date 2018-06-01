@@ -12,46 +12,7 @@ const util = require('util');
 
 const multihashing = util.promisify(multihashingAsync);
 
-class DapContract {
-  /**
-   * @param {string} dapId
-   * @param {string} dapName
-   * @param {string} packetHash
-   * @param {object} contract
-   */
-  constructor(dapId, dapName, packetHash, contract) {
-    this.dapId = dapId;
-    this.dapName = dapName;
-    this.packetHash = packetHash;
-    this.schema = contract;
-  }
-
-  getDapId() {
-    return this.dapId;
-  }
-
-  getDapName() {
-    return this.dapName;
-  }
-
-  getSchema() {
-    return this.schema;
-  }
-
-  /**
-   * Get DapContract JSON representation
-   *
-   * @returns {{dapId: (string), dapName: (string), packetHash: (string), schema: (Object)}}
-   */
-  toJSON() {
-    return {
-      dapId: this.dapId,
-      dapName: this.dapName,
-      packetHash: this.packetHash,
-      schema: this.schema,
-    };
-  }
-}
+const DapContract = require('../lib/stateView/dapContract/DapContract');
 
 class DapContractMongoDbRepository {
   /**
@@ -124,24 +85,6 @@ async function hashDataMerkleRoot(packet) {
 }
 
 describe('State view implementation', () => {
-  describe('DapContract', () => {
-    it('should serialize DapContract', () => {
-      const dapId = '123456';
-      const dapName = 'DashPay';
-      const packetHash = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
-      const schema = {};
-      const dapContract = new DapContract(dapId, dapName, packetHash, schema);
-
-      const dapContractSerialized = dapContract.toJSON();
-      expect(dapContractSerialized).to.deep.equal({
-        dapId,
-        dapName,
-        packetHash,
-        schema: schema,
-      });
-    });
-  });
-
   describe('DapContractRepository', () => {
     let mongoDbInstance;
     startMongoDbInstance().then((_instance) => {
