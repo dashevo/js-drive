@@ -2,4 +2,5 @@
 describe('dapContract', () => {
   require('./DapContract');
   require('./storeDapContractFactory');
+  require('./storeDapContractHandler');
 });

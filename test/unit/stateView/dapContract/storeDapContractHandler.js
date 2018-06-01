@@ -1,17 +1,5 @@
-const getTransitionHeaderFixtures = require('../lib/test/fixtures/getTransitionHeaderFixtures');
-
-/**
- * Store DAP contract handler
- *
- * @param {STHeadersReader} stHeadersReader
- * @param {storeDapContract} storeDapContract
- */
-function storeDapContractHandler(stHeadersReader, storeDapContract) {
-  stHeadersReader.on('header', async (header) => {
-    const cid = header.getPacketCID();
-    await storeDapContract(cid);
-  });
-}
+const getTransitionHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHeaderFixtures');
+const storeDapContractHandler = require('../../../../lib/stateView/dapContract/storeDapContractHandler');
 
 describe('storeDapContractHandler', () => {
   let stHeadersReader;
