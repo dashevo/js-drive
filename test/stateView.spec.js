@@ -13,46 +13,7 @@ const util = require('util');
 const multihashing = util.promisify(multihashingAsync);
 
 const DapContract = require('../lib/stateView/dapContract/DapContract');
-
-class DapContractMongoDbRepository {
-  /**
-   * @param {Db} mongoClient
-   */
-  constructor(mongoClient) {
-    this.mongoClient = mongoClient.collection('dapContracts');
-  }
-
-  /**
-   * Find DapContract by dapId
-   *
-   * @param {string} dapId
-   * @returns {Promise<DapContract>}
-   */
-  async find(dapId) {
-    const dapContractData = await this.mongoClient.findOne({ _id: dapId });
-    return new DapContract(
-      dapContractData.dapId,
-      dapContractData.dapName,
-      dapContractData.packetHash,
-      dapContractData.schema,
-    );
-  }
-
-  /**
-   * Store DapContract entity
-   *
-   * @param {DapContract} dapContract
-   * @returns {Promise}
-   */
-  async store(dapContract) {
-    return this.mongoClient.updateOne(
-      { _id: dapContract.toJSON().dapId },
-      { $set: dapContract.toJSON() },
-      { upsert: true },
-    );
-  }
-}
-
+const DapContractMongoDbRepository = require('../lib/stateView/dapContract/DapContractMongoDbRepository');
 /**
  * @param {DapContractMongoDbRepository} dapContractRepository
  * @param {IpfsAPI} ipfs
@@ -85,28 +46,6 @@ async function hashDataMerkleRoot(packet) {
 }
 
 describe('State view implementation', () => {
-  describe('DapContractRepository', () => {
-    let mongoDbInstance;
-    startMongoDbInstance().then((_instance) => {
-      mongoDbInstance = _instance;
-    });
-
-    it('should store DapContract entity', async () => {
-      const dapId = '123456';
-      const dapName = 'DashPay';
-      const packetHash = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
-      const schema = {};
-      const dapContract = new DapContract(dapId, dapName, packetHash, schema);
-
-      const mongoClient = await mongoDbInstance.getMongoClient();
-      const dapContractRepository = new DapContractMongoDbRepository(mongoClient);
-      await dapContractRepository.store(dapContract);
-      const contract = await dapContractRepository.find(dapId);
-
-      expect(contract.toJSON()).to.deep.equal(dapContract.toJSON());
-    });
-  });
-
   describe('State View', function main() {
     this.timeout(30000);
 
