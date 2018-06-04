@@ -15,7 +15,7 @@ const storeDapContractFactory = require('../lib/stateView/dapContract/storeDapCo
 
 const attachPinSTPacketHandler = require('../lib/storage/attachPinSTPacketHandler');
 const attachStoreSyncStateHandler = require('../lib/sync/state/attachStoreSyncStateHandler');
-const storeDapContractHandler = require('../lib/stateView/dapContract/storeDapContractHandler');
+const attachStoreDapContractHandler = require('../lib/stateView/dapContract/attachStoreDapContractHandler');
 const errorHandler = require('../lib/util/errorHandler');
 
 (async function main() {
@@ -53,7 +53,7 @@ const errorHandler = require('../lib/util/errorHandler');
   attachStoreSyncStateHandler(stHeaderReader, syncState, syncStateRepository);
   const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb);
   const storeDapContract = storeDapContractFactory(dapContractMongoDbRepository, ipfsAPI);
-  storeDapContractHandler(stHeaderReader, storeDapContract);
+  attachStoreDapContractHandler(stHeaderReader, storeDapContract);
 
   await stHeaderReader.read();
 

@@ -1,7 +1,7 @@
 const getTransitionHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHeaderFixtures');
-const storeDapContractHandler = require('../../../../lib/stateView/dapContract/storeDapContractHandler');
+const attachStoreDapContractHandler = require('../../../../lib/stateView/dapContract/attachStoreDapContractHandler');
 
-describe('storeDapContractHandler', () => {
+describe('attachStoreDapContractHandler', () => {
   let stHeadersReader;
   let storeDapContract;
 
@@ -11,10 +11,10 @@ describe('storeDapContractHandler', () => {
       on: (topic, fn) => fn(header),
     };
     storeDapContract = this.sinon.stub();
-    storeDapContractHandler(stHeadersReader, storeDapContract);
+    attachStoreDapContractHandler(stHeadersReader, storeDapContract);
   });
 
-  it('should call storeDapContractHandler on new block header', () => {
+  it('should call attachStoreDapContractHandler on new block header', () => {
     expect(storeDapContract).to.be.calledOnce();
   });
 });
