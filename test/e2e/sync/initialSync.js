@@ -15,6 +15,8 @@ const gst = require('../../../lib/test/fixtures/generateStateTransitions');
 
 const jayson = require('jayson');
 
+const cbor = require('cbor');
+
 describe('Initial sync of Dash Drive and Dash Core', function main() {
   // First node
   let dashDriveInstance;
@@ -26,20 +28,20 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
   let packetsCids;
 
-  this.timeout(100000);
+  const packetsData = getStateTransitionPackets();
+
+  this.timeout(900000);
 
   before('having Dash Drive node #1 up and ready, some amount of STs generated and Dash Drive on node #1 fully synced', async () => {
     dashDriveInstance = await startDashDriveInstance();
 
     const { userId, privateKeyString } = await gst.registerUser('Alice', dashDriveInstance.dashCore.rpcClient);
 
-    const packetsData = getStateTransitionPackets();
-
     const [packet, header] = await gst.createDapContractTransitions(
       userId, privateKeyString, packetsData[0]
     );
 
-    const addSTPacket = addSTPacketFactory(dashDriveInstance.ipfs);
+    const addSTPacket = addSTPacketFactory(dashDriveInstance.ipfs.getApi());
     const packetCid = await addSTPacket(packet);
 
     packetsCids = [packetCid];
@@ -61,11 +63,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     const ipfsInstance = await startIPFSInstance();
     const { apiHost, apiPort } = ipfsInstance;
 
-    const firstInstanceId = await dashDriveInstance.ipfs.id();
-
-    await ipfsInstance.swarm.connect(
-      firstInstanceId.addresses[0]
-    );
+    const firstInstanceId = await dashDriveInstance.ipfs.getApi().id();
 
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -79,12 +77,12 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     // start Dash Drive on node #2
     const envs = [
-      `DASHCORE_ZMQ_PUB_HASHBLOCK=${dashCoreInstance.options.getZmqSockets().hashblock}`,
+      `DASHCORE_ZMQ_PUB_HASHBLOCK=${dashCoreInstance.getZmqSockets().hashblock}`,
       `DASHCORE_JSON_RPC_HOST=${dashCoreInstance.getIp()}`,
       `DASHCORE_JSON_RPC_PORT=${dashCoreInstance.options.getRpcPort()}`,
       `DASHCORE_JSON_RPC_USER=${dashCoreInstance.options.getRpcUser()}`,
       `DASHCORE_JSON_RPC_PASS=${dashCoreInstance.options.getRpcPassword()}`,
-      `STORAGE_IPFS_MULTIADDR=/ip4/${apiHost}/tcp/${apiPort}`,
+      `STORAGE_IPFS_MULTIADDR=${ipfsInstance.getIpfsAddress()}`,
       `STORAGE_MONGODB_URL=mongodb://${mongoDbInstance.getIp()}`,
     ];
 
@@ -115,10 +113,15 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     const driveRpc = await createRpcClient(ddPort);
 
+    const serializedPacket = cbor.encodeCanonical(packetsData[0]);
+    const spJson = {
+      packet: serializedPacket.toString('hex')
+    };
+
     async function dashDriveSyncToFinish() {
       let finished = false;
       while(!finished) {
-	driveRpc.request('addSTPacketMethod', {}, (err, res) => {
+	driveRpc.request('addSTPacketMethod', spJson, (err, res) => {
 	  if (err) {
 	    return;
 	  }
@@ -131,10 +134,13 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       }
     }
 
-    // THIS bastard ruins everything and waits forever
-    //await dashDriveSyncToFinish();
+    await dashDriveSyncToFinish();
 
-    const lsResult = await ipfsInstance.pin.ls();
+    // for (let i = 0; i < 120; i++) {
+    //   await wait(1000);
+    // }
+
+    const lsResult = await ipfsInstance.getApi().pin.ls();
 
     const hashes = lsResult.map(item => item.hash);
 
