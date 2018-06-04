@@ -5,20 +5,7 @@ const getTransitionHeaderFixtures = require('../../../../lib/test/fixtures/getTr
 const StateTransitionHeader = require('../../../../lib/blockchain/StateTransitionHeader');
 const DapContractMongoDbRepository = require('../../../../lib/stateView/dapContract/DapContractMongoDbRepository');
 const storeDapContractFactory = require('../../../../lib/stateView/dapContract/storeDapContractFactory');
-
-const cbor = require('cbor');
-const multihashingAsync = require('multihashing-async');
-const multihashes = require('multihashes');
-const util = require('util');
-
-const multihashing = util.promisify(multihashingAsync);
-
-async function hashDataMerkleRoot(packet) {
-  const serializedPacket = cbor.encodeCanonical(packet);
-  const multihash = await multihashing(serializedPacket, 'sha2-256');
-  const decoded = multihashes.decode(multihash);
-  return decoded.digest.toString('hex');
-}
+const hashDataMerkleRoot = require('../../../../lib/test/consensus/hashDataMerkleRoot');
 
 describe('storeDapContractFactory', function main() {
   this.timeout(30000);
