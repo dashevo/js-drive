@@ -1,4 +1,4 @@
 /* eslint-disable global-require */
-describe('Utils', () => {
+describe('Util', () => {
   require('./wait');
 });

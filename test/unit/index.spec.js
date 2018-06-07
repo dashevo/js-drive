@@ -5,5 +5,5 @@ describe('Unit', () => {
   require('./stateView');
   require('./storage');
   require('./sync');
-  require('./utils');
+  require('./util');
 });
