@@ -7,7 +7,6 @@
     "import/no-extraneous-dependencies": "off"
   },
   "globals": {
-    "expect": true,
-    "wait": true
+    "expect": true
   }
 }

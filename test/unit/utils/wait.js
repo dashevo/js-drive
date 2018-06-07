@@ -1,8 +1,6 @@
-describe('wait', () => {
-  it('should be globally defined for tests', () => {
-    expect(wait).to.exist();
-  });
+const wait = require('../../../lib/test/util/wait');
 
+describe('wait', () => {
   it('should delay execution of a flow for a specified amount of milliseconds', async () => {
     const millisToWait = 1200;
 
