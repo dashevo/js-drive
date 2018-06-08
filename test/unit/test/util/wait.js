@@ -1,4 +1,4 @@
-const wait = require('../../../lib/test/util/wait');
+const wait = require('../../../../lib/test/util/wait');
 
 describe('wait', () => {
   it('should delay execution of a flow for a specified amount of milliseconds', async () => {
