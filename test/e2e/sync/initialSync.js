@@ -25,6 +25,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   let dashCoreInstance;
   let mongoDbInstance;
   let dashDriveInstance2;
+  let ipfsInstance;
 
   let packetsCids;
 
@@ -60,7 +61,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     mongoDbInstance = await createMongoDbInstance();
     await mongoDbInstance.start();
 
-    const ipfsInstance = await startIPFSInstance();
+    ipfsInstance = await startIPFSInstance();
     const { apiHost, apiPort } = ipfsInstance;
 
     const firstInstanceId = await dashDriveInstance.ipfs.getApi().id();
@@ -153,6 +154,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       dashCoreInstance.remove(),
       dashDriveInstance.remove(),
       dashDriveInstance2.remove(),
+      ipfsInstance.remove()
     ]);
     await promises;
   });
