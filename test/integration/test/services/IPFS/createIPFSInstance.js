@@ -30,7 +30,8 @@ describe('createIPFSInstance', function main() {
       await instance.start();
       const { Args } = await instance.container.details();
       expect(Args).to.deep.equal([
-        '-c',
+        '--',
+        '/bin/sh', '-c',
         [
           'ipfs init',
           'ipfs config --json Bootstrap []',
@@ -39,7 +40,6 @@ describe('createIPFSInstance', function main() {
           'ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080',
           'ipfs daemon',
         ].join(' && '),
-        'daemon',
       ]);
     });
 
