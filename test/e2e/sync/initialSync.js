@@ -33,10 +33,8 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     dashDriveInstance = await startDashDriveInstance();
 
     const { userId, privateKeyString } = await generateStateTransitions.registerUser('Alice', dashDriveInstance.dashCore.rpcClient);
-
-    const [packet, header] = await generateStateTransitions.createDapContractTransitions(
-      userId, privateKeyString, packetsData[0]
-    );
+    const [packet, header] = await generateStateTransitions
+      .createDapContractTransitions(userId, privateKeyString, packetsData[0]);
 
     const addSTPacket = addSTPacketFactory(dashDriveInstance.ipfs.getApi());
     const packetCid = await addSTPacket(packet);
@@ -56,13 +54,19 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     ipfsInstance = await startIPFSInstance();
     await ipfsInstance.connect(dashDriveInstance.ipfs);
 
-    while(true) {
-      const status = await dashCoreInstance.rpcClient.mnsync('status');
-      if (status.result.IsSynced === true) {
-	break;
+    async function dashCoreSyncToFinish() {
+      let finished = false;
+      while (!finished) {
+        const status = await dashCoreInstance.rpcClient.mnsync('status');
+        if (status.result.IsSynced) {
+          finished = true;
+        } else {
+          await wait(3000);
+        }
       }
-      await wait(3000);
     }
+
+    await dashCoreSyncToFinish();
 
     // start Dash Drive on node #2
     const envs = [
@@ -80,22 +84,22 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     const serializedPacket = cbor.encodeCanonical(packetsData[0]);
     const spJson = {
-      packet: serializedPacket.toString('hex')
+      packet: serializedPacket.toString('hex'),
     };
 
     async function dashDriveSyncToFinish() {
       let finished = false;
-      while(!finished) {
-	dashDriveInstance2.getApi().request('addSTPacketMethod', spJson, (err, res) => {
-	  if (err) {
-	    return;
-	  }
-	  if (res.error && res.error.code === 100) {
-	    return;
-	  }
-	  finished = true;
-	});
-	await wait(1000);
+      while (!finished) {
+        try {
+          const response = await dashDriveInstance2.getApi().request('addSTPacketMethod', spJson);
+          if (response.result) {
+            finished = true;
+          } else {
+            await wait(1000);
+          }
+        } catch (e) {
+          await wait(1000);
+        }
       }
     }
 
@@ -114,7 +118,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       dashCoreInstance.remove(),
       dashDriveInstance.remove(),
       dashDriveInstance2.remove(),
-      ipfsInstance.remove()
+      ipfsInstance.remove(),
     ]);
     await promises;
   });
