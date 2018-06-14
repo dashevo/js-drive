@@ -17,6 +17,8 @@ const jayson = require('jayson');
 
 const cbor = require('cbor');
 
+const wait = require('../../../lib/test/util/wait');
+
 describe('Initial sync of Dash Drive and Dash Core', function main() {
   // First node
   let dashDriveInstance;
@@ -60,8 +62,6 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     ipfsInstance = await startIPFSInstance();
     await ipfsInstance.connect(dashDriveInstance.ipfs);
-
-    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     while(true) {
       const status = await dashCoreInstance.rpcClient.mnsync('status');
