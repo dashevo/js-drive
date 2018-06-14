@@ -84,30 +84,6 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     dashDriveInstance2 = await createDashDriveInstance(envs);
     await dashDriveInstance2.start();
 
-    const ddPort = await dashDriveInstance2.getRpcPort();
-
-    // Shamelesly taken from David
-    async function createRpcClient(rpcPort) {
-      const client = jayson.client.http({
-	host: '0.0.0.0',
-	port: rpcPort,
-      });
-
-      return new Promise((resolve) => {
-	function request() {
-          client.request('', [], (error) => {
-            if (error && error.message === 'socket hang up') {
-              return setTimeout(request, 1000);
-            }
-            return resolve(client);
-          });
-	}
-	request();
-      });
-    }
-
-    const driveRpc = await createRpcClient(ddPort);
-
     const serializedPacket = cbor.encodeCanonical(packetsData[0]);
     const spJson = {
       packet: serializedPacket.toString('hex')
@@ -116,7 +92,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     async function dashDriveSyncToFinish() {
       let finished = false;
       while(!finished) {
-	driveRpc.request('addSTPacketMethod', spJson, (err, res) => {
+	dashDriveInstance2.getApi().request('addSTPacketMethod', spJson, (err, res) => {
 	  if (err) {
 	    return;
 	  }
