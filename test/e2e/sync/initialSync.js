@@ -1,8 +1,6 @@
 const addSTPacketFactory = require('../../../lib/storage/addSTPacketFactory');
-
-const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
-
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
+const generateStateTransitions = require('../../../lib/test/fixtures/generateStateTransitions');
 
 const startDashDriveInstance = require('../../../lib/test/services/dashDrive/startDashDriveInstance');
 const startDashCoreInstance = require('../../../lib/test/services/dashCore/startDashCoreInstance');
@@ -11,13 +9,8 @@ const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInst
 
 const createDashDriveInstance = require('../../../lib/test/services/dashDrive/createDashDriveInstance');
 
-const gst = require('../../../lib/test/fixtures/generateStateTransitions');
-
-const jayson = require('jayson');
-
-const cbor = require('cbor');
-
 const wait = require('../../../lib/test/util/wait');
+const cbor = require('cbor');
 
 describe('Initial sync of Dash Drive and Dash Core', function main() {
   // First node
@@ -38,9 +31,9 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   before('having Dash Drive node #1 up and ready, some amount of STs generated and Dash Drive on node #1 fully synced', async () => {
     dashDriveInstance = await startDashDriveInstance();
 
-    const { userId, privateKeyString } = await gst.registerUser('Alice', dashDriveInstance.dashCore.rpcClient);
+    const { userId, privateKeyString } = await generateStateTransitions.registerUser('Alice', dashDriveInstance.dashCore.rpcClient);
 
-    const [packet, header] = await gst.createDapContractTransitions(
+    const [packet, header] = await generateStateTransitions.createDapContractTransitions(
       userId, privateKeyString, packetsData[0]
     );
 
@@ -106,10 +99,6 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     }
 
     await dashDriveSyncToFinish();
-
-    // for (let i = 0; i < 120; i++) {
-    //   await wait(1000);
-    // }
 
     const lsResult = await ipfsInstance.getApi().pin.ls();
 
