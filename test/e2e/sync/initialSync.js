@@ -5,11 +5,11 @@ const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacke
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 
 const startDashDriveInstance = require('../../../lib/test/services/dashDrive/startDashDriveInstance');
+const startDashCoreInstance = require('../../../lib/test/services/dashCore/startDashCoreInstance');
+const startMongoDbInstance = require('../../../lib/test/services/mongoDb/startMongoDbInstance');
 const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInstance');
 
 const createDashDriveInstance = require('../../../lib/test/services/dashDrive/createDashDriveInstance');
-const createDashCoreInstance = require('../../../lib/test/services/dashCore/createDashCoreInstance');
-const createMongoDbInstance = require('../../../lib/test/services/mongoDb/createMongoDbInstance');
 
 const gst = require('../../../lib/test/fixtures/generateStateTransitions');
 
@@ -53,18 +53,11 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   });
 
   it('Dash Drive should sync the data with Dash Core upon startup', async () => {
-    dashCoreInstance = await createDashCoreInstance();
-    await dashCoreInstance.start();
-
+    dashCoreInstance = await startDashCoreInstance();
     await dashCoreInstance.connect(dashDriveInstance.dashCore);
 
-    mongoDbInstance = await createMongoDbInstance();
-    await mongoDbInstance.start();
-
+    mongoDbInstance = await startMongoDbInstance();
     ipfsInstance = await startIPFSInstance();
-    const { apiHost, apiPort } = ipfsInstance;
-
-    const firstInstanceId = await dashDriveInstance.ipfs.getApi().id();
 
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
