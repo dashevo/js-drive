@@ -23,12 +23,13 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   let ipfsInstance;
 
   let packetsCids;
-
-  const packetsData = getStateTransitionPackets();
+  let packetsData;
 
   this.timeout(900000);
 
   before('having Dash Drive node #1 up and ready, some amount of STs generated and Dash Drive on node #1 fully synced', async () => {
+    packetsData = getStateTransitionPackets();
+
     dashDriveInstance = await startDashDriveInstance();
 
     const { userId, privateKeyString } = await generateStateTransitions.registerUser('Alice', dashDriveInstance.dashCore.rpcClient);
