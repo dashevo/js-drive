@@ -1,7 +1,10 @@
+const removeContainers = require('../../../../../lib/test/services/docker/removeContainers');
 const startIPFSInstance = require('../../../../../lib/test/services/IPFS/startIPFSInstance');
 
 describe('startIPFSInstance', function main() {
   this.timeout(40000);
+
+  before(removeContainers);
 
   describe('One instance', () => {
     let instance;
@@ -36,6 +39,17 @@ describe('startIPFSInstance', function main() {
         const client = await instances[i].getApi();
         const expectedTrueObject = await client.block.get(actualTrueObject.cid);
         expect(expectedTrueObject.data).to.be.deep.equal(actualTrueObject.data);
+      }
+    });
+
+    it('should propagate data between instances', async () => {
+      const clientOne = instances[0].getApi();
+      const cid = await clientOne.dag.put({ name: 'world' }, { format: 'dag-cbor', hashAlg: 'sha2-256' });
+
+      for (let i = 0; i < 3; i++) {
+        const ipfs = instances[i].getApi();
+        const data = await ipfs.dag.get(cid, 'name', { format: 'dag-cbor', hashAlg: 'sha2-256' });
+        expect(data.value).to.equal('world');
       }
     });
   });
