@@ -57,7 +57,9 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     await dashCoreInstance.connect(dashDriveInstance.dashCore);
 
     mongoDbInstance = await startMongoDbInstance();
+
     ipfsInstance = await startIPFSInstance();
+    await ipfsInstance.connect(dashDriveInstance.ipfs);
 
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
