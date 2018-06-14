@@ -54,10 +54,10 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     ipfsInstance = await startIPFSInstance();
     await ipfsInstance.connect(dashDriveInstance.ipfs);
 
-    async function dashCoreSyncToFinish() {
+    async function dashCoreSyncToFinish(instance) {
       let finished = false;
       while (!finished) {
-        const status = await dashCoreInstance.rpcClient.mnsync('status');
+        const status = await instance.rpcClient.mnsync('status');
         if (status.result.IsSynced) {
           finished = true;
         } else {
@@ -66,7 +66,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       }
     }
 
-    await dashCoreSyncToFinish();
+    await dashCoreSyncToFinish(dashCoreInstance);
 
     // start Dash Drive on node #2
     const envs = [
@@ -87,11 +87,11 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       packet: serializedPacket.toString('hex'),
     };
 
-    async function dashDriveSyncToFinish() {
+    async function dashDriveSyncToFinish(instance) {
       let finished = false;
       while (!finished) {
         try {
-          const response = await dashDriveInstance2.getApi().request('addSTPacketMethod', spJson);
+          const response = await instance.getApi().request('addSTPacketMethod', spJson);
           if (response.result) {
             finished = true;
           } else {
@@ -103,7 +103,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       }
     }
 
-    await dashDriveSyncToFinish();
+    await dashDriveSyncToFinish(dashDriveInstance2);
 
     const lsResult = await ipfsInstance.getApi().pin.ls();
 
