@@ -19,9 +19,7 @@ describe('wait', () => {
     executeWithWait(callback).then(() => {
       expect(callback).have.been.calledOnce();
       done();
-    }).catch((e) => {
-      done(e);
-    });
+    }).catch(done);
 
     clock.tick(1199);
 
