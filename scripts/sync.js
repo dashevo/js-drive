@@ -55,7 +55,7 @@ const errorHandler = require('../lib/util/errorHandler');
   const storeDapContract = storeDapContractFactory(dapContractMongoDbRepository, ipfsAPI);
   attachStoreDapContractHandler(stHeaderReader, storeDapContract);
 
-  await stHeaderReader.read();
+  await stHeaderReader.read().catch(errorHandler);
 
   // Sync arriving ST packets
   const zmqSocket = zmq.createSocket('sub');
