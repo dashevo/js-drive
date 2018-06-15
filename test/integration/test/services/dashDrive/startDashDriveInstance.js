@@ -66,9 +66,9 @@ describe('startDashDriveInstance', function main() {
         NetworkSettings: mongoDbNetworkSettings,
       } = await instance.mongoDb.container.details();
 
-      expect(Object.keys(dashCoreNetworkSettings.Networks)).to.deep.equal(['dash_test_network']);
-      expect(Object.keys(dashDriveNetworkSettings.Networks)).to.deep.equal(['dash_test_network']);
-      expect(Object.keys(mongoDbNetworkSettings.Networks)).to.deep.equal(['dash_test_network']);
+      expect(Object.keys(dashCoreNetworkSettings.Networks)).to.deep.equal([process.env.TEST_DOCKER_NETWORK]);
+      expect(Object.keys(dashDriveNetworkSettings.Networks)).to.deep.equal([process.env.TEST_DOCKER_NETWORK]);
+      expect(Object.keys(mongoDbNetworkSettings.Networks)).to.deep.equal([process.env.TEST_DOCKER_NETWORK]);
     });
   });
 

@@ -16,6 +16,9 @@ services:
       # this will overwrite the default node_modules dir in container so it won't conflict with our
       # /node_modules location.
       - node_modules:${PWD}/node_modules
+    networks:
+      - dash_test_network
+      - default
     ports:
       - 6000:6000
       - 9229:9229
@@ -28,6 +31,9 @@ services:
       - mongodb
       - dashcore
       - ipfs
+    networks:
+      - dash_test_network
+      - default
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - .:${PWD}:delegated
@@ -41,7 +47,6 @@ services:
 
   dashcore:
     image: 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/dashcore:develop
-    restart: always
     volumes:
       - dashcore:/data
     command: dashd -datadir=/data -regtest=1 -keypool=1 -rpcuser=dashrpc -rpcpassword=password -rpcallowip=0.0.0.0/0 -rpcport=9998 -zmqpubhashblock=tcp://0.0.0.0:29998
@@ -66,3 +71,7 @@ volumes:
   dashcore:
   mongodb:
   ipfs:
+
+networks:
+  dash_test_network:
+    external: true

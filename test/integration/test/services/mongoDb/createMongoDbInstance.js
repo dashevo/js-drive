@@ -12,15 +12,15 @@ describe('createMongoDbInstance', function main() {
     });
     after(async () => instance.remove());
 
-    it('should start an instance with a bridge dash_test_network', async () => {
+    it('should start an instance with a bridge test network', async () => {
       await instance.start();
-      const network = new Docker().getNetwork('dash_test_network');
+      const network = new Docker().getNetwork(process.env.TEST_DOCKER_NETWORK);
       const { Driver } = await network.inspect();
       const { NetworkSettings: { Networks } } = await instance.container.details();
       const networks = Object.keys(Networks);
       expect(Driver).to.equal('bridge');
       expect(networks.length).to.equal(1);
-      expect(networks[0]).to.equal('dash_test_network');
+      expect(networks[0]).to.equal(process.env.TEST_DOCKER_NETWORK);
     });
 
     it('should start an instance with the default options', async () => {
