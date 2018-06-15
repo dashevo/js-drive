@@ -108,4 +108,67 @@ describe('isSynced', () => {
       done();
     });
   });
+
+  it('should not remove change listener if SyncState and UpdateState are empty', (done) => {
+    const state = new SyncState([], null);
+    syncStateRepositoryMock.fetch.returns(state);
+
+    const isSyncedPromise = isSynced(rpcClientMock, changeListenerMock, checkInterval);
+
+    setImmediate(() => {
+      const changedState = new SyncState([], null);
+      changeListenerMock.emit('change', changedState);
+
+      expect(changeListenerMock.removeListener).to.be.not.calledOnce();
+      expect(changeListenerMock.removeListener).to.be.not.calledWith('change');
+
+      expect(changeListenerMock.stop).to.be.not.calledOnce();
+
+      expect(isSyncedPromise).become(changedState);
+
+      done();
+    });
+  });
+
+  it('should not remove change listener if SyncState is empty', (done) => {
+    const state = new SyncState([], null);
+    syncStateRepositoryMock.fetch.returns(state);
+
+    const isSyncedPromise = isSynced(rpcClientMock, changeListenerMock, checkInterval);
+
+    setImmediate(() => {
+      const changedState = new SyncState([], new Date());
+      changeListenerMock.emit('change', changedState);
+
+      expect(changeListenerMock.removeListener).to.be.calledOnce();
+      expect(changeListenerMock.removeListener).to.be.calledWith('change');
+
+      expect(changeListenerMock.stop).to.be.calledOnce();
+
+      expect(isSyncedPromise).become(changedState);
+
+      done();
+    });
+  });
+
+  it('should not remove change listener if UpdateSyncState is empty', (done) => {
+    const state = new SyncState([], new Date());
+    syncStateRepositoryMock.fetch.returns(state);
+
+    const isSyncedPromise = isSynced(rpcClientMock, changeListenerMock, checkInterval);
+
+    setImmediate(() => {
+      const changedState = new SyncState([], null);
+      changeListenerMock.emit('change', changedState);
+
+      expect(changeListenerMock.removeListener).to.be.not.calledOnce();
+      expect(changeListenerMock.removeListener).to.be.not.calledWith('change');
+
+      expect(changeListenerMock.stop).to.be.not.calledOnce();
+
+      expect(isSyncedPromise).become(changedState);
+
+      done();
+    });
+  });
 });
