@@ -13,11 +13,14 @@ describe('wait', () => {
     };
   });
 
-  it('should delay execution of a flow for a specified amount of milliseconds', async function it() {
+  it('should delay execution of a flow for a specified amount of milliseconds', function it(done) {
     const callback = this.sinon.stub();
 
     executeWithWait(callback).then(() => {
       expect(callback).have.been.calledOnce();
+      done();
+    }).catch((e) => {
+      done(e);
     });
 
     clock.tick(1199);
