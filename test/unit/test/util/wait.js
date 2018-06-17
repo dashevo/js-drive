@@ -27,8 +27,4 @@ describe('wait', () => {
 
     clock.tick(1);
   });
-
-  after(() => {
-    clock.restore();
-  });
 });
