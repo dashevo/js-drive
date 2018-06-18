@@ -109,14 +109,14 @@ describe('isSynced', () => {
     });
   });
 
-  it('should not remove change listener if SyncState and UpdateState are empty', (done) => {
+  it('should not remove change listener if SyncState and UpdateState have empty lastSyncAt', (done) => {
     const state = new SyncState([], null);
     syncStateRepositoryMock.fetch.returns(state);
 
     const isSyncedPromise = isSynced(rpcClientMock, changeListenerMock, checkInterval);
 
     setImmediate(() => {
-      const changedState = new SyncState([], null);
+      const changedState = new SyncState(rpcClientMock.blocks, null);
       changeListenerMock.emit('change', changedState);
 
       expect(changeListenerMock.removeListener).to.be.not.calledOnce();
@@ -130,14 +130,14 @@ describe('isSynced', () => {
     });
   });
 
-  it('should not remove change listener if SyncState is empty', (done) => {
+  it('should not remove change listener if SyncState has empty lastSyncAt', (done) => {
     const state = new SyncState([], null);
     syncStateRepositoryMock.fetch.returns(state);
 
     const isSyncedPromise = isSynced(rpcClientMock, changeListenerMock, checkInterval);
 
     setImmediate(() => {
-      const changedState = new SyncState([], new Date());
+      const changedState = new SyncState(rpcClientMock.blocks, new Date());
       changeListenerMock.emit('change', changedState);
 
       expect(changeListenerMock.removeListener).to.be.calledOnce();
@@ -151,14 +151,14 @@ describe('isSynced', () => {
     });
   });
 
-  it('should not remove change listener if UpdateSyncState is empty', (done) => {
+  it('should not remove change listener if UpdateSyncState has empty lastSyncAt', (done) => {
     const state = new SyncState([], new Date());
     syncStateRepositoryMock.fetch.returns(state);
 
     const isSyncedPromise = isSynced(rpcClientMock, changeListenerMock, checkInterval);
 
     setImmediate(() => {
-      const changedState = new SyncState([], null);
+      const changedState = new SyncState(rpcClientMock.blocks, null);
       changeListenerMock.emit('change', changedState);
 
       expect(changeListenerMock.removeListener).to.be.not.calledOnce();
