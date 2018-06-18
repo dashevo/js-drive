@@ -28,21 +28,32 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   this.timeout(900000);
 
   before('having Dash Drive node #1 up and ready, some amount of STs generated and Dash Drive on node #1 fully synced', async () => {
+    packetsCids = [];
     packetsData = getStateTransitionPackets();
 
     dashDriveInstance = await startDashDriveInstance();
 
-    const { userId, privateKeyString } = await generateStateTransitions.registerUser('Alice', dashDriveInstance.dashCore.rpcClient);
-    const [packet, header] = await generateStateTransitions
-      .createDapContractTransitions(userId, privateKeyString, packetsData[0]);
+    async function createAndSubmitST(username) {
+      const packetOne = packetsData[0];
+      packetOne.data.objects[0].description = `Valid registration for ${username}`;
 
-    const addSTPacket = addSTPacketFactory(dashDriveInstance.ipfs.getApi());
-    const packetCid = await addSTPacket(packet);
+      const { userId, privateKeyString } = await generateStateTransitions
+        .registerUser(username, dashDriveInstance.dashCore.rpcClient);
+      const [packet, header] = await generateStateTransitions
+        .createDapContractTransitions(userId, privateKeyString, packetOne);
 
-    packetsCids = [packetCid];
+      const addSTPacket = addSTPacketFactory(dashDriveInstance.ipfs.getApi());
+      const packetCid = await addSTPacket(packet);
 
-    await dashDriveInstance.dashCore.rpcClient.sendRawTransition(header);
-    await dashDriveInstance.dashCore.rpcClient.generate(7);
+      packetsCids.push(packetCid);
+
+      await dashDriveInstance.dashCore.rpcClient.sendRawTransition(header);
+      await dashDriveInstance.dashCore.rpcClient.generate(1);
+    }
+
+    for (let i = 0; i < 20; i++) {
+      await createAndSubmitST(`Alice_${i}`);
+    }
   });
 
   it('Dash Drive should sync the data with Dash Core upon startup', async () => {
