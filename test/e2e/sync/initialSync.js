@@ -80,31 +80,42 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     packetsCids = [];
     packetsData = getStateTransitionPackets();
 
+    // 1. Start first Dash Drive node
     fullDashDriveInstance = await startDashDriveInstance();
 
+    // 2. Populate Dash Drive and Dash Core With data
     async function createAndSubmitST(username) {
+      // 2.1 Get packet data with random object description
       const packetOne = packetsData[0];
       packetOne.data.objects[0].description = `Valid registration for ${username}`;
 
+      // 2.2 Register user and create DAP Contract State Transition packet and header
       const { userId, privateKeyString } =
         await registerUser(username, fullDashDriveInstance.dashCore.rpcClient);
       const [packet, header] = await createDapContractST(userId, privateKeyString, packetOne);
 
+      // 2.3 Add ST packet to IPFS
       const addSTPacket = addSTPacketFactory(fullDashDriveInstance.ipfs.getApi());
       const packetCid = await addSTPacket(packet);
 
+      // 2.4 Save CID of freshly added packet for future use
       packetsCids.push(packetCid);
 
+      // 2.5 Send ST header to Dash Core and generate a block with it
       await fullDashDriveInstance.dashCore.rpcClient.sendRawTransition(header);
       await fullDashDriveInstance.dashCore.rpcClient.generate(1);
     }
 
+    // Note: I can't use Promise.all here due to errors with PrivateKey
+    //       I guess some of the actions can't be executed in parallel
     for (let i = 0; i < 20; i++) {
       await createAndSubmitST(`Alice_${i}`);
     }
   });
 
   it('Dash Drive should sync the data with Dash Core upon startup', async () => {
+    // 3. Start services of the 2nd node (Core, Mongo, IPFS),
+    //    but without Drive as we have to be sure Core is synced first
     dashCoreInstance = await startDashCoreInstance();
     await dashCoreInstance.connect(fullDashDriveInstance.dashCore);
 
@@ -113,9 +124,10 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     ipfsInstance = await startIPFSInstance();
     await ipfsInstance.connect(fullDashDriveInstance.ipfs);
 
+    // 4. Await Dash Core to finish syncing
     await dashCoreSyncToFinish(dashCoreInstance);
 
-    // start Dash Drive on node #2
+    // 5. Start Dash Drive on 2nd node
     const envs = [
       `DASHCORE_ZMQ_PUB_HASHBLOCK=${dashCoreInstance.getZmqSockets().hashblock}`,
       `DASHCORE_JSON_RPC_HOST=${dashCoreInstance.getIp()}`,
@@ -129,8 +141,11 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     dashDriveStandaloneInstance = await createDashDriveInstance(envs);
     await dashDriveStandaloneInstance.start();
 
+    // 6. Await Dash Drive on the 2nd node to finish syncing
     await dashDriveSyncToFinish(dashDriveStandaloneInstance);
 
+    // 7. Get all pinned CIDs on the 2nd node and assert
+    //    they contain CIDs saved from the 1st node
     const lsResult = await ipfsInstance.getApi().pin.ls();
 
     const hashes = lsResult.map(item => item.hash);
