@@ -1,6 +1,8 @@
 const addSTPacketFactory = require('../../../lib/storage/addSTPacketFactory');
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
-const generateStateTransitions = require('../../../lib/test/fixtures/generateStateTransitions');
+
+const registerUser = require('../../../lib/test/registerUser');
+const createDapContractST = require('../../../lib/test/createDapContractST');
 
 const startDashDriveInstance = require('../../../lib/test/services/dashDrive/startDashDriveInstance');
 const startDashCoreInstance = require('../../../lib/test/services/dashCore/startDashCoreInstance');
@@ -37,10 +39,9 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
       const packetOne = packetsData[0];
       packetOne.data.objects[0].description = `Valid registration for ${username}`;
 
-      const { userId, privateKeyString } = await generateStateTransitions
-        .registerUser(username, dashDriveInstance.dashCore.rpcClient);
-      const [packet, header] = await generateStateTransitions
-        .createDapContractTransitions(userId, privateKeyString, packetOne);
+      const { userId, privateKeyString } =
+        await registerUser(username, dashDriveInstance.dashCore.rpcClient);
+      const [packet, header] = await createDapContractST(userId, privateKeyString, packetOne);
 
       const addSTPacket = addSTPacketFactory(dashDriveInstance.ipfs.getApi());
       const packetCid = await addSTPacket(packet);
