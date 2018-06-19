@@ -63,12 +63,12 @@ async function dashDriveSyncToFinish(instance) {
 
 describe('Sync interruption and resume between Dash Drive and Dash Core', function main() {
   // First node
-  let dashDriveInstance;
+  let fullDashDriveInstance;
 
   // Second node
   let dashCoreInstance;
   let mongoDbInstance;
-  let dashDriveInstance2;
+  let dashDriveStandaloneInstance;
   let ipfsInstance;
 
   let packetsCids;
@@ -77,7 +77,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
   this.timeout(900000);
 
   before('having Dash Drive node #1 up and running', async () => {
-    dashDriveInstance = await startDashDriveInstance();
+    fullDashDriveInstance = await startDashDriveInstance();
 
     packetsCids = [];
     packetsData = getStateTransitionPackets();
@@ -87,16 +87,16 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
       packetOne.data.objects[0].description = `Valid registration for ${username}`;
 
       const { userId, privateKeyString } =
-        await registerUser(username, dashDriveInstance.dashCore.rpcClient);
+        await registerUser(username, fullDashDriveInstance.dashCore.rpcClient);
       const [packet, header] = await createDapContractST(userId, privateKeyString, packetOne);
 
-      const addSTPacket = addSTPacketFactory(dashDriveInstance.ipfs.getApi());
+      const addSTPacket = addSTPacketFactory(fullDashDriveInstance.ipfs.getApi());
       const packetCid = await addSTPacket(packet);
 
       packetsCids.push(packetCid);
 
-      await dashDriveInstance.dashCore.rpcClient.sendRawTransition(header);
-      await dashDriveInstance.dashCore.rpcClient.generate(1);
+      await fullDashDriveInstance.dashCore.rpcClient.sendRawTransition(header);
+      await fullDashDriveInstance.dashCore.rpcClient.generate(1);
     }
 
     for (let i = 0; i < 50; i++) {
@@ -106,12 +106,12 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
 
   it('Dash Drive should save sync state and continue from saved point after resume', async () => {
     dashCoreInstance = await startDashCoreInstance();
-    await dashCoreInstance.connect(dashDriveInstance.dashCore);
+    await dashCoreInstance.connect(fullDashDriveInstance.dashCore);
 
     mongoDbInstance = await startMongoDbInstance();
 
     ipfsInstance = await startIPFSInstance();
-    await ipfsInstance.connect(dashDriveInstance.ipfs);
+    await ipfsInstance.connect(fullDashDriveInstance.ipfs);
 
     await dashCoreSyncToFinish(dashCoreInstance);
 
@@ -129,15 +129,15 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     let lsResult = await ipfsInstance.getApi().pin.ls();
     const initialHashes = lsResult.map(item => item.hash);
 
-    dashDriveInstance2 = await createDashDriveInstance(envs);
-    await dashDriveInstance2.start();
+    dashDriveStandaloneInstance = await createDashDriveInstance(envs);
+    await dashDriveStandaloneInstance.start();
 
     // Wait a couple of seconds to sync a few packets
     for (let i = 0; i < 5; i++) {
       await wait(1000);
     }
 
-    await dashDriveInstance2.stop();
+    await dashDriveStandaloneInstance.stop();
 
     lsResult = await ipfsInstance.getApi().pin.ls();
     const pinnedHashes = lsResult
@@ -148,9 +148,9 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
       .all(pinnedHashes.map(hash => ipfsInstance.getApi().pin.rm(hash)));
     await rmPromises;
 
-    await dashDriveInstance2.start();
+    await dashDriveStandaloneInstance.start();
 
-    await dashDriveSyncToFinish(dashDriveInstance2);
+    await dashDriveSyncToFinish(dashDriveStandaloneInstance);
 
     lsResult = await ipfsInstance.getApi().pin.ls();
 
@@ -163,8 +163,8 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     const promises = Promise.all([
       mongoDbInstance.remove(),
       dashCoreInstance.remove(),
-      dashDriveInstance.remove(),
-      dashDriveInstance2.remove(),
+      fullDashDriveInstance.remove(),
+      dashDriveStandaloneInstance.remove(),
       ipfsInstance.remove(),
     ]);
     await promises;
