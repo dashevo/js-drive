@@ -1,4 +1,4 @@
-describe('Initial sync of Dash Drive and Dash Core', () => {
+xdescribe('Initial sync of Dash Drive and Dash Core', () => {
   before('having Dash Drive node #1 up and ready, some amount of STs generated and Dash Drive on node #1 fully synced', () => {
     // TODO: start Dash Drive node #1
 
