@@ -14,6 +14,53 @@ const createDashDriveInstance = require('../../../lib/test/services/dashDrive/cr
 const wait = require('../../../lib/test/util/wait');
 const cbor = require('cbor');
 
+/**
+ * Await Dash Core instance to finish syncing
+ *
+ * @param {DashCoreInstance} instance
+ * @returns {Promise<void>}
+ */
+async function dashCoreSyncToFinish(instance) {
+  let finished = false;
+  while (!finished) {
+    const status = await instance.rpcClient.mnsync('status');
+    if (status.result.IsSynced) {
+      finished = true;
+    } else {
+      await wait(3000);
+    }
+  }
+}
+
+/**
+ * Await Dash Drive instance to finish syncing
+ *
+ * @param {DashDriveInstance} instance
+ * @returns {Promise<void>}
+ */
+async function dashDriveSyncToFinish(instance) {
+  const packet = getStateTransitionPackets()[0];
+  const serializedPacket = cbor.encodeCanonical(packet);
+  const serializedPacketJson = {
+    packet: serializedPacket.toString('hex'),
+  };
+
+  let finished = false;
+  while (!finished) {
+    try {
+      const response = await instance.getApi()
+        .request('addSTPacketMethod', serializedPacketJson);
+      if (response.result) {
+        finished = true;
+      } else {
+        await wait(1000);
+      }
+    } catch (e) {
+      await wait(1000);
+    }
+  }
+}
+
 describe('Initial sync of Dash Drive and Dash Core', function main() {
   // First node
   let dashDriveInstance;
@@ -66,18 +113,6 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     ipfsInstance = await startIPFSInstance();
     await ipfsInstance.connect(dashDriveInstance.ipfs);
 
-    async function dashCoreSyncToFinish(instance) {
-      let finished = false;
-      while (!finished) {
-        const status = await instance.rpcClient.mnsync('status');
-        if (status.result.IsSynced) {
-          finished = true;
-        } else {
-          await wait(3000);
-        }
-      }
-    }
-
     await dashCoreSyncToFinish(dashCoreInstance);
 
     // start Dash Drive on node #2
@@ -93,27 +128,6 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     dashDriveInstance2 = await createDashDriveInstance(envs);
     await dashDriveInstance2.start();
-
-    const serializedPacket = cbor.encodeCanonical(packetsData[0]);
-    const spJson = {
-      packet: serializedPacket.toString('hex'),
-    };
-
-    async function dashDriveSyncToFinish(instance) {
-      let finished = false;
-      while (!finished) {
-        try {
-          const response = await instance.getApi().request('addSTPacketMethod', spJson);
-          if (response.result) {
-            finished = true;
-          } else {
-            await wait(1000);
-          }
-        } catch (e) {
-          await wait(1000);
-        }
-      }
-    }
 
     await dashDriveSyncToFinish(dashDriveInstance2);
 
