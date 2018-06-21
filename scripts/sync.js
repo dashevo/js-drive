@@ -70,14 +70,14 @@ const errorHandler = require('../lib/util/errorHandler');
   const zmqSocket = zmq.createSocket('sub');
   zmqSocket.connect(process.env.DASHCORE_ZMQ_PUB_HASHBLOCK);
 
-  let inSync = false;
+  let isInSync = false;
 
   async function onHashBlock() {
-    if (inSync) {
+    if (isInSync) {
       return;
     }
 
-    inSync = true;
+    isInSync = true;
 
     // Start sync from the last synced block + 1
     let height = blockIterator.getBlockHeight();
@@ -91,12 +91,12 @@ const errorHandler = require('../lib/util/errorHandler');
 
     isFirstSyncCompleted = true;
 
-    inSync = false;
+    isInSync = false;
   }
 
   zmqSocket.on('message', () => {
     onHashBlock().catch((error) => {
-      inSync = false;
+      isInSync = false;
       errorHandler(error);
     });
   });
