@@ -84,7 +84,10 @@ const errorHandler = require('../lib/util/errorHandler');
 
       inSync = false;
     }
-    onHashBlock().catch(errorHandler);
+    onHashBlock().catch((error) => {
+      inSync = true;
+      errorHandler(error);
+    });
   });
 
   zmqSocket.subscribe('hashblock');
