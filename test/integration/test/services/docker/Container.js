@@ -154,7 +154,7 @@ describe('Container', function main() {
       expect(removeContainerSpy.callCount).to.be.equal(1);
     });
 
-    it('should remove its volumes upon calling remove method without arguments', async () => {
+    it('should remove its volumes upon calling remove method', async () => {
       const docker = new Docker();
 
       const container =
