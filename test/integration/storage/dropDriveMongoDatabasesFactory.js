@@ -11,14 +11,14 @@ describe('Clean DD instance', () => {
     await mongoClient.db('drive_db').collection('dapObjects').insertOne({ name: 'DashPay' });
 
     const { databases: dbs } = await mongoClient.db().admin().listDatabases();
-    const filterDb = dbs.filter(db => db.name.includes('drive_'));
+    const filterDb = dbs.filter(db => db.name.includes(process.env.STORAGE_MONGODB_PREFIX));
     expect(filterDb.length).to.equal(1);
 
     const dropDriveMongoDatabases = dropDriveMongoDatabasesFactory(mongoClient);
     await dropDriveMongoDatabases();
 
     const { databases: dbsAfter } = await mongoClient.db().admin().listDatabases();
-    const filterDbAfter = dbsAfter.filter(db => db.name.includes('drive_'));
+    const filterDbAfter = dbsAfter.filter(db => db.name.includes(process.env.STORAGE_MONGODB_PREFIX));
     expect(filterDbAfter.length).to.equal(0);
   });
 });
