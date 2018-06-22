@@ -1,19 +1,5 @@
-const startMongoDbInstance = require('../lib/test/services/mocha/startMongoDbInstance');
-
-function dropDriveMongoDatabasesFactory(mongoClient) {
-  async function dropDriveMongoDatabases() {
-    const { databases: dbs } = await mongoClient.db().admin().listDatabases();
-    const dbStartingBy = prefix => db => db.name.includes(prefix);
-    const driveDatabases = dbs.filter(dbStartingBy('drive_'));
-
-    for (let index = 0; index < driveDatabases.length; index++) {
-      const db = driveDatabases[index];
-      await mongoClient.db(db.name).dropDatabase();
-    }
-  }
-
-  return dropDriveMongoDatabases;
-}
+const startMongoDbInstance = require('../../../lib/test/services/mocha/startMongoDbInstance');
+const dropDriveMongoDatabasesFactory = require('../../../lib/storage/dropDriveMongoDatabasesFactory');
 
 describe('Clean DD instance', () => {
   let mongoClient;
