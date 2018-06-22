@@ -1,31 +1,4 @@
-const startIpfsInstance = require('../lib/test/services/mocha/startIPFSInstance');
 const startMongoDbInstance = require('../lib/test/services/mocha/startMongoDbInstance');
-
-async function addPinPacket(ipfsApi) {
-  const packet = {};
-  const cid = await ipfsApi.dag.put(packet, { format: 'dag-cbor', hashAlg: 'sha2-256' });
-  await ipfsApi.pin.add(cid.toBaseEncodedString(), { recursive: true });
-  return cid.toBaseEncodedString();
-}
-
-function byCid(cid) {
-  return object => object.hash === cid;
-}
-
-function unpinAllPacketsFactory(ipfsApi) {
-  async function unpinAllPackets() {
-    const pinset = await ipfsApi.pin.ls();
-    const byPinType = type => pin => pin.type === type;
-    const pins = pinset.filter(byPinType('recursive'));
-
-    for (let index = 0; index < pins.length; index++) {
-      const pin = pins[index];
-      await ipfsApi.pin.rm(pin.hash);
-    }
-  }
-
-  return unpinAllPackets;
-}
 
 function dropDriveMongoDatabasesFactory(mongoClient) {
   async function dropDriveMongoDatabases() {
@@ -43,30 +16,9 @@ function dropDriveMongoDatabasesFactory(mongoClient) {
 }
 
 describe('Clean DD instance', () => {
-  let ipfsInstance;
-  startIpfsInstance().then((instance) => {
-    ipfsInstance = instance;
-  });
-
   let mongoClient;
   startMongoDbInstance().then((instance) => {
     ({ mongoClient } = instance);
-  });
-
-  it('should unpin all blocks in IPFS', async () => {
-    const ipfsApi = ipfsInstance.getApi();
-    const cid = await addPinPacket(ipfsApi);
-
-    const pinsetBefore = await ipfsApi.pin.ls();
-    const filterBefore = pinsetBefore.filter(byCid(cid));
-    expect(filterBefore.length).to.equal(1);
-
-    const unpinAllPackets = unpinAllPacketsFactory(ipfsApi);
-    await unpinAllPackets();
-
-    const pinsetAfter = await ipfsApi.pin.ls();
-    const filterAfter = pinsetAfter.filter(byCid(cid));
-    expect(filterAfter.length).to.equal(0);
   });
 
   it('should drop all Drive Mongo databases', async () => {
