@@ -42,15 +42,6 @@ function dropDriveMongoDatabasesFactory(mongoClient) {
   return dropDriveMongoDatabases;
 }
 
-function cleanDashDriveFactory(unpinAllPackets, dropDriveMongoDatabases) {
-  async function cleanDashDrive() {
-    await unpinAllPackets();
-    await dropDriveMongoDatabases();
-  }
-
-  return cleanDashDrive;
-}
-
 describe('Clean DD instance', () => {
   let ipfsInstance;
   startIpfsInstance().then((instance) => {
@@ -91,22 +82,5 @@ describe('Clean DD instance', () => {
     const { databases: dbsAfter } = await mongoClient.db().admin().listDatabases();
     const filterDbAfter = dbsAfter.filter(db => db.name.includes('drive_'));
     expect(filterDbAfter.length).to.equal(0);
-  });
-
-  describe('cleanDashDrive', () => {
-    let unpinAllPacketsSpy;
-    let dropDriveMongoDatabasesSpy;
-    beforeEach(function beforeEach() {
-      unpinAllPacketsSpy = this.sinon.spy();
-      dropDriveMongoDatabasesSpy = this.sinon.spy();
-    });
-
-    it('should clean DashDrive', async () => {
-      const cleanDashDrive = cleanDashDriveFactory(unpinAllPacketsSpy, dropDriveMongoDatabasesSpy);
-      await cleanDashDrive();
-
-      expect(unpinAllPacketsSpy).to.calledOnce();
-      expect(dropDriveMongoDatabasesSpy).to.calledOnce();
-    });
   });
 });
