@@ -183,28 +183,5 @@ describe('Container', function main() {
         expect(currentVolumeNames).to.not.include(name);
       });
     });
-
-    it('should keep its volumes upon calling remove method with { v : 0 } options', async () => {
-      const container =
-            new Container(mongoDbNetworkName, mongoDbImageName, mongoDbContainerOptions);
-
-      await container.start();
-
-      const containerDetails = await container.details();
-      const containerVolumeNames = containerDetails.Mounts.map(mount => mount.Name);
-
-      // Save names of the volumes we've created to remove them after test
-      containerVolumeNames.forEach(name => createdVolumeNames.push(name));
-
-      await container.remove({ v: 0 });
-
-      const listVolumesResponse = await docker.listVolumes();
-      const volumeList = listVolumesResponse.Volumes || [];
-      const currentVolumeNames = volumeList.map(volume => volume.Name);
-
-      containerVolumeNames.forEach((name) => {
-        expect(currentVolumeNames).to.include(name);
-      });
-    });
   });
 });
