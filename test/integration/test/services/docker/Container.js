@@ -118,8 +118,6 @@ describe('Container', function main() {
     const containerOne = new Container(networkName, imageName, containerOptions);
     const containerTwo = new Container(networkName, imageName, containerOptions);
 
-    const docker = new Docker();
-
     let sandbox;
     beforeEach(function before() {
       sandbox = this.sinon;
@@ -157,6 +155,8 @@ describe('Container', function main() {
     });
 
     it('should remove its volumes upon calling remove method without arguments', async () => {
+      const docker = new Docker();
+
       const container =
         new Container(mongoDbNetworkName, mongoDbImageName, mongoDbContainerOptions);
 
