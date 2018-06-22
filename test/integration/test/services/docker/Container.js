@@ -121,22 +121,14 @@ describe('Container', function main() {
     const docker = new Docker();
 
     let sandbox;
-    let createdVolumeNames;
     beforeEach(function before() {
       sandbox = this.sinon;
-      createdVolumeNames = [];
     });
     after(async () => {
       await Promise.all([
         containerOne.remove(),
         containerTwo.remove(),
       ]);
-
-      const removeVolumeFutures = createdVolumeNames
-        .map(name => docker.getVolume(name))
-        .map(volume => volume.remove());
-
-      await Promise.all(removeVolumeFutures);
     });
 
     it('should call createContainer only once when start/stop/start', async () => {
