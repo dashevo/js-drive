@@ -71,5 +71,6 @@ describe('pin gets stuck', function pinUnknown() {
     expect(keys).to.be.empty();
 
     // TODO: It seems we need to cancel request somehow before removing from this CID from wantlist
+    // https://github.com/ipfs/js-ipfs-api/blob/master/src/utils/send-request.js#L165
   });
 });
