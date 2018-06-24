@@ -8,7 +8,7 @@ const wait = require('../../../lib/test/util/wait');
 
 const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
 
-describe('pinUnknown', function pinUnknown() {
+describe('pin gets stuck', function pinUnknown() {
   let ipfsApi;
   let stHeader;
 

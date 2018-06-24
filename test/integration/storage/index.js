@@ -1,5 +1,5 @@
 /* eslint-disable global-require */
 describe('Storage', () => {
   require('./addSTPacket');
-  require('./pinUnknown');
+  require('./pinGetsStuck');
 });
