@@ -23,7 +23,7 @@ describe('pin gets stuck', function pinUnknown() {
     stHeader = new StateTransitionHeader(stHeaderData);
   });
 
-  it('pin gets stuck', async () => {
+  it('pin gets stuck and reaches timeout', async () => {
     await ipfsApi.pin.add(stHeader.getPacketCID());
   });
 
@@ -52,7 +52,7 @@ describe('pin gets stuck', function pinUnknown() {
     expect(closure()).to.be.eventually.rejectedWith(error).and.notify(done);
   });
 
-  it('pin throws error after timeout and remove cid from wantlist', async () => {
+  it('pin throws error after timeout and DOES NOT remove cid from wantlist YET', async () => {
     const error = new Error('timeout');
     const cid = stHeader.getPacketCID();
     const promise = ipfsApi.pin.add(cid);
