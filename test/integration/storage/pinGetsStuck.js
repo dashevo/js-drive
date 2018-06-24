@@ -28,8 +28,7 @@ describe('pin gets stuck', function pinUnknown() {
   });
 
   it('pin gets stuck with unknown CID and throws context canceled error on Node.JS process exit', async () => {
-    const closure = () => ipfsApi.pin.add(stHeader.getPacketCID());
-    const promise = closure();
+    const promise = ipfsApi.pin.add(stHeader.getPacketCID());
 
     await wait(5000);
 
