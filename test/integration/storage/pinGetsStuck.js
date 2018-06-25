@@ -2,7 +2,7 @@ const startIPFSInstance = require('../../../lib/test/services/mocha/startIPFSIns
 
 const StateTransitionHeader = require('../../../lib/blockchain/StateTransitionHeader');
 
-const throwAfter = require('../../../lib/util/throwAfter');
+const rejectAfter = require('../../../lib/util/rejectAfter');
 
 const wait = require('../../../lib/test/util/wait');
 
@@ -45,7 +45,7 @@ describe('pin gets stuck', function pinUnknown() {
     const closure = () => {
       const promise = ipfsApi.pin.add(stHeader.getPacketCID());
 
-      return throwAfter(promise, error, 5000);
+      return rejectAfter(promise, error, 5000);
     };
 
     expect(closure()).to.be.eventually.rejectedWith(error).and.notify(done);
@@ -57,7 +57,7 @@ describe('pin gets stuck', function pinUnknown() {
     const promise = ipfsApi.pin.add(cid);
 
     try {
-      await throwAfter(promise, error, 5000);
+      await rejectAfter(promise, error, 5000);
     } catch (e) {
       if (e !== error) {
         throw error;
