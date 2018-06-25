@@ -1,5 +1,5 @@
-const startIpfsInstance = require('../../../lib/test/services/mocha/startIPFSInstance');
-const unpinAllIpfsPacketsFactory = require('../../../lib/storage/unpinAllIpfsPacketsFactory');
+const startIpfsInstance = require('../../../../lib/test/services/mocha/startIPFSInstance');
+const unpinAllIpfsPacketsFactory = require('../../../../lib/storage/ipfs/unpinAllIpfsPacketsFactory');
 
 async function addPinPacket(ipfsApi) {
   const packet = {};
