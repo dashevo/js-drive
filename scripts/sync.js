@@ -13,6 +13,10 @@ const STHeadersReader = require('../lib/blockchain/reader/STHeadersReader');
 const DapContractMongoDbRepository = require('../lib/stateView/dapContract/DapContractMongoDbRepository');
 const storeDapContractFactory = require('../lib/stateView/dapContract/storeDapContractFactory');
 
+const cleanDashDriveFactory = require('../lib/sync/cleanDashDriveFactory');
+const unpinAllIpfsPacketsFactory = require('../lib/storage/ipfs/unpinAllIpfsPacketsFactory');
+const dropMongoDatabasesWithPrefixFactory = require('../lib/mongoDb/dropMongoDatabasesWithPrefixFactory');
+
 const attachPinSTPacketHandler = require('../lib/storage/attachPinSTPacketHandler');
 const attachStoreSyncStateHandler = require('../lib/sync/state/attachStoreSyncStateHandler');
 const attachStoreDapContractHandler = require('../lib/stateView/dapContract/attachStoreDapContractHandler');
@@ -49,6 +53,10 @@ const errorHandler = require('../lib/util/errorHandler');
 
   const ipfsAPI = new IpfsAPI(process.env.STORAGE_IPFS_MULTIADDR);
 
+  const unpinAllIpfsPackets = unpinAllIpfsPacketsFactory(ipfsAPI);
+  const dropMongoDatabasesWithPrefix = dropMongoDatabasesWithPrefixFactory(mongoClient);
+  const cleanDashDrive = cleanDashDriveFactory(unpinAllIpfsPackets, dropMongoDatabasesWithPrefix);
+
   attachPinSTPacketHandler(stHeaderReader, ipfsAPI);
   attachStoreSyncStateHandler(stHeaderReader, syncState, syncStateRepository);
   const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb);
@@ -61,7 +69,7 @@ const errorHandler = require('../lib/util/errorHandler');
 
     isFirstSyncCompleted = true;
   } catch (error) {
-    if (error.message !== 'Block height out of range') {
+    if (syncState.isEmpty() && error.message !== 'Block height out of range') {
       throw error;
     }
   }
@@ -87,7 +95,22 @@ const errorHandler = require('../lib/util/errorHandler');
     blockIterator.setBlockHeight(height);
     stHeaderIterator.reset(false);
 
-    await stHeaderReader.read();
+    try {
+      await stHeaderReader.read();
+    } catch (error) {
+      if (!syncState.isEmpty() && error.message === 'Block height out of range') {
+        await cleanDashDrive();
+        stHeadersReaderState.clear();
+        stHeaderIterator.reset(false);
+        blockIterator.setBlockHeight(1);
+        syncState.setBlocks([]);
+        syncState.setLastSyncAt(null);
+        isFirstSyncCompleted = false;
+        isInSync = false;
+        await onHashBlock();
+        return;
+      }
+    }
 
     isFirstSyncCompleted = true;
 
