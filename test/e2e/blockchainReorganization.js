@@ -48,7 +48,7 @@ describe('Blockchain reorganization', function main() {
 
   this.timeout(900000);
 
-  before('having started first Dash Drive node, generated STs and second Dash Drive node replicated data from the first one', async () => {
+  before('having started Dash Drive node and generated some STs', async () => {
     packetsCids = [];
     const packetsData = getStateTransitionPackets();
 
@@ -85,7 +85,7 @@ describe('Blockchain reorganization', function main() {
     lastPacketCid = packetsCids[packetsCids.length - 1];
   });
 
-  it('Dash Drive should sync data after blockchain reorganization, removing uncessary data. Dash Drive on another node should replicate data from the first one.', async () => {
+  it('Dash Drive should sync data after blockchain reorganization, removing uncessary data.', async () => {
     // 4. Invalidate block that is 6 blocks away from the top
     const { result: blockCount } = await dashDriveInstance.dashCore.rpcClient.getBlockCount();
     const { result: blockHashToInvalidate } = await dashDriveInstance.dashCore.rpcClient
