@@ -15,7 +15,7 @@ describe('StateTransitionHeader', () => {
   });
 
   it('should StateTransitionHeader CID equal to IPFS CID', async () => {
-    header.hashDataMerkleRoot = await hashDataMerkleRoot(packet);
+    header.hashSTPacket = await hashDataMerkleRoot(packet);
     const stHeader = new StateTransitionHeader(header);
 
     const stHeaderCid = stHeader.getPacketCID();

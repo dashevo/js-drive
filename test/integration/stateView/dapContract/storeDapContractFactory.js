@@ -23,7 +23,7 @@ describe('storeDapContractFactory', function main() {
   it('should store DAP schema', async () => {
     const packet = getTransitionPacketFixtures()[0];
     const header = getTransitionHeaderFixtures()[0].toJSON();
-    header.hashDataMerkleRoot = await hashDataMerkleRoot(packet);
+    header.hashSTPacket = await hashDataMerkleRoot(packet);
 
     const mongoClient = await mongoDbInstance.getMongoClient();
     const dapContractRepository = new DapContractMongoDbRepository(mongoClient);
