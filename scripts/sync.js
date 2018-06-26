@@ -64,21 +64,18 @@ const errorHandler = require('../lib/util/errorHandler');
   attachStoreDapContractHandler(stHeaderReader, storeDapContract);
 
   let isFirstSyncCompleted = false;
-  try {
-    await stHeaderReader.read();
-
-    isFirstSyncCompleted = true;
-  } catch (error) {
-    if (syncState.isEmpty() && error.message !== 'Block height out of range') {
-      throw error;
-    }
-  }
-
-  // Sync arriving ST packets
-  const zmqSocket = zmq.createSocket('sub');
-  zmqSocket.connect(process.env.DASHCORE_ZMQ_PUB_HASHBLOCK);
-
   let isInSync = false;
+
+  async function resetDashDrive() {
+    await cleanDashDrive();
+    stHeadersReaderState.clear();
+    stHeaderIterator.reset(false);
+    blockIterator.setBlockHeight(1);
+    syncState.setBlocks([]);
+    syncState.setLastSyncAt(null);
+    isFirstSyncCompleted = false;
+    isInSync = false;
+  }
 
   async function onHashBlock() {
     if (isInSync) {
@@ -99,14 +96,7 @@ const errorHandler = require('../lib/util/errorHandler');
       await stHeaderReader.read();
     } catch (error) {
       if (!syncState.isEmpty() && error.message === 'Block height out of range') {
-        await cleanDashDrive();
-        stHeadersReaderState.clear();
-        stHeaderIterator.reset(false);
-        blockIterator.setBlockHeight(1);
-        syncState.setBlocks([]);
-        syncState.setLastSyncAt(null);
-        isFirstSyncCompleted = false;
-        isInSync = false;
+        await resetDashDrive();
         await onHashBlock();
         return;
       }
@@ -116,6 +106,23 @@ const errorHandler = require('../lib/util/errorHandler');
 
     isInSync = false;
   }
+
+  try {
+    await stHeaderReader.read();
+
+    isFirstSyncCompleted = true;
+  } catch (error) {
+    if (!syncState.isEmpty() && error.message === 'Block height out of range') {
+      await resetDashDrive();
+      await onHashBlock();
+    } else if (syncState.isEmpty() && error.message !== 'Block height out of range') {
+      throw error;
+    }
+  }
+
+  // Sync arriving ST packets
+  const zmqSocket = zmq.createSocket('sub');
+  zmqSocket.connect(process.env.DASHCORE_ZMQ_PUB_HASHBLOCK);
 
   zmqSocket.on('message', () => {
     onHashBlock().catch((error) => {
