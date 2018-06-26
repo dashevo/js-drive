@@ -72,7 +72,7 @@ const errorHandler = require('../lib/util/errorHandler');
 
   let isInSync = false;
 
-  async function onBlockHash(blockHash) {
+  async function onHashBlock() {
     if (isInSync) {
       return;
     }
@@ -84,13 +84,6 @@ const errorHandler = require('../lib/util/errorHandler');
     if (isFirstSyncCompleted) {
       height += 1;
     }
-
-    // Reset height to the current block's height
-    const { result: { height: blockHeight } } = rpcClient.getBlock(blockHash);
-    if (blockHeight < height) {
-      height = blockHeight;
-    }
-
     blockIterator.setBlockHeight(height);
     stHeaderIterator.reset(false);
 
@@ -101,8 +94,8 @@ const errorHandler = require('../lib/util/errorHandler');
     isInSync = false;
   }
 
-  zmqSocket.on('message', (topic, blockHash) => {
-    onBlockHash(blockHash).catch((error) => {
+  zmqSocket.on('message', () => {
+    onHashBlock().catch((error) => {
       isInSync = false;
       errorHandler(error);
     });
