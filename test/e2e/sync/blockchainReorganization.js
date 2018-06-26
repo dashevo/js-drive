@@ -1,12 +1,12 @@
-const addSTPacketFactory = require('../../lib/storage/ipfs/addSTPacketFactory');
-const getStateTransitionPackets = require('../../lib/test/fixtures/getTransitionPacketFixtures');
+const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory');
+const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 
-const registerUser = require('../../lib/test/registerUser');
-const createDapContractST = require('../../lib/test/createDapContractST');
+const registerUser = require('../../../lib/test/registerUser');
+const createDapContractST = require('../../../lib/test/createDapContractST');
 
-const startDashDriveInstance = require('../../lib/test/services/dashDrive/startDashDriveInstance');
+const startDashDriveInstance = require('../../../lib/test/services/dashDrive/startDashDriveInstance');
 
-const wait = require('../../lib/test/util/wait');
+const wait = require('../../../lib/test/util/wait');
 const cbor = require('cbor');
 
 /**
