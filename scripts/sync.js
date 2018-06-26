@@ -86,7 +86,7 @@ const errorHandler = require('../lib/util/errorHandler');
     }
 
     // Reset height to the current block's height
-    const { result: { height: blockHeight } } = rpcClient.getBlock(blockHash);
+    const { result: { height: blockHeight } } = await rpcClient.getBlock(blockHash.toString('hex'));
     if (blockHeight < height) {
       height = blockHeight;
     }
