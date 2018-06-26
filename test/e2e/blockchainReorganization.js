@@ -82,7 +82,8 @@ describe('Blockchain reorganization', function main() {
       await createAndSubmitST(`Alice_${i}`);
     }
 
-    lastPacketCid = packetsCids[packetsCids.length - 1];
+    // Remove and track last CID as it's expected to be removed by reorganization
+    lastPacketCid = packetsCids.pop();
   });
 
   it('Dash Drive should sync data after blockchain reorganization, removing uncessary data.', async () => {
@@ -105,6 +106,11 @@ describe('Blockchain reorganization', function main() {
     const currentCids = lsResult.map(item => item.hash);
 
     expect(currentCids).to.not.include(lastPacketCid);
+
+    // 8. Check the rest of CIDs are in place
+    packetsCids.forEach((cid) => {
+      expect(currentCids).to.include(cid);
+    });
   });
 
   after('cleanup lone services', async () => {
