@@ -67,7 +67,7 @@ const errorHandler = require('../lib/util/errorHandler');
   let isInSync = false;
 
   async function resetDashDrive() {
-    await cleanDashDrive();
+    await cleanDashDrive(process.env.MONGODB_DB_PREFIX);
     stHeadersReaderState.clear();
     stHeaderIterator.reset(false);
     blockIterator.setBlockHeight(1);
