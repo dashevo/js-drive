@@ -99,6 +99,7 @@ describe('STHeadersReader', () => {
   it('should emit "wrongSequence" and read from initial block' +
     'if synced blocks it too ahead of current block for sequence verifying', async function it() {
     // Mark all blocks as synced
+    // eslint-disable-next-line arrow-body-style
     reader.getState().setBlocks(rpcClientMock.blocks.map((block) => {
       return Object.assign({}, block, { height: block.height + 100 });
     }));
