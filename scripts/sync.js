@@ -35,7 +35,7 @@ const errorHandler = require('../lib/util/errorHandler');
   const stHeaderIterator = new StateTransitionHeaderIterator(blockIterator, rpcClient);
 
   const mongoClient = await MongoClient.connect(process.env.STORAGE_MONGODB_URL);
-  const mongoDb = mongoClient.db(`${process.env.STORAGE_MONGODB_DB_PREFIX}${process.env.STORAGE_MONGODB_DB}`);
+  const mongoDb = mongoClient.db(`${process.env.MONGODB_DB_PREFIX}${process.env.STORAGE_MONGODB_DB}`);
   const syncStateRepository = new SyncStateRepository(mongoDb);
   const syncState = await syncStateRepository.fetch();
 

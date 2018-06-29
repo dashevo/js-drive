@@ -29,7 +29,7 @@ const addSTPacketMethodFactory = require('../lib/api/methods/addSTPacketMethodFa
   });
 
   const mongoClient = await MongoClient.connect(process.env.STORAGE_MONGODB_URL);
-  const mongoDb = mongoClient.db(`${process.env.STORAGE_MONGODB_DB_PREFIX}${process.env.STORAGE_MONGODB_DB}`);
+  const mongoDb = mongoClient.db(`${process.env.MONGODB_DB_PREFIX}${process.env.STORAGE_MONGODB_DB}`);
   const syncStateRepository = new SyncStateRepository(mongoDb);
   // TODO: Validate env variable (should be number > 0)
   const repositoryChangeListener = new SyncStateRepositoryChangeListener(
