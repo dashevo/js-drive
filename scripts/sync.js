@@ -77,7 +77,11 @@ const errorHandler = require('../lib/util/errorHandler');
     isInSync = false;
   }
 
-  async function onBlockHash(blockHash) {
+  /**
+   * @param {Buffer} [sinceBlockHash]
+   * @returns {Promise<void>}
+   */
+  async function sync(sinceBlockHash = undefined) {
     if (isInSync) {
       return;
     }
@@ -91,9 +95,11 @@ const errorHandler = require('../lib/util/errorHandler');
     }
 
     // Reset height to the current block's height
-    const { result: { height: blockHeight } } = await rpcClient.getBlock(blockHash.toString('hex'));
-    if (blockHeight < height) {
-      height = blockHeight;
+    if (sinceBlockHash) {
+      const { result: { height: blockHeight } } = await rpcClient.getBlock(sinceBlockHash.toString('hex'));
+      if (blockHeight < height) {
+        height = blockHeight;
+      }
     }
 
     blockIterator.setBlockHeight(height);
@@ -102,37 +108,30 @@ const errorHandler = require('../lib/util/errorHandler');
     try {
       await stHeaderReader.read();
     } catch (error) {
-      if (!syncState.isEmpty() && error.message === 'Block height out of range') {
+      if (error.message !== 'Block height out of range') {
+        throw error;
+      }
+
+      if (!syncState.isEmpty()) {
         await resetDashDrive();
-        await onBlockHash();
+        isInSync = false;
+        await sync();
         return;
       }
     }
 
     isFirstSyncCompleted = true;
-
     isInSync = false;
   }
 
-  try {
-    await stHeaderReader.read();
-
-    isFirstSyncCompleted = true;
-  } catch (error) {
-    if (!syncState.isEmpty() && error.message === 'Block height out of range') {
-      await resetDashDrive();
-      await onBlockHash();
-    } else if (syncState.isEmpty() && error.message !== 'Block height out of range') {
-      throw error;
-    }
-  }
+  await sync();
 
   // Sync arriving ST packets
   const zmqSocket = zmq.createSocket('sub');
   zmqSocket.connect(process.env.DASHCORE_ZMQ_PUB_HASHBLOCK);
 
   zmqSocket.on('message', (topic, blockHash) => {
-    onBlockHash(blockHash).catch((error) => {
+    sync(blockHash).catch((error) => {
       isInSync = false;
       errorHandler(error);
     });
