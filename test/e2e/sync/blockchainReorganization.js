@@ -56,7 +56,7 @@ describe('Blockchain reorganization', function main() {
     dashDriveInstance = await startDashDriveInstance();
 
     // 2. Populate instance of Dash Drive and Dash Core with data
-    createAndSubmitST = async (username) => {
+    createAndSubmitST = async (username, savePacketCID = true) => {
       // 2.1 Get packet data with random object description
       const packetOne = packetsData[0];
       packetOne.data.objects[0].description = `Valid registration for ${username}`;
@@ -71,7 +71,9 @@ describe('Blockchain reorganization', function main() {
       const packetCid = await addSTPacket(packet);
 
       // 2.4 Save CID of freshly added packet for future use
-      packetsCids.push(packetCid);
+      if (savePacketCID) {
+        packetsCids.push(packetCid);
+      }
 
       // 2.5 Send ST header to Dash Core and generate a block with it
       await dashDriveInstance.dashCore.rpcClient.sendRawTransition(header);
@@ -95,8 +97,8 @@ describe('Blockchain reorganization', function main() {
     await dashDriveInstance.dashCore.rpcClient.invalidateBlock(blockHashToInvalidate);
 
     // 5. Generate two new STs
-    await createAndSubmitST('Bob');
-    await createAndSubmitST('John');
+    await createAndSubmitST('Bob', false);
+    await createAndSubmitST('John', false);
 
     // 6. Await Dash Drive to sync latest changes
     await dashDriveSyncToFinish(dashDriveInstance.dashDrive);
