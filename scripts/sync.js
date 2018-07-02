@@ -77,11 +77,7 @@ const errorHandler = require('../lib/util/errorHandler');
     isInSync = false;
   }
 
-  /**
-   * @param {Buffer} [sinceBlockHash]
-   * @returns {Promise<void>}
-   */
-  async function sync(sinceBlockHash = undefined) {
+  async function onBlockHash(blockHash) {
     if (isInSync) {
       return;
     }
@@ -95,11 +91,9 @@ const errorHandler = require('../lib/util/errorHandler');
     }
 
     // Reset height to the current block's height
-    if (sinceBlockHash) {
-      const { result: { height: blockHeight } } = await rpcClient.getBlock(sinceBlockHash.toString('hex'));
-      if (blockHeight < height) {
-        height = blockHeight;
-      }
+    const { result: { height: blockHeight } } = await rpcClient.getBlock(blockHash.toString('hex'));
+    if (blockHeight < height) {
+      height = blockHeight;
     }
 
     blockIterator.setBlockHeight(height);
@@ -108,30 +102,37 @@ const errorHandler = require('../lib/util/errorHandler');
     try {
       await stHeaderReader.read();
     } catch (error) {
-      if (error.message !== 'Block height out of range') {
-        throw error;
-      }
-
-      if (!syncState.isEmpty()) {
+      if (!syncState.isEmpty() && error.message === 'Block height out of range') {
         await resetDashDrive();
-        isInSync = false;
-        await sync();
+        await onBlockHash();
         return;
       }
     }
 
     isFirstSyncCompleted = true;
+
     isInSync = false;
   }
 
-  await sync();
+  try {
+    await stHeaderReader.read();
+
+    isFirstSyncCompleted = true;
+  } catch (error) {
+    if (!syncState.isEmpty() && error.message === 'Block height out of range') {
+      await resetDashDrive();
+      await onBlockHash();
+    } else if (syncState.isEmpty() && error.message !== 'Block height out of range') {
+      throw error;
+    }
+  }
 
   // Sync arriving ST packets
   const zmqSocket = zmq.createSocket('sub');
   zmqSocket.connect(process.env.DASHCORE_ZMQ_PUB_HASHBLOCK);
 
   zmqSocket.on('message', (topic, blockHash) => {
-    sync(blockHash).catch((error) => {
+    onBlockHash(blockHash).catch((error) => {
       isInSync = false;
       errorHandler(error);
     });
