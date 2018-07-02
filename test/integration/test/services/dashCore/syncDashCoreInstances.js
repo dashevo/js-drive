@@ -83,6 +83,66 @@ describe('syncDashCoreInstances', function main() {
       expect(firstBlockCount).to.be.not.equal(secondBlockCount);
     });
 
+    it('should have different number of blocks even if TS propagation goes after user registration', async () => {
+      const [firstInstance, secondInstance] = await startDashCoreInstance.many(2);
+
+      const packetsData = getStateTransitionPackets();
+
+      const registrationData = [];
+      for (let i = 0; i < 20; i++) {
+        const username = `Alice_${i}`;
+        const { userId, privateKeyString } =
+              await registerUser(username, firstInstance.rpcClient);
+        await firstInstance.rpcClient.generate(1);
+        registrationData.push({ username, userId, privateKeyString });
+      }
+
+      await dashCoreSyncToFinish(firstInstance, 'first');
+      await dashCoreSyncToFinish(secondInstance, 'second');
+
+      for (let i = 0; i < 90; i++) {
+        const { result: firstBlockCount } = await firstInstance.rpcClient.getBlockCount();
+        const { result: secondBlockCount } = await secondInstance.rpcClient.getBlockCount();
+
+        if (firstBlockCount === secondBlockCount) {
+          break;
+        }
+
+        await wait(1000);
+      }
+
+      for (let i = 0; i < registrationData.length; i++) {
+        const { username, userId, privateKeyString } = registrationData[i];
+
+        const packetOne = packetsData[0];
+        packetOne.data.objects[0].description = `Valid registration for ${username}`;
+
+        const [, header] = await createDapContractST(userId, privateKeyString, packetOne);
+
+        await firstInstance.rpcClient.sendRawTransition(header);
+        await firstInstance.rpcClient.generate(1);
+      }
+
+      await dashCoreSyncToFinish(firstInstance, 'first');
+      await dashCoreSyncToFinish(secondInstance, 'second');
+
+      for (let i = 0; i < 90; i++) {
+        const { result: firstBlockCount } = await firstInstance.rpcClient.getBlockCount();
+        const { result: secondBlockCount } = await secondInstance.rpcClient.getBlockCount();
+
+        if (firstBlockCount === secondBlockCount) {
+          break;
+        }
+
+        await wait(1000);
+      }
+
+      const { result: firstBlockCount } = await firstInstance.rpcClient.getBlockCount();
+      const { result: secondBlockCount } = await secondInstance.rpcClient.getBlockCount();
+
+      expect(firstBlockCount).to.be.not.equal(secondBlockCount);
+    });
+
     it('should eventually have the same number of blocks if both instances connected', async () => {
       const [firstInstance, secondInstance] = await startDashCoreInstance.many(2);
       secondInstance.connect(firstInstance);
