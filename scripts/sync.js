@@ -73,8 +73,6 @@ const errorHandler = require('../lib/util/errorHandler');
     blockIterator.setBlockHeight(1);
     syncState.setBlocks([]);
     syncState.setLastSyncAt(null);
-    isFirstSyncCompleted = false;
-    isInSync = false;
   }
 
   /**
@@ -115,7 +113,10 @@ const errorHandler = require('../lib/util/errorHandler');
 
         if (!syncState.isEmpty()) {
           await resetDashDrive();
+
           isInSync = false;
+          isFirstSyncCompleted = false;
+
           await sync();
           return;
         }
