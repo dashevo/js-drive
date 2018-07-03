@@ -88,40 +88,46 @@ const errorHandler = require('../lib/util/errorHandler');
 
     isInSync = true;
 
-    // Start sync from the last synced block + 1
-    let height = blockIterator.getBlockHeight();
-    if (isFirstSyncCompleted) {
-      height += 1;
-    }
-
-    // Reset height to the current block's height
-    if (sinceBlockHash) {
-      const { result: { height: blockHeight } } = await rpcClient.getBlock(sinceBlockHash.toString('hex'));
-      if (blockHeight < height) {
-        height = blockHeight;
-      }
-    }
-
-    blockIterator.setBlockHeight(height);
-    stHeaderIterator.reset(false);
-
     try {
-      await stHeaderReader.read();
-    } catch (error) {
-      if (error.message !== 'Block height out of range') {
-        throw error;
+      // Start sync from the last synced block + 1
+      let height = blockIterator.getBlockHeight();
+      if (isFirstSyncCompleted) {
+        height += 1;
       }
 
-      if (!syncState.isEmpty()) {
-        await resetDashDrive();
-        isInSync = false;
-        await sync();
-        return;
+      // Reset height to the current block's height
+      if (sinceBlockHash) {
+        const { result: { height: blockHeight } } = await rpcClient.getBlock(sinceBlockHash.toString('hex'));
+        if (blockHeight < height) {
+          height = blockHeight;
+        }
       }
+
+      blockIterator.setBlockHeight(height);
+      stHeaderIterator.reset(false);
+
+      try {
+        await stHeaderReader.read();
+      } catch (error) {
+        if (error.message !== 'Block height out of range') {
+          throw error;
+        }
+
+        if (!syncState.isEmpty()) {
+          await resetDashDrive();
+          isInSync = false;
+          await sync();
+          return;
+        }
+      }
+
+      isFirstSyncCompleted = true;
+      isInSync = false;
+    } catch (e) {
+      isInSync = false;
+
+      throw e;
     }
-
-    isFirstSyncCompleted = true;
-    isInSync = false;
   }
 
   await sync();
