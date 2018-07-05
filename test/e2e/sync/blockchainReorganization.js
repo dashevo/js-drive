@@ -88,7 +88,7 @@ describe('Blockchain reorganization', function main() {
     );
   });
 
-  it('Dash Drive should syncdata after blockchain reorganization, removing missing STs. Adding them back after they reappear in the blockchain.', async () => {
+  it('Dash Drive should sync data after blockchain reorganization, removing missing STs. Adding them back after they reappear in the blockchain.', async () => {
     // 4. Disconnecting nodes to start introducing difference in blocks
     //    TODO: implement `disconnect` method for DashCoreInstance
     const ip = secondInstance.dashCore.getIp();
