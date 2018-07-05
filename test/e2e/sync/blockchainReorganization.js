@@ -122,7 +122,7 @@ describe('Blockchain reorganization', function main() {
     // 7. Generate slightly larger amount of STs on the second node
     //    to introduce reorganization
     for (let i = 4; i < 7; i++) {
-      const packetCid = await createAndSubmitST(`Alice_${i}`, stPackets[0], secondInstance);
+      const { packetCid } = await createAndSubmitST(`Alice_${i}`, stPackets[0], secondInstance);
       packetsCids.push(packetCid);
     }
 
