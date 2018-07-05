@@ -9,6 +9,7 @@ describe('attachPinSTPacketHandler', () => {
   let stHeadersReaderMock;
   let rejectAfterMock;
   let attachPinSTPacketHandler;
+  let unpinAllIpfsPackets;
 
   beforeEach(function beforeEach() {
     rpcClientMock = new RpcClientMock(this.sinon);
@@ -38,13 +39,14 @@ describe('attachPinSTPacketHandler', () => {
     }
 
     stHeadersReaderMock = new STHeadersReader();
+    unpinAllIpfsPackets = this.sinon.stub();
 
     rejectAfterMock = this.sinon.stub();
     attachPinSTPacketHandler = proxyquire('../../../lib/storage/attachPinSTPacketHandler', {
       '../util/rejectAfter': rejectAfterMock,
     });
 
-    attachPinSTPacketHandler(stHeadersReaderMock, ipfsAPIMock);
+    attachPinSTPacketHandler(stHeadersReaderMock, ipfsAPIMock, unpinAllIpfsPackets);
   });
 
   it('should pin ST packets when new header appears', async () => {
@@ -77,5 +79,10 @@ describe('attachPinSTPacketHandler', () => {
     rpcClientMock.transitionHeaders.slice(0, block.ts.length).forEach((header) => {
       expect(ipfsAPIMock.pin.rm).to.be.calledWith(header.getPacketCID(), { recursive: true });
     });
+  });
+
+  it('should call unpinAllIpfsPackets on stHeadersReader reset event', async () => {
+    await stHeadersReaderMock.emit('reset');
+    expect(unpinAllIpfsPackets).to.be.calledOnce();
   });
 });
