@@ -1,8 +1,8 @@
 const Emitter = require('emittery');
 const getTransitionHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHeaderFixtures');
-const attachStoreDapContractHandler = require('../../../../lib/stateView/dapContract/attachStoreDapContractHandler');
+const attachStateViewHandlers = require('../../../../lib/stateView/dapContract/attachStateViewHandlers');
 
-describe('attachStoreDapContractHandler', () => {
+describe('attachStateViewHandlers', () => {
   let stHeadersReader;
   let storeDapContract;
   let dropMongoDatabasesWithPrefixStub;
@@ -12,14 +12,14 @@ describe('attachStoreDapContractHandler', () => {
     stHeadersReader = new STHeadersReader();
     storeDapContract = this.sinon.stub();
     dropMongoDatabasesWithPrefixStub = this.sinon.stub();
-    attachStoreDapContractHandler(
+    attachStateViewHandlers(
       stHeadersReader,
       storeDapContract,
       dropMongoDatabasesWithPrefixStub,
     );
   });
 
-  it('should call attachStoreDapContractHandler on new block header', async () => {
+  it('should call attachStateViewHandlers on new block header', async () => {
     const header = getTransitionHeaderFixtures()[0];
     await stHeadersReader.emitSerial('header', header);
     expect(storeDapContract).to.be.calledOnce();

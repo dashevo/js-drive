@@ -19,7 +19,7 @@ const dropMongoDatabasesWithPrefixFactory = require('../lib/mongoDb/dropMongoDat
 
 const attachPinSTPacketHandler = require('../lib/storage/attachPinSTPacketHandler');
 const attachStoreSyncStateHandler = require('../lib/sync/state/attachStoreSyncStateHandler');
-const attachStoreDapContractHandler = require('../lib/stateView/dapContract/attachStoreDapContractHandler');
+const attachStateViewHandlers = require('../lib/stateView/dapContract/attachStateViewHandlers');
 const errorHandler = require('../lib/util/errorHandler');
 
 (async function main() {
@@ -61,7 +61,7 @@ const errorHandler = require('../lib/util/errorHandler');
   attachStoreSyncStateHandler(stHeaderReader, syncState, syncStateRepository);
   const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb);
   const storeDapContract = storeDapContractFactory(dapContractMongoDbRepository, ipfsAPI);
-  attachStoreDapContractHandler(stHeaderReader, storeDapContract, dropMongoDatabasesWithPrefix);
+  attachStateViewHandlers(stHeaderReader, storeDapContract, dropMongoDatabasesWithPrefix);
 
   let isFirstSyncCompleted = false;
   let isInSync = false;
