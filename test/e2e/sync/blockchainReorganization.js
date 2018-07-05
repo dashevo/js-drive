@@ -7,116 +7,202 @@ const createDapContractST = require('../../../lib/test/createDapContractST');
 const startDashDriveInstance = require('../../../lib/test/services/dashDrive/startDashDriveInstance');
 
 const wait = require('../../../lib/test/util/wait');
-const cbor = require('cbor');
 
-/**
- * Await Dash Drive instance to finish syncing
- *
- * @param {DashDriveInstance} instance
- * @returns {Promise<void>}
- */
-async function dashDriveSyncToFinish(instance) {
-  const packet = getStateTransitionPackets()[0];
-  const serializedPacket = cbor.encodeCanonical(packet);
-  const serializedPacketJson = {
-    packet: serializedPacket.toString('hex'),
-  };
+async function createAndSubmitST(username, basePacketData, instance) {
+  const packetData = Object.assign({}, basePacketData);
+  packetData.data.objects[0].description = `Valid registration for ${username}`;
 
-  let finished = false;
-  while (!finished) {
-    try {
-      const response = await instance.getApi()
-        .request('addSTPacketMethod', serializedPacketJson);
-      if (response.result) {
-        finished = true;
+  const { userId, privateKeyString } =
+        await registerUser(username, instance.dashCore.rpcClient);
+  const [packet, header] = await createDapContractST(userId, privateKeyString, packetData);
+
+  const addSTPacket = addSTPacketFactory(instance.ipfs.getApi());
+  const packetCid = await addSTPacket(packet);
+
+  const { result: tsid } = await instance.dashCore.rpcClient.sendRawTransition(header);
+  await instance.dashCore.rpcClient.generate(1);
+
+  return { packetCid, tsid };
+}
+
+async function blockCountEvenAndEqual(
+  instanceOne,
+  instanceTwo,
+  desiredBlockCount = -1,
+  timeout = 90,
+) {
+  for (let i = 0; i < timeout; i++) {
+    const { result: blockCountOne } = await instanceOne.rpcClient.getBlockCount();
+    const { result: blockCountTwo } = await instanceTwo.rpcClient.getBlockCount();
+
+    if (blockCountOne === blockCountTwo) {
+      if (blockCountOne === desiredBlockCount) {
+        break;
       } else {
-        await wait(1000);
+        throw new Error(`Block count of ${blockCountOne} is not desirable ${desiredBlockCount}`);
       }
-    } catch (e) {
-      await wait(1000);
+    } else if (i === timeout - 1) {
+      throw new Error('Timeout waiting for block count to be equal on both nodes');
     }
+
+    await wait(1000);
   }
 }
 
 describe('Blockchain reorganization', function main() {
-  let dashDriveInstance;
+  let firstInstance;
+  let secondInstance;
 
   let packetsCids;
-  let lastPacketCid;
+  let packetsAddedAfterDisconnect;
+  let stPackets;
+  let tsesAfterDisconnect;
 
-  let createAndSubmitST;
+  const BLOCKS_PER_ST = 109;
 
   this.timeout(900000);
 
   before('having started Dash Drive node and generated some STs', async () => {
     packetsCids = [];
-    const packetsData = getStateTransitionPackets();
+    packetsAddedAfterDisconnect = [];
+    tsesAfterDisconnect = [];
 
-    // 1. Start one full Dash Drive instances
-    dashDriveInstance = await startDashDriveInstance();
+    stPackets = getStateTransitionPackets();
+
+    // 1. Start two full Dash Drive instances
+    [firstInstance, secondInstance] = await startDashDriveInstance.many(2);
 
     // 2. Populate instance of Dash Drive and Dash Core with data
-    createAndSubmitST = async (username) => {
-      // 2.1 Get packet data with random object description
-      const packetOne = packetsData[0];
-      packetOne.data.objects[0].description = `Valid registration for ${username}`;
-
-      // 2.2 Register user and create DAP Contract State Transition packet and header
-      const { userId, privateKeyString } =
-        await registerUser(username, dashDriveInstance.dashCore.rpcClient);
-      const [packet, header] = await createDapContractST(userId, privateKeyString, packetOne);
-
-      // 2.3 Add ST packet to IPFS
-      const addSTPacket = addSTPacketFactory(dashDriveInstance.ipfs.getApi());
-      const packetCid = await addSTPacket(packet);
-
-      // 2.4 Save CID of freshly added packet for future use
-
+    //    First two STs, should be equal on both nodes
+    for (let i = 0; i < 2; i++) {
+      const { packetCid } = await createAndSubmitST(`Alice_${i}`, stPackets[0], firstInstance);
       packetsCids.push(packetCid);
-
-      // 2.5 Send ST header to Dash Core and generate a block with it
-      await dashDriveInstance.dashCore.rpcClient.sendRawTransition(header);
-      await dashDriveInstance.dashCore.rpcClient.generate(1);
-    };
-
-    for (let i = 0; i < 4; i++) {
-      await createAndSubmitST(`Alice_${i}`);
     }
 
-    // Remove and track last CID as it's expected to be removed by reorganization
-    lastPacketCid = packetsCids.pop();
+    // 3. Await block count to be equal on both nodes
+    //    Should be equal number of generated STs times number of blocks per ST
+    await blockCountEvenAndEqual(
+      firstInstance.dashCore,
+      secondInstance.dashCore,
+      2 * BLOCKS_PER_ST,
+    );
   });
 
-  it('Dash Drive should sync data after blockchain reorganization, removing uncessary data.', async () => {
-    // 4. Invalidate block that is 6 blocks away from the top
-    const { result: blockCount } = await dashDriveInstance.dashCore.rpcClient.getBlockCount();
-    const { result: blockHashToInvalidate } = await dashDriveInstance.dashCore.rpcClient
-      .getBlockHash(blockCount - 6);
+  it('Dash Drive should syncdata after blockchain reorganization, removing missing STs. Adding them back after they reappear in the blockchain.', async () => {
+    // 4. Disconnecting nodes to start introducing difference in blocks
+    //    TODO: implement `disconnect` method for DashCoreInstance
+    const ip = secondInstance.dashCore.getIp();
+    const port = secondInstance.dashCore.options.getDashdPort();
+    await firstInstance.dashCore.rpcClient.disconnectNode(`${ip}:${port}`);
+    await firstInstance.dashCore.rpcClient.addNode(`${ip}:${port}`, 'remove');
 
-    await dashDriveInstance.dashCore.rpcClient.invalidateBlock(blockHashToInvalidate);
+    // 5. Generate two more ST on the first node
+    //    Note: keep track of exact those CIDs as they should disappear after reorganization
+    //    Note: keep track of tsid as well to check if it's moved in mempool later on
+    for (let i = 2; i < 4; i++) {
+      const { packetCid, tsid } = await createAndSubmitST(`Alice_${i}`, stPackets[0], firstInstance);
+      packetsCids.push(packetCid);
+      packetsAddedAfterDisconnect.push(packetCid);
+      tsesAfterDisconnect.push(tsid);
+    }
 
-    // 5. Generate two new STs
-    await createAndSubmitST('Bob');
-    await createAndSubmitST('John');
+    // Check tses are not in mempool
+    for (let i = 0; i < tsesAfterDisconnect.length - 1; i++) {
+      const tsid = tsesAfterDisconnect[i];
+      const { result: tsData } = await firstInstance.dashCore.rpcClient.getTransition(tsid);
+      expect(tsData.from_mempool).to.not.exist();
+    }
 
-    // 6. Await Dash Drive to sync latest changes
-    await dashDriveSyncToFinish(dashDriveInstance.dashDrive);
+    // 6. Check proper block count on the first node
+    {
+      const { result: blockCount } = await firstInstance.dashCore.rpcClient.getBlockCount();
+      expect(blockCount).to.be.equal(4 * BLOCKS_PER_ST);
+    }
 
-    // 7. Check that lastly submitted by createAndSubmitST method ST is gone from IPFS
-    const lsResult = await dashDriveInstance.ipfs.getApi().pin.ls();
-    const currentCids = lsResult.map(item => item.hash);
+    // 7. Generate slightly larger amount of STs on the second node
+    //    to introduce reorganization
+    for (let i = 4; i < 7; i++) {
+      const packetCid = await createAndSubmitST(`Alice_${i}`, stPackets[0], secondInstance);
+      packetsCids.push(packetCid);
+    }
 
-    expect(currentCids).to.not.include(lastPacketCid);
+    // 8. Check proper block count on the second node
+    {
+      const { result: blockCount } = await secondInstance.dashCore.rpcClient.getBlockCount();
+      expect(blockCount).to.be.equal(5 * BLOCKS_PER_ST);
+    }
 
-    // 8. Check the rest of CIDs are in place
-    packetsCids.forEach((cid) => {
-      expect(currentCids).to.include(cid);
-    });
+    // 9. Reconnect nodes
+    await firstInstance.dashCore.connect(secondInstance.dashCore);
+
+    // 10. Await equal block count on both nodes
+    //     Notes: should be equal to largest chain
+    await blockCountEvenAndEqual(
+      firstInstance.dashCore,
+      secondInstance.dashCore,
+      5 * BLOCKS_PER_ST,
+    );
+
+    // Check tses are back to mempool
+    for (let i = 0; i < tsesAfterDisconnect.length - 1; i++) {
+      const tsid = tsesAfterDisconnect[i];
+      const { result: tsData } = await firstInstance.dashCore.rpcClient.getTransition(tsid);
+      expect(tsData.from_mempool).to.exist()
+        .and.be.equal(true);
+    }
+
+    // 11. Await Dash Drive to sync
+    await wait(20000);
+
+    // 12. Check packet CIDs added after disconnect does not appear in Dash Drive
+    {
+      const lsResult = await secondInstance.ipfs.getApi().pin.ls();
+      const lsHashes = lsResult.map(item => item.hash);
+
+      packetsAddedAfterDisconnect.forEach((cid) => {
+        expect(lsHashes).to.not.include(cid);
+      });
+    }
+
+    {
+      const lsResult = await firstInstance.ipfs.getApi().pin.ls();
+      const lsHashes = lsResult.map(item => item.hash);
+
+      packetsAddedAfterDisconnect.forEach((cid) => {
+        expect(lsHashes).to.not.include(cid);
+      });
+    }
+
+    // 13. Generate more blocks so TSes reappear on the blockchain
+    await firstInstance.dashCore.rpcClient.generate(10);
+
+    // 14. Await Dass Drive to sync
+    await wait(20000);
+
+    // 15. Check CIDs reappear in Dash Drive
+    {
+      const lsResult = await secondInstance.ipfs.getApi().pin.ls();
+      const lsHashes = lsResult.map(item => item.hash);
+
+      packetsCids.forEach((cid) => {
+        expect(lsHashes).to.include(cid);
+      });
+    }
+
+    {
+      const lsResult = await firstInstance.ipfs.getApi().pin.ls();
+      const lsHashes = lsResult.map(item => item.hash);
+
+      packetsCids.forEach((cid) => {
+        expect(lsHashes).to.include(cid);
+      });
+    }
   });
 
   after('cleanup lone services', async () => {
     const promises = Promise.all([
-      dashDriveInstance.remove(),
+      firstInstance.remove(),
+      secondInstance.remove(),
     ]);
     await promises;
   });
