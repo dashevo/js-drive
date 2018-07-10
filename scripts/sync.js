@@ -19,7 +19,7 @@ const dropMongoDatabasesWithPrefixFactory = require('../lib/mongoDb/dropMongoDat
 
 const attachIpfsHandlers = require('../lib/storage/attachIpfsHandlers');
 const attachSyncHandlers = require('../lib/sync/state/attachSyncHandlers');
-const attachStateViewHandlers = require('../lib/stateView/dapContract/attachStateViewHandlers');
+const attachStateViewHandlers = require('../lib/stateView/attachStateViewHandlers');
 const errorHandler = require('../lib/util/errorHandler');
 
 (async function main() {

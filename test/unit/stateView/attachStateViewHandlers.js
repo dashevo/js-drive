@@ -1,6 +1,6 @@
 const Emitter = require('emittery');
-const getTransitionHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHeaderFixtures');
-const attachStateViewHandlers = require('../../../../lib/stateView/dapContract/attachStateViewHandlers');
+const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
+const attachStateViewHandlers = require('../../../lib/stateView/attachStateViewHandlers');
 
 describe('attachStateViewHandlers', () => {
   let stHeadersReader;
