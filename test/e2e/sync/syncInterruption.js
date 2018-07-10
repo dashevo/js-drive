@@ -108,7 +108,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
 
     // Note: I can't use Promise.all here due to errors with PrivateKey
     //       I guess some of the actions can't be executed in parallel
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
       await createAndSubmitST(`Alice_${i}`);
     }
   });
