@@ -5,7 +5,7 @@
     "dapcontract": {
       "dapschemaid": 0,
       "dapname": "DashPay",
-      "dapver": "1",
+      "dapver": 1,
       "dapschema": {
         "$id": "http://dash.org/schemas/sys/dapschema",
         "title": "Contacts",
@@ -58,7 +58,7 @@
   {
     "pver": 1,
     "dapid": "ac5784e7dd8fc9f1b638a353fb10015d3841bb9076c20e2ebefc3e97599e92b5",
-    "dapobjmerkleroot": "35dd1a700ecc2b78fb2dbd0f976486b63cf0f6d7052a0741dbc5d25d5cd37422",
+    "dapobjectshash": "35dd1a700ecc2b78fb2dbd0f976486b63cf0f6d7052a0741dbc5d25d5cd37422",
     "dapobjects": [
       {
         "objtype": "user",
@@ -75,7 +75,7 @@
   {
     "pver": 1,
     "dapid": "ac5784e7dd8fc9f1b638a353fb10015d3841bb9076c20e2ebefc3e97599e92b5",
-    "dapobjmerkleroot": "7a485fdb68cd4dc7075d063ee0e8a5f8e9b459089647e1c4c536cf4127a555b9",
+    "dapobjectshash": "7a485fdb68cd4dc7075d063ee0e8a5f8e9b459089647e1c4c536cf4127a555b9",
     "dapobjects": [
       {
         "objtype": "user",

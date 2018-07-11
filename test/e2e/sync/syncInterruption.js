@@ -2,7 +2,7 @@ const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 
 const registerUser = require('../../../lib/test/registerUser');
-const createDapContractST = require('../../../lib/test/createDapContractST');
+const createSTHeader = require('../../../lib/test/createSTHeader');
 
 const startDashDriveInstance = require('../../../lib/test/services/dashDrive/startDashDriveInstance');
 const startDashCoreInstance = require('../../../lib/test/services/dashCore/startDashCoreInstance');
@@ -92,11 +92,11 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
       // 2.2 Register user and create DAP Contract State Transition packet and header
       const { userId, privateKeyString } =
         await registerUser(username, fullDashDriveInstance.dashCore.rpcClient);
-      const [packet, header] = await createDapContractST(userId, privateKeyString, packetOne);
+      const header = await createSTHeader(userId, privateKeyString, packetOne);
 
       // 2.3 Add ST packet to IPFS
       const addSTPacket = addSTPacketFactory(fullDashDriveInstance.ipfs.getApi());
-      const packetCid = await addSTPacket(packet);
+      const packetCid = await addSTPacket(packetOne);
 
       // 2.4 Save CID of frshly added packet for future use
       packetsCids.push(packetCid);

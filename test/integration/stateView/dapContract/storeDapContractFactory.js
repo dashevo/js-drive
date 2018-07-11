@@ -22,7 +22,7 @@ describe('storeDapContractFactory', function main() {
   });
 
   it('should store DAP schema', async () => {
-    const packet = getTransitionPacketFixtures()[0].toJSON();
+    const packet = getTransitionPacketFixtures()[0].toJSON({ skipMeta: true });
     const header = getTransitionHeaderFixtures()[0].toJSON();
     header.hashSTPacket = await hashSTPacket(packet);
 
