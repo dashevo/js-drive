@@ -45,7 +45,7 @@
     "sinon-chai": "^2.14.0"
   },
   "dependencies": {
-    "@dashevo/dash-schema": "git+ssh://git@github.com/dashevo/dash-schema.git",
+    "@dashevo/dash-schema": "git+ssh://git@github.com/dashevo/dash-schema.git#v3_develop",
     "@dashevo/dashcore-lib": "git+ssh://git@github.com/dashevo/bitcore-lib-dash-private.git#develop",
     "bitcoind-rpc-dash": "git+ssh://git@github.com/dashevo/bitcoind-rpc-dash-private.git#develop",
     "cbor": "^3.0.3",
@@ -58,6 +58,7 @@
     "jayson": "^2.0.5",
     "mongodb": "^3.0.3",
     "multihashes": "^0.4.13",
+    "recursive-iterator": "^3.3.0",
     "zeromq": "^4.6.0"
   }
 }

@@ -86,8 +86,8 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     // 2. Populate Dash Drive and Dash Core with data
     async function createAndSubmitST(username) {
       // 2.1 Get packet data with random object description
-      const packetOne = packetsData[0];
-      packetOne.data.objects[0].description = `Valid registration for ${username}`;
+      const [packetOne] = packetsData;
+      packetOne.dapcontract.description = `Valid registration for ${username}`;
 
       // 2.2 Register user and create DAP Contract State Transition packet and header
       const { userId, privateKeyString } =

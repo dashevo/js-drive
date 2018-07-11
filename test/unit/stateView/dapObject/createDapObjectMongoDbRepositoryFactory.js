@@ -16,7 +16,7 @@ describe('createDapObjectMongoDbRepositoryFactory', () => {
     );
   });
 
-  it('should create Mongo database with prefix + dapId', async () => {
+  it('should create Mongo database with prefix + id', async () => {
     const dapId = '123456';
     createDapObjectMongoDbRepository(dapId);
 

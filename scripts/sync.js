@@ -10,6 +10,7 @@ const RpcBlockIterator = require('../lib/blockchain/iterator/RpcBlockIterator');
 const StateTransitionHeaderIterator = require('../lib/blockchain/iterator/StateTransitionHeaderIterator');
 const STHeadersReaderState = require('../lib/blockchain/reader/STHeadersReaderState');
 const STHeadersReader = require('../lib/blockchain/reader/STHeadersReader');
+const sanitizeData = require('../lib/mongoDb/sanitizeData');
 const DapContractMongoDbRepository = require('../lib/stateView/dapContract/DapContractMongoDbRepository');
 const storeDapContractFactory = require('../lib/stateView/dapContract/storeDapContractFactory');
 
@@ -59,7 +60,7 @@ const errorHandler = require('../lib/util/errorHandler');
 
   attachIpfsHandlers(stHeaderReader, ipfsAPI, unpinAllIpfsPackets);
   attachSyncHandlers(stHeaderReader, syncState, syncStateRepository);
-  const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb);
+  const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
   const storeDapContract = storeDapContractFactory(dapContractMongoDbRepository, ipfsAPI);
   attachStateViewHandlers(stHeaderReader, storeDapContract, dropMongoDatabasesWithPrefix);
 
