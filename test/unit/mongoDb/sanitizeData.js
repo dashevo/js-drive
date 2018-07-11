@@ -1,4 +1,4 @@
-const { sanitize, unsanitize, VALID_PREFIX } = require('../../../lib/mongoDb/sanitizeData');
+const { sanitize, unsanitize, INTERNAL_PREFIX } = require('../../../lib/mongoDb/sanitizeData');
 
 describe('sanitizeData', () => {
   let unsanitizedData;
@@ -6,16 +6,16 @@ describe('sanitizeData', () => {
 
   beforeEach(() => {
     sanitizedData = {
-      [`${VALID_PREFIX}$a`]: {
+      [`${INTERNAL_PREFIX}$a`]: {
         a: 1,
         b: 2,
-        [`${VALID_PREFIX}$c`]: {
+        [`${INTERNAL_PREFIX}$c`]: {
           a: 1,
           b: 2,
         },
       },
       b: [
-        { [`${VALID_PREFIX}$a`]: 1 },
+        { [`${INTERNAL_PREFIX}$a`]: 1 },
         { b: 2 },
         { c: 3 },
       ],
