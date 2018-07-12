@@ -151,7 +151,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     // TODO: implement this bit in the future using
     //       getSyncStatus API method of Dash Drive
     //       possibly implemented in DD-196
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 30; i++) {
       await wait(1000);
     }
 
