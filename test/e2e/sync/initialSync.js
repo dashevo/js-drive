@@ -40,7 +40,7 @@ async function dashCoreSyncToFinish(instance) {
  */
 async function dashDriveSyncToFinish(instance) {
   const packet = getStateTransitionPackets()[0];
-  const serializedPacket = cbor.encodeCanonical(packet);
+  const serializedPacket = cbor.encodeCanonical(packet.toJSON({ skipMeta: true }));
   const serializedPacketJson = {
     packet: serializedPacket.toString('hex'),
   };
