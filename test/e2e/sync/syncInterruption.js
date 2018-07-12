@@ -134,7 +134,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
       `DASHCORE_JSON_RPC_USER=${dashCoreInstance.options.getRpcUser()}`,
       `DASHCORE_JSON_RPC_PASS=${dashCoreInstance.options.getRpcPassword()}`,
       `STORAGE_IPFS_MULTIADDR=${ipfsInstance.getIpfsAddress()}`,
-      `STORAGE_MONGODB_URL=mongodb://${mongoDbInstance.getIp()}`,
+      `STORAGE_MONGODB_URL=mongodb://${mongoDbInstance.getIp()}:27017`,
     ];
 
     // 7. Save initial list of CIDs in IPFS before Dash Drive started on 2nd node
