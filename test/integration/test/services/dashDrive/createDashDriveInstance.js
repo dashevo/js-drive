@@ -15,7 +15,7 @@ describe('createDashDriveInstance', function main() {
     let instance;
     before(async () => {
       mongoInstance = await startMongoDbInstance();
-      envs = [`STORAGE_MONGODB_URL=mongodb://${mongoInstance.getIp()}`];
+      envs = [`STORAGE_MONGODB_URL=mongodb://${mongoInstance.getIp()}:27017`];
       instance = await createDashDriveInstance(envs);
     });
     after(async () => {
@@ -47,7 +47,7 @@ describe('createDashDriveInstance', function main() {
     it('should start an instance with the default options', async () => {
       await instance.start();
       const { Args } = await instance.container.details();
-      expect(Args).to.deep.equal(['-c', 'npm run sync & npm run api']);
+      expect(Args).to.deep.equal(['-c', 'cd / && npm i && cd /usr/src/app && npm run sync & npm run api']);
     });
 
     it('should return DashDrive RPC port', async () => {
@@ -61,7 +61,7 @@ describe('createDashDriveInstance', function main() {
     let instance;
     before(async () => {
       mongoInstance = await startMongoDbInstance();
-      const envs = [`STORAGE_MONGODB_URL=mongodb://${mongoInstance.getIp()}`];
+      const envs = [`STORAGE_MONGODB_URL=mongodb://${mongoInstance.getIp()}:27017`];
       instance = await createDashDriveInstance(envs);
     });
     after(async () => {
