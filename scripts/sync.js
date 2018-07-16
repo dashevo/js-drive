@@ -12,7 +12,11 @@ const STHeadersReaderState = require('../lib/blockchain/reader/STHeadersReaderSt
 const STHeadersReader = require('../lib/blockchain/reader/STHeadersReader');
 const sanitizeData = require('../lib/mongoDb/sanitizeData');
 const DapContractMongoDbRepository = require('../lib/stateView/dapContract/DapContractMongoDbRepository');
-const storeDapContractFactory = require('../lib/stateView/dapContract/storeDapContractFactory');
+const DapObjectMongoDbRepository = require('../lib/stateView/dapObject/DapObjectMongoDbRepository');
+const createDapObjectMongoDbRepositoryFactory = require('../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
+const updateDapContractFactory = require('../lib/stateView/dapContract/updateDapContractFactory');
+const updateDapObjectFactory = require('../lib/stateView/dapObject/updateDapObjectFactory');
+const computeStateViewFactory = require('../lib/stateView/computeStateViewFactory');
 
 const cleanDashDriveFactory = require('../lib/sync/cleanDashDriveFactory');
 const unpinAllIpfsPacketsFactory = require('../lib/storage/ipfs/unpinAllIpfsPacketsFactory');
@@ -64,8 +68,14 @@ const errorHandler = require('../lib/util/errorHandler');
   attachIpfsHandlers(stHeaderReader, ipfsAPI, unpinAllIpfsPackets);
   attachSyncHandlers(stHeaderReader, syncState, syncStateRepository);
   const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
-  const storeDapContract = storeDapContractFactory(dapContractMongoDbRepository, ipfsAPI);
-  attachStateViewHandlers(stHeaderReader, storeDapContract, dropMongoDatabasesWithPrefix);
+  const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
+    mongoClient,
+    DapObjectMongoDbRepository,
+  );
+  const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
+  const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
+  const computeStateView = computeStateViewFactory(ipfsAPI, updateDapContract, updateDapObject);
+  attachStateViewHandlers(stHeaderReader, computeStateView, dropMongoDatabasesWithPrefix);
 
   let isFirstSyncCompleted = false;
   let isInSync = false;
