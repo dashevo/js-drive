@@ -7,13 +7,11 @@ describe('DapObject', () => {
     const blockHeight = 1;
     const headerHash = '17jasdjk129uasd8asd023098SD09023jll123jlasd90823jklD';
     const hashSTPacket = 'ad877138as8012309asdkl123l123lka908013';
-    const objectHash = '123981as90d01309ad09123';
     const reference = new Reference(
       blockHash,
       blockHeight,
       headerHash,
       hashSTPacket,
-      objectHash,
     );
     const dapObjectData = {
       id: '1234',
@@ -54,8 +52,7 @@ describe('DapObject', () => {
       objtype: 'user',
       idx: 0,
       rev: 1,
-      act: 0,
-
+      act: 1,
     };
     const dapObject = new DapObject(reference, dapObjectData);
     expect(dapObject.isNew()).to.be.false();
