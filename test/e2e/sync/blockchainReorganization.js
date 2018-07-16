@@ -86,9 +86,24 @@ describe('Blockchain reorganization', function main() {
       secondInstance.dashCore,
       2 * BLOCKS_PER_ST,
     );
+
+    // Await first Dash Drive sync
+    for (let i = 0; i < 60; i++) {
+      const lsResult = await firstInstance.ipfs.getApi().pin.ls();
+      const lsHashes = lsResult.map(item => item.hash);
+
+      if (lsHashes.indexOf(packetsCids[0]) !== -1) {
+        break;
+      }
+
+      await wait(1000);
+    }
   });
 
   it('Dash Drive should sync data after blockchain reorganization, removing missing STs. Adding them back after they reappear in the blockchain.', async () => {
+    // Store current CIDs to test initial sync later
+    const packetsBeforeDisconnect = packetsCids.slice();
+
     // 4. Disconnecting nodes to start introducing difference in blocks
     //    TODO: implement `disconnect` method for DashCoreInstance
     const ip = secondInstance.dashCore.getIp();
@@ -132,6 +147,13 @@ describe('Blockchain reorganization', function main() {
       expect(blockCount).to.be.equal(5 * BLOCKS_PER_ST);
     }
 
+    // Remove CIDs on node #1 added before disconnect
+    const rmPormises = packetsBeforeDisconnect.map(cid => firstInstance.ipfs.getApi().pin.rm(cid));
+    await Promise.all(rmPormises);
+
+    console.log('before connect');
+    await wait(30000);
+
     // 9. Reconnect nodes
     await firstInstance.dashCore.connect(secondInstance.dashCore);
 
@@ -169,6 +191,12 @@ describe('Blockchain reorganization', function main() {
       const lsHashes = lsResult.map(item => item.hash);
 
       packetsAddedAfterDisconnect.forEach((cid) => {
+        expect(lsHashes).to.not.include(cid);
+      });
+
+      // Also check removed packets are not present on node #1
+      // This will indicated no initial sync has happened
+      packetsBeforeDisconnect.forEach((cid) => {
         expect(lsHashes).to.not.include(cid);
       });
     }
