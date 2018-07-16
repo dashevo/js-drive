@@ -15,7 +15,7 @@ describe('createDapObjectMongoDbRepositoryFactory', () => {
   });
 
   it('should create DapObjectMongoDbRepository', async () => {
-    const dapId = '123456';
+    const dapId = 'ac5784e7dd8fc9f1b638a353fb10015d3841bb9076c20e2ebefc3e97599e92b5';
     const dapObjectRepository = createDapObjectMongoDbRepository(dapId);
 
     const dapObjectId = '98765';
