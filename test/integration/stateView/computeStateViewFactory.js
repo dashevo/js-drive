@@ -7,6 +7,7 @@ const hashSTPacket = require('../../../lib/test/consensus/hashSTPacket');
 const updateDapContractFactory = require('../../../lib/stateView/dapContract/updateDapContractFactory');
 const updateDapObjectFactory = require('../../../lib/stateView/dapObject/updateDapObjectFactory');
 const computeStateViewFactory = require('../../../lib/stateView/computeStateViewFactory');
+const sanitizeData = require('../../../lib/mongoDb/sanitizeData');
 
 const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
@@ -36,7 +37,7 @@ describe('computeStateViewFactory', () => {
       hashAlg: 'sha2-256',
     });
 
-    const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb);
+    const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
       mongoClient,
       DapObjectMongoDbRepository,
@@ -58,7 +59,7 @@ describe('computeStateViewFactory', () => {
       hashAlg: 'sha2-256',
     });
 
-    const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb);
+    const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
       mongoClient,
       DapObjectMongoDbRepository,
