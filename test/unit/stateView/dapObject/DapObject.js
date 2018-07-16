@@ -70,4 +70,17 @@ describe('DapObject', () => {
     const dapObject = new DapObject(reference, dapObjectData);
     expect(dapObject.isUpdated()).to.be.true();
   });
+
+  it('should be deleted if DapObject action is 2', async () => {
+    const reference = new Reference();
+    const dapObjectData = {
+      id: '1234',
+      objtype: 'user',
+      idx: 0,
+      rev: 1,
+      act: 2,
+    };
+    const dapObject = new DapObject(reference, dapObjectData);
+    expect(dapObject.isDeleted()).to.be.true();
+  });
 });
