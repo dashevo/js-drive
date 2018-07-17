@@ -67,7 +67,7 @@ describe('DapObject', () => {
       rev: 1,
       act: 1,
     };
-    const dapObject = new DapObject(reference, dapObjectData);
+    const dapObject = new DapObject(dapObjectData, reference);
     expect(dapObject.isUpdated()).to.be.true();
   });
 
