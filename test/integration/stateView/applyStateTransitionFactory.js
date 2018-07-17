@@ -6,14 +6,14 @@ const startIPFSInstance = require('../../../lib/test/services/mocha/startIPFSIns
 const hashSTPacket = require('../../../lib/test/consensus/hashSTPacket');
 const updateDapContractFactory = require('../../../lib/stateView/dapContract/updateDapContractFactory');
 const updateDapObjectFactory = require('../../../lib/stateView/dapObject/updateDapObjectFactory');
-const applySTPacketFactory = require('../../../lib/stateView/applySTPacketFactory');
+const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
 const sanitizeData = require('../../../lib/mongoDb/sanitizeData');
 
 const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
 
-describe('applySTPacketFactory', () => {
+describe('applyStateTransitionFactory', () => {
   let mongoClient;
   let mongoDb;
   let ipfsClient;
@@ -44,12 +44,12 @@ describe('applySTPacketFactory', () => {
     );
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
     const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
-    const applySTPacket = applySTPacketFactory(
+    const applyStateTransition = applyStateTransitionFactory(
       ipfsClient,
       updateDapContract,
       updateDapObject,
     );
-    await applySTPacket(header, block);
+    await applyStateTransition(header, block);
   });
 
   it('should compute DapObject state view', async () => {
@@ -70,11 +70,11 @@ describe('applySTPacketFactory', () => {
     );
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
     const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
-    const applySTPacket = applySTPacketFactory(
+    const applyStateTransition = applyStateTransitionFactory(
       ipfsClient,
       updateDapContract,
       updateDapObject,
     );
-    await applySTPacket(header, block);
+    await applyStateTransition(header, block);
   });
 });
