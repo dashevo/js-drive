@@ -20,7 +20,7 @@ describe('DapObject', () => {
       rev: 1,
       act: 1,
     };
-    const dapObject = new DapObject(reference, dapObjectData);
+    const dapObject = new DapObject(dapObjectData, reference);
 
     const dapObjectSerialized = dapObject.toJSON();
     expect(dapObjectSerialized).to.deep.equal({
@@ -41,7 +41,7 @@ describe('DapObject', () => {
       rev: 1,
       act: 0,
     };
-    const dapObject = new DapObject(reference, dapObjectData);
+    const dapObject = new DapObject(dapObjectData, reference);
     expect(dapObject.isNew()).to.be.true();
   });
 
@@ -54,7 +54,7 @@ describe('DapObject', () => {
       rev: 1,
       act: 1,
     };
-    const dapObject = new DapObject(reference, dapObjectData);
+    const dapObject = new DapObject(dapObjectData, reference);
     expect(dapObject.isNew()).to.be.false();
   });
 });

@@ -23,7 +23,7 @@ describe('createDapObjectMongoDbRepositoryFactory', () => {
     const objectData = {
       id: dapObjectId,
     };
-    const dapObject = new DapObject(reference, objectData);
+    const dapObject = new DapObject(objectData, reference);
     await dapObjectRepository.store(dapObject);
 
     const result = await dapObjectRepository.find(dapObjectId);
