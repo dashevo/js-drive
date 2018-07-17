@@ -17,7 +17,6 @@ describe('updateDapObjectFactory', () => {
     const blockHeight = 1;
     const headerHash = '17jasdjk129uasd8asd023098SD09023jll123jlasd90823jklD';
     const hashSTPacket = 'ad877138as8012309asdkl123l123lka908013';
-    const objectHash = '123981as90d01309ad09123';
     reference = new Reference(
       blockHash,
       blockHeight,
