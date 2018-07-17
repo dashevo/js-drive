@@ -54,7 +54,7 @@ describe('DapObjectMongoDbRepository', () => {
       headerHash,
       hashSTPacket,
     );
-    const dapObject = new DapObject(reference, objectData);
+    const dapObject = new DapObject(objectData, reference);
 
     await dapObjectRepository.store(dapObject);
     const object = await dapObjectRepository.find(id);
