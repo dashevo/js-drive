@@ -6,20 +6,20 @@ const startIPFSInstance = require('../../../lib/test/services/mocha/startIPFSIns
 const hashSTPacket = require('../../../lib/test/consensus/hashSTPacket');
 const updateDapContractFactory = require('../../../lib/stateView/dapContract/updateDapContractFactory');
 const updateDapObjectFactory = require('../../../lib/stateView/dapObject/updateDapObjectFactory');
-const computeStateViewFactory = require('../../../lib/stateView/computeStateViewFactory');
+const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
 const sanitizeData = require('../../../lib/mongoDb/sanitizeData');
 
 const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
 
-describe('computeStateViewFactory', () => {
+describe('applyStateTransitionFactory', () => {
   let mongoClient;
   let mongoDb;
   let ipfsClient;
 
   startMongoDbInstance().then(async (mongoDbInstance) => {
-    mongoClient = mongoDbInstance.mongoClient;
+    ({ mongoClient } = mongoDbInstance);
     mongoDb = await mongoDbInstance.getMongoClient();
   });
   startIPFSInstance().then(async (ipfsInstance) => {
@@ -44,8 +44,12 @@ describe('computeStateViewFactory', () => {
     );
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
     const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
-    const computeStateView = computeStateViewFactory(ipfsClient, updateDapContract, updateDapObject);
-    await computeStateView(header, block);
+    const applyStateTransition = applyStateTransitionFactory(
+      ipfsClient,
+      updateDapContract,
+      updateDapObject,
+    );
+    await applyStateTransition(header, block);
   });
 
   it('should compute DapObject state view', async () => {
@@ -66,7 +70,11 @@ describe('computeStateViewFactory', () => {
     );
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
     const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
-    const computeStateView = computeStateViewFactory(ipfsClient, updateDapContract, updateDapObject);
-    await computeStateView(header, block);
+    const applyStateTransition = applyStateTransitionFactory(
+      ipfsClient,
+      updateDapContract,
+      updateDapObject,
+    );
+    await applyStateTransition(header, block);
   });
 });
