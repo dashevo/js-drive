@@ -19,7 +19,7 @@ describe('computeStateViewFactory', () => {
   let ipfsClient;
 
   startMongoDbInstance().then(async (mongoDbInstance) => {
-    mongoClient = mongoDbInstance.mongoClient;
+    ({ mongoClient } = mongoDbInstance);
     mongoDb = await mongoDbInstance.getMongoClient();
   });
   startIPFSInstance().then(async (ipfsInstance) => {
@@ -44,7 +44,11 @@ describe('computeStateViewFactory', () => {
     );
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
     const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
-    const computeStateView = computeStateViewFactory(ipfsClient, updateDapContract, updateDapObject);
+    const computeStateView = computeStateViewFactory(
+      ipfsClient,
+      updateDapContract,
+      updateDapObject,
+    );
     await computeStateView(header, block);
   });
 
@@ -66,7 +70,11 @@ describe('computeStateViewFactory', () => {
     );
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
     const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
-    const computeStateView = computeStateViewFactory(ipfsClient, updateDapContract, updateDapObject);
+    const computeStateView = computeStateViewFactory(
+      ipfsClient,
+      updateDapContract,
+      updateDapObject,
+    );
     await computeStateView(header, block);
   });
 });
