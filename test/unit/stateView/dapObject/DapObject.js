@@ -80,7 +80,7 @@ describe('DapObject', () => {
       rev: 1,
       act: 2,
     };
-    const dapObject = new DapObject(reference, dapObjectData);
+    const dapObject = new DapObject(dapObjectData, reference);
     expect(dapObject.isDeleted()).to.be.true();
   });
 });
