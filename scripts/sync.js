@@ -23,6 +23,9 @@ const attachSyncHandlers = require('../lib/sync/state/attachSyncHandlers');
 const attachStateViewHandlers = require('../lib/stateView/dapContract/attachStateViewHandlers');
 const errorHandler = require('../lib/util/errorHandler');
 
+const isDashCoreRunningFactory = require('../lib/sync/isDashCoreRunningFactory');
+const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError');
+
 (async function main() {
   const rpcClient = new RpcClient({
     protocol: 'http',
@@ -66,6 +69,8 @@ const errorHandler = require('../lib/util/errorHandler');
   const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
   const storeDapContract = storeDapContractFactory(dapContractMongoDbRepository, ipfsAPI);
   attachStateViewHandlers(stHeaderReader, storeDapContract, dropMongoDatabasesWithPrefix);
+
+  const isDashCoreRunning = isDashCoreRunningFactory(rpcClient);
 
   let isFirstSyncCompleted = false;
   let isInSync = false;
@@ -133,6 +138,11 @@ const errorHandler = require('../lib/util/errorHandler');
 
       throw e;
     }
+  }
+
+  const isRunning = await isDashCoreRunning();
+  if (!isRunning) {
+    throw new DashCoreIsNotRunningError();
   }
 
   await sync();
