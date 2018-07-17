@@ -16,7 +16,7 @@ const DapObjectMongoDbRepository = require('../lib/stateView/dapObject/DapObject
 const createDapObjectMongoDbRepositoryFactory = require('../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
 const updateDapContractFactory = require('../lib/stateView/dapContract/updateDapContractFactory');
 const updateDapObjectFactory = require('../lib/stateView/dapObject/updateDapObjectFactory');
-const computeStateViewFactory = require('../lib/stateView/computeStateViewFactory');
+const applySTPacketFactory = require('../lib/stateView/applySTPacketFactory');
 
 const cleanDashDriveFactory = require('../lib/sync/cleanDashDriveFactory');
 const unpinAllIpfsPacketsFactory = require('../lib/storage/ipfs/unpinAllIpfsPacketsFactory');
@@ -74,7 +74,7 @@ const errorHandler = require('../lib/util/errorHandler');
   );
   const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
   const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
-  const computeStateView = computeStateViewFactory(ipfsAPI, updateDapContract, updateDapObject);
+  const computeStateView = applySTPacketFactory(ipfsAPI, updateDapContract, updateDapObject);
   attachStateViewHandlers(stHeaderReader, computeStateView, dropMongoDatabasesWithPrefix);
 
   let isFirstSyncCompleted = false;
