@@ -21,7 +21,7 @@ describe('attachStateViewHandlers', () => {
 
   it('should call attachStateViewHandlers on new block header', async () => {
     const header = getTransitionHeaderFixtures()[0];
-    await stHeadersReader.emitSerial('header', header);
+    await stHeadersReader.emitSerial('header', { header });
     expect(computeStateView).to.be.calledOnce();
   });
 
