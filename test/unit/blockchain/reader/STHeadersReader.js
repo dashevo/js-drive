@@ -40,8 +40,8 @@ describe('STHeadersReader', () => {
 
     await reader.read();
 
-    expect(beginHandlerStub).to.calledOnce();
-    expect(beginHandlerStub).to.calledWith(rpcClientMock.blocks[0].height);
+    expect(beginHandlerStub).to.be.calledOnce();
+    expect(beginHandlerStub).to.be.calledWith(rpcClientMock.blocks[0].height);
     expect(blockHandlerStub).has.callCount(rpcClientMock.blocks.length);
 
     const stHeaders = rpcClientMock.blocks.reduce((result, block) => result.concat(block.ts), []);
@@ -49,11 +49,11 @@ describe('STHeadersReader', () => {
 
     rpcClientMock.transitionHeaders.forEach((header, i) => {
       const currentArg = headerHandlerStub.getCall(i).args[0].header;
-      expect(currentArg.getHash()).to.equals(header.getHash());
+      expect(currentArg.getHash()).to.be.equal(header.getHash());
     });
 
-    expect(endHandlerStub).to.calledOnce();
-    expect(endHandlerStub).to.calledWith(blockIterator.getBlockHeight());
+    expect(endHandlerStub).to.be.calledOnce();
+    expect(endHandlerStub).to.be.calledWith(blockIterator.getBlockHeight());
   });
 
   it('should emit "reset" and read from initial block ' +
@@ -79,11 +79,11 @@ describe('STHeadersReader', () => {
 
     await reader.read();
 
-    expect(resetStub).to.calledOnce();
+    expect(resetStub).to.be.calledOnce();
 
     expect(blockHandlerStub).has.callCount(rpcClientMock.blocks.length);
     rpcClientMock.blocks.forEach((block, i) => {
-      expect(blockHandlerStub.getCall(i).args[0]).to.deep.equals(block);
+      expect(blockHandlerStub.getCall(i).args[0]).to.be.deep.equal(block);
     });
   });
 
@@ -109,8 +109,8 @@ describe('STHeadersReader', () => {
 
     await reader.read();
 
-    expect(resetStub).to.calledOnce();
-    expect(blockHandlerStub).to.callCount(rpcClientMock.blocks.length);
+    expect(resetStub).to.be.calledOnce();
+    expect(blockHandlerStub).to.be.callCount(rpcClientMock.blocks.length);
   });
 
   it('should emit "wrongSequence" if previous block hash not equal to current block previous hash', async function it() {
@@ -134,12 +134,12 @@ describe('STHeadersReader', () => {
 
     await reader.read();
 
-    expect(wrongSequenceStub).to.calledOnce();
-    expect(wrongSequenceStub).to.calledWith(currentBlock);
+    expect(wrongSequenceStub).to.be.calledOnce();
+    expect(wrongSequenceStub).to.be.calledWith(currentBlock);
 
     expect(blockHandlerStub).has.callCount(rpcClientMock.blocks.length);
     rpcClientMock.blocks.forEach((block, i) => {
-      expect(blockHandlerStub.getCall(i).args[0]).to.deep.equals(block);
+      expect(blockHandlerStub.getCall(i).args[0]).to.be.deep.equal(block);
     });
   });
 });
