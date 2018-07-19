@@ -113,7 +113,7 @@ describe('STHeadersReader', () => {
     expect(blockHandlerStub).to.be.callCount(rpcClientMock.blocks.length);
   });
 
-  it('should emit "staledBlock" if previous block hash not equal to current block previous hash', async function it() {
+  it('should emit "staleBlock" if previous block hash not equal to current block previous hash', async function it() {
     const previousBlockIndex = 1;
     const previousBlock = rpcClientMock.blocks[previousBlockIndex];
     const readerState = new STHeadersReaderState([previousBlock]);
@@ -130,7 +130,7 @@ describe('STHeadersReader', () => {
     const wrongSequenceStub = this.sinon.stub();
 
     reader.on('block', blockHandlerStub);
-    reader.on('staledBlock', wrongSequenceStub);
+    reader.on('staleBlock', wrongSequenceStub);
 
     await reader.read();
 
