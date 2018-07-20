@@ -137,7 +137,7 @@ describe('STHeadersReader', () => {
 
     expect(blockHandlerStub).has.callCount(rpcClientMock.blocks.length);
     rpcClientMock.blocks.forEach((block, i) => {
-      expect(blockHandlerStub.getCall(i).args[0]).to.be.deep.equal(block);
+      expect(blockHandlerStub.getCall(i)).to.be.calledWith(block);
     });
   });
 
@@ -167,9 +167,9 @@ describe('STHeadersReader', () => {
     await reader.read();
 
     expect(staleBlockHandlerStub).to.be.calledThrice();
-    expect(staleBlockHandlerStub.getCall(0).args[0]).to.be.deep.equal(blocks[3]);
-    expect(staleBlockHandlerStub.getCall(1).args[0]).to.be.deep.equal(blocks[2]);
-    expect(staleBlockHandlerStub.getCall(2).args[0]).to.be.deep.equal(blocks[1]);
+    expect(staleBlockHandlerStub.firstCall).to.be.calledWith(blocks[3]);
+    expect(staleBlockHandlerStub.secondCall).to.be.calledWith(blocks[2]);
+    expect(staleBlockHandlerStub.thirdCall).to.be.calledWith(blocks[1]);
 
     expect(blockHandlerStub).has.callCount(6);
 
@@ -183,7 +183,7 @@ describe('STHeadersReader', () => {
     ];
 
     rpcClientMock.blocks.forEach((block, i) => {
-      expect(blockHandlerStub.getCall(i).args[0]).to.be.deep.equal(expectedBlocksSequence[i]);
+      expect(blockHandlerStub.getCall(i)).to.be.calledWith(expectedBlocksSequence[i]);
     });
   });
 });
