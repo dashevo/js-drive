@@ -72,14 +72,14 @@ describe('STHeadersReader', () => {
       .returns(Promise.resolve({ result: modifiedBlock }));
 
     const blockHandlerStub = this.sinon.stub();
-    const resetStub = this.sinon.stub();
+    const resetHandlerStub = this.sinon.stub();
 
     reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
-    reader.on(STHeadersReader.EVENTS.RESET, resetStub);
+    reader.on(STHeadersReader.EVENTS.RESET, resetHandlerStub);
 
     await reader.read();
 
-    expect(resetStub).to.be.calledOnce();
+    expect(resetHandlerStub).to.be.calledOnce();
 
     expect(blockHandlerStub).has.callCount(rpcClientMock.blocks.length);
     rpcClientMock.blocks.forEach((block, i) => {
@@ -101,14 +101,14 @@ describe('STHeadersReader', () => {
       .returns(Promise.resolve({ result: currentBlock }));
 
     const blockHandlerStub = this.sinon.stub();
-    const resetStub = this.sinon.stub();
+    const resetHandlerStub = this.sinon.stub();
 
     reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
-    reader.on(STHeadersReader.EVENTS.RESET, resetStub);
+    reader.on(STHeadersReader.EVENTS.RESET, resetHandlerStub);
 
     await reader.read();
 
-    expect(resetStub).to.be.calledOnce();
+    expect(resetHandlerStub).to.be.calledOnce();
     expect(blockHandlerStub).to.be.callCount(rpcClientMock.blocks.length);
   });
 
@@ -125,15 +125,15 @@ describe('STHeadersReader', () => {
       .returns(Promise.resolve({ result: currentBlock }));
 
     const blockHandlerStub = this.sinon.stub();
-    const wrongSequenceStub = this.sinon.stub();
+    const staleBlockHandlerStub = this.sinon.stub();
 
     reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
-    reader.on(STHeadersReader.EVENTS.STALE_BLOCK, wrongSequenceStub);
+    reader.on(STHeadersReader.EVENTS.STALE_BLOCK, staleBlockHandlerStub);
 
     await reader.read();
 
-    expect(wrongSequenceStub).to.be.calledOnce();
-    expect(wrongSequenceStub).to.be.calledWith(previousBlock);
+    expect(staleBlockHandlerStub).to.be.calledOnce();
+    expect(staleBlockHandlerStub).to.be.calledWith(previousBlock);
 
     expect(blockHandlerStub).has.callCount(rpcClientMock.blocks.length);
     rpcClientMock.blocks.forEach((block, i) => {
@@ -141,7 +141,7 @@ describe('STHeadersReader', () => {
     });
   });
 
-  it('should emit "wrongSequence" for synced blocks if current block height is lower than last synced block', async function it() {
+  it('should emit "staleBlock" for synced blocks if current block height is lower than last synced block', async function it() {
     const { blocks } = rpcClientMock;
 
     const currentBlockHeight = 2;
@@ -159,17 +159,17 @@ describe('STHeadersReader', () => {
     blockIterator.setBlockHeight(currentBlockHeight);
 
     const blockHandlerStub = this.sinon.stub();
-    const wrongSequenceStub = this.sinon.stub();
+    const staleBlockHandlerStub = this.sinon.stub();
 
-    reader.on('block', blockHandlerStub);
-    reader.on('wrongSequence', wrongSequenceStub);
+    reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
+    reader.on(STHeadersReader.EVENTS.STALE_BLOCK, staleBlockHandlerStub);
 
     await reader.read();
 
-    expect(wrongSequenceStub).to.be.calledThrice();
-    expect(wrongSequenceStub.getCall(0).args[0]).to.be.deep.equal(blocks[3]);
-    expect(wrongSequenceStub.getCall(1).args[0]).to.be.deep.equal(blocks[2]);
-    expect(wrongSequenceStub.getCall(2).args[0]).to.be.deep.equal(blocks[1]);
+    expect(staleBlockHandlerStub).to.be.calledThrice();
+    expect(staleBlockHandlerStub.getCall(0).args[0]).to.be.deep.equal(blocks[3]);
+    expect(staleBlockHandlerStub.getCall(1).args[0]).to.be.deep.equal(blocks[2]);
+    expect(staleBlockHandlerStub.getCall(2).args[0]).to.be.deep.equal(blocks[1]);
 
     expect(blockHandlerStub).has.callCount(6);
 
