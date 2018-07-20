@@ -33,10 +33,10 @@ describe('STHeadersReader', () => {
     const blockHandlerStub = this.sinon.stub();
     const endHandlerStub = this.sinon.stub();
 
-    reader.on('begin', beginHandlerStub);
-    reader.on('block', blockHandlerStub);
-    reader.on('header', headerHandlerStub);
-    reader.on('end', endHandlerStub);
+    reader.on(STHeadersReader.EVENTS.BEGIN, beginHandlerStub);
+    reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
+    reader.on(STHeadersReader.EVENTS.HEADER, headerHandlerStub);
+    reader.on(STHeadersReader.EVENTS.END, endHandlerStub);
 
     await reader.read();
 
@@ -74,8 +74,8 @@ describe('STHeadersReader', () => {
     const blockHandlerStub = this.sinon.stub();
     const resetStub = this.sinon.stub();
 
-    reader.on('block', blockHandlerStub);
-    reader.on('reset', resetStub);
+    reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
+    reader.on(STHeadersReader.EVENTS.RESET, resetStub);
 
     await reader.read();
 
@@ -103,8 +103,8 @@ describe('STHeadersReader', () => {
     const blockHandlerStub = this.sinon.stub();
     const resetStub = this.sinon.stub();
 
-    reader.on('block', blockHandlerStub);
-    reader.on('reset', resetStub);
+    reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
+    reader.on(STHeadersReader.EVENTS.RESET, resetStub);
 
     await reader.read();
 
@@ -112,7 +112,7 @@ describe('STHeadersReader', () => {
     expect(blockHandlerStub).to.be.callCount(rpcClientMock.blocks.length);
   });
 
-  it('should emit "wrongSequence" if previous block hash not equal to current block previous hash', async function it() {
+  it('should emit "staleBlock" if previous block hash not equal to current block previous hash', async function it() {
     const previousBlockIndex = 1;
     const previousBlock = rpcClientMock.blocks[previousBlockIndex];
     const readerState = new STHeadersReaderState([previousBlock]);
@@ -127,8 +127,8 @@ describe('STHeadersReader', () => {
     const blockHandlerStub = this.sinon.stub();
     const wrongSequenceStub = this.sinon.stub();
 
-    reader.on('block', blockHandlerStub);
-    reader.on('wrongSequence', wrongSequenceStub);
+    reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
+    reader.on(STHeadersReader.EVENTS.STALE_BLOCK, wrongSequenceStub);
 
     await reader.read();
 
