@@ -144,19 +144,10 @@ describe('STHeadersReader', () => {
   it('should emit "staleBlock" for synced blocks if current block height is lower than last synced block', async function it() {
     const { blocks } = rpcClientMock;
 
-    const currentBlockHeight = 2;
-    const previousBlockHash = blocks[0].hash;
-    const currentBlock = { height: currentBlockHeight, previousblockhash: previousBlockHash };
-
-    rpcClientMock.getBlock.callThrough()
-      .withArgs(previousBlockHash)
-      .onCall(0)
-      .returns(Promise.resolve({ result: currentBlock }));
-
     const readerState = new STHeadersReaderState(blocks);
     const reader = new STHeadersReader(stateTransitionHeaderIterator, readerState);
 
-    blockIterator.setBlockHeight(currentBlockHeight);
+    blockIterator.setBlockHeight(2);
 
     const blockHandlerStub = this.sinon.stub();
     const staleBlockHandlerStub = this.sinon.stub();
@@ -171,19 +162,9 @@ describe('STHeadersReader', () => {
     expect(staleBlockHandlerStub.secondCall).to.be.calledWith(blocks[2]);
     expect(staleBlockHandlerStub.thirdCall).to.be.calledWith(blocks[1]);
 
-    expect(blockHandlerStub).has.callCount(6);
-
-    const expectedBlocksSequence = [
-      blocks[1],
-      blocks[1],
-      blocks[1],
-      blocks[1],
-      blocks[2],
-      blocks[3],
-    ];
-
-    rpcClientMock.blocks.forEach((block, i) => {
-      expect(blockHandlerStub.getCall(i)).to.be.calledWith(expectedBlocksSequence[i]);
-    });
+    expect(blockHandlerStub).to.be.calledThrice();
+    expect(blockHandlerStub.firstCall).to.be.calledWith(blocks[1]);
+    expect(blockHandlerStub.secondCall).to.be.calledWith(blocks[2]);
+    expect(blockHandlerStub.thirdCall).to.be.calledWith(blocks[3]);
   });
 });
