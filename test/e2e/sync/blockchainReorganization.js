@@ -1,5 +1,6 @@
 const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory');
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
+const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
 
 const registerUser = require('../../../lib/test/registerUser');
 const createSTHeader = require('../../../lib/test/createSTHeader');
