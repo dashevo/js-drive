@@ -3,15 +3,7 @@ const Reference = require('../../../../lib/stateView/Reference');
 const DapObjectMongoDbRepository = require('../../../../lib/stateView/dapObject/DapObjectMongoDbRepository');
 const startMongoDbInstance = require('../../../../lib/test/services/mocha/startMongoDbInstance');
 
-describe('DapObjectMongoDbRepository', () => {
-  let dapObjectRepository;
-  startMongoDbInstance().then(async (mongoDbInstance) => {
-    const mongoClient = await mongoDbInstance.mongoClient;
-    const mongoDb = mongoClient.db('test_dap');
-    dapObjectRepository = new DapObjectMongoDbRepository(mongoDb);
-  });
-
-  const id = '123456';
+function createDapObjectWithId(id) {
   const objectData = {
     id,
     act: 0,
@@ -29,11 +21,24 @@ describe('DapObjectMongoDbRepository', () => {
     headerHash,
     hashSTPacket,
   );
-  const dapObject = new DapObject(objectData, reference);
+
+  return new DapObject(objectData, reference);
+}
+
+describe('DapObjectMongoDbRepository', () => {
+  let dapObjectRepository;
+  startMongoDbInstance().then(async (mongoDbInstance) => {
+    const mongoClient = await mongoDbInstance.mongoClient;
+    const mongoDb = mongoClient.db('test_dap');
+    dapObjectRepository = new DapObjectMongoDbRepository(mongoDb);
+  });
+
+  const dapId = '90';
+  const dapObject = createDapObjectWithId(dapId);
 
   it('should store DapObject entity', async () => {
     await dapObjectRepository.store(dapObject);
-    const object = await dapObjectRepository.find(id);
+    const object = await dapObjectRepository.find(dapId);
     expect(object.toJSON()).to.deep.equal(dapObject.toJSON());
   });
 
@@ -77,9 +82,10 @@ describe('DapObjectMongoDbRepository', () => {
   });
 
   it('should limit return to 1 DapObject if limit', async () => {
-    objectData.id = '4444';
-    const dapObject2 = new DapObject(objectData, reference);
-    await dapObjectRepository.store(dapObject2);
+    const id = '80';
+    const dapObj = createDapObjectWithId(id);
+    await dapObjectRepository.store(dapObj);
+
     const type = 'DashPayContact';
     const options = {
       limit: 1,
@@ -89,6 +95,10 @@ describe('DapObjectMongoDbRepository', () => {
   });
 
   it('should order desc by DapObject id', async () => {
+    const id = '99';
+    const dapObj = createDapObjectWithId(id);
+    await dapObjectRepository.store(dapObj);
+
     const type = 'DashPayContact';
     const options = {
       orderBy: {
@@ -96,10 +106,14 @@ describe('DapObjectMongoDbRepository', () => {
       },
     };
     const result = await dapObjectRepository.fetch(type, options);
-    expect(result[0].toJSON().id).to.be.equal('4444');
+    expect(result[0].toJSON().id).to.be.equal(id);
   });
 
   it('should order asc by DapObject id', async () => {
+    const id = '50';
+    const dapObj = createDapObjectWithId(id);
+    await dapObjectRepository.store(dapObj);
+
     const type = 'DashPayContact';
     const options = {
       orderBy: {
@@ -107,25 +121,39 @@ describe('DapObjectMongoDbRepository', () => {
       },
     };
     const result = await dapObjectRepository.fetch(type, options);
-    expect(result[0].toJSON().id).to.be.equal('123456');
+    expect(result[0].toJSON().id).to.be.equal(id);
   });
 
   it('should start at 1 DapObject', async () => {
+    const id = '1';
+    const dapObj = createDapObjectWithId(id);
+    await dapObjectRepository.store(dapObj);
+
     const type = 'DashPayContact';
     const options = {
+      orderBy: {
+        id: 1,
+      },
       startAt: 1,
     };
     const result = await dapObjectRepository.fetch(type, options);
-    expect(result[0].toJSON().id).to.be.equal('123456');
+    expect(result[0].toJSON().id).to.be.equal(id);
   });
 
   it('should start after 1 DapObject', async () => {
+    const id = '2';
+    const dapObj = createDapObjectWithId(id);
+    await dapObjectRepository.store(dapObj);
+
     const type = 'DashPayContact';
     const options = {
+      orderBy: {
+        id: 1,
+      },
       startAfter: 1,
     };
     const result = await dapObjectRepository.fetch(type, options);
-    expect(result[0].toJSON().id).to.be.equal('4444');
+    expect(result[0].toJSON().id).to.be.equal(id);
   });
 
   it('should return empty array if fetch does not find DapObjects', async () => {
@@ -134,12 +162,14 @@ describe('DapObjectMongoDbRepository', () => {
     expect(result).to.be.deep.equal([]);
   });
 
-  xit('should delete DapObject entity', async () => {
-    await dapObjectRepository.store(dapObject);
+  it('should delete DapObject entity', async () => {
+    const id = '5';
+    const dapObj = createDapObjectWithId(id);
+    await dapObjectRepository.store(dapObj);
     const object = await dapObjectRepository.find(id);
-    expect(object.toJSON()).to.deep.equal(dapObject.toJSON());
+    expect(object.toJSON()).to.deep.equal(dapObj.toJSON());
 
-    await dapObjectRepository.delete(dapObject);
+    await dapObjectRepository.delete(dapObj);
     const objectTwo = await dapObjectRepository.find(id);
     const serializeObject = objectTwo.toJSON();
     expect(serializeObject.id).to.not.exist();
