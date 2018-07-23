@@ -10,8 +10,13 @@ const RpcBlockIterator = require('../lib/blockchain/iterator/RpcBlockIterator');
 const StateTransitionHeaderIterator = require('../lib/blockchain/iterator/StateTransitionHeaderIterator');
 const STHeadersReaderState = require('../lib/blockchain/reader/STHeadersReaderState');
 const STHeadersReader = require('../lib/blockchain/reader/STHeadersReader');
+const sanitizeData = require('../lib/mongoDb/sanitizeData');
 const DapContractMongoDbRepository = require('../lib/stateView/dapContract/DapContractMongoDbRepository');
-const storeDapContractFactory = require('../lib/stateView/dapContract/storeDapContractFactory');
+const DapObjectMongoDbRepository = require('../lib/stateView/dapObject/DapObjectMongoDbRepository');
+const createDapObjectMongoDbRepositoryFactory = require('../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
+const updateDapContractFactory = require('../lib/stateView/dapContract/updateDapContractFactory');
+const updateDapObjectFactory = require('../lib/stateView/dapObject/updateDapObjectFactory');
+const applyStateTransitionFactory = require('../lib/stateView/applyStateTransitionFactory');
 
 const cleanDashDriveFactory = require('../lib/sync/cleanDashDriveFactory');
 const unpinAllIpfsPacketsFactory = require('../lib/storage/ipfs/unpinAllIpfsPacketsFactory');
@@ -19,8 +24,11 @@ const dropMongoDatabasesWithPrefixFactory = require('../lib/mongoDb/dropMongoDat
 
 const attachIpfsHandlers = require('../lib/storage/attachIpfsHandlers');
 const attachSyncHandlers = require('../lib/sync/state/attachSyncHandlers');
-const attachStateViewHandlers = require('../lib/stateView/dapContract/attachStateViewHandlers');
+const attachStateViewHandlers = require('../lib/stateView/attachStateViewHandlers');
 const errorHandler = require('../lib/util/errorHandler');
+
+const isDashCoreRunningFactory = require('../lib/sync/isDashCoreRunningFactory');
+const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError');
 
 (async function main() {
   const rpcClient = new RpcClient({
@@ -38,7 +46,10 @@ const errorHandler = require('../lib/util/errorHandler');
 
   const stHeaderIterator = new StateTransitionHeaderIterator(blockIterator, rpcClient);
 
-  const mongoClient = await MongoClient.connect(process.env.STORAGE_MONGODB_URL);
+  const mongoClient = await MongoClient.connect(
+    process.env.STORAGE_MONGODB_URL,
+    { useNewUrlParser: true },
+  );
   const mongoDb = mongoClient.db(process.env.STORAGE_MONGODB_DB);
   const syncStateRepository = new SyncStateRepository(mongoDb);
   const syncState = await syncStateRepository.fetch();
@@ -59,9 +70,21 @@ const errorHandler = require('../lib/util/errorHandler');
 
   attachIpfsHandlers(stHeaderReader, ipfsAPI, unpinAllIpfsPackets);
   attachSyncHandlers(stHeaderReader, syncState, syncStateRepository);
-  const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb);
-  const storeDapContract = storeDapContractFactory(dapContractMongoDbRepository, ipfsAPI);
-  attachStateViewHandlers(stHeaderReader, storeDapContract, dropMongoDatabasesWithPrefix);
+  const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
+  const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
+    mongoClient,
+    DapObjectMongoDbRepository,
+  );
+  const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
+  const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
+  const applyStateTransition = applyStateTransitionFactory(
+    ipfsAPI,
+    updateDapContract,
+    updateDapObject,
+  );
+  attachStateViewHandlers(stHeaderReader, applyStateTransition, dropMongoDatabasesWithPrefix);
+
+  const isDashCoreRunning = isDashCoreRunningFactory(rpcClient);
 
   let isFirstSyncCompleted = false;
   let isInSync = false;
@@ -129,6 +152,11 @@ const errorHandler = require('../lib/util/errorHandler');
 
       throw e;
     }
+  }
+
+  const isRunning = await isDashCoreRunning();
+  if (!isRunning) {
+    throw new DashCoreIsNotRunningError();
   }
 
   await sync();
