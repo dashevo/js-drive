@@ -60,7 +60,7 @@ const fetchDapObjectsMethodFactory = require('../lib/api/methods/fetchDapObjects
     mongoClient,
     DapObjectMongoDbRepository,
   );
-  const fetchDapObjects = fetchDapObjectsFactory(createDapObjectMongoDbRepository)
+  const fetchDapObjects = fetchDapObjectsFactory(createDapObjectMongoDbRepository);
   const fetchDapObjectsMethod = fetchDapObjectsMethodFactory(fetchDapObjects);
 
   // Initialize API methods
