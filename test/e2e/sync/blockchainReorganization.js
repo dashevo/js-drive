@@ -2,19 +2,20 @@ const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 
 const registerUser = require('../../../lib/test/registerUser');
-const createDapContractST = require('../../../lib/test/createDapContractST');
+const createSTHeader = require('../../../lib/test/createSTHeader');
 
 const startDashDriveInstance = require('../../../lib/test/services/dashDrive/startDashDriveInstance');
 
 const wait = require('../../../lib/test/util/wait');
 
 async function createAndSubmitST(username, basePacketData, instance) {
-  const packetData = Object.assign({}, basePacketData);
-  packetData.data.objects[0].description = `Valid registration for ${username}`;
+  const packet = new StateTransitionPacket(basePacketData);
+  packet.dapcontract.description = `Valid registration for ${username}`;
 
   const { userId, privateKeyString } =
         await registerUser(username, instance.dashCore.rpcClient);
-  const [packet, header] = await createDapContractST(userId, privateKeyString, packetData);
+  
+  const header = await createSTHeader(userId, privateKeyString, packet);
 
   const addSTPacket = addSTPacketFactory(instance.ipfs.getApi());
   const packetCid = await addSTPacket(packet);
