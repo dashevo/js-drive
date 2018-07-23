@@ -1,3 +1,4 @@
+require('dotenv-safe').config();
 require('dotenv-expand')(require('dotenv').config());
 
 const zmq = require('zeromq');
