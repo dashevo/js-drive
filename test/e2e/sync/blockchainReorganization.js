@@ -9,13 +9,10 @@ const startDashDriveInstance = require('../../../lib/test/services/dashDrive/sta
 
 const wait = require('../../../lib/test/util/wait');
 
-async function createAndSubmitST(username, basePacketData, instance) {
+async function createAndSubmitST(userId, privateKeyString, username, basePacketData, instance) {
   const packet = new StateTransitionPacket(basePacketData);
   packet.dapcontract.description = `Valid registration for ${username}`;
 
-  const { userId, privateKeyString } =
-        await registerUser(username, instance.dashCore.rpcClient);
-  
   const header = await createSTHeader(userId, privateKeyString, packet);
 
   const addSTPacket = addSTPacketFactory(instance.ipfs.getApi());
@@ -60,7 +57,10 @@ describe('Blockchain reorganization', function main() {
   let stPackets;
   let tsesAfterDisconnect;
 
-  const BLOCKS_PER_ST = 109;
+  let registeredUsers;
+
+  const BLOCKS_PER_ST = 1;
+  const BLOCKS_PER_REGISTRATION = 108;
 
   this.timeout(900000);
 
@@ -68,16 +68,41 @@ describe('Blockchain reorganization', function main() {
     packetsCids = [];
     packetsAddedAfterDisconnect = [];
     tsesAfterDisconnect = [];
+    registeredUsers = [];
 
     stPackets = getStateTransitionPackets();
 
     // 1. Start two full Dash Drive instances
     [firstInstance, secondInstance] = await startDashDriveInstance.many(2);
 
+    // Register a pool of users.
+    // Do that here so major part of blocks are in the beginning
+    for (let i = 0; i < 10; i++) {
+      const instance = firstInstance;
+      const username = `Alice_${i}`;
+      const { userId, privateKeyString } =
+            await registerUser(username, instance.dashCore.rpcClient);
+      registeredUsers.push({ username, userId, privateKeyString });
+    }
+
+    // Await number of blocks even on both nodes
+    await blockCountEvenAndEqual(
+      firstInstance.dashCore,
+      secondInstance.dashCore,
+      10 * BLOCKS_PER_REGISTRATION,
+    );
+
     // 2. Populate instance of Dash Drive and Dash Core with data
     //    First two STs, should be equal on both nodes
     for (let i = 0; i < 2; i++) {
-      const { packetCid } = await createAndSubmitST(`Alice_${i}`, stPackets[0], firstInstance);
+      const user = registeredUsers.pop();
+      const { packetCid } = await createAndSubmitST(
+        user.userId,
+        user.privateKeyString,
+        user.username,
+        stPackets[0],
+        firstInstance,
+      );
       packetsCids.push(packetCid);
     }
 
@@ -86,15 +111,15 @@ describe('Blockchain reorganization', function main() {
     await blockCountEvenAndEqual(
       firstInstance.dashCore,
       secondInstance.dashCore,
-      2 * BLOCKS_PER_ST,
+      (10 * BLOCKS_PER_REGISTRATION) + (2 * BLOCKS_PER_ST),
     );
 
     // Await first Dash Drive sync
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 120; i++) {
       const lsResult = await firstInstance.ipfs.getApi().pin.ls();
       const lsHashes = lsResult.map(item => item.hash);
 
-      if (lsHashes.indexOf(packetsCids[0]) !== -1) {
+      if (lsHashes.indexOf(packetsCids[0]) !== -1 && lsHashes.indexOf(packetsCids[1]) !== -1) {
         break;
       }
 
@@ -117,7 +142,14 @@ describe('Blockchain reorganization', function main() {
     //    Note: keep track of exact those CIDs as they should disappear after reorganization
     //    Note: keep track of tsid as well to check if it's moved in mempool later on
     for (let i = 2; i < 4; i++) {
-      const { packetCid, tsid } = await createAndSubmitST(`Alice_${i}`, stPackets[0], firstInstance);
+      const user = registeredUsers.pop();
+      const { packetCid, tsid } = await createAndSubmitST(
+        user.userId,
+        user.privateKeyString,
+        user.username,
+        stPackets[0],
+        firstInstance,
+      );
       packetsCids.push(packetCid);
       packetsAddedAfterDisconnect.push(packetCid);
       tsesAfterDisconnect.push(tsid);
@@ -133,27 +165,33 @@ describe('Blockchain reorganization', function main() {
     // 6. Check proper block count on the first node
     {
       const { result: blockCount } = await firstInstance.dashCore.rpcClient.getBlockCount();
-      expect(blockCount).to.be.equal(4 * BLOCKS_PER_ST);
+      expect(blockCount).to.be.equal((10 * BLOCKS_PER_REGISTRATION) + (4 * BLOCKS_PER_ST));
     }
 
     // 7. Generate slightly larger amount of STs on the second node
     //    to introduce reorganization
     for (let i = 4; i < 7; i++) {
-      const { packetCid } = await createAndSubmitST(`Alice_${i}`, stPackets[0], secondInstance);
+      const user = registeredUsers.pop();
+      const { packetCid } = await createAndSubmitST(
+        user.userId,
+        user.privateKeyString,
+        user.username,
+        stPackets[0],
+        secondInstance,
+      );
       packetsCids.push(packetCid);
     }
 
     // 8. Check proper block count on the second node
     {
       const { result: blockCount } = await secondInstance.dashCore.rpcClient.getBlockCount();
-      expect(blockCount).to.be.equal(5 * BLOCKS_PER_ST);
+      expect(blockCount).to.be.equal((10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST));
     }
 
     // Remove CIDs on node #1 added before disconnect
     const rmPormises = packetsBeforeDisconnect.map(cid => firstInstance.ipfs.getApi().pin.rm(cid));
     await Promise.all(rmPormises);
 
-    console.log('before connect');
     await wait(30000);
 
     // 9. Reconnect nodes
@@ -164,7 +202,7 @@ describe('Blockchain reorganization', function main() {
     await blockCountEvenAndEqual(
       firstInstance.dashCore,
       secondInstance.dashCore,
-      5 * BLOCKS_PER_ST,
+      (10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST),
     );
 
     // Check tses are back to mempool
@@ -206,7 +244,7 @@ describe('Blockchain reorganization', function main() {
     // 13. Generate more blocks so TSes reappear on the blockchain
     await firstInstance.dashCore.rpcClient.generate(10);
 
-    // 14. Await Dass Drive to sync
+    // 14. Await Dash Drive to sync
     await wait(20000);
 
     // 15. Check CIDs reappear in Dash Drive
@@ -223,7 +261,7 @@ describe('Blockchain reorganization', function main() {
       const lsResult = await firstInstance.ipfs.getApi().pin.ls();
       const lsHashes = lsResult.map(item => item.hash);
 
-      packetsCids.forEach((cid) => {
+      packetsAddedAfterDisconnect.forEach((cid) => {
         expect(lsHashes).to.include(cid);
       });
     }
