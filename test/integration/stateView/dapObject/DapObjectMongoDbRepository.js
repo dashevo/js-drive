@@ -1,6 +1,9 @@
 const DapObject = require('../../../../lib/stateView/dapObject/DapObject');
 const Reference = require('../../../../lib/stateView/Reference');
 const DapObjectMongoDbRepository = require('../../../../lib/stateView/dapObject/DapObjectMongoDbRepository');
+const InvalidLimitError = require('../../../../lib/stateView/dapObject/InvalidLimitError');
+const InvalidStartAtError = require('../../../../lib/stateView/dapObject/InvalidStartAtError');
+const InvalidStartAfterError = require('../../../../lib/stateView/dapObject/InvalidStartAfterError');
 const startMongoDbInstance = require('../../../../lib/test/services/mocha/startMongoDbInstance');
 
 function createDapObjectWithId(id) {
@@ -94,6 +97,21 @@ describe('DapObjectMongoDbRepository', () => {
     expect(result.length).to.be.equal(1);
   });
 
+  it('should throw InvalidLimitError if limit is not a number', async () => {
+    const type = 'DashPayContact';
+    const options = {
+      limit: 'something',
+    };
+
+    let error;
+    try {
+      await dapObjectRepository.fetch(type, options);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.instanceOf(InvalidLimitError);
+  });
+
   it('should order desc by DapObject id', async () => {
     const id = '99';
     const dapObj = createDapObjectWithId(id);
@@ -140,6 +158,21 @@ describe('DapObjectMongoDbRepository', () => {
     expect(result[0].toJSON().id).to.be.equal(id);
   });
 
+  it('should throw InvalidStartAtError if startAt is not a number', async () => {
+    const type = 'DashPayContact';
+    const options = {
+      startAt: 'something',
+    };
+
+    let error;
+    try {
+      await dapObjectRepository.fetch(type, options);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.instanceOf(InvalidStartAtError);
+  });
+
   it('should start after 1 DapObject', async () => {
     const id = '2';
     const dapObj = createDapObjectWithId(id);
@@ -154,6 +187,21 @@ describe('DapObjectMongoDbRepository', () => {
     };
     const result = await dapObjectRepository.fetch(type, options);
     expect(result[0].toJSON().id).to.be.equal(id);
+  });
+
+  it('should throw InvalidStartAfterError if startAfter is not a number', async () => {
+    const type = 'DashPayContact';
+    const options = {
+      startAfter: 'something',
+    };
+
+    let error;
+    try {
+      await dapObjectRepository.fetch(type, options);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.instanceOf(InvalidStartAfterError);
   });
 
   it('should return empty array if fetch does not find DapObjects', async () => {
