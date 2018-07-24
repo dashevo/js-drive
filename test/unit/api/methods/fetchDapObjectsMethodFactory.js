@@ -2,6 +2,9 @@ const fetchDapObjectsMethodFactory = require('../../../../lib/api/methods/fetchD
 const InvalidParamsError = require('../../../../lib/api/InvalidParamsError');
 const DapObject = require('../../../../lib/stateView/dapObject/DapObject');
 const Reference = require('../../../../lib/stateView/Reference');
+const InvalidLimitError = require('../../../../lib/stateView/dapObject/InvalidLimitError');
+const InvalidStartAtError = require('../../../../lib/stateView/dapObject/InvalidStartAtError');
+const InvalidStartAfterError = require('../../../../lib/stateView/dapObject/InvalidStartAfterError');
 
 describe('fetchDapObjectsMethod', () => {
   let fetchDapObjects;
@@ -14,6 +17,30 @@ describe('fetchDapObjectsMethod', () => {
 
   it('should throw InvalidParamsError if DAP id is not provided', () => {
     expect(fetchDapObjectsMethod()).to.be.rejectedWith(InvalidParamsError);
+  });
+
+  it('should throw InvalidParamsError if InvalidLimitError is thrown', async () => {
+    const dapId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
+    const type = 'DashPayContact';
+    const options = {};
+    fetchDapObjects.throws(new InvalidLimitError());
+    expect(fetchDapObjectsMethod({ dapId, type, options })).to.be.rejectedWith(InvalidParamsError);
+  });
+
+  it('should throw InvalidParamsError if InvalidStartAtError is thrown', () => {
+    const dapId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
+    const type = 'DashPayContact';
+    const options = {};
+    fetchDapObjects.throws(new InvalidStartAtError());
+    expect(fetchDapObjectsMethod({ dapId, type, options })).to.be.rejectedWith(InvalidParamsError);
+  });
+
+  it('should throw InvalidParamsError if InvalidStartAfterError is thrown', () => {
+    const dapId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
+    const type = 'DashPayContact';
+    const options = {};
+    fetchDapObjects.throws(new InvalidStartAfterError());
+    expect(fetchDapObjectsMethod({ dapId, type, options })).to.be.rejectedWith(InvalidParamsError);
   });
 
   it('should return DAP object', async () => {
