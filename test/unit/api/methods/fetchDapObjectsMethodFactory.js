@@ -2,6 +2,8 @@ const fetchDapObjectsMethodFactory = require('../../../../lib/api/methods/fetchD
 const InvalidParamsError = require('../../../../lib/api/InvalidParamsError');
 const DapObject = require('../../../../lib/stateView/dapObject/DapObject');
 const Reference = require('../../../../lib/stateView/Reference');
+const InvalidWhereError = require('../../../../lib/stateView/dapObject/InvalidWhereError');
+const InvalidOrderByError = require('../../../../lib/stateView/dapObject/InvalidOrderByError');
 const InvalidLimitError = require('../../../../lib/stateView/dapObject/InvalidLimitError');
 const InvalidStartAtError = require('../../../../lib/stateView/dapObject/InvalidStartAtError');
 const InvalidStartAfterError = require('../../../../lib/stateView/dapObject/InvalidStartAfterError');
@@ -19,7 +21,23 @@ describe('fetchDapObjectsMethod', () => {
     expect(fetchDapObjectsMethod()).to.be.rejectedWith(InvalidParamsError);
   });
 
-  it('should throw InvalidParamsError if InvalidLimitError is thrown', async () => {
+  it('should throw InvalidParamsError if InvalidWhereError is thrown', () => {
+    const dapId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
+    const type = 'DashPayContact';
+    const options = {};
+    fetchDapObjects.throws(new InvalidWhereError());
+    expect(fetchDapObjectsMethod({ dapId, type, options })).to.be.rejectedWith(InvalidParamsError);
+  });
+
+  it('should throw InvalidParamsError if InvalidOrderByError is thrown', () => {
+    const dapId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
+    const type = 'DashPayContact';
+    const options = {};
+    fetchDapObjects.throws(new InvalidOrderByError());
+    expect(fetchDapObjectsMethod({ dapId, type, options })).to.be.rejectedWith(InvalidParamsError);
+  });
+
+  it('should throw InvalidParamsError if InvalidLimitError is thrown', () => {
     const dapId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
     const type = 'DashPayContact';
     const options = {};
