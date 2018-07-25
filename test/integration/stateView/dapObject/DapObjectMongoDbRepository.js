@@ -1,6 +1,8 @@
 const DapObject = require('../../../../lib/stateView/dapObject/DapObject');
 const Reference = require('../../../../lib/stateView/Reference');
 const DapObjectMongoDbRepository = require('../../../../lib/stateView/dapObject/DapObjectMongoDbRepository');
+const InvalidWhereError = require('../../../../lib/stateView/dapObject/InvalidWhereError');
+const InvalidOrderBy = require('../../../../lib/stateView/dapObject/InvalidOrderByError');
 const InvalidLimitError = require('../../../../lib/stateView/dapObject/InvalidLimitError');
 const InvalidStartAtError = require('../../../../lib/stateView/dapObject/InvalidStartAtError');
 const InvalidStartAfterError = require('../../../../lib/stateView/dapObject/InvalidStartAfterError');
@@ -58,6 +60,21 @@ describe('DapObjectMongoDbRepository', () => {
     };
     const result = await dapObjectRepository.fetch(type, options);
     expect(result).to.be.deep.equal([dapObject]);
+  });
+
+  it('should throw InvalidWhereError if where is not an object', async () => {
+    const type = 'DashPayContact';
+    const options = {
+      where: 'something',
+    };
+
+    let error;
+    try {
+      await dapObjectRepository.fetch(type, options);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.instanceOf(InvalidWhereError);
   });
 
   it('should return empty array if where conditions do not match', async () => {
@@ -140,6 +157,21 @@ describe('DapObjectMongoDbRepository', () => {
     };
     const result = await dapObjectRepository.fetch(type, options);
     expect(result[0].toJSON().id).to.be.equal(id);
+  });
+
+  it('should throw InvalidOrderBy if orderBy is not an object', async () => {
+    const type = 'DashPayContact';
+    const options = {
+      orderBy: 'something',
+    };
+
+    let error;
+    try {
+      await dapObjectRepository.fetch(type, options);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.be.instanceOf(InvalidOrderBy);
   });
 
   it('should start at 1 DapObject', async () => {
