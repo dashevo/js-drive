@@ -141,7 +141,7 @@ describe('Blockchain reorganization', function main() {
     // 5. Generate two more ST on the first node
     //    Note: keep track of exact those CIDs as they should disappear after reorganization
     //    Note: keep track of tsid as well to check if it's moved in mempool later on
-    for (let i = 2; i < 4; i++) {
+    for (let i = 0; i < 2; i++) {
       const user = registeredUsers.pop();
       const { packetCid, tsid } = await createAndSubmitST(
         user.userId,
@@ -170,7 +170,7 @@ describe('Blockchain reorganization', function main() {
 
     // 7. Generate slightly larger amount of STs on the second node
     //    to introduce reorganization
-    for (let i = 4; i < 7; i++) {
+    for (let i = 0; i < 3; i++) {
       const user = registeredUsers.pop();
       const { packetCid } = await createAndSubmitST(
         user.userId,
