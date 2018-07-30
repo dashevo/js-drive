@@ -77,7 +77,7 @@ describe('createDashDriveInstance', function main() {
       const rpc = instance.getApi();
       const res = await rpc.request('addSTPacketMethod', {});
 
-      expect(res.error.message).to.be.equal('Initial sync in progress');
+      expect(res.error.code).to.be.equal(100);
     });
   });
 });
