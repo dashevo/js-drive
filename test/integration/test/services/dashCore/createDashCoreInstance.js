@@ -148,7 +148,7 @@ describe('createDashCoreInstance', function main() {
 
       const rpcClient = instance.getApi();
       const { result } = await rpcClient.getInfo();
-      expect(result.version).to.equal(120300);
+      expect(result).to.have.property('version');
     });
 
     it('should work after restarting the instance', async () => {
@@ -158,7 +158,7 @@ describe('createDashCoreInstance', function main() {
 
       const rpcClient = instance.getApi();
       const { result } = await rpcClient.getInfo();
-      expect(result.version).to.equal(120300);
+      expect(result).to.have.property('version');
     });
   });
 });

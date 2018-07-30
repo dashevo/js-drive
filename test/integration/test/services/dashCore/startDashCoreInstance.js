@@ -23,7 +23,7 @@ describe('startDashCoreInstance', function main() {
 
     it('should has RPC connected', async () => {
       const { result } = await instance.rpcClient.getInfo();
-      expect(result.version).to.equal(120300);
+      expect(result).to.have.property('version');
     });
   });
 
