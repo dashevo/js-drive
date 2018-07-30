@@ -48,7 +48,7 @@ describe('startDashCoreInstance', function main() {
     it('should propagate blocks between instances', async () => {
       for (let i = 0; i < 3; i++) {
         const { result: blocks } = await instances[i].rpcClient.getBlockCount();
-        expect(blocks).to.equal(0);
+        expect(blocks).to.be.equal(0);
       }
 
       await instances[0].rpcClient.generate(2);
@@ -56,7 +56,7 @@ describe('startDashCoreInstance', function main() {
 
       for (let i = 0; i < 3; i++) {
         const { result: blocks } = await instances[i].rpcClient.getBlockCount();
-        expect(blocks).to.equal(2);
+        expect(blocks).to.be.equal(2);
       }
     });
   });
