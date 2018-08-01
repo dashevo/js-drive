@@ -117,6 +117,11 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     // 3. Start services of the 2nd node (Core, Mongo, IPFS),
     //    but without Drive as we have to be sure Core is synced first
     dashCoreInstance = await startDashCoreInstance();
+
+    // Workaround for develop branch
+    // We should generate genesis block before we connect instances
+    await dashCoreInstance.getApi().generate(1);
+
     await dashCoreInstance.connect(fullDashDriveInstance.dashCore);
 
     mongoDbInstance = await startMongoDbInstance();
