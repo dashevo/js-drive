@@ -65,19 +65,19 @@ const fetchDapObjectsMethodFactory = require('../lib/api/methods/fetchDapObjects
   const fetchDapObjectsMethod = fetchDapObjectsMethodFactory(fetchDapObjects);
 
 
-/**
- * Remove 'Method' Postfix
- *
- * Takes a function as an argument, returns the function's name
- * as a string without 'Method' as a postfix.
- *
- * @param {function} func Function that uses 'Method' postfix
- * @returns {string} String of function name without 'Method' postfix
- */
+  /**
+   * Remove 'Method' Postfix
+   *
+   * Takes a function as an argument, returns the function's name
+   * as a string without 'Method' as a postfix.
+   *
+   * @param {function} func Function that uses 'Method' postfix
+   * @returns {string} String of function name without 'Method' postfix
+   */
   function rmPostfix(func) {
     const funcName = func.name;
     return funcName.substr(0, funcName.length - 'Method'.length);
-  };
+  }
 
   // Initialize API methods
   const rpcMethods = {
