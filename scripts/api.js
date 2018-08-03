@@ -24,8 +24,6 @@ const createDapObjectMongoDbRepositoryFactory = require('../lib/stateView/dapObj
 const fetchDapObjectsFactory = require('../lib/stateView/dapObject/fetchDapObjectsFactory');
 const fetchDapObjectsMethodFactory = require('../lib/api/methods/fetchDapObjectsMethodFactory');
 
-const rmPostfix = require('../lib/util/rmPostfix.js');
-
 
 (async function main() {
   const rpcClient = new RpcClient({
