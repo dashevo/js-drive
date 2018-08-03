@@ -102,7 +102,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       packetsCids.push(packetCid);
 
       // 2.5 Send ST header to Dash Core and generate a block with it
-      await fullDashDriveInstance.dashCore.rpcClient.sendRawTransition(header);
+      await fullDashDriveInstance.dashCore.rpcClient.sendRawTransition(header.serialize());
       await fullDashDriveInstance.dashCore.rpcClient.generate(1);
     }
 
@@ -159,13 +159,15 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   });
 
   after('cleanup lone services', async () => {
-    const promises = Promise.all([
-      mongoDbInstance.remove(),
-      dashCoreInstance.remove(),
-      fullDashDriveInstance.remove(),
-      dashDriveStandaloneInstance.remove(),
-      ipfsInstance.remove(),
-    ]);
-    await promises;
+    const instances = [
+      mongoDbInstance,
+      dashCoreInstance,
+      fullDashDriveInstance,
+      dashDriveStandaloneInstance,
+      ipfsInstance,
+    ];
+
+    await Promise.all(instances.filter(i => i)
+      .map(i => i.remove()));
   });
 });
