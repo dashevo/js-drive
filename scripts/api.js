@@ -24,6 +24,9 @@ const createDapObjectMongoDbRepositoryFactory = require('../lib/stateView/dapObj
 const fetchDapObjectsFactory = require('../lib/stateView/dapObject/fetchDapObjectsFactory');
 const fetchDapObjectsMethodFactory = require('../lib/api/methods/fetchDapObjectsMethodFactory');
 
+const rmPostfix = require('../lib/util/rmPostfix.js');
+
+
 (async function main() {
   const rpcClient = new RpcClient({
     protocol: 'http',
@@ -63,10 +66,16 @@ const fetchDapObjectsMethodFactory = require('../lib/api/methods/fetchDapObjects
   const fetchDapObjects = fetchDapObjectsFactory(createDapObjectMongoDbRepository);
   const fetchDapObjectsMethod = fetchDapObjectsMethodFactory(fetchDapObjects);
 
+  // Remove 'Method' Postfix
+  function rmPostfix(func) {
+    const funcName = func.name;
+    return funcName.substr(0, funcName.length - 'Method'.length);
+  };
+
   // Initialize API methods
   const rpcMethods = {
-    [addSTPacketMethod.name]: wrapToErrorHandler(addSTPacketMethod),
-    [fetchDapObjectsMethod.name]: wrapToErrorHandler(fetchDapObjectsMethod),
+    [rmPostfix(addSTPacketMethod)]: wrapToErrorHandler(addSTPacketMethod),
+    [rmPostfix(fetchDapObjectsMethod)]: wrapToErrorHandler(fetchDapObjectsMethod),
   };
 
   const rpc = jayson.server(rpcMethods);
