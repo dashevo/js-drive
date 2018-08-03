@@ -1,6 +1,5 @@
 [
   {
-    "hash": "7f449b780efcb1f6bac106c72732a687cb2fc69ae0672c1f33c48ca45c123db6",
     "type": 12,
     "version": 3,
     "fee": 0.01,
@@ -13,20 +12,18 @@
     }
   },
   {
-    "hash": "1e117a2553888ded65ca9f110dd91ba889f6b6c7fdf403515ebaf773e0c7e17b",
     "type": 12,
     "version": 3,
     "fee": 0.01,
     "extraPayload": {
       "nVersion": 1,
       "regTxId": "c4970326400177ce67ec582425a698b85ae03cae2b0d168e87eed697f1388e5b",
-      "hashPrevSubTx": "7f449b780efcb1f6bac106c72732a687cb2fc69ae0672c1f33c48ca45c123db6",
+      "hashPrevSubTx": "f106d46288c73b0cd137566427a0d9ff3a7daf6b4642634a8904648cb6d172c4",
       "creditFee": 1,
       "hashSTPacket": "c4970326400177ce67ec582425a698b85ae03cae2b0d168e87eed697f1388e5b"
     }
   },
   {
-    "hash": "180bbf78cad1731a09762f4975ed489ff32adb9e96801ddf78c400a75339292d",
     "type": 12,
     "version": 3,
     "fee": 0.01,
@@ -39,7 +36,6 @@
     }
   },
   {
-    "hash": "6e0772a700f57350bde782b1773dccb5ae91628222d50c4e8972fbd000929e9f",
     "type": 12,
     "version": 3,
     "fee": 0.01,
@@ -52,7 +48,6 @@
     }
   },
   {
-    "hash": "ca350a7ddf3c8ec7098e61082bfdb37c4f490c11f73f8f5dd1de40a98f4fc266",
     "type": 12,
     "version": 3,
     "fee": 0.01,
