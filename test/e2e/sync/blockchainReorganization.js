@@ -5,7 +5,7 @@ const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacke
 const registerUser = require('../../../lib/test/registerUser');
 const createSTHeader = require('../../../lib/test/createSTHeader');
 
-const startDashDriveInstance = require('../../../lib/test/services/dashDrive/startDashDriveInstance');
+const { startDashDriveInstance } = require('js-evo-services-ctl');
 
 const wait = require('../../../lib/test/util/wait');
 
@@ -73,7 +73,20 @@ describe('Blockchain reorganization', function main() {
     stPackets = getStateTransitionPackets();
 
     // 1. Start two full Dash Drive instances
-    [firstInstance, secondInstance] = await startDashDriveInstance.many(2);
+    const rootPath = process.cwd();
+    const options = {
+      dashDrive: {
+        volumes: [
+          `${rootPath}/lib:/usr/src/app/lib`,
+          `${rootPath}/scripts:/usr/src/app/scripts`,
+          `${rootPath}/package.json:/usr/src/app/package.json`,
+          `${rootPath}/package-lock.json:/usr/src/app/package-lock.json`,
+          `${rootPath}/package.json:/package.json`,
+          `${rootPath}/package-lock.json:/package-lock.json`,
+        ],
+      },
+    };
+    [firstInstance, secondInstance] = await startDashDriveInstance.many(2, options);
 
     // Register a pool of users.
     // Do that here so major part of blocks are in the beginning

@@ -4,12 +4,13 @@ const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransit
 const registerUser = require('../../../lib/test/registerUser');
 const createSTHeader = require('../../../lib/test/createSTHeader');
 
-const startDashDriveInstance = require('../../../lib/test/services/dashDrive/startDashDriveInstance');
-const startDashCoreInstance = require('../../../lib/test/services/dashCore/startDashCoreInstance');
-const startMongoDbInstance = require('../../../lib/test/services/mongoDb/startMongoDbInstance');
-const startIPFSInstance = require('../../../lib/test/services/IPFS/startIPFSInstance');
-
-const createDashDriveInstance = require('../../../lib/test/services/dashDrive/createDashDriveInstance');
+const {
+  startDashDriveInstance,
+  startDashCoreInstance,
+  startMongoDbInstance,
+  startIPFSInstance,
+  createDashDriveInstance,
+} = require('js-evo-services-ctl');
 
 const wait = require('../../../lib/test/util/wait');
 const cbor = require('cbor');
@@ -78,7 +79,20 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
 
   before('having Dash Drive node #1 up and running', async () => {
     // 1. Start first Dash Drive node
-    fullDashDriveInstance = await startDashDriveInstance();
+    const rootPath = process.cwd();
+    const options = {
+      dashDrive: {
+        volumes: [
+          `${rootPath}/lib:/usr/src/app/lib`,
+          `${rootPath}/scripts:/usr/src/app/scripts`,
+          `${rootPath}/package.json:/usr/src/app/package.json`,
+          `${rootPath}/package-lock.json:/usr/src/app/package-lock.json`,
+          `${rootPath}/package.json:/package.json`,
+          `${rootPath}/package-lock.json:/package-lock.json`,
+        ],
+      },
+    };
+    fullDashDriveInstance = await startDashDriveInstance(options);
 
     packetsCids = [];
     packetsData = getStateTransitionPackets();
@@ -142,7 +156,21 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     const initialHashes = lsResult.map(item => item.hash);
 
     // 6. Start Dash Drive on 2nd node
-    dashDriveStandaloneInstance = await createDashDriveInstance(envs);
+    const rootPath = process.cwd();
+    const options = {
+      dashDrive: {
+        volumes: [
+          `${rootPath}/lib:/usr/src/app/lib`,
+          `${rootPath}/scripts:/usr/src/app/scripts`,
+          `${rootPath}/package.json:/usr/src/app/package.json`,
+          `${rootPath}/package-lock.json:/usr/src/app/package-lock.json`,
+          `${rootPath}/package.json:/package.json`,
+          `${rootPath}/package-lock.json:/package-lock.json`,
+        ],
+      },
+    };
+    const opts = { ...options, envs };
+    dashDriveStandaloneInstance = await createDashDriveInstance(opts);
     await dashDriveStandaloneInstance.start();
 
     // 7. Wait for IPFS on 2nd node to have 3 packets pinned
