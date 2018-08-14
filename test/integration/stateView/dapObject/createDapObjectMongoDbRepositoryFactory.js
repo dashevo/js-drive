@@ -2,11 +2,11 @@ const DapObject = require('../../../../lib/stateView/dapObject/DapObject');
 const Reference = require('../../../../lib/stateView/Reference');
 const createDapObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
 const DapObjectMongoDbRepository = require('../../../../lib/stateView/dapObject/DapObjectMongoDbRepository');
-const { startMongoDbInstance } = require('js-evo-services-ctl').mocha;
+const { startMongoDb } = require('js-evo-services-ctl').mocha;
 
 describe('createDapObjectMongoDbRepositoryFactory', () => {
   let createDapObjectMongoDbRepository;
-  startMongoDbInstance().then(async (mongoDbInstance) => {
+  startMongoDb().then(async (mongoDbInstance) => {
     const mongoClient = await mongoDbInstance.mongoClient;
     createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
       mongoClient,

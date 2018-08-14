@@ -5,11 +5,11 @@ const registerUser = require('../../../lib/test/registerUser');
 const createSTHeader = require('../../../lib/test/createSTHeader');
 
 const {
-  startDashDriveInstance,
-  startDashCoreInstance,
-  startMongoDbInstance,
-  startIPFSInstance,
-  createDashDriveInstance,
+  startDashDrive,
+  startDashCore,
+  startMongoDb,
+  startIPFS,
+  createDashDrive,
 } = require('js-evo-services-ctl');
 
 const wait = require('../../../lib/test/util/wait');
@@ -79,7 +79,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
 
   before('having Dash Drive node #1 up and running', async () => {
     // 1. Start first Dash Drive node
-    fullDashDriveInstance = await startDashDriveInstance();
+    fullDashDriveInstance = await startDashDrive();
 
     packetsCids = [];
     packetsData = getStateTransitionPackets();
@@ -117,12 +117,12 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
   it('Dash Drive should save sync state and continue from saved point after resume', async () => {
     // 3. Start services of the 2nd node (Core, Mongo, IPFS),
     //    but without Drive as we have to be sure Core is synced first
-    dashCoreInstance = await startDashCoreInstance();
+    dashCoreInstance = await startDashCore();
     await dashCoreInstance.connect(fullDashDriveInstance.dashCore);
 
-    mongoDbInstance = await startMongoDbInstance();
+    mongoDbInstance = await startMongoDb();
 
-    ipfsInstance = await startIPFSInstance();
+    ipfsInstance = await startIPFS();
     await ipfsInstance.connect(fullDashDriveInstance.ipfs);
 
     // 4. Await Dash Core to finish syncing
@@ -144,7 +144,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
 
     // 6. Start Dash Drive on 2nd node
     const opts = { container: { envs } };
-    dashDriveStandaloneInstance = await createDashDriveInstance(opts);
+    dashDriveStandaloneInstance = await createDashDrive(opts);
     await dashDriveStandaloneInstance.start();
 
     // 7. Wait for IPFS on 2nd node to have 3 packets pinned

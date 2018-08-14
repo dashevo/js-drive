@@ -5,11 +5,11 @@ const registerUser = require('../../../lib/test/registerUser');
 const createSTHeader = require('../../../lib/test/createSTHeader');
 
 const {
-  startDashDriveInstance,
-  startDashCoreInstance,
-  startMongoDbInstance,
-  startIPFSInstance,
-  createDashDriveInstance,
+  startDashDrive,
+  startDashCore,
+  startMongoDb,
+  startIPFS,
+  createDashDrive,
 } = require('js-evo-services-ctl');
 
 const wait = require('../../../lib/test/util/wait');
@@ -82,7 +82,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     packetsData = getStateTransitionPackets();
 
     // 1. Start first Dash Drive node
-    fullDashDriveInstance = await startDashDriveInstance();
+    fullDashDriveInstance = await startDashDrive();
 
     // 2. Populate Dash Drive and Dash Core With data
     async function createAndSubmitST(username) {
@@ -117,12 +117,12 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   it('Dash Drive should sync the data with Dash Core upon startup', async () => {
     // 3. Start services of the 2nd node (Core, Mongo, IPFS),
     //    but without Drive as we have to be sure Core is synced first
-    dashCoreInstance = await startDashCoreInstance();
+    dashCoreInstance = await startDashCore();
     await dashCoreInstance.connect(fullDashDriveInstance.dashCore);
 
-    mongoDbInstance = await startMongoDbInstance();
+    mongoDbInstance = await startMongoDb();
 
-    ipfsInstance = await startIPFSInstance();
+    ipfsInstance = await startIPFS();
     await ipfsInstance.connect(fullDashDriveInstance.ipfs);
 
     // 4. Await Dash Core to finish syncing
@@ -139,7 +139,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       `STORAGE_MONGODB_URL=mongodb://${mongoDbInstance.getIp()}:27017`,
     ];
     const opts = { container: { envs } };
-    dashDriveStandaloneInstance = await createDashDriveInstance(opts);
+    dashDriveStandaloneInstance = await createDashDrive(opts);
     await dashDriveStandaloneInstance.start();
 
     // 6. Await Dash Drive on the 2nd node to finish syncing

@@ -1,11 +1,11 @@
-const { startMongoDbInstance } = require('js-evo-services-ctl').mocha;
+const { startMongoDb } = require('js-evo-services-ctl').mocha;
 const dropMongoDatabasesWithPrefixFactory = require('../../../lib/mongoDb/dropMongoDatabasesWithPrefixFactory');
 
 const byDbPrefix = prefix => db => db.name.includes(prefix);
 
 describe('dropMongoDatabasesWithPrefixFactory', () => {
   let mongoClient;
-  startMongoDbInstance().then((instance) => {
+  startMongoDb().then((instance) => {
     ({ mongoClient } = instance);
   });
 

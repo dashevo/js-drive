@@ -2,8 +2,8 @@ const createDapObjectMongoDbRepositoryFactory = require('../../../lib/stateView/
 const DapObjectMongoDbRepository = require('../../../lib/stateView/dapObject/DapObjectMongoDbRepository');
 const DapContractMongoDbRepository = require('../../../lib/stateView/dapContract/DapContractMongoDbRepository');
 const {
-  startMongoDbInstance,
-  startIPFSInstance,
+  startMongoDb,
+  startIPFS,
 } = require('js-evo-services-ctl').mocha;
 const hashSTPacket = require('../../../lib/test/consensus/hashSTPacket');
 const updateDapContractFactory = require('../../../lib/stateView/dapContract/updateDapContractFactory');
@@ -20,11 +20,11 @@ describe('applyStateTransitionFactory', () => {
   let mongoDb;
   let ipfsClient;
 
-  startMongoDbInstance().then(async (mongoDbInstance) => {
+  startMongoDb().then(async (mongoDbInstance) => {
     ({ mongoClient } = mongoDbInstance);
     mongoDb = await mongoDbInstance.getMongoClient();
   });
-  startIPFSInstance().then(async (ipfsInstance) => {
+  startIPFS().then(async (ipfsInstance) => {
     ipfsClient = await ipfsInstance.getApi();
   });
 

@@ -1,6 +1,6 @@
 const {
-  startMongoDbInstance,
-  startIPFSInstance,
+  startMongoDb,
+  startIPFS,
 } = require('js-evo-services-ctl').mocha;
 const getTransitionPacketFixtures = require('../../../../lib/test/fixtures/getTransitionPacketFixtures');
 const getTransitionHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHeaderFixtures');
@@ -14,12 +14,12 @@ describe('storeDapContractFactory', function main() {
   this.timeout(30000);
 
   let mongoDbInstance;
-  startMongoDbInstance().then((_instance) => {
+  startMongoDb().then((_instance) => {
     mongoDbInstance = _instance;
   });
 
   let ipfsClient;
-  startIPFSInstance().then((_instance) => {
+  startIPFS().then((_instance) => {
     ipfsClient = _instance.getApi();
   });
 

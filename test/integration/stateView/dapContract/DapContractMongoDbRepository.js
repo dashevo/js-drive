@@ -1,11 +1,11 @@
 const DapContract = require('../../../../lib/stateView/dapContract/DapContract');
 const DapContractMongoDbRepository = require('../../../../lib/stateView/dapContract/DapContractMongoDbRepository');
-const { startMongoDbInstance } = require('js-evo-services-ctl').mocha;
+const { startMongoDb } = require('js-evo-services-ctl').mocha;
 const sanitizeData = require('../../../../lib/mongoDb/sanitizeData');
 
 describe('DapContractRepository', () => {
   let dapContractRepository;
-  startMongoDbInstance().then(async (mongoDbInstance) => {
+  startMongoDb().then(async (mongoDbInstance) => {
     const mongoClient = await mongoDbInstance.getMongoClient();
     dapContractRepository = new DapContractMongoDbRepository(mongoClient, sanitizeData);
   });
