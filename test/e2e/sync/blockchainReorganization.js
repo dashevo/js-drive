@@ -73,20 +73,7 @@ describe('Blockchain reorganization', function main() {
     stPackets = getStateTransitionPackets();
 
     // 1. Start two full Dash Drive instances
-    const rootPath = process.cwd();
-    const options = {
-      dashDrive: {
-        volumes: [
-          `${rootPath}/lib:/usr/src/app/lib`,
-          `${rootPath}/scripts:/usr/src/app/scripts`,
-          `${rootPath}/package.json:/usr/src/app/package.json`,
-          `${rootPath}/package-lock.json:/usr/src/app/package-lock.json`,
-          `${rootPath}/package.json:/package.json`,
-          `${rootPath}/package-lock.json:/package-lock.json`,
-        ],
-      },
-    };
-    [firstInstance, secondInstance] = await startDashDriveInstance.many(2, options);
+    [firstInstance, secondInstance] = await startDashDriveInstance.many(2);
 
     // Register a pool of users.
     // Do that here so major part of blocks are in the beginning

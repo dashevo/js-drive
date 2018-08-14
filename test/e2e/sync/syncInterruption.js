@@ -79,20 +79,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
 
   before('having Dash Drive node #1 up and running', async () => {
     // 1. Start first Dash Drive node
-    const rootPath = process.cwd();
-    const options = {
-      dashDrive: {
-        volumes: [
-          `${rootPath}/lib:/usr/src/app/lib`,
-          `${rootPath}/scripts:/usr/src/app/scripts`,
-          `${rootPath}/package.json:/usr/src/app/package.json`,
-          `${rootPath}/package-lock.json:/usr/src/app/package-lock.json`,
-          `${rootPath}/package.json:/package.json`,
-          `${rootPath}/package-lock.json:/package-lock.json`,
-        ],
-      },
-    };
-    fullDashDriveInstance = await startDashDriveInstance(options);
+    fullDashDriveInstance = await startDashDriveInstance();
 
     packetsCids = [];
     packetsData = getStateTransitionPackets();
@@ -156,20 +143,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     const initialHashes = lsResult.map(item => item.hash);
 
     // 6. Start Dash Drive on 2nd node
-    const rootPath = process.cwd();
-    const options = {
-      dashDrive: {
-        volumes: [
-          `${rootPath}/lib:/usr/src/app/lib`,
-          `${rootPath}/scripts:/usr/src/app/scripts`,
-          `${rootPath}/package.json:/usr/src/app/package.json`,
-          `${rootPath}/package-lock.json:/usr/src/app/package-lock.json`,
-          `${rootPath}/package.json:/package.json`,
-          `${rootPath}/package-lock.json:/package-lock.json`,
-        ],
-      },
-    };
-    const opts = { ...options, envs };
+    const opts = { container: { envs } };
     dashDriveStandaloneInstance = await createDashDriveInstance(opts);
     await dashDriveStandaloneInstance.start();
 

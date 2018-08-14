@@ -82,20 +82,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     packetsData = getStateTransitionPackets();
 
     // 1. Start first Dash Drive node
-    const rootPath = process.cwd();
-    const options = {
-      dashDrive: {
-        volumes: [
-          `${rootPath}/lib:/usr/src/app/lib`,
-          `${rootPath}/scripts:/usr/src/app/scripts`,
-          `${rootPath}/package.json:/usr/src/app/package.json`,
-          `${rootPath}/package-lock.json:/usr/src/app/package-lock.json`,
-          `${rootPath}/package.json:/package.json`,
-          `${rootPath}/package-lock.json:/package-lock.json`,
-        ],
-      },
-    };
-    fullDashDriveInstance = await startDashDriveInstance(options);
+    fullDashDriveInstance = await startDashDriveInstance();
 
     // 2. Populate Dash Drive and Dash Core With data
     async function createAndSubmitST(username) {
@@ -151,20 +138,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       `STORAGE_IPFS_MULTIADDR=${ipfsInstance.getIpfsAddress()}`,
       `STORAGE_MONGODB_URL=mongodb://${mongoDbInstance.getIp()}:27017`,
     ];
-    const rootPath = process.cwd();
-    const options = {
-      dashDrive: {
-        volumes: [
-          `${rootPath}/lib:/usr/src/app/lib`,
-          `${rootPath}/scripts:/usr/src/app/scripts`,
-          `${rootPath}/package.json:/usr/src/app/package.json`,
-          `${rootPath}/package-lock.json:/usr/src/app/package-lock.json`,
-          `${rootPath}/package.json:/package.json`,
-          `${rootPath}/package-lock.json:/package-lock.json`,
-        ],
-      },
-    };
-    const opts = { ...options, envs };
+    const opts = { container: { envs } };
     dashDriveStandaloneInstance = await createDashDriveInstance(opts);
     await dashDriveStandaloneInstance.start();
 

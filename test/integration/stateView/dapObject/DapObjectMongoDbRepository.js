@@ -6,7 +6,7 @@ const InvalidOrderBy = require('../../../../lib/stateView/dapObject/InvalidOrder
 const InvalidLimitError = require('../../../../lib/stateView/dapObject/InvalidLimitError');
 const InvalidStartAtError = require('../../../../lib/stateView/dapObject/InvalidStartAtError');
 const InvalidStartAfterError = require('../../../../lib/stateView/dapObject/InvalidStartAfterError');
-const startMongoDbInstance = require('../../../../lib/test/services/mocha/startMongoDbInstance');
+const { startMongoDbInstance } = require('js-evo-services-ctl').mocha;
 
 function createDapObjectWithId(id) {
   const objectData = {

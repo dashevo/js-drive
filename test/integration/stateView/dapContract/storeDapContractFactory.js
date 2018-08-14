@@ -1,5 +1,7 @@
-const startMongoDbInstance = require('../../../../lib/test/services/mocha/startMongoDbInstance');
-const startIPFSInstance = require('../../../../lib/test/services/mocha/startIPFSInstance');
+const {
+  startMongoDbInstance,
+  startIPFSInstance,
+} = require('js-evo-services-ctl').mocha;
 const getTransitionPacketFixtures = require('../../../../lib/test/fixtures/getTransitionPacketFixtures');
 const getTransitionHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHeaderFixtures');
 const StateTransitionHeader = require('../../../../lib/blockchain/StateTransitionHeader');

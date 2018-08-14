@@ -1,8 +1,10 @@
 const createDapObjectMongoDbRepositoryFactory = require('../../../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
 const DapObjectMongoDbRepository = require('../../../lib/stateView/dapObject/DapObjectMongoDbRepository');
 const DapContractMongoDbRepository = require('../../../lib/stateView/dapContract/DapContractMongoDbRepository');
-const startMongoDbInstance = require('../../../lib/test/services/mocha/startMongoDbInstance');
-const startIPFSInstance = require('../../../lib/test/services/mocha/startIPFSInstance');
+const {
+  startMongoDbInstance,
+  startIPFSInstance,
+} = require('js-evo-services-ctl').mocha;
 const hashSTPacket = require('../../../lib/test/consensus/hashSTPacket');
 const updateDapContractFactory = require('../../../lib/stateView/dapContract/updateDapContractFactory');
 const updateDapObjectFactory = require('../../../lib/stateView/dapObject/updateDapObjectFactory');
