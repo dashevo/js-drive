@@ -50,7 +50,7 @@ async function dashDriveSyncToFinish(instance) {
   while (!finished) {
     try {
       const response = await instance.getApi()
-        .request('addSTPacketMethod', serializedPacketJson);
+        .request('addSTPacket', serializedPacketJson);
       if (response.result) {
         finished = true;
       } else {
