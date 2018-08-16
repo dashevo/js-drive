@@ -2,4 +2,5 @@
 describe('E2E Tests', () => {
   require('./replication');
   require('./sync');
+  require('./stateView');
 });
