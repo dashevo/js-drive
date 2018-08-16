@@ -130,7 +130,7 @@ describe('update', function main() {
     await blockCountEvenAndEqual(firstInstance.dashCore, secondInstance.dashCore);
 
     // Await some time for Dash Drive nodes to sync
-    await wait(2000);
+    await wait(10000);
 
     // Ensure first Dash Drive have a proper data
     {
@@ -181,7 +181,7 @@ describe('update', function main() {
     await blockCountEvenAndEqual(firstInstance.dashCore, secondInstance.dashCore);
 
     // Await some time for Dash Drive nodes to sync
-    await wait(2000);
+    await wait(10000);
 
     // Ensure first Dash Drive have a proper updated data
     {
