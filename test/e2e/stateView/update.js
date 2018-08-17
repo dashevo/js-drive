@@ -57,6 +57,21 @@ async function blockCountEvenAndEqual(
   }
 }
 
+async function ensureDriveHaveCIDs(instance, cids) {
+  for (let i = 0; i < 120; i++) {
+    const lsResult = await instance.ipfs.getApi().pin.ls();
+    const lsHashes = lsResult.map(item => item.hash);
+
+    const haveAll = cids.reduce((acc, next) => acc && (lsHashes.indexOf(next) !== -1), true);
+
+    if (haveAll) {
+      break;
+    }
+
+    await wait(1000);
+  }
+}
+
 describe('update', function main() {
   this.timeout(400000);
 
@@ -70,14 +85,17 @@ describe('update', function main() {
   let dapId;
   let prevTransitionId;
 
+  let packetsCids;
+
   before('setup nodes, users and initial state view', async () => {
     stPackets = getStateTransitionPackets();
+    packetsCids = [];
 
     // Start two Dash Drive nodes
     [firstInstance, secondInstance] = await startDashDriveInstance.many(2);
 
     // Wait for Dash Drive nodes to start
-    await wait(30000);
+    await wait(40000);
 
     // Register a single user on a blockchain
     aliceUser = {
@@ -90,13 +108,16 @@ describe('update', function main() {
     await blockCountEvenAndEqual(firstInstance.dashCore, secondInstance.dashCore);
 
     // Create DAP Contract
-    ({ tsId: dapId } = await createAndSubmitST(
+    let packetCid;
+    ({ packetCid, tsId: dapId } = await createAndSubmitST(
       aliceUser.userId,
       aliceUser.privateKeyString,
       aliceUser.username,
       stPackets[0],
       firstInstance,
     ));
+
+    packetsCids.push(packetCid);
 
     // Ensure both Dash Core nodes have the same amount of blocks
     await blockCountEvenAndEqual(firstInstance.dashCore, secondInstance.dashCore);
@@ -117,7 +138,7 @@ describe('update', function main() {
       ],
     });
 
-    ({ tsId: prevTransitionId } = await createAndSubmitST(
+    ({ packetCid, tsId: prevTransitionId } = await createAndSubmitST(
       aliceUser.userId,
       aliceUser.privateKeyString,
       aliceUser.username,
@@ -126,11 +147,14 @@ describe('update', function main() {
       dapId,
     ));
 
+    packetsCids.push(packetCid);
+
     // Ensure both Dash Core nodes have the same amount of blocks
     await blockCountEvenAndEqual(firstInstance.dashCore, secondInstance.dashCore);
 
-    // Await some time for Dash Drive nodes to sync
-    await wait(10000);
+    // Ensure both nodes have necessary CIDs
+    await ensureDriveHaveCIDs(firstInstance, packetsCids);
+    await ensureDriveHaveCIDs(secondInstance, packetsCids);
 
     // Ensure first Dash Drive have a proper data
     {
@@ -168,7 +192,7 @@ describe('update', function main() {
       ],
     });
 
-    await createAndSubmitST(
+    const { packetCid } = await createAndSubmitST(
       aliceUser.userId,
       aliceUser.privateKeyString,
       aliceUser.username,
@@ -177,11 +201,14 @@ describe('update', function main() {
       prevTransitionId,
     );
 
+    packetsCids.push(packetCid);
+
     // Ensure both Dash Core nodes have the same amount of blocks
     await blockCountEvenAndEqual(firstInstance.dashCore, secondInstance.dashCore);
 
-    // Await some time for Dash Drive nodes to sync
-    await wait(10000);
+    // Ensure both nodes have necessary CIDs
+    await ensureDriveHaveCIDs(firstInstance, packetsCids);
+    await ensureDriveHaveCIDs(secondInstance, packetsCids);
 
     // Ensure first Dash Drive have a proper updated data
     {
