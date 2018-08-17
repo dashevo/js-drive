@@ -1,6 +1,7 @@
 {
   "extends": "airbnb-base",
   "rules": {
+    "strict": ["warn", "global"],
     "no-plusplus": 0,
     "eol-last": [
       "error",
