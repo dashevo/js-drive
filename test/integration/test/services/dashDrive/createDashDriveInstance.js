@@ -75,7 +75,7 @@ describe('createDashDriveInstance', function main() {
       await instance.start();
 
       const rpc = instance.getApi();
-      const res = await rpc.request('addSTPacketMethod', {});
+      const res = await rpc.request('addSTPacket', {});
 
       expect(res.error.code).to.be.equal(100);
     });
