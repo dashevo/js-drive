@@ -23,7 +23,7 @@ const cbor = require('cbor');
 async function dashCoreSyncToFinish(instance) {
   let finished = false;
   while (!finished) {
-    const status = await instance.rpcClient.mnsync('status');
+    const status = await instance.getApi().mnsync('status');
     if (status.result.IsSynced) {
       finished = true;
     } else {
@@ -74,7 +74,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   let packetsCids;
   let packetsData;
 
-  this.timeout(900000);
+  this.timeout(2000000);
 
   before('having Dash Drive node #1 up and ready, some amount of STs generated and Dash Drive on node #1 fully synced', async () => {
     packetsCids = [];
@@ -82,6 +82,9 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     // 1. Start first Dash Drive node
     fullDashDriveInstance = await startDashDriveInstance();
+
+    // 1.1 Activate Special Transactions
+    await fullDashDriveInstance.dashCore.getApi().generate(1000);
 
     // 2. Populate Dash Drive and Dash Core With data
     async function createAndSubmitST(username) {
@@ -91,7 +94,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
       // 2.2 Register user and create DAP Contract State Transition packet and header
       const { userId, privateKeyString } =
-        await registerUser(username, fullDashDriveInstance.dashCore.rpcClient);
+        await registerUser(username, fullDashDriveInstance.dashCore.getApi());
       const header = await createSTHeader(userId, privateKeyString, packetOne);
 
       // 2.3 Add ST packet to IPFS
@@ -102,8 +105,8 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       packetsCids.push(packetCid);
 
       // 2.5 Send ST header to Dash Core and generate a block with it
-      await fullDashDriveInstance.dashCore.rpcClient.sendRawTransition(header.serialize());
-      await fullDashDriveInstance.dashCore.rpcClient.generate(1);
+      await fullDashDriveInstance.dashCore.getApi().sendRawTransition(header.serialize());
+      await fullDashDriveInstance.dashCore.getApi().generate(1);
     }
 
     // Note: I can't use Promise.all here due to errors with PrivateKey
@@ -120,7 +123,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     // Workaround for develop branch
     // We should generate genesis block before we connect instances
-    await dashCoreInstance.getApi().generate(1);
+    // await dashCoreInstance.getApi().generate(2000);
 
     await dashCoreInstance.connect(fullDashDriveInstance.dashCore);
 

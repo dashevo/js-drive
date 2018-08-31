@@ -23,7 +23,7 @@ const cbor = require('cbor');
 async function dashCoreSyncToFinish(instance) {
   let finished = false;
   while (!finished) {
-    const status = await instance.rpcClient.mnsync('status');
+    const status = await instance.getApi().mnsync('status');
     if (status.result.IsSynced) {
       finished = true;
     } else {
@@ -80,6 +80,9 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     // 1. Start first Dash Drive node
     fullDashDriveInstance = await startDashDriveInstance();
 
+    // 1.1 Activate Special Transactions
+    await fullDashDriveInstance.dashCore.getApi().generate(1000);
+
     packetsCids = [];
     packetsData = getStateTransitionPackets();
 
@@ -91,7 +94,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
 
       // 2.2 Register user and create DAP Contract State Transition packet and header
       const { userId, privateKeyString } =
-        await registerUser(username, fullDashDriveInstance.dashCore.rpcClient);
+        await registerUser(username, fullDashDriveInstance.dashCore.getApi());
       const header = await createSTHeader(userId, privateKeyString, packetOne);
 
       // 2.3 Add ST packet to IPFS
@@ -102,8 +105,8 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
       packetsCids.push(packetCid);
 
       // 2.5 Send ST header to Dash Core and generate a block with it
-      await fullDashDriveInstance.dashCore.rpcClient.sendRawTransition(header.serialize());
-      await fullDashDriveInstance.dashCore.rpcClient.generate(1);
+      await fullDashDriveInstance.dashCore.getApi().sendRawTransition(header.serialize());
+      await fullDashDriveInstance.dashCore.getApi().generate(1);
     }
 
     // Note: I can't use Promise.all here due to errors with PrivateKey
@@ -117,10 +120,6 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     // 3. Start services of the 2nd node (Core, Mongo, IPFS),
     //    but without Drive as we have to be sure Core is synced first
     dashCoreInstance = await startDashCoreInstance();
-
-    // Workaround for develop branch
-    // We should generate genesis block before we connect instances
-    await dashCoreInstance.getApi().generate(1);
 
     await dashCoreInstance.connect(fullDashDriveInstance.dashCore);
 
