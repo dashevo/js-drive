@@ -13,6 +13,8 @@ const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
 
+const createDapObjectId = require('../../../lib/stateView/dapObject/createDapObjectId');
+
 describe('applyStateTransitionFactory', () => {
   let mongoClient;
   let mongoDb;
@@ -76,5 +78,19 @@ describe('applyStateTransitionFactory', () => {
       updateDapObject,
     );
     await applyStateTransition(header, block);
+
+    const dapId = packet.dapid;
+    const dapObjectRepository = createDapObjectMongoDbRepository(dapId);
+    const objectType = packet.dapobjects[0].objtype;
+    const objects = await dapObjectRepository.fetch(objectType);
+
+    expect(objects.length).to.be.equal(1);
+
+    const dapObject = objects[0];
+    const blockchainUserId = packet.meta.uid;
+    const slotNumber = packet.dapobjects[0].idx;
+    const dapObjectId = createDapObjectId(blockchainUserId, slotNumber);
+
+    expect(dapObject.getId()).to.be.equal(dapObjectId);
   });
 });
