@@ -61,6 +61,8 @@ describe('Blockchain reorganization', function main() {
 
   const BLOCKS_PER_ST = 1;
   const BLOCKS_PER_REGISTRATION = 108;
+  const BLOCKS_PROPAGATION_ACTIVATION = 1;
+  const BLOCKS_ST_ACTIVATION = 1000;
 
   this.timeout(900000);
 
@@ -76,7 +78,7 @@ describe('Blockchain reorganization', function main() {
     [firstInstance, secondInstance] = await startDashDriveInstance.many(2);
 
     // 1.1 Activate Special Transactions
-    await firstInstance.dashCore.getApi().generate(1000);
+    await firstInstance.dashCore.getApi().generate(BLOCKS_ST_ACTIVATION);
 
     // Register a pool of users.
     // Do that here so major part of blocks are in the beginning
@@ -92,7 +94,8 @@ describe('Blockchain reorganization', function main() {
     await blockCountEvenAndEqual(
       firstInstance.dashCore,
       secondInstance.dashCore,
-      10 * BLOCKS_PER_REGISTRATION,
+      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
+      (10 * BLOCKS_PER_REGISTRATION),
     );
 
     // 2. Populate instance of Dash Drive and Dash Core with data
@@ -114,6 +117,7 @@ describe('Blockchain reorganization', function main() {
     await blockCountEvenAndEqual(
       firstInstance.dashCore,
       secondInstance.dashCore,
+      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
       (10 * BLOCKS_PER_REGISTRATION) + (2 * BLOCKS_PER_ST),
     );
 
@@ -168,7 +172,12 @@ describe('Blockchain reorganization', function main() {
     // 6. Check proper block count on the first node
     {
       const { result: blockCount } = await firstInstance.dashCore.getApi().getBlockCount();
-      expect(blockCount).to.be.equal((10 * BLOCKS_PER_REGISTRATION) + (4 * BLOCKS_PER_ST));
+
+      const expectedBlockCount = BLOCKS_PROPAGATION_ACTIVATION +
+                                 BLOCKS_ST_ACTIVATION +
+                                 (10 * BLOCKS_PER_REGISTRATION) + (4 * BLOCKS_PER_ST);
+
+      expect(blockCount).to.be.equal(expectedBlockCount);
     }
 
     // 7. Generate slightly larger amount of STs on the second node
@@ -188,7 +197,12 @@ describe('Blockchain reorganization', function main() {
     // 8. Check proper block count on the second node
     {
       const { result: blockCount } = await secondInstance.dashCore.getApi().getBlockCount();
-      expect(blockCount).to.be.equal((10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST));
+
+      const expectedBlockCount = BLOCKS_PROPAGATION_ACTIVATION +
+                                 BLOCKS_ST_ACTIVATION +
+                                 (10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST);
+
+      expect(blockCount).to.be.equal(expectedBlockCount);
     }
 
     // Remove CIDs on node #1 added before disconnect
@@ -205,6 +219,7 @@ describe('Blockchain reorganization', function main() {
     await blockCountEvenAndEqual(
       firstInstance.dashCore,
       secondInstance.dashCore,
+      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
       (10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST),
     );
 
@@ -271,10 +286,12 @@ describe('Blockchain reorganization', function main() {
   });
 
   after('cleanup lone services', async () => {
-    const promises = Promise.all([
-      firstInstance.remove(),
-      secondInstance.remove(),
-    ]);
-    await promises;
+    const instances = [
+      firstInstance,
+      secondInstance,
+    ];
+
+    await Promise.all(instances.filter(i => i)
+      .map(i => i.remove()));
   });
 });
