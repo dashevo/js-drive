@@ -150,9 +150,8 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     await dashDriveStandaloneInstance.start();
 
     // 6. Await Dash Drive on the 2nd node to finish syncing
-    console.log('sync drive');
     await dashDriveSyncToFinish(dashDriveStandaloneInstance);
-    console.log('drive synced');
+
     // 7. Get all pinned CIDs on the 2nd node and assert
     //    they contain CIDs saved from the 1st node
     const lsResult = await ipfsInstance.getApi().pin.ls();
