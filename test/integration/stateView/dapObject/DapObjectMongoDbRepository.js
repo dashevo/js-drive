@@ -347,6 +347,6 @@ describe('DapObjectMongoDbRepository', () => {
     const object = await dapObjectRepository.find();
 
     const serializeObject = object.toJSON();
-    expect(serializeObject.buid).to.not.exist();
+    expect(serializeObject.blockchainUserId).to.not.exist();
   });
 });

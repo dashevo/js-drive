@@ -27,6 +27,6 @@ describe('createDapObjectMongoDbRepositoryFactory', () => {
     await dapObjectRepository.store(dapObject);
 
     const result = await dapObjectRepository.find(dapObject.getId());
-    expect(result.toJSON().buid).to.equal(blockchainUserId);
+    expect(result.toJSON().blockchainUserId).to.equal(blockchainUserId);
   });
 });
