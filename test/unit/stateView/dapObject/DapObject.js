@@ -41,7 +41,7 @@ describe('DapObject', () => {
 
     const dapObjectSerialized = dapObject.toJSON();
     expect(dapObjectSerialized).to.deep.equal({
-      blockchainUserId: blockchainUserId,
+      blockchainUserId,
       type: dapObjectData.objtype,
       object: dapObjectData,
       revision: dapObjectData.rev,
