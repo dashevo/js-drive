@@ -21,7 +21,7 @@ describe('IsDashCoreRunning', () => {
   it('should return false if DashCore is down', async () => {
     await dashCoreInstance.stop();
 
-    const isRunning = await isDashCoreRunning();
+    const isRunning = await isDashCoreRunning({ retryDelay: 50 });
     expect(isRunning).to.be.false();
   });
 });
