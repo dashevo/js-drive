@@ -1,7 +1,7 @@
 const Reference = require('../../../../lib/stateView/Reference');
 const DapObject = require('../../../../lib/stateView/dapObject/DapObject');
 
-const createDapObjectId = require('../../../../lib/stateView/dapObject/createDapObjectId');
+const generateDapObjectId = require('../../../../lib/stateView/dapObject/generateDapObjectId');
 
 describe('DapObject', () => {
   it('should get DapObject ID', async () => {
@@ -15,7 +15,7 @@ describe('DapObject', () => {
     };
     const reference = new Reference();
     const dapObject = new DapObject(blockchainUserId, dapObjectData, reference);
-    const dapObjectId = createDapObjectId(blockchainUserId, slotNumber);
+    const dapObjectId = generateDapObjectId(blockchainUserId, slotNumber);
     expect(dapObject.getId()).to.be.equal(dapObjectId);
   });
 
