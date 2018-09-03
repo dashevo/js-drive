@@ -13,7 +13,7 @@ describe('isDashCoreRunningFactory', () => {
 
     const isRunning = await isDashCoreRunning({
       retries: 2,
-      retryDelay: 50,
+      retryDelay: 0.1,
     });
 
     expect(isRunning).to.be.false();
@@ -23,7 +23,7 @@ describe('isDashCoreRunningFactory', () => {
   it('should return true if DashCore is not running', async () => {
     const isRunning = await isDashCoreRunning({
       retries: 2,
-      retryDelay: 50,
+      retryDelay: 0.1,
     });
 
     expect(isRunning).to.be.true();
