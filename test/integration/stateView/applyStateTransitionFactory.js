@@ -31,7 +31,7 @@ describe('applyStateTransitionFactory', () => {
   it('should compute DapContract state view', async () => {
     const block = getBlockFixtures()[0];
     const packet = getTransitionPacketFixtures()[0];
-    const header = getTransitionHeaderFixtures()[0].toJSON();
+    const header = getTransitionHeaderFixtures()[0];
     header.extraPayload.hashSTPacket = await hashSTPacket(packet);
 
     await ipfsClient.dag.put(packet, {
@@ -57,7 +57,7 @@ describe('applyStateTransitionFactory', () => {
   it('should compute DapObject state view', async () => {
     const block = getBlockFixtures()[1];
     const packet = getTransitionPacketFixtures()[1];
-    const header = getTransitionHeaderFixtures()[1].toJSON();
+    const header = getTransitionHeaderFixtures()[1];
     header.extraPayload.hashSTPacket = await hashSTPacket(packet);
 
     await ipfsClient.dag.put(packet, {
@@ -87,7 +87,7 @@ describe('applyStateTransitionFactory', () => {
     expect(objects.length).to.be.equal(1);
 
     const dapObject = objects[0];
-    const blockchainUserId = packet.meta.uid;
+    const blockchainUserId = header.extraPayload.regTxId;
     const slotNumber = packet.dapobjects[0].idx;
     const dapObjectId = generateDapObjectId(blockchainUserId, slotNumber);
 
