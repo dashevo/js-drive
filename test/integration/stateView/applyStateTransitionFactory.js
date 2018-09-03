@@ -32,7 +32,7 @@ describe('applyStateTransitionFactory', () => {
     const block = getBlockFixtures()[0];
     const packet = getTransitionPacketFixtures()[0];
     const header = getTransitionHeaderFixtures()[0].toJSON();
-    header.hashSTPacket = await hashSTPacket(packet);
+    header.extraPayload.hashSTPacket = await hashSTPacket(packet);
 
     await ipfsClient.dag.put(packet, {
       format: 'dag-cbor',
@@ -58,7 +58,7 @@ describe('applyStateTransitionFactory', () => {
     const block = getBlockFixtures()[1];
     const packet = getTransitionPacketFixtures()[1];
     const header = getTransitionHeaderFixtures()[1].toJSON();
-    header.hashSTPacket = await hashSTPacket(packet);
+    header.extraPayload.hashSTPacket = await hashSTPacket(packet);
 
     await ipfsClient.dag.put(packet, {
       format: 'dag-cbor',
