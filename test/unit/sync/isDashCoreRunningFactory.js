@@ -1,4 +1,4 @@
-const isDashCoreRunningFactory = require('../../../../lib/sync/isDashCoreRunningFactory');
+const isDashCoreRunningFactory = require('../../../lib/sync/isDashCoreRunningFactory');
 
 describe('isDashCoreRunningFactory', () => {
   let isDashCoreRunning;
