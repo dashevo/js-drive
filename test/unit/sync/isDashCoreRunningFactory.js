@@ -25,7 +25,7 @@ describe('isDashCoreRunningFactory', () => {
     expect(wait).to.be.calledOnce();
   });
 
-  it('should not wait and return true if DashCore is not running', async () => {
+  it('should not wait and return true if DashCore is running', async () => {
     const retries = 2;
     const retryDelay = 0.1;
     const isRunning = await isDashCoreRunning(retries, retryDelay);
