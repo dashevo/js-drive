@@ -11,20 +11,18 @@ describe('isDashCoreRunningFactory', () => {
   it('should return false and retry 2 times if DashCore is not running', async () => {
     rpcClient.ping.throws(new Error());
 
-    const isRunning = await isDashCoreRunning({
-      retries: 2,
-      retryDelay: 0.1,
-    });
+    const retries = 2;
+    const retryDelay = 0.1;
+    const isRunning = await isDashCoreRunning(retries, retryDelay);
 
     expect(isRunning).to.be.false();
     expect(rpcClient.ping).to.be.calledTwice();
   });
 
   it('should return true if DashCore is not running', async () => {
-    const isRunning = await isDashCoreRunning({
-      retries: 2,
-      retryDelay: 0.1,
-    });
+    const retries = 2;
+    const retryDelay = 0.1;
+    const isRunning = await isDashCoreRunning(retries, retryDelay);
 
     expect(isRunning).to.be.true();
     expect(rpcClient.ping).to.be.calledOnce();
