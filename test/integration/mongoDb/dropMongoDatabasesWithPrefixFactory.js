@@ -1,4 +1,4 @@
-const { startMongoDb } = require('js-evo-services-ctl').mocha;
+const { mocha: { startMongoDb } } = require('js-evo-services-ctl');
 const dropMongoDatabasesWithPrefixFactory = require('../../../lib/mongoDb/dropMongoDatabasesWithPrefixFactory');
 
 const byDbPrefix = prefix => db => db.name.includes(prefix);

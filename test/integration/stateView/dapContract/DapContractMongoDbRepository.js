@@ -1,6 +1,6 @@
 const DapContract = require('../../../../lib/stateView/dapContract/DapContract');
 const DapContractMongoDbRepository = require('../../../../lib/stateView/dapContract/DapContractMongoDbRepository');
-const { startMongoDb } = require('js-evo-services-ctl').mocha;
+const { mocha: { startMongoDb } } = require('js-evo-services-ctl');
 const sanitizeData = require('../../../../lib/mongoDb/sanitizeData');
 
 describe('DapContractRepository', () => {

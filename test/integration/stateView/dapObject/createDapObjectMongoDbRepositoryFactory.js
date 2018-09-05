@@ -2,7 +2,7 @@ const DapObject = require('../../../../lib/stateView/dapObject/DapObject');
 const Reference = require('../../../../lib/stateView/Reference');
 const createDapObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
 const DapObjectMongoDbRepository = require('../../../../lib/stateView/dapObject/DapObjectMongoDbRepository');
-const { startMongoDb } = require('js-evo-services-ctl').mocha;
+const { mocha: { startMongoDb } } = require('js-evo-services-ctl');
 
 describe('createDapObjectMongoDbRepositoryFactory', () => {
   let createDapObjectMongoDbRepository;
