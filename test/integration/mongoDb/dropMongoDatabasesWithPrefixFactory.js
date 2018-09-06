@@ -10,7 +10,7 @@ describe('dropMongoDatabasesWithPrefixFactory', () => {
   });
 
   it('should drop all Drive Mongo databases', async () => {
-    await mongoClient.getClient().db('drive_db').collection('dapObjects').insertOne({ name: 'DashPay' });
+    await mongoClient.db('drive_db').collection('dapObjects').insertOne({ name: 'DashPay' });
 
     const { databases: dbs } = await mongoClient.db('test').admin().listDatabases();
     const filterDb = dbs.filter(byDbPrefix(process.env.MONGODB_DB_PREFIX));
