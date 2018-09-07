@@ -139,11 +139,7 @@ describe('Blockchain reorganization', function main() {
     const packetsBeforeDisconnect = packetsCids.slice();
 
     // 4. Disconnecting nodes to start introducing difference in blocks
-    //    TODO: implement `disconnect` method for DashCoreInstance
-    const ip = secondInstance.dashCore.getIp();
-    const port = secondInstance.dashCore.options.getDashdPort();
-    await firstInstance.dashCore.getApi().disconnectNode(`${ip}:${port}`);
-    await firstInstance.dashCore.getApi().addNode(`${ip}:${port}`, 'remove');
+    firstInstance.disconnect(secondInstance);
 
     // 5. Generate two more ST on the first node
     //    Note: keep track of exact those CIDs as they should disappear after reorganization
