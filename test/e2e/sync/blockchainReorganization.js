@@ -139,7 +139,7 @@ describe('Blockchain reorganization', function main() {
     const packetsBeforeDisconnect = packetsCids.slice();
 
     // 4. Disconnecting nodes to start introducing difference in blocks
-    dashDriveFirst.disconnect(dashDriveSecond);
+    dashDriveFirst.dashCore.disconnect(dashDriveSecond.dashCore);
 
     // 5. Generate two more ST on the first node
     //    Note: keep track of exact those CIDs as they should disappear after reorganization
