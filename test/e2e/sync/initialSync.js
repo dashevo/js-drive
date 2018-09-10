@@ -39,8 +39,8 @@ async function dashDriveSyncToFinish(instance) {
 }
 
 describe('Initial sync of Dash Drive and Dash Core', function main() {
-  let dashDriveFirst;
-  let dashDriveSecond;
+  let firstDashDrive;
+  let secondDashDrive;
 
   let packetsCids;
   let packetsData;
@@ -52,10 +52,10 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     packetsData = getStateTransitionPackets();
 
     // 1. Start first Dash Drive node
-    dashDriveFirst = await startDashDrive();
+    firstDashDrive = await startDashDrive();
 
     // 1.1 Activate Special Transactions
-    await dashDriveFirst.dashCore.getApi().generate(1000);
+    await firstDashDrive.dashCore.getApi().generate(1000);
 
     // 2. Populate Dash Drive and Dash Core With data
     async function createAndSubmitST(username) {
@@ -65,19 +65,19 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
       // 2.2 Register user and create DAP Contract State Transition packet and header
       const { userId, privateKeyString } =
-        await registerUser(username, dashDriveFirst.dashCore.getApi());
+        await registerUser(username, firstDashDrive.dashCore.getApi());
       const header = await createSTHeader(userId, privateKeyString, packetOne);
 
       // 2.3 Add ST packet to IPFS
-      const addSTPacket = addSTPacketFactory(dashDriveFirst.ipfs.getApi());
+      const addSTPacket = addSTPacketFactory(firstDashDrive.ipfs.getApi());
       const packetCid = await addSTPacket(packetOne);
 
       // 2.4 Save CID of freshly added packet for future use
       packetsCids.push(packetCid);
 
       // 2.5 Send ST header to Dash Core and generate a block with it
-      await dashDriveFirst.dashCore.getApi().sendRawTransition(header.serialize());
-      await dashDriveFirst.dashCore.getApi().generate(1);
+      await firstDashDrive.dashCore.getApi().sendRawTransition(header.serialize());
+      await firstDashDrive.dashCore.getApi().generate(1);
     }
 
     // Note: I can't use Promise.all here due to errors with PrivateKey
@@ -89,16 +89,16 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
   it('Dash Drive should sync the data with Dash Core upon startup', async () => {
     // 3. Start 2nd Dash Drive node and connect to the first one
-    dashDriveSecond = await startDashDrive();
-    await dashDriveSecond.ipfs.connect(dashDriveFirst.ipfs);
-    await dashDriveSecond.dashCore.connect(dashDriveFirst.dashCore);
+    secondDashDrive = await startDashDrive();
+    await secondDashDrive.ipfs.connect(firstDashDrive.ipfs);
+    await secondDashDrive.dashCore.connect(firstDashDrive.dashCore);
 
     // 4. Await Dash Drive on the 2nd node to finish syncing
-    await dashDriveSyncToFinish(dashDriveSecond.driveApi);
+    await dashDriveSyncToFinish(secondDashDrive.driveApi);
 
     // 5. Get all pinned CIDs on the 2nd node and assert
     //    they contain CIDs saved from the 1st node
-    const lsResult = await dashDriveSecond.ipfs.getApi().pin.ls();
+    const lsResult = await secondDashDrive.ipfs.getApi().pin.ls();
 
     const hashes = lsResult.map(item => item.hash);
 
@@ -107,8 +107,8 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
   after('cleanup lone services', async () => {
     const instances = [
-      dashDriveFirst,
-      dashDriveSecond,
+      firstDashDrive,
+      secondDashDrive,
     ];
 
     await Promise.all(instances.filter(i => i)
