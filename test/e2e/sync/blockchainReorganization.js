@@ -49,8 +49,8 @@ async function blockCountEvenAndEqual(
 }
 
 describe('Blockchain reorganization', function main() {
-  let firstInstance;
-  let secondInstance;
+  let dashDriveFirst;
+  let dashDriveSecond;
 
   let packetsCids;
   let packetsAddedAfterDisconnect;
@@ -75,15 +75,15 @@ describe('Blockchain reorganization', function main() {
     stPackets = getStateTransitionPackets();
 
     // 1. Start two full Dash Drive instances
-    [firstInstance, secondInstance] = await startDashDrive.many(2);
+    [dashDriveFirst, dashDriveSecond] = await startDashDrive.many(2);
 
     // 1.1 Activate Special Transactions
-    await firstInstance.dashCore.getApi().generate(BLOCKS_ST_ACTIVATION);
+    await dashDriveFirst.dashCore.getApi().generate(BLOCKS_ST_ACTIVATION);
 
     // Register a pool of users.
     // Do that here so major part of blocks are in the beginning
     for (let i = 0; i < 10; i++) {
-      const instance = firstInstance;
+      const instance = dashDriveFirst;
       const username = `Alice_${i}`;
       const { userId, privateKeyString } =
             await registerUser(username, instance.dashCore.getApi());
@@ -92,8 +92,8 @@ describe('Blockchain reorganization', function main() {
 
     // Await number of blocks even on both nodes
     await blockCountEvenAndEqual(
-      firstInstance.dashCore,
-      secondInstance.dashCore,
+      dashDriveFirst.dashCore,
+      dashDriveSecond.dashCore,
       BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
       (10 * BLOCKS_PER_REGISTRATION),
     );
@@ -107,7 +107,7 @@ describe('Blockchain reorganization', function main() {
         user.privateKeyString,
         user.username,
         stPackets[0],
-        firstInstance,
+        dashDriveFirst,
       );
       packetsCids.push(packetCid);
     }
@@ -115,15 +115,15 @@ describe('Blockchain reorganization', function main() {
     // 3. Await block count to be equal on both nodes
     //    Should be equal number of generated STs times number of blocks per ST
     await blockCountEvenAndEqual(
-      firstInstance.dashCore,
-      secondInstance.dashCore,
+      dashDriveFirst.dashCore,
+      dashDriveSecond.dashCore,
       BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
       (10 * BLOCKS_PER_REGISTRATION) + (2 * BLOCKS_PER_ST),
     );
 
     // Await first Dash Drive sync
     for (let i = 0; i < 120; i++) {
-      const lsResult = await firstInstance.ipfs.getApi().pin.ls();
+      const lsResult = await dashDriveFirst.ipfs.getApi().pin.ls();
       const lsHashes = lsResult.map(item => item.hash);
 
       if (lsHashes.indexOf(packetsCids[0]) !== -1 && lsHashes.indexOf(packetsCids[1]) !== -1) {
@@ -139,7 +139,7 @@ describe('Blockchain reorganization', function main() {
     const packetsBeforeDisconnect = packetsCids.slice();
 
     // 4. Disconnecting nodes to start introducing difference in blocks
-    firstInstance.disconnect(secondInstance);
+    dashDriveFirst.disconnect(dashDriveSecond);
 
     // 5. Generate two more ST on the first node
     //    Note: keep track of exact those CIDs as they should disappear after reorganization
@@ -151,7 +151,7 @@ describe('Blockchain reorganization', function main() {
         user.privateKeyString,
         user.username,
         stPackets[0],
-        firstInstance,
+        dashDriveFirst,
       );
       packetsCids.push(packetCid);
       packetsAddedAfterDisconnect.push(packetCid);
@@ -161,13 +161,13 @@ describe('Blockchain reorganization', function main() {
     // Check tses are not in mempool
     for (let i = 0; i < tsesAfterDisconnect.length - 1; i++) {
       const tsid = tsesAfterDisconnect[i];
-      const { result: tsData } = await firstInstance.dashCore.getApi().getTransition(tsid);
+      const { result: tsData } = await dashDriveFirst.dashCore.getApi().getTransition(tsid);
       expect(tsData.from_mempool).to.not.exist();
     }
 
     // 6. Check proper block count on the first node
     {
-      const { result: blockCount } = await firstInstance.dashCore.getApi().getBlockCount();
+      const { result: blockCount } = await dashDriveFirst.dashCore.getApi().getBlockCount();
 
       const expectedBlockCount = BLOCKS_PROPAGATION_ACTIVATION +
                                  BLOCKS_ST_ACTIVATION +
@@ -185,14 +185,14 @@ describe('Blockchain reorganization', function main() {
         user.privateKeyString,
         user.username,
         stPackets[0],
-        secondInstance,
+        dashDriveSecond,
       );
       packetsCids.push(packetCid);
     }
 
     // 8. Check proper block count on the second node
     {
-      const { result: blockCount } = await secondInstance.dashCore.getApi().getBlockCount();
+      const { result: blockCount } = await dashDriveSecond.dashCore.getApi().getBlockCount();
 
       const expectedBlockCount = BLOCKS_PROPAGATION_ACTIVATION +
                                  BLOCKS_ST_ACTIVATION +
@@ -202,19 +202,19 @@ describe('Blockchain reorganization', function main() {
     }
 
     // Remove CIDs on node #1 added before disconnect
-    const rmPormises = packetsBeforeDisconnect.map(cid => firstInstance.ipfs.getApi().pin.rm(cid));
+    const rmPormises = packetsBeforeDisconnect.map(cid => dashDriveFirst.ipfs.getApi().pin.rm(cid));
     await Promise.all(rmPormises);
 
     await wait(30000);
 
     // 9. Reconnect nodes
-    await firstInstance.dashCore.connect(secondInstance.dashCore);
+    await dashDriveFirst.dashCore.connect(dashDriveSecond.dashCore);
 
     // 10. Await equal block count on both nodes
     //     Notes: should be equal to largest chain
     await blockCountEvenAndEqual(
-      firstInstance.dashCore,
-      secondInstance.dashCore,
+      dashDriveFirst.dashCore,
+      dashDriveSecond.dashCore,
       BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
       (10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST),
     );
@@ -222,7 +222,7 @@ describe('Blockchain reorganization', function main() {
     // Check tses are back to mempool
     for (let i = 0; i < tsesAfterDisconnect.length - 1; i++) {
       const tsid = tsesAfterDisconnect[i];
-      const { result: tsData } = await firstInstance.dashCore.getApi().getTransition(tsid);
+      const { result: tsData } = await dashDriveFirst.dashCore.getApi().getTransition(tsid);
       expect(tsData.from_mempool).to.exist()
         .and.be.equal(true);
     }
@@ -232,7 +232,7 @@ describe('Blockchain reorganization', function main() {
 
     // 12. Check packet CIDs added after disconnect does not appear in Dash Drive
     {
-      const lsResult = await secondInstance.ipfs.getApi().pin.ls();
+      const lsResult = await dashDriveSecond.ipfs.getApi().pin.ls();
       const lsHashes = lsResult.map(item => item.hash);
 
       packetsAddedAfterDisconnect.forEach((cid) => {
@@ -241,7 +241,7 @@ describe('Blockchain reorganization', function main() {
     }
 
     {
-      const lsResult = await firstInstance.ipfs.getApi().pin.ls();
+      const lsResult = await dashDriveFirst.ipfs.getApi().pin.ls();
       const lsHashes = lsResult.map(item => item.hash);
 
       packetsAddedAfterDisconnect.forEach((cid) => {
@@ -256,14 +256,14 @@ describe('Blockchain reorganization', function main() {
     }
 
     // 13. Generate more blocks so TSes reappear on the blockchain
-    await firstInstance.dashCore.getApi().generate(10);
+    await dashDriveFirst.dashCore.getApi().generate(10);
 
     // 14. Await Dash Drive to sync
     await wait(20000);
 
     // 15. Check CIDs reappear in Dash Drive
     {
-      const lsResult = await secondInstance.ipfs.getApi().pin.ls();
+      const lsResult = await dashDriveSecond.ipfs.getApi().pin.ls();
       const lsHashes = lsResult.map(item => item.hash);
 
       packetsCids.forEach((cid) => {
@@ -272,7 +272,7 @@ describe('Blockchain reorganization', function main() {
     }
 
     {
-      const lsResult = await firstInstance.ipfs.getApi().pin.ls();
+      const lsResult = await dashDriveFirst.ipfs.getApi().pin.ls();
       const lsHashes = lsResult.map(item => item.hash);
 
       packetsAddedAfterDisconnect.forEach((cid) => {
@@ -283,8 +283,8 @@ describe('Blockchain reorganization', function main() {
 
   after('cleanup lone services', async () => {
     const instances = [
-      firstInstance,
-      secondInstance,
+      dashDriveFirst,
+      dashDriveSecond,
     ];
 
     await Promise.all(instances.filter(i => i)
