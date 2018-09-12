@@ -1,6 +1,8 @@
-const createDashDriveInstance = require('../../../lib/test/services/dashDrive/createDashDriveInstance');
-const createMongoDbInstance = require('../../../lib/test/services/mongoDb/createMongoDbInstance');
-const wait = require('../../../lib/test/util/wait');
+const {
+  createDashDrive,
+  createMongoDb,
+} = require('js-evo-services-ctl');
+const wait = require('../../../lib/util/wait');
 const { PassThrough } = require('stream');
 
 async function containerLogs(container) {
@@ -28,15 +30,17 @@ describe('DashDrive throws DashCoreIsNotRunningError', function main() {
   let dashDriveInstance;
   let mongoDbInstance;
   beforeEach(async () => {
-    mongoDbInstance = await createMongoDbInstance();
+    mongoDbInstance = await createMongoDb();
     await mongoDbInstance.start();
   });
 
-  it('should throw DashCoreIsNotRunningError if DashCore is not running', async () => {
+  // TODO Skip since DD-315 and DD-327 are not implemented
+  it.skip('should throw DashCoreIsNotRunningError if DashCore is not running', async () => {
     const envs = [
       `STORAGE_MONGODB_URL=mongodb://${mongoDbInstance.getIp()}:27017`,
     ];
-    dashDriveInstance = await createDashDriveInstance(envs);
+    const opts = { container: { envs } };
+    dashDriveInstance = await createDashDrive(opts);
     dashDriveInstance.initialize = () => {};
 
     await dashDriveInstance.start();
@@ -46,10 +50,12 @@ describe('DashDrive throws DashCoreIsNotRunningError', function main() {
   });
 
   after('Clean instances', async () => {
-    const promises = Promise.all([
-      mongoDbInstance.remove(),
-      dashDriveInstance.remove(),
-    ]);
-    await promises;
+    const instances = [
+      mongoDbInstance,
+      dashDriveInstance,
+    ];
+
+    await Promise.all(instances.filter(i => i)
+      .map(i => i.remove()));
   });
 });

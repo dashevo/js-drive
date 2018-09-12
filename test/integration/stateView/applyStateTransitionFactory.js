@@ -1,8 +1,12 @@
 const createDapObjectMongoDbRepositoryFactory = require('../../../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
 const DapObjectMongoDbRepository = require('../../../lib/stateView/dapObject/DapObjectMongoDbRepository');
 const DapContractMongoDbRepository = require('../../../lib/stateView/dapContract/DapContractMongoDbRepository');
-const startMongoDbInstance = require('../../../lib/test/services/mocha/startMongoDbInstance');
-const startIPFSInstance = require('../../../lib/test/services/mocha/startIPFSInstance');
+const {
+  mocha: {
+    startMongoDb,
+    startIPFS,
+  },
+} = require('js-evo-services-ctl');
 const hashSTPacket = require('../../../lib/test/consensus/hashSTPacket');
 const updateDapContractFactory = require('../../../lib/stateView/dapContract/updateDapContractFactory');
 const updateDapObjectFactory = require('../../../lib/stateView/dapObject/updateDapObjectFactory');
@@ -13,24 +17,26 @@ const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
 
+const generateDapObjectId = require('../../../lib/stateView/dapObject/generateDapObjectId');
+
 describe('applyStateTransitionFactory', () => {
   let mongoClient;
   let mongoDb;
   let ipfsClient;
 
-  startMongoDbInstance().then(async (mongoDbInstance) => {
+  startMongoDb().then(async (mongoDbInstance) => {
     ({ mongoClient } = mongoDbInstance);
     mongoDb = await mongoDbInstance.getMongoClient();
   });
-  startIPFSInstance().then(async (ipfsInstance) => {
+  startIPFS().then(async (ipfsInstance) => {
     ipfsClient = await ipfsInstance.getApi();
   });
 
   it('should compute DapContract state view', async () => {
     const block = getBlockFixtures()[0];
     const packet = getTransitionPacketFixtures()[0];
-    const header = getTransitionHeaderFixtures()[0].toJSON();
-    header.hashSTPacket = await hashSTPacket(packet);
+    const header = getTransitionHeaderFixtures()[0];
+    header.extraPayload.hashSTPacket = await hashSTPacket(packet);
 
     await ipfsClient.dag.put(packet, {
       format: 'dag-cbor',
@@ -55,8 +61,8 @@ describe('applyStateTransitionFactory', () => {
   it('should compute DapObject state view', async () => {
     const block = getBlockFixtures()[1];
     const packet = getTransitionPacketFixtures()[1];
-    const header = getTransitionHeaderFixtures()[1].toJSON();
-    header.hashSTPacket = await hashSTPacket(packet);
+    const header = getTransitionHeaderFixtures()[1];
+    header.extraPayload.hashSTPacket = await hashSTPacket(packet);
 
     await ipfsClient.dag.put(packet, {
       format: 'dag-cbor',
@@ -76,5 +82,19 @@ describe('applyStateTransitionFactory', () => {
       updateDapObject,
     );
     await applyStateTransition(header, block);
+
+    const dapId = packet.dapid;
+    const dapObjectRepository = createDapObjectMongoDbRepository(dapId);
+    const objectType = packet.dapobjects[0].objtype;
+    const objects = await dapObjectRepository.fetch(objectType);
+
+    expect(objects.length).to.be.equal(1);
+
+    const dapObject = objects[0];
+    const blockchainUserId = header.extraPayload.regTxId;
+    const slotNumber = packet.dapobjects[0].idx;
+    const dapObjectId = generateDapObjectId(blockchainUserId, slotNumber);
+
+    expect(dapObject.getId()).to.be.equal(dapObjectId);
   });
 });
