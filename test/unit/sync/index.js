@@ -5,6 +5,7 @@ describe('Sync', () => {
   require('./isSynced');
   require('./getCheckSyncHttpMiddleware');
   require('./getDriveStatusFactory');
+  require('./getSyncStatusFactory');
   require('./state');
   require('./SyncStatus');
 });
