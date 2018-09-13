@@ -4,6 +4,7 @@ describe('Sync', () => {
   require('./isDashCoreRunningFactory');
   require('./isSynced');
   require('./getCheckSyncHttpMiddleware');
+  require('./getDriveStatusFactory');
   require('./state');
   require('./SyncStatus');
 });
