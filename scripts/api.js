@@ -24,6 +24,11 @@ const createDapObjectMongoDbRepositoryFactory = require('../lib/stateView/dapObj
 const fetchDapObjectsFactory = require('../lib/stateView/dapObject/fetchDapObjectsFactory');
 const fetchDapObjectsMethodFactory = require('../lib/api/methods/fetchDapObjectsMethodFactory');
 
+const getLastBlockFactory = require('../lib/blockchain/getLastBlockFactory');
+const getDriveStatusFactory = require('../lib/sync/getDriveStatusFactory');
+const getSyncStatusFactory = require('../lib/sync/getSyncStatusFactory');
+const getSyncStatusMethodFactory = require('../lib/api/methods/getSyncStatusMethodFactory');
+
 const isDashCoreRunningFactory = require('../lib/sync/isDashCoreRunningFactory');
 const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError');
 
@@ -76,6 +81,11 @@ const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError
   const fetchDapObjects = fetchDapObjectsFactory(createDapObjectMongoDbRepository);
   const fetchDapObjectsMethod = fetchDapObjectsMethodFactory(fetchDapObjects);
 
+  const getLastBlock = getLastBlockFactory(rpcClient);
+  const getDriveStatus = getDriveStatusFactory(rpcClient);
+  const getSyncStatus = getSyncStatusFactory(syncStateRepository, getDriveStatus, getLastBlock);
+  const getSyncStatusMethod = getSyncStatusMethodFactory(getSyncStatus);
+
 
   /**
    * Remove 'Method' Postfix
@@ -95,6 +105,7 @@ const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError
   const rpcMethods = {
     [rmPostfix(addSTPacketMethod)]: wrapToErrorHandler(addSTPacketMethod),
     [rmPostfix(fetchDapObjectsMethod)]: wrapToErrorHandler(fetchDapObjectsMethod),
+    [rmPostfix(getSyncStatusMethod)]: wrapToErrorHandler(getSyncStatusMethod),
   };
 
   const rpc = jayson.server(rpcMethods);
