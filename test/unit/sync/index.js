@@ -5,4 +5,5 @@ describe('Sync', () => {
   require('./isSynced');
   require('./getCheckSyncHttpMiddleware');
   require('./state');
+  require('./SyncStatus');
 });
