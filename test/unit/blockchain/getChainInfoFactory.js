@@ -2,7 +2,7 @@ const RpcClientMock = require('../../../lib/test/mock/RpcClientMock');
 const getChainInfoFactory = require('../../../lib/blockchain/getChainInfoFactory');
 const ChainInfo = require('../../../lib/blockchain/ChainInfo');
 
-describe('getLastBlockFactory', () => {
+describe('getChainInfoFactory', () => {
   let rpcClient;
   let getChainInfo;
 
