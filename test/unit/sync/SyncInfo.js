@@ -21,8 +21,8 @@ describe('SyncInfo', () => {
       lastSyncedBlockHeight: lastSyncedBlock.height,
       lastSyncedBlockHash: lastSyncedBlock.hash,
       lastSyncAt,
-      currentBlockHeight: lastChainBlock.height,
-      currentBlockHash: lastChainBlock.hash,
+      lastChainBlockHeight: lastChainBlock.height,
+      lastChainBlockHash: lastChainBlock.hash,
       status,
     });
   });

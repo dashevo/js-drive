@@ -95,7 +95,7 @@ describe('getSyncInfoFactory', () => {
     });
   });
 
-  describe('currentBlockHeight', () => {
+  describe('lastChainBlockHeight', () => {
     it('should be the same block hash as the one returned by getChainInfo', async () => {
       const syncStateLastSyncAt = new Date();
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
@@ -108,11 +108,11 @@ describe('getSyncInfoFactory', () => {
         isBlockchainSynced,
       ));
       const syncInfo = await getSyncInfo();
-      expect(syncInfo.getCurrentBlockHeight()).to.be.deep.equal(chainLastBlock.height);
+      expect(syncInfo.getLastChainBlockHeight()).to.be.deep.equal(chainLastBlock.height);
     });
   });
 
-  describe('currentBlockHash', () => {
+  describe('lastChainBlockHash', () => {
     it('should be the same block height as the one returned by getChainInfo', async () => {
       const syncStateLastSyncAt = new Date();
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
@@ -125,7 +125,7 @@ describe('getSyncInfoFactory', () => {
         isBlockchainSynced,
       ));
       const syncInfo = await getSyncInfo();
-      expect(syncInfo.getCurrentBlockHash()).to.be.deep.equal(chainLastBlock.hash);
+      expect(syncInfo.getLastChainBlockHash()).to.be.deep.equal(chainLastBlock.hash);
     });
   });
 });
