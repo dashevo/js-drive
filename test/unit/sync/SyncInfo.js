@@ -1,7 +1,7 @@
-const SyncStatus = require('../../../lib/sync/SyncStatus');
+const SyncInfo = require('../../../lib/sync/SyncInfo');
 const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 
-describe('SyncStatus', () => {
+describe('SyncInfo', () => {
   const blocks = getBlockFixtures();
 
   it('should serialize SyncSatus', () => {
@@ -9,7 +9,7 @@ describe('SyncStatus', () => {
     const lastChainBlock = blocks[3];
     const lastSyncAt = new Date();
     const status = 'sync';
-    const syncStatus = new SyncStatus(
+    const syncInfo = new SyncInfo(
       lastSyncedBlock.height,
       lastSyncedBlock.hash,
       lastSyncAt,
@@ -17,7 +17,7 @@ describe('SyncStatus', () => {
       lastChainBlock.hash,
       status,
     );
-    expect(syncStatus.toJSON()).to.be.deep.equal({
+    expect(syncInfo.toJSON()).to.be.deep.equal({
       lastSyncedBlockHeight: lastSyncedBlock.height,
       lastSyncedBlockHash: lastSyncedBlock.hash,
       lastSyncAt,

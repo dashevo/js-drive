@@ -7,5 +7,5 @@ describe('Sync', () => {
   require('./getDriveStatusFactory');
   require('./getSyncInfoFactory');
   require('./state');
-  require('./SyncStatus');
+  require('./SyncInfo');
 });

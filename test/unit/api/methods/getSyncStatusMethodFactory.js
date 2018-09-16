@@ -1,5 +1,5 @@
 const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
-const SyncStatus = require('../../../../lib/sync/SyncStatus');
+const SyncInfo = require('../../../../lib/sync/SyncInfo');
 const getSyncStatusMethodFactory = require('../../../../lib/api/methods/getSyncStatusMethodFactory');
 
 describe('getSyncStatusMethodFactory', () => {
@@ -22,7 +22,7 @@ describe('getSyncStatusMethodFactory', () => {
     const lastChainBlock = blocks[3];
     const lastSyncAt = new Date();
     const status = 'sync';
-    const syncStatus = new SyncStatus(
+    const syncStatus = new SyncInfo(
       lastSyncedBlock.height,
       lastSyncedBlock.hash,
       lastSyncAt,

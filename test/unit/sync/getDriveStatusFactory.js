@@ -1,6 +1,6 @@
 const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 const SyncState = require('../../../lib/sync/state/SyncState');
-const SyncStatus = require('../../../lib/sync/SyncStatus');
+const SyncInfo = require('../../../lib/sync/SyncInfo');
 const getDriveStatusFactory = require('../../../lib/sync/getDriveStatusFactory');
 
 describe('getDriveStatusFactory', () => {
@@ -24,7 +24,7 @@ describe('getDriveStatusFactory', () => {
     const syncState = new SyncState([], null);
 
     const driveSynced = await isDriveSynced(syncState);
-    expect(driveSynced).to.be.equal(SyncStatus.STATUSES.INITIAL_SYNC);
+    expect(driveSynced).to.be.equal(SyncInfo.STATUSES.INITIAL_SYNC);
   });
 
   it('should not be synced if blockchain blocks is > 0 and MN IsBlockchainSynced is false', async () => {
@@ -33,7 +33,7 @@ describe('getDriveStatusFactory', () => {
     const syncState = new SyncState([], new Date());
 
     const driveSynced = await isDriveSynced(syncState);
-    expect(driveSynced).to.be.equal(SyncStatus.STATUSES.SYNCING);
+    expect(driveSynced).to.be.equal(SyncInfo.STATUSES.SYNCING);
   });
 
   it('should not be synced if SyncState last block hash is different with blockchain last block hash', async () => {
@@ -45,7 +45,7 @@ describe('getDriveStatusFactory', () => {
     const syncState = new SyncState([driveLastSyncedBlock], new Date());
 
     const driveSynced = await isDriveSynced(syncState);
-    expect(driveSynced).to.be.equal(SyncStatus.STATUSES.SYNCING);
+    expect(driveSynced).to.be.equal(SyncInfo.STATUSES.SYNCING);
     expect(rpcClient.getBlockHash).to.be.calledOnce();
   });
 
@@ -58,7 +58,7 @@ describe('getDriveStatusFactory', () => {
     const syncState = new SyncState([driveLastSyncedBlock], new Date());
 
     const driveSynced = await isDriveSynced(syncState);
-    expect(driveSynced).to.be.equal(SyncStatus.STATUSES.SYNCED);
+    expect(driveSynced).to.be.equal(SyncInfo.STATUSES.SYNCED);
     expect(rpcClient.getBlockHash).to.be.calledOnce();
   });
 });

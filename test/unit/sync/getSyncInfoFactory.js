@@ -1,6 +1,6 @@
 const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 const SyncState = require('../../../lib/sync/state/SyncState');
-const SyncStatus = require('../../../lib/sync/SyncStatus');
+const SyncInfo = require('../../../lib/sync/SyncInfo');
 const getSyncInfoFactory = require('../../../lib/sync/getSyncInfoFactory');
 
 describe('getSyncInfoFactory', () => {
@@ -46,27 +46,27 @@ describe('getSyncInfoFactory', () => {
       const syncStateLastSyncAt = null;
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
-      getDriveStatus.returns(SyncStatus.STATUSES.INITIAL_SYNC);
+      getDriveStatus.returns(SyncInfo.STATUSES.INITIAL_SYNC);
       const syncInfo = await getSyncInfo();
-      expect(syncInfo.getStatus()).to.be.deep.equal(SyncStatus.STATUSES.INITIAL_SYNC);
+      expect(syncInfo.getStatus()).to.be.deep.equal(SyncInfo.STATUSES.INITIAL_SYNC);
     });
 
     it('should be sync if SyncState has lastSyncAt and DashDrive is not synced', async () => {
       const syncStateLastSyncAt = new Date();
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
-      getDriveStatus.returns(SyncStatus.STATUSES.SYNCING);
+      getDriveStatus.returns(SyncInfo.STATUSES.SYNCING);
       const syncInfo = await getSyncInfo();
-      expect(syncInfo.getStatus()).to.be.deep.equal(SyncStatus.STATUSES.SYNCING);
+      expect(syncInfo.getStatus()).to.be.deep.equal(SyncInfo.STATUSES.SYNCING);
     });
 
     it('should be synced if SyncState has lastSyncAt and DashDrive is synced', async () => {
       const syncStateLastSyncAt = new Date();
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
-      getDriveStatus.returns(SyncStatus.STATUSES.SYNCED);
+      getDriveStatus.returns(SyncInfo.STATUSES.SYNCED);
       const syncInfo = await getSyncInfo();
-      expect(syncInfo.getStatus()).to.be.deep.equal(SyncStatus.STATUSES.SYNCED);
+      expect(syncInfo.getStatus()).to.be.deep.equal(SyncInfo.STATUSES.SYNCED);
     });
   });
 
