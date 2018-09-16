@@ -6,7 +6,7 @@ const getSyncInfoFactory = require('../../../lib/sync/getSyncInfoFactory');
 describe('getSyncInfoFactory', () => {
   let blocks;
   let syncStateRepository;
-  let getDriveStatus;
+  let getSyncStatus;
   let getLastBlock;
   let lastChainBlock;
   let getSyncInfo;
@@ -17,10 +17,10 @@ describe('getSyncInfoFactory', () => {
     syncStateRepository = {
       fetch: this.sinon.stub(),
     };
-    getDriveStatus = this.sinon.stub();
+    getSyncStatus = this.sinon.stub();
     getLastBlock = this.sinon.stub();
     getLastBlock.returns(lastChainBlock);
-    getSyncInfo = getSyncInfoFactory(syncStateRepository, getDriveStatus, getLastBlock);
+    getSyncInfo = getSyncInfoFactory(syncStateRepository, getSyncStatus, getLastBlock);
   });
 
   describe('lastSyncAt', () => {
@@ -42,29 +42,29 @@ describe('getSyncInfoFactory', () => {
   });
 
   describe('status', () => {
-    it('should be initialSync if SyncState lastSyncAt is null and DashDrive is not synced', async () => {
+    it('should be initialSync if getSyncStatus returns INITIAL_SYNC', async () => {
       const syncStateLastSyncAt = null;
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
-      getDriveStatus.returns(SyncInfo.STATUSES.INITIAL_SYNC);
+      getSyncStatus.returns(SyncInfo.STATUSES.INITIAL_SYNC);
       const syncInfo = await getSyncInfo();
       expect(syncInfo.getStatus()).to.be.deep.equal(SyncInfo.STATUSES.INITIAL_SYNC);
     });
 
-    it('should be sync if SyncState has lastSyncAt and DashDrive is not synced', async () => {
+    it('should be syncing if getSyncStatus returns SYNCING', async () => {
       const syncStateLastSyncAt = new Date();
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
-      getDriveStatus.returns(SyncInfo.STATUSES.SYNCING);
+      getSyncStatus.returns(SyncInfo.STATUSES.SYNCING);
       const syncInfo = await getSyncInfo();
       expect(syncInfo.getStatus()).to.be.deep.equal(SyncInfo.STATUSES.SYNCING);
     });
 
-    it('should be synced if SyncState has lastSyncAt and DashDrive is synced', async () => {
+    it('should be synced if getSyncStatus returns SYNCED', async () => {
       const syncStateLastSyncAt = new Date();
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
-      getDriveStatus.returns(SyncInfo.STATUSES.SYNCED);
+      getSyncStatus.returns(SyncInfo.STATUSES.SYNCED);
       const syncInfo = await getSyncInfo();
       expect(syncInfo.getStatus()).to.be.deep.equal(SyncInfo.STATUSES.SYNCED);
     });
