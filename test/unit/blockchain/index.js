@@ -2,5 +2,5 @@
 describe('Blockchain', () => {
   require('./iterator');
   require('./reader');
-  require('./getLastBlockFactory');
+  require('./getChainInfoFactory');
 });

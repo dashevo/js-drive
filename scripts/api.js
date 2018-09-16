@@ -24,7 +24,7 @@ const createDapObjectMongoDbRepositoryFactory = require('../lib/stateView/dapObj
 const fetchDapObjectsFactory = require('../lib/stateView/dapObject/fetchDapObjectsFactory');
 const fetchDapObjectsMethodFactory = require('../lib/api/methods/fetchDapObjectsMethodFactory');
 
-const getLastBlockFactory = require('../lib/blockchain/getLastBlockFactory');
+const getChainInfoFactory = require('../lib/blockchain/getChainInfoFactory');
 const getDriveStatusFactory = require('../lib/sync/getDriveStatusFactory');
 const getSyncInfoFactory = require('../lib/sync/getSyncInfoFactory');
 const getSyncInfoMethodFactory = require('../lib/api/methods/getSyncInfoMethodFactory');
@@ -81,9 +81,9 @@ const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError
   const fetchDapObjects = fetchDapObjectsFactory(createDapObjectMongoDbRepository);
   const fetchDapObjectsMethod = fetchDapObjectsMethodFactory(fetchDapObjects);
 
-  const getLastBlock = getLastBlockFactory(rpcClient);
+  const getChainInfo = getChainInfoFactory(rpcClient);
   const getDriveStatus = getDriveStatusFactory(rpcClient);
-  const getSyncInfo = getSyncInfoFactory(syncStateRepository, getDriveStatus, getLastBlock);
+  const getSyncInfo = getSyncInfoFactory(syncStateRepository, getDriveStatus, getChainInfo);
   const getSyncInfoMethod = getSyncInfoMethodFactory(getSyncInfo);
 
 
