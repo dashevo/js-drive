@@ -26,7 +26,7 @@ const fetchDapObjectsMethodFactory = require('../lib/api/methods/fetchDapObjects
 
 const getLastBlockFactory = require('../lib/blockchain/getLastBlockFactory');
 const getDriveStatusFactory = require('../lib/sync/getDriveStatusFactory');
-const getSyncStatusFactory = require('../lib/sync/getSyncStatusFactory');
+const getSyncInfoFactory = require('../lib/sync/getSyncInfoFactory');
 const getSyncStatusMethodFactory = require('../lib/api/methods/getSyncStatusMethodFactory');
 
 const isDashCoreRunningFactory = require('../lib/sync/isDashCoreRunningFactory');
@@ -83,8 +83,8 @@ const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError
 
   const getLastBlock = getLastBlockFactory(rpcClient);
   const getDriveStatus = getDriveStatusFactory(rpcClient);
-  const getSyncStatus = getSyncStatusFactory(syncStateRepository, getDriveStatus, getLastBlock);
-  const getSyncStatusMethod = getSyncStatusMethodFactory(getSyncStatus);
+  const getSyncInfo = getSyncInfoFactory(syncStateRepository, getDriveStatus, getLastBlock);
+  const getSyncStatusMethod = getSyncStatusMethodFactory(getSyncInfo);
 
 
   /**

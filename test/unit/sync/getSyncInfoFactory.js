@@ -1,15 +1,15 @@
 const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 const SyncState = require('../../../lib/sync/state/SyncState');
 const SyncStatus = require('../../../lib/sync/SyncStatus');
-const getSyncStatusFactory = require('../../../lib/sync/getSyncStatusFactory');
+const getSyncInfoFactory = require('../../../lib/sync/getSyncInfoFactory');
 
-describe('getSyncStatusFactory', () => {
+describe('getSyncInfoFactory', () => {
   let blocks;
   let syncStateRepository;
   let getDriveStatus;
   let getLastBlock;
   let lastChainBlock;
-  let getSyncStatus;
+  let getSyncInfo;
 
   beforeEach(function beforeEach() {
     blocks = getBlockFixtures();
@@ -20,7 +20,7 @@ describe('getSyncStatusFactory', () => {
     getDriveStatus = this.sinon.stub();
     getLastBlock = this.sinon.stub();
     getLastBlock.returns(lastChainBlock);
-    getSyncStatus = getSyncStatusFactory(syncStateRepository, getDriveStatus, getLastBlock);
+    getSyncInfo = getSyncInfoFactory(syncStateRepository, getDriveStatus, getLastBlock);
   });
 
   describe('lastSyncAt', () => {
@@ -28,16 +28,16 @@ describe('getSyncStatusFactory', () => {
       const syncStateLastSyncAt = null;
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
-      const syncStatus = await getSyncStatus();
-      expect(syncStatus.getLastSyncAt()).to.be.deep.equal(syncStateLastSyncAt);
+      const syncInfo = await getSyncInfo();
+      expect(syncInfo.getLastSyncAt()).to.be.deep.equal(syncStateLastSyncAt);
     });
 
     it('should be equal to SyncState lastSyncAt', async () => {
       const syncStateLastSyncAt = new Date();
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
-      const syncStatus = await getSyncStatus();
-      expect(syncStatus.getLastSyncAt()).to.be.deep.equal(syncStateLastSyncAt);
+      const syncInfo = await getSyncInfo();
+      expect(syncInfo.getLastSyncAt()).to.be.deep.equal(syncStateLastSyncAt);
     });
   });
 
@@ -47,8 +47,8 @@ describe('getSyncStatusFactory', () => {
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
       getDriveStatus.returns(SyncStatus.STATUSES.INITIAL_SYNC);
-      const syncStatus = await getSyncStatus();
-      expect(syncStatus.getStatus()).to.be.deep.equal(SyncStatus.STATUSES.INITIAL_SYNC);
+      const syncInfo = await getSyncInfo();
+      expect(syncInfo.getStatus()).to.be.deep.equal(SyncStatus.STATUSES.INITIAL_SYNC);
     });
 
     it('should be sync if SyncState has lastSyncAt and DashDrive is not synced', async () => {
@@ -56,8 +56,8 @@ describe('getSyncStatusFactory', () => {
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
       getDriveStatus.returns(SyncStatus.STATUSES.SYNCING);
-      const syncStatus = await getSyncStatus();
-      expect(syncStatus.getStatus()).to.be.deep.equal(SyncStatus.STATUSES.SYNCING);
+      const syncInfo = await getSyncInfo();
+      expect(syncInfo.getStatus()).to.be.deep.equal(SyncStatus.STATUSES.SYNCING);
     });
 
     it('should be synced if SyncState has lastSyncAt and DashDrive is synced', async () => {
@@ -65,8 +65,8 @@ describe('getSyncStatusFactory', () => {
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
       getDriveStatus.returns(SyncStatus.STATUSES.SYNCED);
-      const syncStatus = await getSyncStatus();
-      expect(syncStatus.getStatus()).to.be.deep.equal(SyncStatus.STATUSES.SYNCED);
+      const syncInfo = await getSyncInfo();
+      expect(syncInfo.getStatus()).to.be.deep.equal(SyncStatus.STATUSES.SYNCED);
     });
   });
 
@@ -76,8 +76,8 @@ describe('getSyncStatusFactory', () => {
       const lastSyncedBlock = blocks[blocks.length - 1];
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
-      const syncStatus = await getSyncStatus();
-      expect(syncStatus.getLastSyncedBlockHeight()).to.be.deep.equal(lastSyncedBlock.height);
+      const syncInfo = await getSyncInfo();
+      expect(syncInfo.getLastSyncedBlockHeight()).to.be.deep.equal(lastSyncedBlock.height);
     });
   });
 
@@ -87,8 +87,8 @@ describe('getSyncStatusFactory', () => {
       const lastSyncedBlock = blocks[blocks.length - 1];
       const syncState = new SyncState(blocks, syncStateLastSyncAt);
       syncStateRepository.fetch.returns(syncState);
-      const syncStatus = await getSyncStatus();
-      expect(syncStatus.getLastSyncedBlockHash()).to.be.deep.equal(lastSyncedBlock.hash);
+      const syncInfo = await getSyncInfo();
+      expect(syncInfo.getLastSyncedBlockHash()).to.be.deep.equal(lastSyncedBlock.hash);
     });
   });
 
@@ -99,8 +99,8 @@ describe('getSyncStatusFactory', () => {
       syncStateRepository.fetch.returns(syncState);
       const currentBlockHeight = blocks[blocks.length - 1];
       getLastBlock.returns(currentBlockHeight);
-      const syncStatus = await getSyncStatus();
-      expect(syncStatus.getCurrentBlockHeight()).to.be.deep.equal(currentBlockHeight.height);
+      const syncInfo = await getSyncInfo();
+      expect(syncInfo.getCurrentBlockHeight()).to.be.deep.equal(currentBlockHeight.height);
     });
   });
 
@@ -111,8 +111,8 @@ describe('getSyncStatusFactory', () => {
       syncStateRepository.fetch.returns(syncState);
       const currentBlockHeight = blocks[blocks.length - 1];
       getLastBlock.returns(currentBlockHeight);
-      const syncStatus = await getSyncStatus();
-      expect(syncStatus.getCurrentBlockHash()).to.be.deep.equal(currentBlockHeight.hash);
+      const syncInfo = await getSyncInfo();
+      expect(syncInfo.getCurrentBlockHash()).to.be.deep.equal(currentBlockHeight.hash);
     });
   });
 });
