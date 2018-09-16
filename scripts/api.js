@@ -27,7 +27,7 @@ const fetchDapObjectsMethodFactory = require('../lib/api/methods/fetchDapObjects
 const getLastBlockFactory = require('../lib/blockchain/getLastBlockFactory');
 const getDriveStatusFactory = require('../lib/sync/getDriveStatusFactory');
 const getSyncInfoFactory = require('../lib/sync/getSyncInfoFactory');
-const getSyncStatusMethodFactory = require('../lib/api/methods/getSyncStatusMethodFactory');
+const getSyncInfoMethodFactory = require('../lib/api/methods/getSyncInfoMethodFactory');
 
 const isDashCoreRunningFactory = require('../lib/sync/isDashCoreRunningFactory');
 const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError');
@@ -84,7 +84,7 @@ const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError
   const getLastBlock = getLastBlockFactory(rpcClient);
   const getDriveStatus = getDriveStatusFactory(rpcClient);
   const getSyncInfo = getSyncInfoFactory(syncStateRepository, getDriveStatus, getLastBlock);
-  const getSyncStatusMethod = getSyncStatusMethodFactory(getSyncInfo);
+  const getSyncInfoMethod = getSyncInfoMethodFactory(getSyncInfo);
 
 
   /**
@@ -105,7 +105,7 @@ const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError
   const rpcMethods = {
     [rmPostfix(addSTPacketMethod)]: wrapToErrorHandler(addSTPacketMethod),
     [rmPostfix(fetchDapObjectsMethod)]: wrapToErrorHandler(fetchDapObjectsMethod),
-    [rmPostfix(getSyncStatusMethod)]: wrapToErrorHandler(getSyncStatusMethod),
+    [rmPostfix(getSyncInfoMethod)]: wrapToErrorHandler(getSyncInfoMethod),
   };
 
   const rpc = jayson.server(rpcMethods);

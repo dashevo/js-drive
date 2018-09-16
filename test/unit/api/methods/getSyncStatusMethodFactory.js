@@ -1,20 +1,20 @@
 const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
 const SyncInfo = require('../../../../lib/sync/SyncInfo');
-const getSyncStatusMethodFactory = require('../../../../lib/api/methods/getSyncStatusMethodFactory');
+const getSyncInfoMethodFactory = require('../../../../lib/api/methods/getSyncInfoMethodFactory');
 
 describe('getSyncStatusMethodFactory', () => {
-  let getSyncStatus;
-  let getSyncStatusMethod;
+  let getSyncInfo;
+  let getSyncInfoMethod;
   const blocks = getBlockFixtures();
 
   beforeEach(function beforeEach() {
-    getSyncStatus = this.sinon.stub();
-    getSyncStatusMethod = getSyncStatusMethodFactory(getSyncStatus);
+    getSyncInfo = this.sinon.stub();
+    getSyncInfoMethod = getSyncInfoMethodFactory(getSyncInfo);
   });
 
   it('should throw an error if getSyncStatus fails', async () => {
-    getSyncStatus.throws(new Error());
-    expect(getSyncStatusMethod()).to.be.rejectedWith(Error);
+    getSyncInfo.throws(new Error());
+    expect(getSyncInfoMethod()).to.be.rejectedWith(Error);
   });
 
   it('should return Sync Status', async () => {
@@ -22,7 +22,7 @@ describe('getSyncStatusMethodFactory', () => {
     const lastChainBlock = blocks[3];
     const lastSyncAt = new Date();
     const status = 'sync';
-    const syncStatus = new SyncInfo(
+    const syncInfo = new SyncInfo(
       lastSyncedBlock.height,
       lastSyncedBlock.hash,
       lastSyncAt,
@@ -30,8 +30,8 @@ describe('getSyncStatusMethodFactory', () => {
       lastChainBlock.hash,
       status,
     );
-    getSyncStatus.returns(syncStatus);
-    const syncStatusData = await getSyncStatusMethod();
+    getSyncInfo.returns(syncInfo);
+    const syncStatusData = await getSyncInfoMethod();
     expect(syncStatusData).to.be.deep.equal({
       lastSyncedBlockHeight: lastSyncedBlock.height,
       lastSyncedBlockHash: lastSyncedBlock.hash,
