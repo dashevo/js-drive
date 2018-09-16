@@ -3,5 +3,5 @@ describe('Methods', () => {
   require('./addSTPacketMethod');
   require('./fetchDapContractMethod');
   require('./fetchDapObjectsMethodFactory');
-  require('./getSyncStatusMethodFactory');
+  require('./getSyncInfoMethodFactory');
 });
