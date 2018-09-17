@@ -24,8 +24,8 @@ const createDapObjectMongoDbRepositoryFactory = require('../lib/stateView/dapObj
 const fetchDapObjectsFactory = require('../lib/stateView/dapObject/fetchDapObjectsFactory');
 const fetchDapObjectsMethodFactory = require('../lib/api/methods/fetchDapObjectsMethodFactory');
 
-const getChainInfoFactory = require('../lib/blockchain/getChainInfoFactory');
-const getSyncInfoFactory = require('../lib/sync/getSyncInfoFactory');
+const getChainInfoFactory = require('../lib/sync/info/chain/getChainInfoFactory');
+const getSyncInfoFactory = require('../lib/sync/info/getSyncInfoFactory');
 const getSyncInfoMethodFactory = require('../lib/api/methods/getSyncInfoMethodFactory');
 
 const isDashCoreRunningFactory = require('../lib/sync/isDashCoreRunningFactory');

@@ -1,8 +1,8 @@
-const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
-const SyncState = require('../../../lib/sync/state/SyncState');
-const SyncInfo = require('../../../lib/sync/SyncInfo');
-const ChainInfo = require('../../../lib/blockchain/ChainInfo');
-const getSyncInfoFactory = require('../../../lib/sync/getSyncInfoFactory');
+const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
+const SyncState = require('../../../../lib/sync/state/SyncState');
+const SyncInfo = require('../../../../lib/sync/info/SyncInfo');
+const ChainInfo = require('../../../../lib/sync/info/chain/ChainInfo');
+const getSyncInfoFactory = require('../../../../lib/sync/info/getSyncInfoFactory');
 
 describe('getSyncInfoFactory', () => {
   let blocks;
