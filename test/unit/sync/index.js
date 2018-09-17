@@ -4,7 +4,6 @@ describe('Sync', () => {
   require('./isDashCoreRunningFactory');
   require('./isSynced');
   require('./getCheckSyncHttpMiddleware');
-  require('./getSyncStatusFactory');
   require('./getSyncInfoFactory');
   require('./state');
   require('./SyncInfo');

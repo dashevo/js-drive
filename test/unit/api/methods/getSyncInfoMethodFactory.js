@@ -21,14 +21,14 @@ describe('getSyncStatusMethodFactory', () => {
     const lastSyncedBlock = blocks[0];
     const lastChainBlock = blocks[3];
     const lastSyncAt = new Date();
-    const status = 'sync';
+    const isBlockchainSynced = true;
     const syncInfo = new SyncInfo(
       lastSyncedBlock.height,
       lastSyncedBlock.hash,
       lastSyncAt,
       lastChainBlock.height,
       lastChainBlock.hash,
-      status,
+      isBlockchainSynced,
     );
     getSyncInfo.returns(syncInfo);
     const syncStatusData = await getSyncInfoMethod();
@@ -38,7 +38,7 @@ describe('getSyncStatusMethodFactory', () => {
       lastSyncAt,
       lastChainBlockHeight: lastChainBlock.height,
       lastChainBlockHash: lastChainBlock.hash,
-      status,
+      status: SyncInfo.STATUSES.SYNCING,
     });
   });
 });
