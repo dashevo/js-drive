@@ -8,20 +8,27 @@ const createSTHeader = require('../../../lib/test/createSTHeader');
 const { startDashDrive } = require('js-evo-services-ctl');
 
 const wait = require('../../../lib/util/wait');
+const cbor = require('cbor');
 
-async function createAndSubmitST(userId, privateKeyString, username, basePacketData, instance) {
+async function createAndSubmitST(
+  userId,
+  privateKeyString,
+  username,
+  basePacketData,
+  instance,
+  previousTransitionHash = undefined,
+) {
   const packet = new StateTransitionPacket(basePacketData);
-  packet.dapcontract.description = `Valid registration for ${username}`;
 
-  const header = await createSTHeader(userId, privateKeyString, packet);
+  const header = await createSTHeader(userId, privateKeyString, packet, previousTransitionHash);
 
   const addSTPacket = addSTPacketFactory(instance.ipfs.getApi());
   const packetCid = await addSTPacket(packet);
 
-  const { result: tsid } = await instance.dashCore.getApi().sendRawTransition(header);
+  const { result: tsId } = await instance.dashCore.getApi().sendRawTransition(header);
   await instance.dashCore.getApi().generate(1);
 
-  return { packetCid, tsid };
+  return { packetCid, tsId };
 }
 
 async function blockCountEvenAndEqual(
@@ -35,11 +42,14 @@ async function blockCountEvenAndEqual(
     const { result: blockCountTwo } = await instanceTwo.getApi().getBlockCount();
 
     if (blockCountOne === blockCountTwo) {
-      if (blockCountOne === desiredBlockCount) {
-        break;
-      } else {
-        throw new Error(`Block count of ${blockCountOne} is not desirable ${desiredBlockCount}`);
+      if (desiredBlockCount !== -1) {
+        if (blockCountOne === desiredBlockCount) {
+          break;
+        } else {
+          throw new Error(`Block count of ${blockCountOne} is not desirable ${desiredBlockCount}`);
+        }
       }
+      break;
     } else if (i === timeout - 1) {
       throw new Error('Timeout waiting for block count to be equal on both nodes');
     }
@@ -48,28 +58,81 @@ async function blockCountEvenAndEqual(
   }
 }
 
+/**
+ * Await Dash Drive instance to finish syncing
+ *
+ * @param {DriveApi} instance
+ * @returns {Promise<void>}
+ */
+async function dashDriveSyncToFinish(instance) {
+  const packet = getStateTransitionPackets()[0];
+  const serializedPacket = cbor.encodeCanonical(packet.toJSON({ skipMeta: true }));
+  const serializedPacketJson = {
+    packet: serializedPacket.toString('hex'),
+  };
+
+  let finished = false;
+  while (!finished) {
+    try {
+      const response = await instance.getApi()
+        .request('addSTPacket', serializedPacketJson);
+      if (response.result) {
+        finished = true;
+      } else {
+        await wait(1000);
+      }
+    } catch (e) {
+      await wait(1000);
+    }
+  }
+}
+
+async function createDAPObjects(instance, dapId, stPacket, ...users) {
+  for (let i = 0; i < users.length; i++) {
+    const user = users[i];
+
+    const userData = Object.assign({}, stPacket, {
+      dapid: dapId,
+      dapobjects: [
+        {
+          objtype: 'user',
+          aboutme: user.aboutMe,
+          pver: 1,
+          idx: 0,
+          rev: 1,
+          act: 1,
+        },
+      ],
+    });
+
+    user.userData = userData;
+
+    ({ tsId: user.prevTransitionId } = await createAndSubmitST(
+      user.userId,
+      user.privateKeyString,
+      user.username,
+      userData,
+      instance,
+      user.prevTransitionId,
+    ));
+  }
+}
+
 describe('Blockchain reorganization', function main() {
   let firstDashDrive;
   let secondDashDrive;
 
-  let packetsCids;
-  let packetsAddedAfterDisconnect;
   let stPackets;
-  let transitionsAfterDisconnect;
 
   let registeredUsers;
 
-  const BLOCKS_PER_ST = 1;
-  const BLOCKS_PER_REGISTRATION = 108;
-  const BLOCKS_PROPAGATION_ACTIVATION = 1;
+  let dapId;
+
   const BLOCKS_ST_ACTIVATION = 1000;
 
   this.timeout(900000);
 
   before('having started Dash Drive node and generated some STs', async () => {
-    packetsCids = [];
-    packetsAddedAfterDisconnect = [];
-    transitionsAfterDisconnect = [];
     registeredUsers = [];
 
     stPackets = getStateTransitionPackets();
@@ -80,203 +143,220 @@ describe('Blockchain reorganization', function main() {
     // 1.1 Activate Special Transactions
     await firstDashDrive.dashCore.getApi().generate(BLOCKS_ST_ACTIVATION);
 
-    // Register a pool of users.
-    // Do that here so major part of blocks are in the beginning
+    // 2. Register a bunch of users on a blockchain
     for (let i = 0; i < 10; i++) {
-      const instance = firstDashDrive;
-      const username = `Alice_${i}`;
-      const { userId, privateKeyString } =
-            await registerUser(username, instance.dashCore.getApi());
-      registeredUsers.push({ username, userId, privateKeyString });
+      const user = {
+        username: `BC_USER_${i}`,
+        aboutMe: `Something about BC_USER_${i}`,
+        prevTransitionId: undefined,
+      };
+
+      ({ userId: user.userId, privateKeyString: user.privateKeyString } =
+        await registerUser(user.username, firstDashDrive.dashCore.getApi()));
+
+      registeredUsers.push(user);
     }
 
-    // Await number of blocks even on both nodes
+    // 2.1 Await number of blocks even on both nodes
     await blockCountEvenAndEqual(
       firstDashDrive.dashCore,
       secondDashDrive.dashCore,
-      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
-      (10 * BLOCKS_PER_REGISTRATION),
     );
 
-    // 2. Populate instance of Dash Drive and Dash Core with data
-    //    First two STs, should be equal on both nodes
-    for (let i = 0; i < 2; i++) {
-      const user = registeredUsers.pop();
-      const { packetCid } = await createAndSubmitST(
-        user.userId,
-        user.privateKeyString,
-        user.username,
-        stPackets[0],
-        firstDashDrive,
-      );
-      packetsCids.push(packetCid);
-    }
+    // 3. Create DAP Contract
+    ({ tsId: dapId } = await createAndSubmitST(
+      registeredUsers[0].userId,
+      registeredUsers[0].privateKeyString,
+      registeredUsers[0].username,
+      stPackets[0],
+      firstDashDrive,
+    ));
 
-    // 3. Await block count to be equal on both nodes
-    //    Should be equal number of generated STs times number of blocks per ST
+    // Assign `dapId` as `prevTransitionId` for the first user
+    registeredUsers[0].prevTransitionId = dapId;
+
+    // 3.1 Await block count to be equal on both nodes
     await blockCountEvenAndEqual(
       firstDashDrive.dashCore,
       secondDashDrive.dashCore,
-      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
-      (10 * BLOCKS_PER_REGISTRATION) + (2 * BLOCKS_PER_ST),
     );
 
-    // Await first Dash Drive sync
-    for (let i = 0; i < 120; i++) {
-      const lsResult = await firstDashDrive.ipfs.getApi().pin.ls();
-      const lsHashes = lsResult.map(item => item.hash);
+    // 4. Register 2 `user` DAP Objects
+    await createDAPObjects(
+      firstDashDrive,
+      dapId,
+      stPackets[1],
+      registeredUsers[0],
+      registeredUsers[1],
+    );
 
-      if (lsHashes.indexOf(packetsCids[0]) !== -1 && lsHashes.indexOf(packetsCids[1]) !== -1) {
-        break;
+    // 4.1 Await block count to be equal on both nodes
+    await blockCountEvenAndEqual(
+      firstDashDrive.dashCore,
+      secondDashDrive.dashCore,
+    );
+
+    // 4.2 Await for initial sync to finish
+    await dashDriveSyncToFinish(firstDashDrive.driveApi);
+    await dashDriveSyncToFinish(secondDashDrive.driveApi);
+
+    // Ensure first Dash Drive have a proper data
+    {
+      const response = await firstDashDrive.driveApi.getApi()
+        .request('fetchDapObjects', { dapId, type: 'user' });
+
+      const objects = response.result;
+
+      expect(objects.length).to.be.equal(2);
+
+      const aboutMes = objects.map(o => o.object.aboutme);
+
+      for (let i = 0; i < 2; i++) {
+        expect(aboutMes).to.include(registeredUsers[i].aboutMe);
       }
+    }
 
-      await wait(1000);
+    // Ensure second Dash Drive have a proper data
+    {
+      const response = await secondDashDrive.driveApi.getApi()
+        .request('fetchDapObjects', { dapId, type: 'user' });
+
+      const objects = response.result;
+
+      expect(objects.length).to.be.equal(2);
+
+      const aboutMes = objects.map(o => o.object.aboutme);
+
+      for (let i = 0; i < 2; i++) {
+        expect(aboutMes).to.include(registeredUsers[i].aboutMe);
+      }
     }
   });
 
   it('Dash Drive should sync data after blockchain reorganization, removing missing STs. Adding them back after they reappear in the blockchain.', async () => {
-    // Store current CIDs to test initial sync later
-    const packetsBeforeDisconnect = packetsCids.slice();
-
     // 4. Disconnecting nodes to start introducing difference in blocks
     firstDashDrive.dashCore.disconnect(secondDashDrive.dashCore);
 
-    // 5. Generate two more ST on the first node
-    //    Note: keep track of exact those CIDs as they should disappear after reorganization
-    //    Note: keep track of tsid as well to check if it's moved in mempool later on
-    for (let i = 0; i < 2; i++) {
-      const user = registeredUsers.pop();
-      const { packetCid, tsid } = await createAndSubmitST(
-        user.userId,
-        user.privateKeyString,
-        user.username,
-        stPackets[0],
-        firstDashDrive,
-      );
-      packetsCids.push(packetCid);
-      packetsAddedAfterDisconnect.push(packetCid);
-      transitionsAfterDisconnect.push(tsid);
-    }
+    // 5. Register 2 more `user` DAP Objects on the first node
+    await createDAPObjects(
+      firstDashDrive,
+      dapId,
+      stPackets[1],
+      registeredUsers[2],
+      registeredUsers[3],
+    );
 
-    // Check tses are not in mempool
-    for (let i = 0; i < transitionsAfterDisconnect.length - 1; i++) {
-      const tsid = transitionsAfterDisconnect[i];
-      const { result: tsData } = await firstDashDrive.dashCore.getApi().getTransition(tsid);
-      expect(tsData.from_mempool).to.not.exist();
-    }
-
-    // 6. Check proper block count on the first node
-    {
-      const { result: blockCount } = await firstDashDrive.dashCore.getApi().getBlockCount();
-
-      const expectedBlockCount = BLOCKS_PROPAGATION_ACTIVATION +
-                                 BLOCKS_ST_ACTIVATION +
-                                 (10 * BLOCKS_PER_REGISTRATION) + (4 * BLOCKS_PER_ST);
-
-      expect(blockCount).to.be.equal(expectedBlockCount);
-    }
-
-    // 7. Generate slightly larger amount of STs on the second node
-    //    to introduce reorganization
-    for (let i = 0; i < 3; i++) {
-      const user = registeredUsers.pop();
-      const { packetCid } = await createAndSubmitST(
-        user.userId,
-        user.privateKeyString,
-        user.username,
-        stPackets[0],
-        secondDashDrive,
-      );
-      packetsCids.push(packetCid);
-    }
-
-    // 8. Check proper block count on the second node
-    {
-      const { result: blockCount } = await secondDashDrive.dashCore.getApi().getBlockCount();
-
-      const expectedBlockCount = BLOCKS_PROPAGATION_ACTIVATION +
-                                 BLOCKS_ST_ACTIVATION +
-                                 (10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST);
-
-      expect(blockCount).to.be.equal(expectedBlockCount);
-    }
-
-    // Remove CIDs on node #1 added before disconnect
-    const rmPormises = packetsBeforeDisconnect.map(cid => firstDashDrive.ipfs.getApi().pin.rm(cid));
-    await Promise.all(rmPormises);
+    // 6. Register 3 more `user` DAP Objects on the second node
+    await createDAPObjects(
+      secondDashDrive,
+      dapId,
+      stPackets[1],
+      registeredUsers[4],
+      registeredUsers[5],
+      registeredUsers[6],
+    );
 
     await wait(30000);
 
-    // 9. Reconnect nodes
+    // 7. Reconnect nodes
     await firstDashDrive.dashCore.connect(secondDashDrive.dashCore);
 
-    // 10. Await equal block count on both nodes
-    //     Notes: should be equal to largest chain
+    // 7.1 Await equal number of blocks on both nodes
     await blockCountEvenAndEqual(
       firstDashDrive.dashCore,
       secondDashDrive.dashCore,
-      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
-      (10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST),
     );
 
-    // Check tses are back to mempool
-    for (let i = 0; i < transitionsAfterDisconnect.length - 1; i++) {
-      const tsid = transitionsAfterDisconnect[i];
-      const { result: tsData } = await firstDashDrive.dashCore.getApi().getTransition(tsid);
-      expect(tsData.from_mempool).to.exist()
-        .and.be.equal(true);
-    }
+    await wait(30000);
 
-    // 11. Await Dash Drive to sync
-    await wait(20000);
-
-    // 12. Check packet CIDs added after disconnect does not appear in Dash Drive
-    {
-      const lsResult = await secondDashDrive.ipfs.getApi().pin.ls();
-      const lsHashes = lsResult.map(item => item.hash);
-
-      packetsAddedAfterDisconnect.forEach((cid) => {
-        expect(lsHashes).to.not.include(cid);
-      });
-    }
+    // 8. Ensure first Dash Drive have only 5 `user` DAP Objects
+    //    0, 1, 4, 5, 6 as a result of reorganization
+    const aboutMesAfterReconnect = [
+      registeredUsers[0].aboutMe,
+      registeredUsers[1].aboutMe,
+      registeredUsers[4].aboutMe,
+      registeredUsers[5].aboutMe,
+      registeredUsers[6].aboutMe,
+    ];
 
     {
-      const lsResult = await firstDashDrive.ipfs.getApi().pin.ls();
-      const lsHashes = lsResult.map(item => item.hash);
+      const response = await firstDashDrive.driveApi.getApi()
+        .request('fetchDapObjects', { dapId, type: 'user' });
 
-      packetsAddedAfterDisconnect.forEach((cid) => {
-        expect(lsHashes).to.not.include(cid);
-      });
+      const objects = response.result;
 
-      // Also check removed packets are not present on node #1
-      // This will indicated no initial sync has happened
-      packetsBeforeDisconnect.forEach((cid) => {
-        expect(lsHashes).to.not.include(cid);
+      expect(objects.length).to.be.equal(5);
+
+      const aboutMes = objects.map(o => o.object.aboutme);
+
+      aboutMesAfterReconnect.forEach((aboutMe) => {
+        expect(aboutMes).to.include(aboutMe);
       });
     }
 
-    // 13. Generate more blocks so TSes reappear on the blockchain
+    {
+      const response = await secondDashDrive.driveApi.getApi()
+        .request('fetchDapObjects', { dapId, type: 'user' });
+
+      const objects = response.result;
+
+      expect(objects.length).to.be.equal(5);
+
+      const aboutMes = objects.map(o => o.object.aboutme);
+
+      aboutMesAfterReconnect.forEach((aboutMe) => {
+        expect(aboutMes).to.include(aboutMe);
+      });
+    }
+
+    // 9. Generate more blocks so TSes reappear on the blockchain
     await firstDashDrive.dashCore.getApi().generate(10);
 
-    // 14. Await Dash Drive to sync
-    await wait(20000);
+    await blockCountEvenAndEqual(
+      firstDashDrive.dashCore,
+      secondDashDrive.dashCore,
+    );
 
-    // 15. Check CIDs reappear in Dash Drive
+    await wait(30000);
+
+    // 10. Check all of the `user` DAP Objects are present after more blocks generated
+    const aboutMesAfterGenerate = [
+      registeredUsers[0].aboutMe,
+      registeredUsers[1].aboutMe,
+      registeredUsers[2].aboutMe,
+      registeredUsers[3].aboutMe,
+      registeredUsers[4].aboutMe,
+      registeredUsers[5].aboutMe,
+      registeredUsers[6].aboutMe,
+    ];
+
     {
-      const lsResult = await secondDashDrive.ipfs.getApi().pin.ls();
-      const lsHashes = lsResult.map(item => item.hash);
+      const response = await firstDashDrive.driveApi.getApi()
+        .request('fetchDapObjects', { dapId, type: 'user' });
 
-      packetsCids.forEach((cid) => {
-        expect(lsHashes).to.include(cid);
+      const objects = response.result;
+
+      expect(objects.length).to.be.equal(7);
+
+      const aboutMes = objects.map(o => o.object.aboutme);
+
+      aboutMesAfterGenerate.forEach((aboutMe) => {
+        expect(aboutMes).to.include(aboutMe);
       });
     }
 
     {
-      const lsResult = await firstDashDrive.ipfs.getApi().pin.ls();
-      const lsHashes = lsResult.map(item => item.hash);
+      const response = await secondDashDrive.driveApi.getApi()
+        .request('fetchDapObjects', { dapId, type: 'user' });
 
-      packetsAddedAfterDisconnect.forEach((cid) => {
-        expect(lsHashes).to.include(cid);
+      const objects = response.result;
+
+      expect(objects.length).to.be.equal(7);
+
+      const aboutMes = objects.map(o => o.object.aboutme);
+
+      aboutMesAfterGenerate.forEach((aboutMe) => {
+        expect(aboutMes).to.include(aboutMe);
       });
     }
   });
