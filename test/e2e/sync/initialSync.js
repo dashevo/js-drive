@@ -165,10 +165,8 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     // 5. Ensure second Dash Drive have a proper data
     {
-      const response = await secondDashDrive.driveApi.getApi()
+      const { result: objects } = await secondDashDrive.driveApi.getApi()
         .request('fetchDapObjects', { dapId, type: 'user' });
-
-      const objects = response.result;
 
       expect(objects.length).to.be.equal(users.length);
 
