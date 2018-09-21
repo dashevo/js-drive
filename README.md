@@ -12,6 +12,7 @@ An [event-sourced](https://martinfowler.com/eaaDev/EventSourcing.html) metadata 
 2. [Install Docker](https://docs.docker.com/install/)
 3. [Install Docker compose](https://docs.docker.com/compose/install/)
 4. Copy `.env.example` to `.env` file
+5. Install npm dependencies: `npm install`
 
 ## Configuration
 
@@ -106,6 +107,20 @@ Fetch method options:
 | name    | type   | description  |
 |---------|--------|--------------|
 | result  | array  | DAP objects  |
+
+#### getSyncInfo
+
+Get Sync information
+
+##### Params
+
+None
+
+##### Response
+
+| name    | type   | description     |
+|---------|--------|-----------------|
+| result  | object | SyncInfo object |
 
 ### Errors
 
