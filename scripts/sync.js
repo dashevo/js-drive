@@ -116,6 +116,7 @@ class SyncApplication {
     return cleanDashDriveFactory(
       this.createUnpinAllIpfsPackets(),
       this.createDropMongoDatabasesWithPrefix(),
+      process.env.MONGODB_DB_PREFIX,
     );
   }
 
