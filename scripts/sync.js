@@ -161,10 +161,7 @@ function readChainFactory(stHeaderReader, syncState, cleanDashDrive) {
         await cleanDashDrive(process.env.MONGODB_DB_PREFIX);
 
         stHeaderReader.resetToBlockHeight(1);
-
-        syncState.setBlocks([]);
-        syncState.setLastSyncAt(null);
-        syncState.setLastInitialSyncAt(null);
+        syncState.clean();
 
         isInSync = false;
 
