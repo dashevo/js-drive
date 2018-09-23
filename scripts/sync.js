@@ -160,9 +160,7 @@ function readChainFactory(stHeaderReader, syncState, cleanDashDrive) {
       if (error.message === 'Block height out of range' && !syncState.isEmpty()) {
         await cleanDashDrive(process.env.MONGODB_DB_PREFIX);
 
-        stHeaderReader.state.clear();
-        stHeaderReader.stHeaderIterator.reset(false);
-        stHeaderReader.stHeaderIterator.blockIterator.setBlockHeight(1);
+        stHeaderReader.resetToBlockHeight(1);
 
         syncState.setBlocks([]);
         syncState.setLastSyncAt(null);
