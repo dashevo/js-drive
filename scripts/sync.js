@@ -1,36 +1,13 @@
 require('dotenv-expand')(require('dotenv-safe').config());
 
 const zmq = require('zeromq');
-const IpfsAPI = require('ipfs-api');
-const RpcClient = require('bitcoind-rpc-dash/promise');
-const { MongoClient } = require('mongodb');
 
-const SyncStateRepository = require('../lib/sync/state/repository/SyncStateRepository');
-const RpcBlockIterator = require('../lib/blockchain/iterator/RpcBlockIterator');
-const StateTransitionHeaderIterator = require('../lib/blockchain/iterator/StateTransitionHeaderIterator');
-const STHeadersReaderState = require('../lib/blockchain/reader/STHeadersReaderState');
-const STHeadersReader = require('../lib/blockchain/reader/STHeadersReader');
-const sanitizeData = require('../lib/mongoDb/sanitizeData');
-const DapContractMongoDbRepository = require('../lib/stateView/dapContract/DapContractMongoDbRepository');
-const DapObjectMongoDbRepository = require('../lib/stateView/dapObject/DapObjectMongoDbRepository');
-const createDapObjectMongoDbRepositoryFactory = require('../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
-const updateDapContractFactory = require('../lib/stateView/dapContract/updateDapContractFactory');
-const updateDapObjectFactory = require('../lib/stateView/dapObject/updateDapObjectFactory');
-const applyStateTransitionFactory = require('../lib/stateView/applyStateTransitionFactory');
-
-const cleanDashDriveFactory = require('../lib/sync/cleanDashDriveFactory');
-const unpinAllIpfsPacketsFactory = require('../lib/storage/ipfs/unpinAllIpfsPacketsFactory');
-const dropMongoDatabasesWithPrefixFactory = require('../lib/mongoDb/dropMongoDatabasesWithPrefixFactory');
-
+const SyncApp = require('../lib/app/SyncApp');
 const attachStorageHandlers = require('../lib/storage/attachStorageHandlers');
 const attachSyncHandlers = require('../lib/sync/state/attachSyncHandlers');
 const attachStateViewHandlers = require('../lib/stateView/attachStateViewHandlers');
-const errorHandler = require('../lib/util/errorHandler');
-
-const isDashCoreRunningFactory = require('../lib/sync/isDashCoreRunningFactory');
-const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError');
-
 const readChainFactory = require('../lib/blockchain/readChainFactory');
+const errorHandler = require('../lib/util/errorHandler');
 
 class SyncAppOptions {
   constructor(options) {
@@ -99,115 +76,6 @@ class SyncAppOptions {
 
   getMongoDbPrefix() {
     return this.mongoDbPrefix;
-  }
-}
-
-class SyncApp {
-  /**
-   * @param {SyncAppOptions} options
-   */
-  constructor(options) {
-    this.options = options;
-    this.rpcClient = new RpcClient({
-      protocol: 'http',
-      host: this.options.getDashCoreJsonRpcHost(),
-      port: this.options.getDashCoreJsonRpcPort(),
-      user: this.options.getDashCoreJsonRpcUser(),
-      pass: this.options.getDashCoreJsonRpcPass(),
-    });
-    this.ipfsAPI = new IpfsAPI(this.options.getStorageIpfsMultiAddr());
-    this.mongoClient = null;
-    this.syncStateRepository = null;
-    this.syncState = null;
-  }
-
-  async init() {
-    const isDashCoreRunning = isDashCoreRunningFactory(this.rpcClient);
-
-    const isRunning = await isDashCoreRunning(
-      this.options.getDashCoreRunningCheckMaxRetries(),
-      this.options.getDashCoreRunningCheckInterval(),
-    );
-    if (!isRunning) {
-      throw new DashCoreIsNotRunningError();
-    }
-
-    this.mongoClient = await MongoClient.connect(
-      this.options.getStorageMongoDbUrl(),
-      { useNewUrlParser: true },
-    );
-
-    const mongoDb = this.mongoClient.db(this.options.getStorageMongoDbDatabase());
-    this.syncStateRepository = new SyncStateRepository(mongoDb);
-    this.syncState = await this.syncStateRepository.fetch();
-  }
-
-  getMongoClient() {
-    return this.mongoClient;
-  }
-
-  getRpcClient() {
-    return this.rpcClient;
-  }
-
-  getSyncStateRepository() {
-    return this.syncStateRepository;
-  }
-
-  getSyncState() {
-    return this.syncState;
-  }
-
-  getIpfsApi() {
-    return this.ipfsAPI;
-  }
-
-  createSTHeadersReader() {
-    const blockIterator = new RpcBlockIterator(
-      this.getRpcClient(),
-      this.options.getSyncEvoStartBlockHeight(),
-    );
-    const stHeaderIterator = new StateTransitionHeaderIterator(
-      blockIterator,
-      this.getRpcClient(),
-    );
-    const stHeadersReaderState = new STHeadersReaderState(
-      this.getSyncState().getBlocks(),
-      this.options.getSyncStateBlocksLimit(),
-    );
-    return new STHeadersReader(stHeaderIterator, stHeadersReaderState);
-  }
-
-  createUnpinAllIpfsPackets() {
-    return unpinAllIpfsPacketsFactory(this.getIpfsApi());
-  }
-
-  createDropMongoDatabasesWithPrefix() {
-    return dropMongoDatabasesWithPrefixFactory(this.getMongoClient());
-  }
-
-  createCleanDashDrive() {
-    return cleanDashDriveFactory(
-      this.createUnpinAllIpfsPackets(),
-      this.createDropMongoDatabasesWithPrefix(),
-      this.options.getMongoDbPrefix(),
-    );
-  }
-
-  createApplyStateTransition() {
-    const mongoDb = this.getMongoClient().db(this.options.getStorageMongoDbDatabase());
-    const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
-    const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
-      this.getMongoClient(),
-      DapObjectMongoDbRepository,
-    );
-    const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
-    const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
-    return applyStateTransitionFactory(
-      this.getIpfsApi(),
-      updateDapContract,
-      updateDapObject,
-    );
   }
 }
 
