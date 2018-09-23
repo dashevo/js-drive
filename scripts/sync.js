@@ -30,6 +30,8 @@ const errorHandler = require('../lib/util/errorHandler');
 const isDashCoreRunningFactory = require('../lib/sync/isDashCoreRunningFactory');
 const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError');
 
+const readChainFactory = require('../lib/blockchain/readChainFactory');
+
 class SyncAppOptions {
   constructor(options) {
     this.dashCoreJsonRpcHost = options.DASHCORE_JSON_RPC_HOST;
@@ -209,47 +211,8 @@ class SyncApp {
   }
 }
 
-function readChainFactory(stHeaderReader, syncState, cleanDashDrive) {
-  let isInSync = false;
-  async function readChain(sinceBlockHash) {
-    try {
-      if (isInSync) {
-        return;
-      }
-      isInSync = true;
-
-      // Start sync from the last synced block + 1
-      stHeaderReader.stHeaderIterator.blockIterator.setBlockHeightFromSyncState(syncState);
-      // Reset height to the current block's height
-      await stHeaderReader.stHeaderIterator.blockIterator.resetFromCurrentBlockHeight(sinceBlockHash);
-
-      stHeaderReader.stHeaderIterator.reset(false);
-
-      await stHeaderReader.read();
-
-      isInSync = false;
-    } catch (error) {
-      if (error.message === 'Block height out of range' && !syncState.isEmpty()) {
-        await cleanDashDrive(process.env.MONGODB_DB_PREFIX);
-
-        stHeaderReader.resetToBlockHeight(1);
-        syncState.clean();
-
-        isInSync = false;
-
-        await readChain();
-
-        return;
-      }
-      isInSync = false;
-      throw error;
-    }
-  }
-  return readChain;
-}
-
 (async function main() {
-  const syncAppOptions = new SyncAppOptions(process.envs);
+  const syncAppOptions = new SyncAppOptions(process.env);
   const syncApplication = new SyncApp(syncAppOptions);
   await syncApplication.init();
 
