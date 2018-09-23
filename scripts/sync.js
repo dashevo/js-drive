@@ -137,9 +137,9 @@ class SyncApplication {
   }
 }
 
-function runSyncFactory(stHeaderReader, syncState, cleanDashDrive) {
+function readChainFactory(stHeaderReader, syncState, cleanDashDrive) {
   let isInSync = false;
-  async function runSync(sinceBlockHash) {
+  async function readChain(sinceBlockHash) {
     try {
       if (isInSync) {
         return;
@@ -170,7 +170,7 @@ function runSyncFactory(stHeaderReader, syncState, cleanDashDrive) {
 
         isInSync = false;
 
-        await runSync();
+        await readChain();
 
         return;
       }
@@ -178,7 +178,7 @@ function runSyncFactory(stHeaderReader, syncState, cleanDashDrive) {
       throw error;
     }
   }
-  return runSync;
+  return readChain;
 }
 
 (async function main() {
@@ -198,8 +198,8 @@ function runSyncFactory(stHeaderReader, syncState, cleanDashDrive) {
   attachSyncHandlers(stHeaderReader, syncState, syncStateRepository);
   attachStateViewHandlers(stHeaderReader, applyStateTransition, dropMongoDatabasesWithPrefix);
 
-  const runSync = runSyncFactory(stHeaderReader, syncState, cleanDashDrive);
-  await runSync();
+  const readChain = readChainFactory(stHeaderReader, syncState, cleanDashDrive);
+  await readChain();
 
   // Sync arriving ST packets
   const zmqSocket = zmq.createSocket('sub');
@@ -207,7 +207,7 @@ function runSyncFactory(stHeaderReader, syncState, cleanDashDrive) {
 
   zmqSocket.on('message', (topic, blockHash) => {
     const sinceBlockHash = blockHash.toString('hex');
-    runSync(sinceBlockHash).catch(errorHandler);
+    readChain(sinceBlockHash).catch(errorHandler);
   });
 
   zmqSocket.subscribe('hashblock');
