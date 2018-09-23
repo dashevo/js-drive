@@ -30,7 +30,7 @@ const errorHandler = require('../lib/util/errorHandler');
 const isDashCoreRunningFactory = require('../lib/sync/isDashCoreRunningFactory');
 const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError');
 
-class SyncApplication {
+class SyncApp {
   constructor() {
     this.rpcClient = new RpcClient({
       protocol: 'http',
@@ -177,7 +177,7 @@ function readChainFactory(stHeaderReader, syncState, cleanDashDrive) {
 }
 
 (async function main() {
-  const syncApplication = new SyncApplication();
+  const syncApplication = new SyncApp();
   await syncApplication.init();
 
   const stHeaderReader = syncApplication.createSTHeadersReader();
