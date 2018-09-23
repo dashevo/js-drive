@@ -30,16 +30,90 @@ const errorHandler = require('../lib/util/errorHandler');
 const isDashCoreRunningFactory = require('../lib/sync/isDashCoreRunningFactory');
 const DashCoreIsNotRunningError = require('../lib/sync/DashCoreIsNotRunningError');
 
+class SyncAppOptions {
+  constructor(options) {
+    this.dashCoreJsonRpcHost = options.DASHCORE_JSON_RPC_HOST;
+    this.dashCoreJsonRpcPort = options.DASHCORE_JSON_RPC_PORT;
+    this.dashCoreJsonRpcUser = options.DASHCORE_JSON_RPC_USER;
+    this.dashCoreJsonRpcPass = options.DASHCORE_JSON_RPC_PASS;
+    this.dashCoreRunningCheckMaxRetries = parseInt(options.DASHCORE_RUNNING_CHECK_MAX_RETRIES, 10);
+    this.dashCoreRunningCheckInterval = parseInt(options.DASHCORE_RUNNING_CHECK_INTERVAL, 10);
+    this.dashCoreZmqPubHashblock = options.DASHCORE_ZMQ_PUB_HASHBLOCK;
+    this.storageIpfsMultiAddr = options.STORAGE_IPFS_MULTIADDR;
+    this.storageMongoDbUrl = options.STORAGE_MONGODB_URL;
+    this.storageMongoDbDatabase = options.STORAGE_MONGODB_DB;
+    this.syncEvoStartBlockHeight = parseInt(options.SYNC_EVO_START_BLOCK_HEIGHT, 10);
+    this.syncStateBlocksLimit = options.SYNC_STATE_BLOCKS_LIMIT;
+    this.mongoDbPrefix = options.MONGODB_DB_PREFIX;
+  }
+
+  getDashCoreJsonRpcHost() {
+    return this.dashCoreJsonRpcHost;
+  }
+
+  getDashCoreJsonRpcPort() {
+    return this.dashCoreJsonRpcPort;
+  }
+
+  getDashCoreJsonRpcUser() {
+    return this.dashCoreJsonRpcUser;
+  }
+
+  getDashCoreJsonRpcPass() {
+    return this.dashCoreJsonRpcPass;
+  }
+
+  getDashCoreRunningCheckMaxRetries() {
+    return this.dashCoreRunningCheckMaxRetries;
+  }
+
+  getDashCoreRunningCheckInterval() {
+    return this.dashCoreRunningCheckInterval;
+  }
+
+  getDashCoreZmqPubHashBlock() {
+    return this.dashCoreZmqPubHashblock;
+  }
+
+  getStorageIpfsMultiAddr() {
+    return this.storageIpfsMultiAddr;
+  }
+
+  getStorageMongoDbUrl() {
+    return this.storageMongoDbUrl;
+  }
+
+  getStorageMongoDbDatabase() {
+    return this.storageMongoDbDatabase;
+  }
+
+  getSyncEvoStartBlockHeight() {
+    return this.syncEvoStartBlockHeight;
+  }
+
+  getSyncStateBlocksLimit() {
+    return this.syncStateBlocksLimit;
+  }
+
+  getMongoDbPrefix() {
+    return this.mongoDbPrefix;
+  }
+}
+
 class SyncApp {
-  constructor() {
+  /**
+   * @param {SyncAppOptions} options
+   */
+  constructor(options) {
+    this.options = options;
     this.rpcClient = new RpcClient({
       protocol: 'http',
-      host: process.env.DASHCORE_JSON_RPC_HOST,
-      port: process.env.DASHCORE_JSON_RPC_PORT,
-      user: process.env.DASHCORE_JSON_RPC_USER,
-      pass: process.env.DASHCORE_JSON_RPC_PASS,
+      host: this.options.getDashCoreJsonRpcHost(),
+      port: this.options.getDashCoreJsonRpcPort(),
+      user: this.options.getDashCoreJsonRpcUser(),
+      pass: this.options.getDashCoreJsonRpcPass(),
     });
-    this.ipfsAPI = new IpfsAPI(process.env.STORAGE_IPFS_MULTIADDR);
+    this.ipfsAPI = new IpfsAPI(this.options.getStorageIpfsMultiAddr());
     this.mongoClient = null;
     this.syncStateRepository = null;
     this.syncState = null;
@@ -49,23 +123,21 @@ class SyncApp {
     const isDashCoreRunning = isDashCoreRunningFactory(this.rpcClient);
 
     const isRunning = await isDashCoreRunning(
-      parseInt(process.env.DASHCORE_RUNNING_CHECK_MAX_RETRIES, 10),
-      parseInt(process.env.DASHCORE_RUNNING_CHECK_INTERVAL, 10),
+      this.options.getDashCoreRunningCheckMaxRetries(),
+      this.options.getDashCoreRunningCheckInterval(),
     );
     if (!isRunning) {
       throw new DashCoreIsNotRunningError();
     }
 
     this.mongoClient = await MongoClient.connect(
-      process.env.STORAGE_MONGODB_URL,
+      this.options.getStorageMongoDbUrl(),
       { useNewUrlParser: true },
     );
 
-    const mongoDb = this.mongoClient.db(process.env.STORAGE_MONGODB_DB);
+    const mongoDb = this.mongoClient.db(this.options.getStorageMongoDbDatabase());
     this.syncStateRepository = new SyncStateRepository(mongoDb);
     this.syncState = await this.syncStateRepository.fetch();
-
-    this.isInitialized = true;
   }
 
   getMongoClient() {
@@ -91,7 +163,7 @@ class SyncApp {
   createSTHeadersReader() {
     const blockIterator = new RpcBlockIterator(
       this.getRpcClient(),
-      parseInt(process.env.SYNC_EVO_START_BLOCK_HEIGHT, 10),
+      this.options.getSyncEvoStartBlockHeight(),
     );
     const stHeaderIterator = new StateTransitionHeaderIterator(
       blockIterator,
@@ -99,7 +171,7 @@ class SyncApp {
     );
     const stHeadersReaderState = new STHeadersReaderState(
       this.getSyncState().getBlocks(),
-      process.env.SYNC_STATE_BLOCKS_LIMIT,
+      this.options.getSyncStateBlocksLimit(),
     );
     return new STHeadersReader(stHeaderIterator, stHeadersReaderState);
   }
@@ -116,12 +188,12 @@ class SyncApp {
     return cleanDashDriveFactory(
       this.createUnpinAllIpfsPackets(),
       this.createDropMongoDatabasesWithPrefix(),
-      process.env.MONGODB_DB_PREFIX,
+      this.options.getMongoDbPrefix(),
     );
   }
 
   createApplyStateTransition() {
-    const mongoDb = this.getMongoClient().db(process.env.STORAGE_MONGODB_DB);
+    const mongoDb = this.getMongoClient().db(this.options.getStorageMongoDbDatabase());
     const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
       this.getMongoClient(),
@@ -177,7 +249,8 @@ function readChainFactory(stHeaderReader, syncState, cleanDashDrive) {
 }
 
 (async function main() {
-  const syncApplication = new SyncApp();
+  const syncAppOptions = new SyncAppOptions(process.envs);
+  const syncApplication = new SyncApp(syncAppOptions);
   await syncApplication.init();
 
   const stHeaderReader = syncApplication.createSTHeadersReader();
@@ -198,7 +271,7 @@ function readChainFactory(stHeaderReader, syncState, cleanDashDrive) {
 
   // Sync arriving ST packets
   const zmqSocket = zmq.createSocket('sub');
-  zmqSocket.connect(process.env.DASHCORE_ZMQ_PUB_HASHBLOCK);
+  zmqSocket.connect(syncAppOptions.getDashCoreZmqPubHashBlock());
 
   zmqSocket.on('message', (topic, blockHash) => {
     const sinceBlockHash = blockHash.toString('hex');
