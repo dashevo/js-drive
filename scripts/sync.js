@@ -16,6 +16,7 @@ const errorHandler = require('../lib/util/errorHandler');
   await syncApplication.init();
 
   const stHeaderReader = syncApplication.createSTHeadersReader();
+  const rpcClient = syncApplication.getRpcClient();
   const ipfsAPI = syncApplication.getIpfsApi();
   const unpinAllIpfsPackets = syncApplication.createUnpinAllIpfsPackets();
   const syncState = syncApplication.getSyncState();
@@ -28,7 +29,7 @@ const errorHandler = require('../lib/util/errorHandler');
   attachSyncHandlers(stHeaderReader, syncState, syncStateRepository);
   attachStateViewHandlers(stHeaderReader, applyStateTransition, dropMongoDatabasesWithPrefix);
 
-  const readChain = readChainFactory(stHeaderReader, syncState, cleanDashDrive);
+  const readChain = readChainFactory(stHeaderReader, rpcClient, syncState, cleanDashDrive);
   await readChain();
 
   // Sync arriving ST packets
