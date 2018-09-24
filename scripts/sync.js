@@ -12,18 +12,18 @@ const errorHandler = require('../lib/util/errorHandler');
 
 (async function main() {
   const syncAppOptions = new SyncAppOptions(process.env);
-  const syncApplication = new SyncApp(syncAppOptions);
-  await syncApplication.init();
+  const syncApp = new SyncApp(syncAppOptions);
+  await syncApp.init();
 
-  const stHeaderReader = syncApplication.createSTHeadersReader();
-  const rpcClient = syncApplication.getRpcClient();
-  const ipfsAPI = syncApplication.getIpfsApi();
-  const unpinAllIpfsPackets = syncApplication.createUnpinAllIpfsPackets();
-  const syncState = syncApplication.getSyncState();
-  const syncStateRepository = syncApplication.getSyncStateRepository();
-  const applyStateTransition = syncApplication.createApplyStateTransition();
-  const dropMongoDatabasesWithPrefix = syncApplication.createDropMongoDatabasesWithPrefix();
-  const cleanDashDrive = syncApplication.createCleanDashDrive();
+  const stHeaderReader = syncApp.createSTHeadersReader();
+  const rpcClient = syncApp.getRpcClient();
+  const ipfsAPI = syncApp.getIpfsApi();
+  const unpinAllIpfsPackets = syncApp.createUnpinAllIpfsPackets();
+  const syncState = syncApp.getSyncState();
+  const syncStateRepository = syncApp.getSyncStateRepository();
+  const applyStateTransition = syncApp.createApplyStateTransition();
+  const dropMongoDatabasesWithPrefix = syncApp.createDropMongoDatabasesWithPrefix();
+  const cleanDashDrive = syncApp.createCleanDashDrive();
 
   attachStorageHandlers(stHeaderReader, ipfsAPI, unpinAllIpfsPackets);
   attachSyncHandlers(stHeaderReader, syncState, syncStateRepository);
