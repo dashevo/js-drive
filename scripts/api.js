@@ -11,6 +11,7 @@ const errorHandler = require('../lib/util/errorHandler');
 (async function main() {
   const apiAppOptions = new ApiAppOptions(process.env);
   const apiApp = new ApiApp(apiAppOptions);
+
   await apiApp.init();
 
   const rpc = jayson.server(apiApp.createRpcMethodsWithNames());
