@@ -15,6 +15,10 @@ RUN apk update && \
 # for easier app bind mounting for local development
 WORKDIR /
 
+# Authentication for private packages
+ENV NPM_TOKEN=$npm_token
+RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+
 # Install packages
 COPY package.json package-lock.json ./
 ENV npm_config_zmq_external=true
