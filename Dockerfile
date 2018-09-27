@@ -16,8 +16,8 @@ RUN apk update && \
 WORKDIR /
 
 # Authentication for private packages
-ENV NPM_TOKEN=$npm_token
-RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+ARG npm_token
+RUN echo "//registry.npmjs.org/:_authToken=$npm_token" >> .npmrc
 
 # Install packages
 COPY package.json package-lock.json ./
