@@ -161,7 +161,7 @@ describe('Blockchain reorganization', function main() {
     // Check tses are not in mempool
     for (let i = 0; i < transitionsAfterDisconnect.length - 1; i++) {
       const tsid = transitionsAfterDisconnect[i];
-      const { result: tsData } = await firstDashDrive.dashCore.getApi().getTransition(tsid);
+      const { result: tsData } = await firstDashDrive.dashCore.getApi().getTransaction(tsid);
       expect(tsData.from_mempool).to.not.exist();
     }
 
@@ -222,7 +222,7 @@ describe('Blockchain reorganization', function main() {
     // Check tses are back to mempool
     for (let i = 0; i < transitionsAfterDisconnect.length - 1; i++) {
       const tsid = transitionsAfterDisconnect[i];
-      const { result: tsData } = await firstDashDrive.dashCore.getApi().getTransition(tsid);
+      const { result: tsData } = await firstDashDrive.dashCore.getApi().getTransaction(tsid);
       expect(tsData.from_mempool).to.exist()
         .and.be.equal(true);
     }
