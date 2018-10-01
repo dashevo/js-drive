@@ -17,6 +17,7 @@ const errorHandler = require('../lib/util/errorHandler');
   const rpc = jayson.server(apiApp.createRpcMethodsWithNames());
   const server = connect();
 
+  server.use(apiApp.createParseBody());
   server.use(apiApp.createCheckSyncStateHttpMiddleware());
   server.use(rpc.middleware());
 
