@@ -18,7 +18,7 @@ const errorHandler = require('../lib/util/errorHandler');
   const server = connect();
 
   server.use(apiApp.createParseBody());
-  server.use(apiApp.createCheckSyncStateHttpMiddleware());
+  server.use(apiApp.createBypass(apiApp.createCheckSyncStateHttpMiddleware(), ['getSyncInfo']));
   server.use(rpc.middleware());
 
   server.listen(
