@@ -2,7 +2,6 @@ const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 
 const ApiAppOptions = require('../../../lib/app/ApiAppOptions');
-const apiAppOptions = new ApiAppOptions(process.env);
 
 const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
 
@@ -13,6 +12,8 @@ const { startDashDrive } = require('@dashevo/js-evo-services-ctl');
 
 const wait = require('../../../lib/util/wait');
 const cbor = require('cbor');
+
+const apiAppOptions = new ApiAppOptions(process.env);
 
 /**
  * Await Dash Drive instance to finish syncing

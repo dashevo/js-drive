@@ -1,7 +1,6 @@
 const bypassFactory = require('../../../../lib/api/middlewares/bypassFactory');
 
 describe('bypassFactory', () => {
-
   let next;
   let method;
   beforeEach(function beforeEach() {
