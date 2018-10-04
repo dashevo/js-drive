@@ -7,7 +7,7 @@ const {
     startIPFS,
   },
 } = require('@dashevo/js-evo-services-ctl');
-const hashSTPacket = require('../../../lib/test/consensus/hashSTPacket');
+const doubleSha256 = require('../../../lib/util/doubleSha256');
 const updateDapContractFactory = require('../../../lib/stateView/dapContract/updateDapContractFactory');
 const updateDapObjectFactory = require('../../../lib/stateView/dapObject/updateDapObjectFactory');
 const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
@@ -36,7 +36,7 @@ describe('applyStateTransitionFactory', () => {
     const block = getBlockFixtures()[0];
     const packet = getTransitionPacketFixtures()[0];
     const header = getTransitionHeaderFixtures()[0];
-    header.extraPayload.hashSTPacket = await hashSTPacket(packet);
+    header.extraPayload.hashSTPacket = doubleSha256(packet);
 
     await ipfsClient.dag.put(packet, {
       format: 'dag-cbor',
@@ -62,7 +62,7 @@ describe('applyStateTransitionFactory', () => {
     const block = getBlockFixtures()[1];
     const packet = getTransitionPacketFixtures()[1];
     const header = getTransitionHeaderFixtures()[1];
-    header.extraPayload.hashSTPacket = await hashSTPacket(packet);
+    header.extraPayload.hashSTPacket = doubleSha256(packet);
 
     await ipfsClient.dag.put(packet, {
       format: 'dag-cbor',

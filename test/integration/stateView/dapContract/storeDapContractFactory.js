@@ -8,7 +8,7 @@ const getTransitionPacketFixtures = require('../../../../lib/test/fixtures/getTr
 const getTransitionHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHeaderFixtures');
 const DapContractMongoDbRepository = require('../../../../lib/stateView/dapContract/DapContractMongoDbRepository');
 const storeDapContractFactory = require('../../../../lib/stateView/dapContract/storeDapContractFactory');
-const hashSTPacket = require('../../../../lib/test/consensus/hashSTPacket');
+const doubleSha256 = require('../../../../lib/util/doubleSha256');
 const sanitizeData = require('../../../../lib/mongoDb/sanitizeData');
 
 describe('storeDapContractFactory', function main() {
@@ -28,7 +28,7 @@ describe('storeDapContractFactory', function main() {
     const packet = getTransitionPacketFixtures()[0].toJSON({ skipMeta: true });
     const header = getTransitionHeaderFixtures()[0];
 
-    header.extraPayload.setHashSTPacket(await hashSTPacket(packet));
+    header.extraPayload.setHashSTPacket(doubleSha256(packet));
 
     const mongoDb = await mongoDbInstance.getDb();
     const dapContractRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
