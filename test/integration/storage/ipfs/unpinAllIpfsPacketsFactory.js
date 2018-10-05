@@ -3,7 +3,7 @@ const unpinAllIpfsPacketsFactory = require('../../../../lib/storage/ipfs/unpinAl
 
 async function addPinPacket(ipfsApi) {
   const packet = {};
-  const cid = await ipfsApi.dag.put(packet, { format: 'dag-cbor', hashAlg: 'sha2-256' });
+  const cid = await ipfsApi.dag.put(packet, { format: 'dag-cbor', hash: 'dbl-sha2-256' });
   await ipfsApi.pin.add(cid.toBaseEncodedString(), { recursive: true });
   return cid.toBaseEncodedString();
 }

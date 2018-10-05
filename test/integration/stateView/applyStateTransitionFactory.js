@@ -40,7 +40,7 @@ describe('applyStateTransitionFactory', () => {
 
     await ipfsClient.dag.put(packet, {
       format: 'dag-cbor',
-      hashAlg: 'sha2-256',
+      hash: 'dbl-sha2-256',
     });
 
     const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
@@ -66,7 +66,7 @@ describe('applyStateTransitionFactory', () => {
 
     await ipfsClient.dag.put(packet, {
       format: 'dag-cbor',
-      hashAlg: 'sha2-256',
+      hash: 'dbl-sha2-256',
     });
 
     const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
