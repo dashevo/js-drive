@@ -38,10 +38,7 @@ describe('applyStateTransitionFactory', () => {
     const header = getTransitionHeaderFixtures()[0];
     header.extraPayload.hashSTPacket = doubleSha256(packet);
 
-    await ipfsClient.dag.put(packet, {
-      format: 'dag-cbor',
-      hash: 'dbl-sha2-256',
-    });
+    await ipfsClient.dag.put(packet, { cid: packet.getCID() });
 
     const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
@@ -64,10 +61,7 @@ describe('applyStateTransitionFactory', () => {
     const header = getTransitionHeaderFixtures()[1];
     header.extraPayload.hashSTPacket = doubleSha256(packet);
 
-    await ipfsClient.dag.put(packet, {
-      format: 'dag-cbor',
-      hash: 'dbl-sha2-256',
-    });
+    await ipfsClient.dag.put(packet, { cid: packet.getCID() });
 
     const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(

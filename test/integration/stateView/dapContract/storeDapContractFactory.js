@@ -8,8 +8,8 @@ const getTransitionPacketFixtures = require('../../../../lib/test/fixtures/getTr
 const getTransitionHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHeaderFixtures');
 const DapContractMongoDbRepository = require('../../../../lib/stateView/dapContract/DapContractMongoDbRepository');
 const storeDapContractFactory = require('../../../../lib/stateView/dapContract/storeDapContractFactory');
-const doubleSha256 = require('../../../../lib/util/doubleSha256');
 const sanitizeData = require('../../../../lib/mongoDb/sanitizeData');
+const doubleSha256 = require('../../../../lib/util/doubleSha256');
 
 describe('storeDapContractFactory', function main() {
   this.timeout(30000);
@@ -25,24 +25,21 @@ describe('storeDapContractFactory', function main() {
   });
 
   it('should store DAP schema', async () => {
-    const packet = getTransitionPacketFixtures()[0].toJSON({ skipMeta: true });
+    const packet = getTransitionPacketFixtures()[0];
     const header = getTransitionHeaderFixtures()[0];
 
-    header.extraPayload.setHashSTPacket(doubleSha256(packet));
+    header.extraPayload.setHashSTPacket(packet.getHash());
 
     const mongoDb = await mongoDbInstance.getDb();
     const dapContractRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const storeDapContract = storeDapContractFactory(dapContractRepository, ipfsClient);
 
-    await ipfsClient.dag.put(packet, {
-      format: 'dag-cbor',
-      hash: 'dbl-sha2-256',
-    });
+    const packetData = packet.toJSON({ skipMeta: true });
+    await ipfsClient.dag.put(packetData, { cid: packet.getCID() });
 
-    const cid = header.getPacketCID();
-    await storeDapContract(cid);
+    await storeDapContract(header.getPacketCID());
 
-    const dapId = packet.dapid;
+    const dapId = doubleSha256(packet.dapcontract);
     const dapContract = await dapContractRepository.find(dapId);
 
     expect(dapContract.getDapId()).to.equal(dapId);
