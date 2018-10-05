@@ -10,9 +10,12 @@ const DapContractMongoDbRepository = require('../../../../lib/stateView/dapContr
 const storeDapContractFactory = require('../../../../lib/stateView/dapContract/storeDapContractFactory');
 const sanitizeData = require('../../../../lib/mongoDb/sanitizeData');
 const doubleSha256 = require('../../../../lib/util/doubleSha256');
+const addSTPacketFactory = require('../../../../lib/storage/ipfs/addSTPacketFactory');
 
 describe('storeDapContractFactory', function main() {
   this.timeout(30000);
+
+  let addSTPacket;
 
   let mongoDbInstance;
   startMongoDb().then((_instance) => {
@@ -22,6 +25,10 @@ describe('storeDapContractFactory', function main() {
   let ipfsClient;
   startIPFS().then((_instance) => {
     ipfsClient = _instance.getApi();
+  });
+
+  beforeEach(() => {
+    addSTPacket = addSTPacketFactory(ipfsClient);
   });
 
   it('should store DAP schema', async () => {
@@ -34,8 +41,7 @@ describe('storeDapContractFactory', function main() {
     const dapContractRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const storeDapContract = storeDapContractFactory(dapContractRepository, ipfsClient);
 
-    const packetData = packet.toJSON({ skipMeta: true });
-    await ipfsClient.dag.put(packetData, { cid: packet.getCID() });
+    await addSTPacket(packet);
 
     await storeDapContract(header.getPacketCID());
 

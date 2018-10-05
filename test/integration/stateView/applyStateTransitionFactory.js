@@ -15,20 +15,25 @@ const sanitizeData = require('../../../lib/mongoDb/sanitizeData');
 const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
-
+const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory');
 const generateDapObjectId = require('../../../lib/stateView/dapObject/generateDapObjectId');
 
 describe('applyStateTransitionFactory', () => {
   let mongoClient;
   let mongoDb;
   let ipfsClient;
+  let addSTPacket;
 
   startMongoDb().then(async (mongoDbInstance) => {
-    mongoClient = mongoDbInstance.getClient();
-    mongoDb = mongoDbInstance.getDb();
+    mongoClient = await mongoDbInstance.getClient();
+    mongoDb = await mongoDbInstance.getDb();
   });
   startIPFS().then(async (ipfsInstance) => {
     ipfsClient = await ipfsInstance.getApi();
+  });
+
+  beforeEach(() => {
+    addSTPacket = addSTPacketFactory(ipfsClient);
   });
 
   it('should compute DapContract state view', async () => {
@@ -37,8 +42,7 @@ describe('applyStateTransitionFactory', () => {
     const header = getTransitionHeaderFixtures()[0];
     header.extraPayload.hashSTPacket = packet.getHash();
 
-    const packetData = packet.toJSON({ skipMeta: true });
-    await ipfsClient.dag.put(packetData, { cid: packet.getCID() });
+    await addSTPacket(packet);
 
     const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
@@ -61,8 +65,7 @@ describe('applyStateTransitionFactory', () => {
     const header = getTransitionHeaderFixtures()[1];
     header.extraPayload.hashSTPacket = packet.getHash();
 
-    const packetData = packet.toJSON({ skipMeta: true });
-    await ipfsClient.dag.put(packetData, { cid: packet.getCID() });
+    await addSTPacket(packet);
 
     const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
