@@ -9,7 +9,7 @@
     "api": "node scripts/api",
     "sync": "node scripts/sync",
     "lint": "eslint .",
-    "test": "mocha './test/**/*.spec.js'",
+    "test": "mocha './test/unit/index.spec.js' './test/integration/index.spec.js' './test/e2e/index.spec.js'",
     "test:unit": "mocha './test/unit/**/*.spec.js'",
     "test:integration": "mocha './test/integration/**/*.spec.js'",
     "test:e2e": "mocha './test/e2e/**/*.spec.js'"
