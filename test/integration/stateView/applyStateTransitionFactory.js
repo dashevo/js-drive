@@ -37,7 +37,8 @@ describe('applyStateTransitionFactory', () => {
     const header = getTransitionHeaderFixtures()[0];
     header.extraPayload.hashSTPacket = packet.getHash();
 
-    await ipfsClient.dag.put(packet, { cid: packet.getCID() });
+    const packetData = packet.toJSON({ skipMeta: true });
+    await ipfsClient.dag.put(packetData, { cid: packet.getCID() });
 
     const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
@@ -60,7 +61,8 @@ describe('applyStateTransitionFactory', () => {
     const header = getTransitionHeaderFixtures()[1];
     header.extraPayload.hashSTPacket = packet.getHash();
 
-    await ipfsClient.dag.put(packet, { cid: packet.getCID() });
+    const packetData = packet.toJSON({ skipMeta: true });
+    await ipfsClient.dag.put(packetData, { cid: packet.getCID() });
 
     const dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(

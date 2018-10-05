@@ -51,7 +51,7 @@
     "dotenv-expand": "^4.2.0",
     "dotenv-safe": "^6.0.0",
     "emittery": "^0.3.0",
-    "ipfs-api": "^20.1",
+    "ipfs-api": "^24.0.2",
     "jayson": "^2.0.6",
     "mongodb": "^3.1.1",
     "multihashes": "^0.4.13",
