@@ -3,7 +3,7 @@ const unpinAllIpfsPacketsFactory = require('../../../../lib/storage/ipfs/unpinAl
 const getTransitionPacketFixtures = require('../../../../lib/test/fixtures/getTransitionPacketFixtures');
 const addSTPacketFactory = require('../../../../lib/storage/ipfs/addSTPacketFactory');
 
-const byCid = cid => object => object.hash === cid;
+const byCid = cid => object => object.hash === cid.toBaseEncodedString();
 
 describe('unpinAllIpfsPacketsFactory', () => {
   let ipfsInstance;
