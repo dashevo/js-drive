@@ -15,9 +15,9 @@ describe('StateTransitionHeader', () => {
   it('should StateTransitionHeader CID equal to IPFS CID', async () => {
     header.extraPayload.setHashSTPacket(packet.getHash());
 
-    const stHeaderCid = header.getPacketCID();
     const ipfsCid = await addSTPacket(packet);
 
+    const stHeaderCid = header.getPacketCID();
     expect(stHeaderCid.toBaseEncodedString()).to.equal(ipfsCid.toBaseEncodedString());
   });
 });

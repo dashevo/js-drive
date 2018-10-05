@@ -23,7 +23,7 @@ describe('unpinAllIpfsPacketsFactory', () => {
     const ipfsApi = ipfsInstance.getApi();
 
     const cid = await addSTPacket(packet);
-    await ipfsApi.pin.add(cid, { recursive: true });
+    await ipfsApi.pin.add(cid.toBaseEncodedString(), { recursive: true });
 
     const pinsetBefore = await ipfsApi.pin.ls();
     const filterBefore = pinsetBefore.filter(byCid(cid));

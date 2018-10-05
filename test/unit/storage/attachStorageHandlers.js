@@ -58,8 +58,9 @@ describe('attachStorageHandlers', () => {
 
     await stHeadersReaderMock.emitSerial(STHeadersReaderEvents.HEADER, { header });
 
+    const packetPath = header.getPacketCID().toBaseEncodedString();
     expect(ipfsAPIMock.pin.add).to.be.calledOnce();
-    expect(ipfsAPIMock.pin.add).to.be.calledWith(header.getPacketCID(), { recursive: true });
+    expect(ipfsAPIMock.pin.add).to.be.calledWith(packetPath, { recursive: true });
 
     expect(rejectAfterMock).to.be.calledOnce();
 
