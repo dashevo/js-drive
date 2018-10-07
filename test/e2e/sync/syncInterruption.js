@@ -1,4 +1,3 @@
-const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory');
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 
 const ApiAppOptions = require('../../../lib/app/ApiAppOptions');
@@ -67,9 +66,13 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
         await registerUser(username, firstDashDrive.dashCore.getApi());
       const header = await createSTHeader(userId, privateKeyString, packetOne);
 
-      // 2.3 Add ST packet to IPFS
-      const addSTPacket = addSTPacketFactory(firstDashDrive.ipfs.getApi());
-      const packetCid = await addSTPacket(packetOne);
+      // 2.3 Add ST packet
+      const serializedPacket = cbor.encodeCanonical(packetOne.toJSON({ skipMeta: true }));
+      const serializedPacketJson = {
+        packet: serializedPacket.toString('hex'),
+      };
+      const { result: packetCid } = await firstDashDrive.driveApi.getApi()
+        .request('addSTPacket', serializedPacketJson);
 
       // 2.4 Save CID of freshly added packet for future use
       packetsCids.push(packetCid);
