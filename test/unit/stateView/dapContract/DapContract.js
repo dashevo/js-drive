@@ -7,7 +7,14 @@ describe('DapContract', () => {
     const dapName = 'DashPay';
     const reference = new Reference();
     const schema = {};
-    const dapContract = new DapContract(dapId, dapName, reference, schema);
+    const version = 2;
+    const dapContract = new DapContract(
+      dapId,
+      dapName,
+      reference,
+      schema,
+      version,
+    );
 
     const dapContractSerialized = dapContract.toJSON();
     expect(dapContractSerialized).to.deep.equal({
@@ -15,6 +22,7 @@ describe('DapContract', () => {
       dapName,
       reference,
       schema,
+      version,
     });
   });
 });

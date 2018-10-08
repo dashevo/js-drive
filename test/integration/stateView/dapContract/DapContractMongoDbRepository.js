@@ -16,7 +16,8 @@ describe('DapContractRepository', () => {
     const dapName = 'DashPay';
     const reference = new Reference();
     const schema = {};
-    const dapContract = new DapContract(dapId, dapName, reference, schema);
+    const version = 2;
+    const dapContract = new DapContract(dapId, dapName, reference, schema, version);
 
     await dapContractRepository.store(dapContract);
     const contract = await dapContractRepository.find(dapId);
@@ -31,5 +32,6 @@ describe('DapContractRepository', () => {
     expect(serializeContract.dapName).to.not.exist();
     expect(serializeContract.reference).to.be.deep.equal(new Reference().toJSON());
     expect(serializeContract.schema).to.not.exist();
+    expect(serializeContract.version).to.not.exist();
   });
 });
