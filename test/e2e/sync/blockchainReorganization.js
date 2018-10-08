@@ -161,9 +161,6 @@ describe('Blockchain reorganization', function main() {
   });
 
   it('Dash Drive should sync data after blockchain reorganization, removing missing STs. Adding them back after they reappear in the blockchain.', async () => {
-    // Store current CIDs to test initial sync later
-    const packetsBeforeDisconnect = packetsCids.slice();
-
     // 4. Disconnecting nodes to start introducing difference in blocks
     firstDashDrive.dashCore.disconnect(secondDashDrive.dashCore);
 
@@ -227,10 +224,7 @@ describe('Blockchain reorganization', function main() {
       expect(blockCount).to.be.equal(expectedBlockCount);
     }
 
-    // Remove CIDs on node #1 added before disconnect
-    const rmPormises = packetsBeforeDisconnect.map(cid => firstDashDrive.ipfs.getApi().pin.rm(cid));
-    await Promise.all(rmPormises);
-
+    // Await for Drive to sync
     await dashDriveSyncToFinish(firstDashDrive.driveApi);
 
     // Store `lastInitialSyncAt` to check later that no
@@ -279,12 +273,8 @@ describe('Blockchain reorganization', function main() {
         expect(lsHashes).to.not.include(cid);
       });
 
-      // Also check removed packets are not present on node #1
-      // This will indicated no initial sync has happened
-      packetsBeforeDisconnect.forEach((cid) => {
-        expect(lsHashes).to.not.include(cid);
-      });
-
+      // Check `lastInitialSyncAt is not changed
+      // This will indicate no initial sync happened after reconnect
       const { result: { lastInitialSyncAt } } = await firstDashDrive.driveApi.getApi()
         .request('getSyncInfo', []);
 
