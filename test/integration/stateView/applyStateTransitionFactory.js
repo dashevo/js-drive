@@ -18,6 +18,8 @@ const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTrans
 const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory');
 const generateDapObjectId = require('../../../lib/stateView/dapObject/generateDapObjectId');
 
+const doubleSha256 = require('../../../lib/util/doubleSha256');
+
 describe('applyStateTransitionFactory', () => {
   let mongoClient;
   let mongoDb;
@@ -57,6 +59,14 @@ describe('applyStateTransitionFactory', () => {
       updateDapObject,
     );
     await applyStateTransition(header, block);
+
+    const dapId = doubleSha256(packet.dapcontract);
+
+    const dapContract = await dapContractMongoDbRepository.find(dapId);
+
+    expect(dapContract.getDapId()).to.be.equal(dapId);
+    expect(dapContract.getDapName()).to.be.equal(packet.dapcontract.dapname);
+    expect(dapContract.getSchema()).to.be.deep.equal(packet.dapcontract.schema);
   });
 
   it('should compute DapObject state view', async () => {
