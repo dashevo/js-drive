@@ -8,6 +8,7 @@ const createSTHeader = require('../../../lib/test/createSTHeader');
 const { startDashDrive } = require('@dashevo/js-evo-services-ctl');
 
 const wait = require('../../../lib/util/wait');
+const cbor = require('cbor');
 
 const apiAppOptions = new ApiAppOptions(process.env);
 
