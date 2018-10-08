@@ -66,7 +66,7 @@ describe('applyStateTransitionFactory', () => {
 
     expect(dapContract.getDapId()).to.be.equal(dapId);
     expect(dapContract.getDapName()).to.be.equal(packet.dapcontract.dapname);
-    expect(dapContract.getSchema()).to.be.deep.equal(packet.dapcontract.schema);
+    expect(dapContract.getSchema()).to.be.deep.equal(packet.dapcontract.dapschema);
   });
 
   it('should compute DapObject state view', async () => {

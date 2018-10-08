@@ -17,7 +17,10 @@ describe('DapContractRepository', () => {
     const reference = new Reference();
     const schema = {};
     const version = 2;
-    const previousRevisions = [{}];
+    const previousRevisions = [{
+      version: 1,
+      reference: new Reference(),
+    }];
     const dapContract = new DapContract(
       dapId,
       dapName,

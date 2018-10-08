@@ -1,5 +1,6 @@
 const fetchDapContractMethodFactory = require('../../../../lib/api/methods/fetchDapContractMethodFactory');
 const InvalidParamsError = require('../../../../lib/api/InvalidParamsError');
+const Reference = require('../../../../lib/stateView/Reference');
 const DapContract = require('../../../../lib/stateView/dapContract/DapContract');
 
 describe('fetchDapContractMehotd', () => {
@@ -20,9 +21,18 @@ describe('fetchDapContractMehotd', () => {
   it('should return DAP contract', async () => {
     const dapId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
     const dapName = 'DashPay';
-    const packetHash = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
+    const reference = new Reference();
     const schema = {};
-    const contract = new DapContract(dapId, dapName, packetHash, schema);
+    const version = 2;
+    const previousRevisions = [];
+    const contract = new DapContract(
+      dapId,
+      dapName,
+      reference,
+      schema,
+      version,
+      previousRevisions,
+    );
     dapContractMongoDbRepository.find.returns(contract);
 
     const dapContract = await fetchDapContractMethod({ dapId });
@@ -30,8 +40,10 @@ describe('fetchDapContractMehotd', () => {
     expect(dapContract).to.be.deep.equal({
       dapId,
       dapName,
-      packetHash,
+      reference,
       schema,
+      version,
+      previousRevisions,
     });
   });
 });
