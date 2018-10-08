@@ -8,12 +8,14 @@ describe('DapContract', () => {
     const reference = new Reference();
     const schema = {};
     const version = 2;
+    const previousRevisions = [];
     const dapContract = new DapContract(
       dapId,
       dapName,
       reference,
       schema,
       version,
+      previousRevisions,
     );
 
     const dapContractSerialized = dapContract.toJSON();
@@ -23,6 +25,7 @@ describe('DapContract', () => {
       reference,
       schema,
       version,
+      previousRevisions,
     });
   });
 });

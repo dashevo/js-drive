@@ -17,7 +17,15 @@ describe('DapContractRepository', () => {
     const reference = new Reference();
     const schema = {};
     const version = 2;
-    const dapContract = new DapContract(dapId, dapName, reference, schema, version);
+    const previousRevisions = [{}];
+    const dapContract = new DapContract(
+      dapId,
+      dapName,
+      reference,
+      schema,
+      version,
+      previousRevisions,
+    );
 
     await dapContractRepository.store(dapContract);
     const contract = await dapContractRepository.find(dapId);
@@ -33,5 +41,6 @@ describe('DapContractRepository', () => {
     expect(serializeContract.reference).to.be.deep.equal(new Reference().toJSON());
     expect(serializeContract.schema).to.not.exist();
     expect(serializeContract.version).to.not.exist();
+    expect(serializeContract.previousRevisions).to.be.deep.equal([]);
   });
 });
