@@ -1,18 +1,19 @@
+const Reference = require('../../../../lib/stateView/Reference');
 const DapContract = require('../../../../lib/stateView/dapContract/DapContract');
 
 describe('DapContract', () => {
   it('should serialize DapContract', () => {
     const dapId = '123456';
     const dapName = 'DashPay';
-    const packetHash = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
+    const reference = new Reference();
     const schema = {};
-    const dapContract = new DapContract(dapId, dapName, packetHash, schema);
+    const dapContract = new DapContract(dapId, dapName, reference, schema);
 
     const dapContractSerialized = dapContract.toJSON();
     expect(dapContractSerialized).to.deep.equal({
       dapId,
       dapName,
-      packetHash,
+      reference,
       schema,
     });
   });
