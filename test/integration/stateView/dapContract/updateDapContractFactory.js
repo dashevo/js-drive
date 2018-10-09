@@ -46,43 +46,55 @@ describe('updateDapContractFactory', () => {
   });
 
   it('should maintain DapContract previous revisions and add new one', async () => {
-    const dapId = '123456';
-    const dapName = 'DashPay';
-    const reference = new Reference();
-    const schema = {};
-    const version = 2;
-    const firstRevision = {
-      version: 1,
-      reference,
-    };
-    const previousRevisions = [firstRevision];
-    const previousDapContract = new DapContract(
-      dapId,
-      dapName,
-      reference,
-      schema,
-      version,
-      previousRevisions,
+    const firstDapId = '1234';
+    const firstDapName = 'DashPay';
+    const firstReference = new Reference();
+    const firstSchema = {};
+    const firstVersion = 1;
+    const firstPreviousVersions = [];
+    const firstDapContract = new DapContract(
+      firstDapId,
+      firstDapName,
+      firstReference,
+      firstSchema,
+      firstVersion,
+      firstPreviousVersions,
     );
-    await dapContractRepository.store(previousDapContract);
+
+    const secondDapId = '5678';
+    const secondDapName = 'DashPay';
+    const secondReference = new Reference();
+    const secondSchema = {};
+    const secondVersion = 2;
+    const secondPreviousRevisions = [firstDapContract.getRevision()];
+    const secondDapContract = new DapContract(
+      secondDapId,
+      secondDapName,
+      secondReference,
+      secondSchema,
+      secondVersion,
+      secondPreviousRevisions,
+    );
+    await dapContractRepository.store(secondDapContract);
 
     const packet = getTransitionPacketFixtures()[0];
-    const newDapContractData = packet.dapcontract;
-    newDapContractData.dapver = 3;
-    newDapContractData.upgradedapid = dapId;
-    const newDapId = doubleSha256(newDapContractData);
-    const newReference = new Reference();
+    const thirdVersion = 3;
+    const thirdDapContractData = packet.dapcontract;
+    thirdDapContractData.dapver = thirdVersion;
+    thirdDapContractData.upgradedapid = secondDapId;
+    const thirdDapId = doubleSha256(thirdDapContractData);
+    const thirdReference = new Reference();
 
-    await updateDapContract(newDapId, newReference, newDapContractData);
-    const currentDapContract = await dapContractRepository.find(newDapId);
-    const oldDapContract = await dapContractRepository.find(dapId);
+    await updateDapContract(thirdDapId, thirdReference, thirdDapContractData);
+    const thirdDapContractEntity = await dapContractRepository.find(thirdDapId);
+    const secondDapContractEntity = await dapContractRepository.find(secondDapId);
 
-    expect(currentDapContract.getSchema()).to.deep.equal(newDapContractData.dapschema);
-    expect(currentDapContract.getVersion()).to.deep.equal(newDapContractData.dapver);
-    expect(currentDapContract.getPreviousRevisions()).to.deep.equal([
-      firstRevision,
-      previousDapContract.getRevision(),
+    expect(thirdDapContractEntity.getSchema()).to.deep.equal(thirdDapContractData.dapschema);
+    expect(thirdDapContractEntity.getVersion()).to.deep.equal(thirdDapContractData.dapver);
+    expect(thirdDapContractEntity.getPreviousRevisions()).to.deep.equal([
+      firstDapContract.getRevision(),
+      secondDapContract.getRevision(),
     ]);
-    expect(oldDapContract.getDapId()).to.not.exist();
+    expect(secondDapContractEntity.getDapId()).to.not.exist();
   });
 });
