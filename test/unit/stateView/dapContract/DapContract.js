@@ -28,4 +28,58 @@ describe('DapContract', () => {
       previousRevisions,
     });
   });
+
+  it('should add revision to DapContract', () => {
+    const firstDapId = '1234';
+    const firstDapName = 'DashPay';
+    const firstReference = new Reference();
+    const firstSchema = {};
+    const firstVersion = 1;
+    const firstPreviousVersions = [];
+    const firstDapContract = new DapContract(
+      firstDapId,
+      firstDapName,
+      firstReference,
+      firstSchema,
+      firstVersion,
+      firstPreviousVersions,
+    );
+
+    const secondDapId = '5678';
+    const secondDapName = 'DashPay';
+    const secondReference = new Reference();
+    const secondSchema = {};
+    const secondVersion = 2;
+    const secondPreviousRevisions = [firstDapContract.currentRevision()];
+    const secondDapContract = new DapContract(
+      secondDapId,
+      secondDapName,
+      secondReference,
+      secondSchema,
+      secondVersion,
+      secondPreviousRevisions,
+    );
+
+    const thirdDapId = '9999';
+    const thirdDapName = 'DashPay';
+    const thirdReference = new Reference();
+    const thirdSchema = {};
+    const thirdVersion = 2;
+    const thirdPreviousRevisions = [];
+    const thirdDapContract = new DapContract(
+      thirdDapId,
+      thirdDapName,
+      thirdReference,
+      thirdSchema,
+      thirdVersion,
+      thirdPreviousRevisions,
+    );
+
+    thirdDapContract.addRevision(secondDapContract);
+
+    expect(thirdDapContract.getPreviousRevisions()).to.be.deep.equal([
+      firstDapContract.currentRevision(),
+      secondDapContract.currentRevision(),
+    ]);
+  });
 });
