@@ -66,7 +66,7 @@ describe('updateDapContractFactory', () => {
     const secondReference = new Reference();
     const secondSchema = {};
     const secondVersion = 2;
-    const secondPreviousRevisions = [firstDapContract.getRevision()];
+    const secondPreviousRevisions = [firstDapContract.currentRevision()];
     const secondDapContract = new DapContract(
       secondDapId,
       secondDapName,
@@ -92,8 +92,8 @@ describe('updateDapContractFactory', () => {
     expect(thirdDapContractEntity.getSchema()).to.deep.equal(thirdDapContractData.dapschema);
     expect(thirdDapContractEntity.getVersion()).to.deep.equal(thirdDapContractData.dapver);
     expect(thirdDapContractEntity.getPreviousRevisions()).to.deep.equal([
-      firstDapContract.getRevision(),
-      secondDapContract.getRevision(),
+      firstDapContract.currentRevision(),
+      secondDapContract.currentRevision(),
     ]);
     expect(secondDapContractEntity.getDapId()).to.not.exist();
   });
