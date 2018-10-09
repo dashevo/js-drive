@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
 
@@ -308,6 +309,15 @@ describe('Blockchain reorganization', function main() {
   });
 
   after('cleanup lone services', async () => {
+    const firstNode = await firstDashDrive.driveSync.container.container.logs({ stdout: true });
+    const secondNode = await secondDashDrive.driveSync.container.container.logs({ stdout: true });
+
+    console.log('First node:');
+    console.log(firstNode);
+    console.log('');
+    console.log('Second node:');
+    console.log(secondNode);
+
     const instances = [
       firstDashDrive,
       secondDashDrive,
