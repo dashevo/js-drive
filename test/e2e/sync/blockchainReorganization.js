@@ -157,6 +157,18 @@ describe('Blockchain reorganization', function main() {
       (10 * BLOCKS_PER_REGISTRATION) + (2 * BLOCKS_PER_ST),
     );
 
+    // Output logs after 3 minutes of waiting
+    setTimeout(async () => {
+      const firstNode = await firstDashDrive.driveSync.container.container.logs({ stdout: true });
+      const secondNode = await secondDashDrive.driveSync.container.container.logs({ stdout: true });
+
+      console.log('First node:');
+      console.log(firstNode);
+      console.log('');
+      console.log('Second node:');
+      console.log(secondNode);
+    }, 3 * (60 * 1000));
+
     // Await first Dash Drive sync
     await dashDriveSyncToFinish(firstDashDrive.driveApi);
   });
