@@ -157,6 +157,12 @@ describe('Blockchain reorganization', function main() {
       (10 * BLOCKS_PER_REGISTRATION) + (2 * BLOCKS_PER_ST),
     );
 
+    const { result: firstNodeBlockCount } = await firstDashDrive.dashCore.getApi().blockCount();
+    const { result: secondNodeBlockCount } = await firstDashDrive.dashCore.getApi().blockCount();
+
+    console.log(`FIRST NODE BLOCK COUNT: ${firstNodeBlockCount}`);
+    console.log(`SECOND NODE BLOCK COUNT: ${secondNodeBlockCount}`);
+
     // Output logs after 3 minutes of waiting
     setTimeout(async () => {
       const firstNode = await firstDashDrive.driveSync.container.container.logs({ stdout: true });
