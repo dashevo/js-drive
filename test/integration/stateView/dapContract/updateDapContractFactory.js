@@ -88,7 +88,7 @@ describe('updateDapContractFactory', () => {
 
     expect(thirdDapContractEntity.getSchema()).to.deep.equal(thirdDapContractData.dapschema);
     expect(thirdDapContractEntity.getVersion()).to.deep.equal(thirdDapContractData.dapver);
-    expect(thirdDapContractEntity.getPreviousRevisions()).to.deep.equal([
+    expect(thirdDapContractEntity.getPreviousVersions()).to.deep.equal([
       firstDapContractVersion.currentRevision(),
       secondDapContractVersion.currentRevision(),
     ]);
@@ -109,6 +109,6 @@ describe('updateDapContractFactory', () => {
 
     expect(thirdDapContractEntity.getSchema()).to.deep.equal(dapContractData.dapschema);
     expect(thirdDapContractEntity.getVersion()).to.deep.equal(dapContractData.dapver);
-    expect(thirdDapContractEntity.getPreviousRevisions()).to.deep.equal([]);
+    expect(thirdDapContractEntity.getPreviousVersions()).to.deep.equal([]);
   });
 });

@@ -71,7 +71,7 @@ describe('applyStateTransitionFactory', () => {
     expect(dapContract.getDapName()).to.be.equal(packet.dapcontract.dapname);
     expect(dapContract.getSchema()).to.be.deep.equal(packet.dapcontract.dapschema);
     expect(dapContract.getVersion()).to.be.deep.equal(packet.dapcontract.dapver);
-    expect(dapContract.getPreviousRevisions()).to.be.deep.equal([]);
+    expect(dapContract.getPreviousVersions()).to.be.deep.equal([]);
   });
 
   it('should update with revisions DapContract state view', async () => {
@@ -108,7 +108,7 @@ describe('applyStateTransitionFactory', () => {
     expect(dapContract.getDapName()).to.be.equal(packet.dapcontract.dapname);
     expect(dapContract.getSchema()).to.be.deep.equal(packet.dapcontract.dapschema);
     expect(dapContract.getVersion()).to.be.deep.equal(packet.dapcontract.dapver);
-    expect(dapContract.getPreviousRevisions()).to.be.deep.equal([
+    expect(dapContract.getPreviousVersions()).to.be.deep.equal([
       firstDapContractVersion.currentRevision(),
     ]);
   });
