@@ -65,14 +65,14 @@ describe('updateDapContractFactory', () => {
     const secondReference = new Reference();
     const secondSchema = {};
     const secondVersion = 2;
-    const secondPreviousRevisions = [firstDapContractVersion.currentRevision()];
+    const secondPreviousVersions = [firstDapContractVersion.currentRevision()];
     const secondDapContractVersion = new DapContract(
       dapId,
       dapName,
       secondReference,
       secondSchema,
       secondVersion,
-      secondPreviousRevisions,
+      secondPreviousVersions,
     );
     await dapContractRepository.store(secondDapContractVersion);
 

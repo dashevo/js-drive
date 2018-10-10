@@ -8,14 +8,14 @@ describe('DapContract', () => {
     const reference = new Reference();
     const schema = {};
     const version = 2;
-    const previousRevisions = [];
+    const previousVersions = [];
     const dapContract = new DapContract(
       dapId,
       dapName,
       reference,
       schema,
       version,
-      previousRevisions,
+      previousVersions,
     );
 
     const dapContractSerialized = dapContract.toJSON();
@@ -25,7 +25,7 @@ describe('DapContract', () => {
       reference,
       schema,
       version,
-      previousRevisions,
+      previousVersions,
     });
   });
 
@@ -50,14 +50,14 @@ describe('DapContract', () => {
     const secondReference = new Reference();
     const secondSchema = {};
     const secondVersion = 2;
-    const secondPreviousRevisions = [firstDapContract.currentRevision()];
+    const secondPreviousVersions = [firstDapContract.currentRevision()];
     const secondDapContract = new DapContract(
       secondDapId,
       secondDapName,
       secondReference,
       secondSchema,
       secondVersion,
-      secondPreviousRevisions,
+      secondPreviousVersions,
     );
 
     const thirdDapId = '9999';
@@ -65,14 +65,14 @@ describe('DapContract', () => {
     const thirdReference = new Reference();
     const thirdSchema = {};
     const thirdVersion = 2;
-    const thirdPreviousRevisions = [];
+    const thirdPreviousVersions = [];
     const thirdDapContract = new DapContract(
       thirdDapId,
       thirdDapName,
       thirdReference,
       thirdSchema,
       thirdVersion,
-      thirdPreviousRevisions,
+      thirdPreviousVersions,
     );
 
     thirdDapContract.addRevision(secondDapContract);

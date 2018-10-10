@@ -24,14 +24,14 @@ describe('fetchDapContractMehotd', () => {
     const reference = new Reference();
     const schema = {};
     const version = 2;
-    const previousRevisions = [];
+    const previousVersions = [];
     const contract = new DapContract(
       dapId,
       dapName,
       reference,
       schema,
       version,
-      previousRevisions,
+      previousVersions,
     );
     dapContractMongoDbRepository.find.returns(contract);
 
@@ -43,7 +43,7 @@ describe('fetchDapContractMehotd', () => {
       reference,
       schema,
       version,
-      previousRevisions,
+      previousVersions,
     });
   });
 });

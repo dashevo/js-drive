@@ -17,7 +17,7 @@ describe('DapContractRepository', () => {
     const reference = new Reference();
     const schema = {};
     const version = 2;
-    const previousRevisions = [{
+    const previousVersions = [{
       version: 1,
       reference: new Reference(),
     }];
@@ -27,7 +27,7 @@ describe('DapContractRepository', () => {
       reference,
       schema,
       version,
-      previousRevisions,
+      previousVersions,
     );
 
     await dapContractRepository.store(dapContract);
@@ -44,6 +44,6 @@ describe('DapContractRepository', () => {
     expect(serializeContract.reference).to.be.deep.equal(new Reference().toJSON());
     expect(serializeContract.schema).to.not.exist();
     expect(serializeContract.version).to.not.exist();
-    expect(serializeContract.previousRevisions).to.be.deep.equal([]);
+    expect(serializeContract.previousVersions).to.be.deep.equal([]);
   });
 });
