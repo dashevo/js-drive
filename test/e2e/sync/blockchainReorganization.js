@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
 
@@ -157,24 +156,6 @@ describe('Blockchain reorganization', function main() {
       (10 * BLOCKS_PER_REGISTRATION) + (2 * BLOCKS_PER_ST),
     );
 
-    // Output logs after 3 minutes of waiting
-    setTimeout(async () => {
-      const { result: firstNodeBlockCount } = await firstDashDrive.dashCore.getApi().blockCount();
-      const { result: secondNodeBlockCount } = await firstDashDrive.dashCore.getApi().blockCount();
-
-      console.log(`FIRST NODE BLOCK COUNT: ${firstNodeBlockCount}`);
-      console.log(`SECOND NODE BLOCK COUNT: ${secondNodeBlockCount}`);
-
-      const firstNode = await firstDashDrive.driveSync.container.container.logs({ stdout: true });
-      const secondNode = await secondDashDrive.driveSync.container.container.logs({ stdout: true });
-
-      console.log('First node:');
-      console.log(firstNode);
-      console.log('');
-      console.log('Second node:');
-      console.log(secondNode);
-    }, 3 * (60 * 1000));
-
     // Await first Dash Drive sync
     await dashDriveSyncToFinish(firstDashDrive.driveApi);
   });
@@ -327,15 +308,6 @@ describe('Blockchain reorganization', function main() {
   });
 
   after('cleanup lone services', async () => {
-    const firstNode = await firstDashDrive.driveSync.container.container.logs({ stdout: true });
-    const secondNode = await secondDashDrive.driveSync.container.container.logs({ stdout: true });
-
-    console.log('First node:');
-    console.log(firstNode);
-    console.log('');
-    console.log('Second node:');
-    console.log(secondNode);
-
     const instances = [
       firstDashDrive,
       secondDashDrive,
