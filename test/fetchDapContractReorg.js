@@ -20,19 +20,23 @@ const doubleSha256 = require('../lib/util/doubleSha256');
 function applyDapContractReorgFactory(dapContractMongoDbRepository, rpcClient, applyStateTransition) {
   async function applyDapContractReorg(staleBlock) {
     const dapContract = await dapContractMongoDbRepository.findByReferenceBlockHash(staleBlock.hash);
+    await dapContractMongoDbRepository.deleteByReferenceBlockHash(staleBlock.hash);
     const previousVersions = dapContract.getPreviousVersions();
 
     for (let i = 0; i < previousVersions.length; i++) {
       const previousVersionReference = previousVersions[i].reference;
-      const block = await rpcClient.getBlock(previousVersionReference.blockHash);
-      const header = await rpcClient.getTransaction(previousVersionReference.stHeaderHash);
+      const blockHash = previousVersionReference.blockHash;
+      const block = await rpcClient.getBlock(blockHash);
+      const transactionId = previousVersionReference.stHeaderHash;
+      const { result: header } = await rpcClient.getRawTransaction(transactionId);
       await applyStateTransition(header, block);
     }
   }
   return applyDapContractReorg;
 }
 
-describe('applyDapContractReorgFactory', () => {
+describe('applyDapContractReorgFactory', function() {
+  this.timeout(10000);
   // 1 2 3 4 5 6 7 8
   //         5 6 7 8 9 10
 
@@ -66,7 +70,6 @@ describe('applyDapContractReorgFactory', () => {
   });
 
   it('...with versions', async () => {
-    const dapId = '1234';
     const dapName = 'DashPay';
 
     const versionOneBlock = getBlockFixtures()[0];
@@ -75,7 +78,10 @@ describe('applyDapContractReorgFactory', () => {
     const versionOneHeader = getTransitionHeaderFixtures()[0];
     versionOneHeader.extraPayload.hashSTPacket = versionOnePacket.getHash();
 
-    await addSTPacket(versionOnePacket);
+    const dapId = doubleSha256(versionOnePacket.dapcontract);
+
+    const versionOneObjectCid = await addSTPacket(versionOnePacket);
+    console.log('CID v1', versionOneObjectCid.toBaseEncodedString());
 
     const lastVersionBlock = getBlockFixtures()[1];
     const lastVersionPacket = getTransitionPacketFixtures()[0];
@@ -84,13 +90,14 @@ describe('applyDapContractReorgFactory', () => {
     const lastVersionHeader = getTransitionHeaderFixtures()[1];
     lastVersionHeader.extraPayload.hashSTPacket = lastVersionPacket.getHash();
 
-    await addSTPacket(lastVersionPacket);
+    const lastVersionObjectCid = await addSTPacket(lastVersionPacket);
+    console.log('CID v2', lastVersionObjectCid.toBaseEncodedString());
 
     const lastVersionBlockHash = lastVersionBlock.hash;
     const lastVersionBlockHeight = lastVersionBlock.height;
-    const lastVersionStHeaderHash = '';
-    const lastVersionStPacketHash = '';
-    const lastVersionObjectHash = '';
+    const lastVersionStHeaderHash = lastVersionHeader.extraPayload.regTxId;
+    const lastVersionStPacketHash = lastVersionPacket.getHash();
+    const lastVersionObjectHash = lastVersionObjectCid.toBaseEncodedString();
     const lastReference = new Reference(
       lastVersionBlockHash,
       lastVersionBlockHeight,
@@ -103,9 +110,9 @@ describe('applyDapContractReorgFactory', () => {
 
     const versionOneBlockHash = versionOneBlock.hash;
     const versionOneBlockHeight = versionOneBlock.height;
-    const versionOneStHeaderHash = '';
-    const versionOneStPacketHash = '';
-    const versionOneObjectHash = '';
+    const versionOneStHeaderHash = versionOneHeader.extraPayload.regTxId;
+    const versionOneStPacketHash = versionOnePacket.getHash();
+    const versionOneObjectHash = versionOneObjectCid.toBaseEncodedString();
     const previousVersions = [
       {
         version: 1,
@@ -128,7 +135,8 @@ describe('applyDapContractReorgFactory', () => {
     );
     await dapContractMongoDbRepository.store(dapContract);
 
-
+    rpcClientMock.transitionHeaders[0].extraPayload.hashSTPacket = versionOneHeader.extraPayload.hashSTPacket;
+    rpcClientMock.transitionHeaders[1].extraPayload.hashSTPacket = lastVersionHeader.extraPayload.hashSTPacket;
     const applyDapContractReorg = applyDapContractReorgFactory(
       dapContractMongoDbRepository,
       rpcClientMock,
