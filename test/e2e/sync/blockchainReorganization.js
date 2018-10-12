@@ -1,13 +1,13 @@
+const cbor = require('cbor');
+const { startDashDrive } = require('@dashevo/js-evo-services-ctl');
+
 const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 const StateTransitionPacket = require('../../../lib/storage/StateTransitionPacket');
 
 const registerUser = require('../../../lib/test/registerUser');
+
 const createSTHeader = require('../../../lib/test/createSTHeader');
-
-const { startDashDrive } = require('@dashevo/js-evo-services-ctl');
-
 const wait = require('../../../lib/util/wait');
-const cbor = require('cbor');
 
 async function createAndSubmitST(userId, privateKeyString, username, basePacketData, instance) {
   const packet = new StateTransitionPacket(basePacketData);
@@ -89,8 +89,7 @@ describe('Blockchain reorganization', function main() {
     for (let i = 0; i < 10; i++) {
       const instance = firstDashDrive;
       const username = `Alice_${i}`;
-      const { userId, privateKeyString } =
-            await registerUser(username, instance.dashCore.getApi());
+      const { userId, privateKeyString } = await registerUser(username, instance.dashCore.getApi());
       registeredUsers.push({ username, userId, privateKeyString });
     }
 
@@ -98,8 +97,8 @@ describe('Blockchain reorganization', function main() {
     await blockCountEvenAndEqual(
       firstDashDrive.dashCore,
       secondDashDrive.dashCore,
-      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
-      (10 * BLOCKS_PER_REGISTRATION),
+      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION
+      + (10 * BLOCKS_PER_REGISTRATION),
     );
 
     // 2. Populate instance of Dash Drive and Dash Core with data
@@ -121,8 +120,8 @@ describe('Blockchain reorganization', function main() {
     await blockCountEvenAndEqual(
       firstDashDrive.dashCore,
       secondDashDrive.dashCore,
-      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
-      (10 * BLOCKS_PER_REGISTRATION) + (2 * BLOCKS_PER_ST),
+      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION
+      + (10 * BLOCKS_PER_REGISTRATION) + (2 * BLOCKS_PER_ST),
     );
 
     // Await first Dash Drive sync
@@ -173,9 +172,9 @@ describe('Blockchain reorganization', function main() {
     {
       const { result: blockCount } = await firstDashDrive.dashCore.getApi().getBlockCount();
 
-      const expectedBlockCount = BLOCKS_PROPAGATION_ACTIVATION +
-                                 BLOCKS_ST_ACTIVATION +
-                                 (10 * BLOCKS_PER_REGISTRATION) + (4 * BLOCKS_PER_ST);
+      const expectedBlockCount = BLOCKS_PROPAGATION_ACTIVATION
+                                 + BLOCKS_ST_ACTIVATION
+                                 + (10 * BLOCKS_PER_REGISTRATION) + (4 * BLOCKS_PER_ST);
 
       expect(blockCount).to.be.equal(expectedBlockCount);
     }
@@ -198,9 +197,9 @@ describe('Blockchain reorganization', function main() {
     {
       const { result: blockCount } = await secondDashDrive.dashCore.getApi().getBlockCount();
 
-      const expectedBlockCount = BLOCKS_PROPAGATION_ACTIVATION +
-                                 BLOCKS_ST_ACTIVATION +
-                                 (10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST);
+      const expectedBlockCount = BLOCKS_PROPAGATION_ACTIVATION
+                                 + BLOCKS_ST_ACTIVATION
+                                 + (10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST);
 
       expect(blockCount).to.be.equal(expectedBlockCount);
     }
@@ -219,8 +218,8 @@ describe('Blockchain reorganization', function main() {
     await blockCountEvenAndEqual(
       firstDashDrive.dashCore,
       secondDashDrive.dashCore,
-      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION +
-      (10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST),
+      BLOCKS_PROPAGATION_ACTIVATION + BLOCKS_ST_ACTIVATION
+      + (10 * BLOCKS_PER_REGISTRATION) + (5 * BLOCKS_PER_ST),
     );
 
     // Check tses are back to mempool
