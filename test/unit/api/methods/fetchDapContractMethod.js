@@ -14,7 +14,7 @@ describe('fetchDapContractMethod', () => {
   });
 
   it('should throw InvalidParamsError if DAP id is not provided', () => {
-    expect(fetchDapContractMethod()).to.be.rejectedWith(InvalidParamsError);
+    expect(fetchDapContractMethod({})).to.be.rejectedWith(InvalidParamsError);
   });
 
   it('should return DAP contract', async () => {
