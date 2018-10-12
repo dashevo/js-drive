@@ -2,7 +2,7 @@ const fetchDapContractMethodFactory = require('../../../../lib/api/methods/fetch
 const InvalidParamsError = require('../../../../lib/api/InvalidParamsError');
 const DapContract = require('../../../../lib/stateView/dapContract/DapContract');
 
-describe('fetchDapContractMehotd', () => {
+describe('fetchDapContractMethod', () => {
   let fetchDapContractMethod;
   let dapContractMongoDbRepository;
 
