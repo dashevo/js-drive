@@ -1,8 +1,9 @@
+const { mocha: { startMongoDb } } = require('@dashevo/js-evo-services-ctl');
+
 const getTransitionPacketFixtures = require('../../../../lib/test/fixtures/getTransitionPacketFixtures');
 const doubleSha256 = require('../../../../lib/util/doubleSha256');
 const Reference = require('../../../../lib/stateView/Reference');
 const DapContract = require('../../../../lib/stateView/dapContract/DapContract');
-const { mocha: { startMongoDb } } = require('@dashevo/js-evo-services-ctl');
 const sanitizeData = require('../../../../lib/mongoDb/sanitizeData');
 const DapContractMongoDbRepository = require('../../../../lib/stateView/dapContract/DapContractMongoDbRepository');
 const updateDapContractFactory = require('../../../../lib/stateView/dapContract/updateDapContractFactory');
