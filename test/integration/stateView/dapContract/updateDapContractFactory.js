@@ -94,7 +94,7 @@ describe('updateDapContractFactory', () => {
     ]);
   });
 
-  it('should store DapContract if DapContract with upgrade dap id is not found', async () => {
+  it('should not store DapContract if DapContract with upgrade dap id is not found', async () => {
     const dapId = '1234';
 
     const packet = getTransitionPacketFixtures()[0];
@@ -107,8 +107,6 @@ describe('updateDapContractFactory', () => {
     await updateDapContract(dapId, reference, dapContractData);
     const thirdDapContractEntity = await dapContractRepository.find(dapId);
 
-    expect(thirdDapContractEntity.getSchema()).to.deep.equal(dapContractData.dapschema);
-    expect(thirdDapContractEntity.getVersion()).to.deep.equal(dapContractData.dapver);
-    expect(thirdDapContractEntity.getPreviousVersions()).to.deep.equal([]);
+    expect(thirdDapContractEntity).to.be.null();
   });
 });
