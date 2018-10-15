@@ -1,7 +1,7 @@
+const { mocha: { startMongoDb } } = require('@dashevo/js-evo-services-ctl');
 const Reference = require('../../../../lib/stateView/Reference');
 const DapContract = require('../../../../lib/stateView/dapContract/DapContract');
 const DapContractMongoDbRepository = require('../../../../lib/stateView/dapContract/DapContractMongoDbRepository');
-const { mocha: { startMongoDb } } = require('@dashevo/js-evo-services-ctl');
 const sanitizeData = require('../../../../lib/mongoDb/sanitizeData');
 
 describe('DapContractRepository', () => {
@@ -35,15 +35,9 @@ describe('DapContractRepository', () => {
     expect(contract.toJSON()).to.deep.equal(dapContract.toJSON());
   });
 
-  it('should return empty DAP contract if not found', async () => {
-    const contract = await dapContractRepository.find();
+  it('should return null if not found', async () => {
+    const contract = await dapContractRepository.find('unknown');
 
-    const serializeContract = contract.toJSON();
-    expect(serializeContract.dapId).to.not.exist();
-    expect(serializeContract.dapName).to.not.exist();
-    expect(serializeContract.reference).to.be.deep.equal(new Reference().toJSON());
-    expect(serializeContract.schema).to.not.exist();
-    expect(serializeContract.version).to.not.exist();
-    expect(serializeContract.previousVersions).to.be.deep.equal([]);
+    expect(contract).to.be.null();
   });
 });

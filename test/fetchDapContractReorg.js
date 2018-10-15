@@ -184,6 +184,6 @@ describe('applyDapContractReorgFactory', function() {
     await applyDapContractReorg(staleBlock);
 
     const dapContractAfter = await dapContractMongoDbRepository.find(dapId);
-    expect(dapContractAfter.getDapId()).to.not.exist();
+    expect(dapContractAfter).to.not.exist();
   });
 });
