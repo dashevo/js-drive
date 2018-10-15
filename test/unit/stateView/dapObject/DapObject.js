@@ -37,15 +37,17 @@ describe('DapObject', () => {
       headerHash,
       hashSTPacket,
     );
-    const dapObject = new DapObject(blockchainUserId, dapObjectData, reference);
+    const previousVersions = [];
+    const dapObject = new DapObject(blockchainUserId, dapObjectData, reference, previousVersions);
 
     const dapObjectSerialized = dapObject.toJSON();
     expect(dapObjectSerialized).to.deep.equal({
       blockchainUserId,
       type: dapObjectData.objtype,
       object: dapObjectData,
-      revision: dapObjectData.rev,
+      version: dapObjectData.rev,
       reference: reference.toJSON(),
+      previousVersions,
     });
   });
 
@@ -67,5 +69,63 @@ describe('DapObject', () => {
     const reference = new Reference();
     const dapObject = new DapObject(blockchainUserId, dapObjectData, reference);
     expect(dapObject.getAction()).to.be.equal(0);
+  });
+
+  it('should add revision to DapObject', () => {
+    const blockchainUserId = '3557b9a8dfcc1ef9674b50d8d232e0e3e9020f49fa44f89cace622a01f43d03e';
+
+    const firstDapObjectData = {
+      id: '1234',
+      objtype: 'user',
+      idx: 0,
+      rev: 1,
+      act: 0,
+    };
+    const firstReference = new Reference();
+    const firstPreviousRevisions = [];
+    const firstDapObject = new DapObject(
+      blockchainUserId,
+      firstDapObjectData,
+      firstReference,
+      firstPreviousRevisions,
+    );
+
+    const secondDapObjectData = {
+      id: '1234',
+      objtype: 'user',
+      idx: 0,
+      rev: 2,
+      act: 0,
+    };
+    const secondReference = new Reference();
+    const secondPreviousVersions = [firstDapObject.currentRevision()];
+    const secondDapObject = new DapObject(
+      blockchainUserId,
+      secondDapObjectData,
+      secondReference,
+      secondPreviousVersions,
+    );
+
+    const thirdDapObjectData = {
+      id: '1234',
+      objtype: 'user',
+      idx: 0,
+      rev: 3,
+      act: 0,
+    };
+    const thirdReference = new Reference();
+    const thirdPreviousVersions = [];
+    const thirdDapObject = new DapObject(
+      blockchainUserId,
+      thirdDapObjectData,
+      thirdReference,
+      thirdPreviousVersions,
+    );
+    thirdDapObject.addRevision(secondDapObject);
+
+    expect(thirdDapObject.getPreviousVersions()).to.be.deep.equal([
+      firstDapObject.currentRevision(),
+      secondDapObject.currentRevision(),
+    ]);
   });
 });
