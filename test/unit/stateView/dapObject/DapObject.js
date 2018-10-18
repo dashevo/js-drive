@@ -40,7 +40,13 @@ describe('DapObject', () => {
       hashSTPacket,
     );
     const previousVersions = [];
-    const dapObject = new DapObject(blockchainUserId, isDeleted, dapObjectData, reference, previousVersions);
+    const dapObject = new DapObject(
+      blockchainUserId,
+      isDeleted,
+      dapObjectData,
+      reference,
+      previousVersions,
+    );
 
     const dapObjectSerialized = dapObject.toJSON();
     expect(dapObjectSerialized).to.deep.equal({
