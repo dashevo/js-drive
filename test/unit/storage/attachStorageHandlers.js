@@ -68,7 +68,7 @@ describe('attachStorageHandlers', () => {
 
     expect(calledWithArgs[0]).to.be.equal(pinPromise);
     expect(calledWithArgs[1].name).to.be.equal('InvalidPacketCidError');
-    expect(calledWithArgs[2]).to.be.equal(attachStorageHandlers.PIN_REJECTION_TIMEOUT);
+    expect(calledWithArgs[2]).to.be.equal(process.env.STORAGE_IPFS_TIMEOUT);
   });
 
   it('should unpin ST packets in case of reorg', async () => {
