@@ -12,6 +12,7 @@ const AmbiguousStartError = require('../../../../lib/stateView/dapObject/errors/
 let id = 1;
 function createDapObjectWithAge(age) {
   const blockchainUserId = id++;
+  const isDeleted = false;
   const objectData = {
     act: 0,
     objtype: 'DashPayContact',
@@ -38,7 +39,7 @@ function createDapObjectWithAge(age) {
       reference,
     },
   ];
-  return new DapObject(blockchainUserId, objectData, reference, previousVersions);
+  return new DapObject(blockchainUserId, isDeleted, objectData, reference, previousVersions);
 }
 
 describe('DapObjectMongoDbRepository', () => {
