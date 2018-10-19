@@ -22,12 +22,18 @@ const errorHandler = require('../lib/util/errorHandler');
   const syncState = syncApp.getSyncState();
   const syncStateRepository = syncApp.getSyncStateRepository();
   const applyStateTransition = syncApp.createApplyStateTransition();
+  const applyReorgForDapContract = syncApp.createApplyReorgForDapContract(applyStateTransition);
   const dropMongoDatabasesWithPrefix = syncApp.createDropMongoDatabasesWithPrefix();
   const cleanDashDrive = syncApp.createCleanDashDrive();
 
   attachStorageHandlers(stHeaderReader, ipfsAPI, unpinAllIpfsPackets);
   attachSyncHandlers(stHeaderReader, syncState, syncStateRepository);
-  attachStateViewHandlers(stHeaderReader, applyStateTransition, dropMongoDatabasesWithPrefix);
+  attachStateViewHandlers(
+    stHeaderReader,
+    applyStateTransition,
+    applyReorgForDapContract,
+    dropMongoDatabasesWithPrefix,
+  );
 
   const readChain = readChainFactory(stHeaderReader, rpcClient, syncState, cleanDashDrive);
 

@@ -6,16 +6,19 @@ const STHeadersReader = require('../../../lib/blockchain/reader/STHeadersReader'
 describe('attachStateViewHandlers', () => {
   let stHeadersReaderMock;
   let applyStateTransition;
+  let applyReorgForDapContract;
   let dropMongoDatabasesWithPrefixStub;
 
   beforeEach(function beforeEach() {
     class STHeadersReaderMock extends Emitter {}
     stHeadersReaderMock = new STHeadersReaderMock();
     applyStateTransition = this.sinon.stub();
+    applyReorgForDapContract = this.sinon.stub();
     dropMongoDatabasesWithPrefixStub = this.sinon.stub();
     attachStateViewHandlers(
       stHeadersReaderMock,
       applyStateTransition,
+      applyReorgForDapContract,
       dropMongoDatabasesWithPrefixStub,
     );
   });
@@ -24,6 +27,12 @@ describe('attachStateViewHandlers', () => {
     const header = getTransitionHeaderFixtures()[0];
     await stHeadersReaderMock.emitSerial(STHeadersReader.EVENTS.HEADER, { header });
     expect(applyStateTransition).to.be.calledOnce();
+  });
+
+  it('should call applyReorgForDapContract on a stale block', async () => {
+    const staleBlock = {};
+    await stHeadersReaderMock.emitSerial(STHeadersReader.EVENTS.STALE_BLOCK, { staleBlock });
+    expect(applyReorgForDapContract).to.be.calledOnce();
   });
 
   it('should call dropMongoDatabasesWithPrefix on reset event', async () => {
