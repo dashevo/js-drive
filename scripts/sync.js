@@ -26,8 +26,20 @@ const errorHandler = require('../lib/util/errorHandler');
   const dropMongoDatabasesWithPrefix = syncApp.createDropMongoDatabasesWithPrefix();
   const cleanDashDrive = syncApp.createCleanDashDrive();
 
-  attachStorageHandlers(stHeaderReader, ipfsAPI, unpinAllIpfsPackets);
-  attachSyncHandlers(stHeaderReader, syncState, syncStateRepository);
+  // Attach listeners to ST Header Reader
+  attachStorageHandlers(
+    stHeaderReader,
+    ipfsAPI,
+    unpinAllIpfsPackets,
+    syncAppOptions.getStorageIpfsTimeout(),
+  );
+
+  attachSyncHandlers(
+    stHeaderReader,
+    syncState,
+    syncStateRepository,
+  );
+
   attachStateViewHandlers(
     stHeaderReader,
     applyStateTransition,
