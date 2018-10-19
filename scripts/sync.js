@@ -22,7 +22,7 @@ const errorHandler = require('../lib/util/errorHandler');
   const syncState = syncApp.getSyncState();
   const syncStateRepository = syncApp.getSyncStateRepository();
   const applyStateTransition = syncApp.createApplyStateTransition();
-  const applyReorgForDapContract = syncApp.createApplyReorgForDapContract(applyStateTransition);
+  const revertDapContractsForBlock = syncApp.createRevertDapContractsForBlock(applyStateTransition);
   const dropMongoDatabasesWithPrefix = syncApp.createDropMongoDatabasesWithPrefix();
   const cleanDashDrive = syncApp.createCleanDashDrive();
 
@@ -43,7 +43,7 @@ const errorHandler = require('../lib/util/errorHandler');
   attachStateViewHandlers(
     stHeaderReader,
     applyStateTransition,
-    applyReorgForDapContract,
+    revertDapContractsForBlock,
     dropMongoDatabasesWithPrefix,
   );
 

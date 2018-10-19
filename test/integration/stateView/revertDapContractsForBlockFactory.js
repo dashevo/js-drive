@@ -20,11 +20,11 @@ const RpcClientMock = require('../../../lib/test/mock/RpcClientMock');
 const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory');
 const updateDapContractFactory = require('../../../lib/stateView/dapContract/updateDapContractFactory');
 const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
-const applyReorgForDapContractFactory = require('../../../lib/stateView/applyReorgForDapContractFactory');
+const revertDapContractsForBlockFactory = require('../../../lib/stateView/revertDapContractsForBlockFactory');
 
 const doubleSha256 = require('../../../lib/util/doubleSha256');
 
-describe('applyReorgForDapContractFactory', function main() {
+describe('revertDapContractsForBlockFactory', function main() {
   this.timeout(10000);
 
   let mongoDb;
@@ -117,12 +117,12 @@ describe('applyReorgForDapContractFactory', function main() {
         .header.extraPayload.hashSTPacket;
     }
 
-    const applyReorgForDapContract = applyReorgForDapContractFactory(
+    const revertDapContractsForBlock = revertDapContractsForBlockFactory(
       dapContractMongoDbRepository,
       rpcClientMock,
       applyStateTransition,
     );
-    await applyReorgForDapContract(dapContractVersions[dapContractVersions.length - 1].block);
+    await revertDapContractsForBlock(dapContractVersions[dapContractVersions.length - 1].block);
 
     const dapContractAfter = await dapContractMongoDbRepository.find(dapId);
 
@@ -165,13 +165,13 @@ describe('applyReorgForDapContractFactory', function main() {
     );
     await dapContractMongoDbRepository.store(dapContract);
 
-    const applyReorgForDapContract = applyReorgForDapContractFactory(
+    const revertDapContractsForBlock = revertDapContractsForBlockFactory(
       dapContractMongoDbRepository,
       rpcClientMock,
       applyStateTransition,
     );
 
-    await applyReorgForDapContract(block);
+    await revertDapContractsForBlock(block);
 
     const dapContractAfter = await dapContractMongoDbRepository.find(dapId);
     expect(dapContractAfter).to.not.exist();
