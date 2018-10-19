@@ -29,7 +29,7 @@ const doubleSha256 = require('../../../lib/util/doubleSha256');
 describe('revertDapContractsForBlockFactory', function main() {
   this.timeout(10000);
 
-  let syncAppOptions = new SyncAppOptions(process.env);
+  const syncAppOptions = new SyncAppOptions(process.env);
 
   let mongoDb;
   startMongoDb().then(async (mongoDbInstance) => {
