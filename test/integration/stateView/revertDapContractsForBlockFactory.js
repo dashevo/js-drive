@@ -22,10 +22,14 @@ const updateDapContractFactory = require('../../../lib/stateView/dapContract/upd
 const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
 const revertDapContractsForBlockFactory = require('../../../lib/stateView/revertDapContractsForBlockFactory');
 
+const SyncAppOptions = require('../../../lib/app/SyncAppOptions');
+
 const doubleSha256 = require('../../../lib/util/doubleSha256');
 
 describe('revertDapContractsForBlockFactory', function main() {
   this.timeout(10000);
+
+  let syncAppOptions = new SyncAppOptions(process.env);
 
   let mongoDb;
   startMongoDb().then(async (mongoDbInstance) => {
@@ -48,6 +52,7 @@ describe('revertDapContractsForBlockFactory', function main() {
       ipfsClient,
       updateDapContract,
       null,
+      syncAppOptions.getStorageIpfsTimeout() * 1000,
     );
   });
 
