@@ -74,10 +74,10 @@ describe('updateDapObjectFactory', () => {
     const dapObjectMongoDbRepository = createDapObjectMongoDbRepository(dapId);
     const id = generateDapObjectId(blockchainUserId, revisionOneDapObjectData.idx);
     const dapObject = await dapObjectMongoDbRepository.find(id);
-    expect(dapObject.getVersion()).to.be.equal(revisionTwoDapObjectData.rev);
-    expect(dapObject.getPreviousVersions()).to.be.deep.equal([
+    expect(dapObject.getRevision()).to.be.equal(revisionTwoDapObjectData.rev);
+    expect(dapObject.getPreviousRevisions()).to.be.deep.equal([
       {
-        version: revisionOneDapObjectData.rev,
+        revision: revisionOneDapObjectData.rev,
         reference,
       },
     ]);

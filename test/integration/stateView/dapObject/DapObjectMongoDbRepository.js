@@ -33,13 +33,13 @@ function createDapObjectWithAge(age) {
     hashSTPacket,
     objectHash,
   );
-  const previousVersions = [
+  const previousRevisions = [
     {
-      version: 1,
+      revision: 1,
       reference,
     },
   ];
-  return new DapObject(blockchainUserId, isDeleted, objectData, reference, previousVersions);
+  return new DapObject(blockchainUserId, isDeleted, objectData, reference, previousRevisions);
 }
 
 describe('DapObjectMongoDbRepository', () => {

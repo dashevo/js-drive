@@ -39,13 +39,13 @@ describe('DapObject', () => {
       headerHash,
       hashSTPacket,
     );
-    const previousVersions = [];
+    const previousRevisions = [];
     const dapObject = new DapObject(
       blockchainUserId,
       isDeleted,
       dapObjectData,
       reference,
-      previousVersions,
+      previousRevisions,
     );
 
     const dapObjectSerialized = dapObject.toJSON();
@@ -54,9 +54,9 @@ describe('DapObject', () => {
       markAsDeleted: isDeleted,
       type: dapObjectData.objtype,
       object: dapObjectData,
-      version: dapObjectData.rev,
+      revision: dapObjectData.rev,
       reference: reference.toJSON(),
-      previousVersions,
+      previousRevisions,
     });
   });
 
@@ -137,7 +137,7 @@ describe('DapObject', () => {
     );
     thirdDapObject.addRevision(secondDapObject);
 
-    expect(thirdDapObject.getPreviousVersions()).to.be.deep.equal([
+    expect(thirdDapObject.getPreviousRevisions()).to.be.deep.equal([
       firstDapObject.currentRevision(),
       secondDapObject.currentRevision(),
     ]);
