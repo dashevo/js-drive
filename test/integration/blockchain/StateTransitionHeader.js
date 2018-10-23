@@ -4,12 +4,26 @@ const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTrans
 const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
 
 describe('StateTransitionHeader', () => {
-  const packet = getTransitionPacketFixtures()[0];
-  const header = getTransitionHeaderFixtures()[0];
-
+  let ipfsAPI;
   let addSTPacket;
+  let packet;
+  let header;
+
   startIPFS().then((instance) => {
-    addSTPacket = addSTPacketFactory(instance.getApi());
+    ipfsAPI = instance.getApi();
+  });
+
+  beforeEach(() => {
+    [packet] = getTransitionPacketFixtures();
+    [header] = getTransitionHeaderFixtures();
+
+    const repositoryMock = {
+      find() {
+        return packet.dapcontract;
+      },
+    };
+
+    addSTPacket = addSTPacketFactory(ipfsAPI, repositoryMock);
   });
 
   it('should StateTransitionHeader CID equal to IPFS CID', async () => {

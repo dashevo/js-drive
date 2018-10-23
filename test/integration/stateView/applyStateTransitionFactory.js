@@ -27,28 +27,33 @@ describe('applyStateTransitionFactory', () => {
   let mongoClient;
   let mongoDb;
   let ipfsClient;
+  let addSTPacket;
+  let dapContractMongoDbRepository;
+  let createDapObjectMongoDbRepository;
+  let applyStateTransition;
 
   startMongoDb().then(async (mongoDbInstance) => {
     mongoClient = await mongoDbInstance.getClient();
     mongoDb = await mongoDbInstance.getDb();
   });
+
   startIPFS().then(async (ipfsInstance) => {
     ipfsClient = await ipfsInstance.getApi();
   });
 
-  let addSTPacket;
-  let dapContractMongoDbRepository;
-  let createDapObjectMongoDbRepository;
-  let applyStateTransition;
   beforeEach(() => {
-    addSTPacket = addSTPacketFactory(ipfsClient);
     dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
+
+    addSTPacket = addSTPacketFactory(ipfsClient, dapContractMongoDbRepository);
+
     createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
       mongoClient,
       DapObjectMongoDbRepository,
     );
+
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
     const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
+
     applyStateTransition = applyStateTransitionFactory(
       ipfsClient,
       updateDapContract,

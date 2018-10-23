@@ -36,12 +36,12 @@
     "eslint-plugin-import": "^2.13.0",
     "mocha": "^5.2.0",
     "mocha-sinon": "^2.1.0",
-    "multihashing-async": "^0.5.1",
     "proxyquire": "^2.1.0",
     "sinon": "^6.3.5",
     "sinon-chai": "^3.2.0"
   },
   "dependencies": {
+    "@dashevo/dash-schema": "^3.0.0-alpha.3",
     "@dashevo/dashcore-lib": "1.0.0-alpha.15",
     "@dashevo/dashd-rpc": "^1.2.0",
     "bs58": "^4.0.1",
