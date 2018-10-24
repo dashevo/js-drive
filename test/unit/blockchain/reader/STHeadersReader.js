@@ -34,7 +34,7 @@ describe('STHeadersReader', () => {
     const endHandlerStub = this.sinon.stub();
 
     reader.on(STHeadersReader.EVENTS.BEGIN, beginHandlerStub);
-    reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
+    reader.on(STHeadersReader.EVENTS.BLOCK_END, blockHandlerStub);
     reader.on(STHeadersReader.EVENTS.HEADER, headerHandlerStub);
     reader.on(STHeadersReader.EVENTS.END, endHandlerStub);
 
@@ -74,7 +74,7 @@ describe('STHeadersReader', () => {
     const blockHandlerStub = this.sinon.stub();
     const resetHandlerStub = this.sinon.stub();
 
-    reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
+    reader.on(STHeadersReader.EVENTS.BLOCK_END, blockHandlerStub);
     reader.on(STHeadersReader.EVENTS.RESET, resetHandlerStub);
 
     await reader.read();
@@ -103,7 +103,7 @@ describe('STHeadersReader', () => {
     const blockHandlerStub = this.sinon.stub();
     const resetHandlerStub = this.sinon.stub();
 
-    reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
+    reader.on(STHeadersReader.EVENTS.BLOCK_END, blockHandlerStub);
     reader.on(STHeadersReader.EVENTS.RESET, resetHandlerStub);
 
     await reader.read();
@@ -127,7 +127,7 @@ describe('STHeadersReader', () => {
     const blockHandlerStub = this.sinon.stub();
     const staleBlockHandlerStub = this.sinon.stub();
 
-    reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
+    reader.on(STHeadersReader.EVENTS.BLOCK_END, blockHandlerStub);
     reader.on(STHeadersReader.EVENTS.STALE_BLOCK, staleBlockHandlerStub);
 
     await reader.read();
@@ -152,7 +152,7 @@ describe('STHeadersReader', () => {
     const blockHandlerStub = this.sinon.stub();
     const staleBlockHandlerStub = this.sinon.stub();
 
-    reader.on(STHeadersReader.EVENTS.BLOCK, blockHandlerStub);
+    reader.on(STHeadersReader.EVENTS.BLOCK_END, blockHandlerStub);
     reader.on(STHeadersReader.EVENTS.STALE_BLOCK, staleBlockHandlerStub);
 
     await reader.read();

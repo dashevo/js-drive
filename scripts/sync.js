@@ -7,7 +7,8 @@ const SyncApp = require('../lib/app/SyncApp');
 const attachStorageHandlers = require('../lib/storage/attachStorageHandlers');
 const attachSyncHandlers = require('../lib/sync/state/attachSyncHandlers');
 const attachStateViewHandlers = require('../lib/stateView/attachStateViewHandlers');
-const readChainFactory = require('../lib/blockchain/readChainFactory');
+const readChainFactory = require('../lib/blockchain/reader/readChainFactory');
+const readChainWithThrottlingFactory = require('../lib/blockchain/reader/readChainWithThrottlingFactory');
 const errorHandler = require('../lib/util/errorHandler');
 
 (async function main() {
@@ -23,7 +24,6 @@ const errorHandler = require('../lib/util/errorHandler');
   const syncStateRepository = syncApp.getSyncStateRepository();
   const applyStateTransition = syncApp.createApplyStateTransition();
   const dropMongoDatabasesWithPrefix = syncApp.createDropMongoDatabasesWithPrefix();
-  const cleanDashDrive = syncApp.createCleanDashDrive();
 
   // Attach listeners to ST Header Reader
   attachStorageHandlers(
@@ -45,18 +45,18 @@ const errorHandler = require('../lib/util/errorHandler');
     dropMongoDatabasesWithPrefix,
   );
 
-  const readChain = readChainFactory(stHeaderReader, rpcClient, syncState, cleanDashDrive);
+  const readChain = readChainFactory(stHeaderReader, rpcClient);
+  const readChainWithThrottling = readChainWithThrottlingFactory(readChain);
 
   // Sync arriving ST packets
   const zmqSocket = zmq.createSocket('sub');
   zmqSocket.connect(syncAppOptions.getDashCoreZmqPubHashBlock());
 
-  zmqSocket.on('message', (topic, blockHash) => {
-    const sinceBlockHash = blockHash.toString('hex');
-    readChain(sinceBlockHash).catch(errorHandler);
+  zmqSocket.on('message', () => {
+    readChainWithThrottling().catch(errorHandler);
   });
 
   zmqSocket.subscribe('hashblock');
 
-  await readChain();
+  await readChainWithThrottling();
 }()).catch(errorHandler);

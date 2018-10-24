@@ -43,7 +43,7 @@ describe('attachSyncHandlers', () => {
   it('should store sync state when next block has processed', async () => {
     attachSyncHandlers(stHeadersReaderMock, syncState, syncStateRepositoryMock);
 
-    await stHeadersReaderMock.emitSerial(STHeadersReader.EVENTS.BLOCK, blocks[0]);
+    await stHeadersReaderMock.emitSerial(STHeadersReader.EVENTS.BLOCK_END, blocks[0]);
 
     expect(syncState.setBlocks).to.be.calledOnce();
     expect(syncState.setBlocks).to.be.calledWith(blocks);
