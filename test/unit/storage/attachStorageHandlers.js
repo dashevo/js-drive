@@ -1,7 +1,7 @@
 const Emitter = require('emittery');
 const proxyquire = require('proxyquire');
 
-const { EVENTS: STHeadersReaderEvents } = require('../../../lib/blockchain/reader/STHeadersReader');
+const { EVENTS: STHeadersReaderEvents } = require('../../../lib/blockchain/reader/header/STHeadersReader');
 const RpcClientMock = require('../../../lib/test/mock/RpcClientMock');
 
 describe('attachStorageHandlers', () => {

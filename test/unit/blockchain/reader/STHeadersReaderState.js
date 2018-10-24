@@ -1,4 +1,4 @@
-const STHeadersReaderState = require('../../../../lib/blockchain/reader/STHeadersReaderState');
+const STHeadersReaderState = require('../../../../lib/blockchain/reader/header/STHeadersReaderState');
 const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
 
 describe('STHeadersReaderState', () => {

@@ -1,7 +1,7 @@
 const Emitter = require('emittery');
 
 const SyncState = require('../../../../lib/sync/state/SyncState');
-const STHeadersReader = require('../../../../lib/blockchain/reader/STHeadersReader');
+const STHeadersReader = require('../../../../lib/blockchain/reader/header/STHeadersReader');
 
 const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
 const attachSyncHandlers = require('../../../../lib/sync/state/attachSyncHandlers');

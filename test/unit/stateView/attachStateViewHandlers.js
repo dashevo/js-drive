@@ -1,7 +1,7 @@
 const Emitter = require('emittery');
 const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
 const attachStateViewHandlers = require('../../../lib/stateView/attachStateViewHandlers');
-const STHeadersReader = require('../../../lib/blockchain/reader/STHeadersReader');
+const STHeadersReader = require('../../../lib/blockchain/reader/header/STHeadersReader');
 
 describe('attachStateViewHandlers', () => {
   let stHeadersReaderMock;
