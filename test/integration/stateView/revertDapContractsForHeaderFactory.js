@@ -20,13 +20,13 @@ const RpcClientMock = require('../../../lib/test/mock/RpcClientMock');
 const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory');
 const updateDapContractFactory = require('../../../lib/stateView/dapContract/updateDapContractFactory');
 const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
-const revertDapContractsForBlockFactory = require('../../../lib/stateView/revertDapContractsForBlockFactory');
+const revertDapContractsForHeaderFactory = require('../../../lib/stateView/revertDapContractsForHeaderFactory');
 
 const SyncAppOptions = require('../../../lib/app/SyncAppOptions');
 
 const doubleSha256 = require('../../../lib/util/doubleSha256');
 
-describe('revertDapContractsForBlockFactory', function main() {
+describe('revertDapContractsForHeaderFactory', function main() {
   this.timeout(10000);
 
   const syncAppOptions = new SyncAppOptions(process.env);
@@ -123,12 +123,12 @@ describe('revertDapContractsForBlockFactory', function main() {
         .header.extraPayload.hashSTPacket;
     }
 
-    const revertDapContractsForBlock = revertDapContractsForBlockFactory(
+    const revertDapContractsForHeader = revertDapContractsForHeaderFactory(
       dapContractMongoDbRepository,
       rpcClientMock,
       applyStateTransition,
     );
-    await revertDapContractsForBlock(dapContractVersions[dapContractVersions.length - 1].block);
+    await revertDapContractsForHeader(dapContractVersions[dapContractVersions.length - 1].header);
 
     const dapContractAfter = await dapContractMongoDbRepository.find(dapId);
 
@@ -146,9 +146,10 @@ describe('revertDapContractsForBlockFactory', function main() {
     const dapName = 'DashPay';
 
     const block = getBlockFixtures()[0];
+    const header = getTransitionHeaderFixtures()[0];
     const blockHash = block.hash;
     const blockHeight = block.height;
-    const stHeaderHash = '';
+    const stHeaderHash = header.hash;
     const stPacketHash = '';
     const objectHash = '';
     const reference = new Reference(
@@ -173,13 +174,13 @@ describe('revertDapContractsForBlockFactory', function main() {
     );
     await dapContractMongoDbRepository.store(dapContract);
 
-    const revertDapContractsForBlock = revertDapContractsForBlockFactory(
+    const revertDapContractsForHeader = revertDapContractsForHeaderFactory(
       dapContractMongoDbRepository,
       rpcClientMock,
       applyStateTransition,
     );
 
-    await revertDapContractsForBlock(block);
+    await revertDapContractsForHeader(header);
 
     const dapContractAfter = await dapContractMongoDbRepository.find(dapId);
     expect(dapContractAfter).to.not.exist();
