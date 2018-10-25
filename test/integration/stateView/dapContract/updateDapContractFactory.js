@@ -52,6 +52,7 @@ describe('updateDapContractFactory', () => {
     const firstReference = new Reference();
     const firstSchema = {};
     const firstVersion = 1;
+    const firstVersionDeleted = false;
     const firstPreviousVersions = [];
     const firstDapContractVersion = new DapContract(
       dapId,
@@ -59,12 +60,14 @@ describe('updateDapContractFactory', () => {
       firstReference,
       firstSchema,
       firstVersion,
+      firstVersionDeleted,
       firstPreviousVersions,
     );
 
     const secondReference = new Reference();
     const secondSchema = {};
     const secondVersion = 2;
+    const secondVersionDeleted = false;
     const secondPreviousVersions = [firstDapContractVersion.currentRevision()];
     const secondDapContractVersion = new DapContract(
       dapId,
@@ -72,6 +75,7 @@ describe('updateDapContractFactory', () => {
       secondReference,
       secondSchema,
       secondVersion,
+      secondVersionDeleted,
       secondPreviousVersions,
     );
     await dapContractRepository.store(secondDapContractVersion);

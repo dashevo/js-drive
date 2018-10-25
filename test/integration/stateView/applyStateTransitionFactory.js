@@ -82,6 +82,7 @@ describe('applyStateTransitionFactory', () => {
     const firstReference = new Reference();
     const firstSchema = {};
     const firstVersion = 1;
+    const firstVersionDeleted = false;
     const firstPreviousVersions = [];
     const firstDapContractVersion = new DapContract(
       dapId,
@@ -89,6 +90,7 @@ describe('applyStateTransitionFactory', () => {
       firstReference,
       firstSchema,
       firstVersion,
+      firstVersionDeleted,
       firstPreviousVersions,
     );
     await dapContractMongoDbRepository.store(firstDapContractVersion);

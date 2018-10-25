@@ -17,6 +17,7 @@ describe('DapContractRepository', () => {
     const reference = new Reference();
     const schema = {};
     const version = 2;
+    const deleted = false;
     const previousVersions = [{
       version: 1,
       reference: new Reference(),
@@ -27,6 +28,7 @@ describe('DapContractRepository', () => {
       reference,
       schema,
       version,
+      deleted,
       previousVersions,
     );
 
@@ -38,6 +40,32 @@ describe('DapContractRepository', () => {
   it('should return null if not found', async () => {
     const contract = await dapContractRepository.find('unknown');
 
+    expect(contract).to.be.null();
+  });
+
+  it('should return null if contract was marked as deleted', async () => {
+    const dapId = '123456';
+    const dapName = 'DashPay';
+    const reference = new Reference();
+    const schema = {};
+    const version = 2;
+    const deleted = true;
+    const previousVersions = [{
+      version: 1,
+      reference: new Reference(),
+    }];
+    const dapContract = new DapContract(
+      dapId,
+      dapName,
+      reference,
+      schema,
+      version,
+      deleted,
+      previousVersions,
+    );
+
+    await dapContractRepository.store(dapContract);
+    const contract = await dapContractRepository.find(dapId);
     expect(contract).to.be.null();
   });
 });

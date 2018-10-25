@@ -112,6 +112,7 @@ describe('revertDapContractsForBlockFactory', function main() {
       dapContractVersions[dapContractVersions.length - 1].reference,
       {},
       dapContractVersions.length,
+      false,
       previousVersions,
     );
     await dapContractMongoDbRepository.store(dapContract);
@@ -159,6 +160,7 @@ describe('revertDapContractsForBlockFactory', function main() {
     );
     const schema = {};
     const version = 1;
+    const deleted = false;
     const previousVersions = [];
     const dapContract = new DapContract(
       dapId,
@@ -166,6 +168,7 @@ describe('revertDapContractsForBlockFactory', function main() {
       reference,
       schema,
       version,
+      deleted,
       previousVersions,
     );
     await dapContractMongoDbRepository.store(dapContract);
