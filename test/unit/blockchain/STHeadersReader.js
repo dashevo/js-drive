@@ -1,6 +1,6 @@
 const RpcClientMock = require('../../../../lib/test/mock/RpcClientMock');
 const RpcBlockIterator = require('../../../../lib/blockchain/iterator/RpcBlockIterator');
-const StateTransitionHeaderIterator = require('../../../../lib/blockchain/iterator/STIterator');
+const StateTransitionHeaderIterator = require('../../../../lib/blockchain/iterator/StateTransitionHeaderIterator');
 const STHeadersReader = require('../../../../lib/blockchain/reader/header/STHeadersReader');
 const STHeadersReaderState = require('../../../../lib/blockchain/reader/header/STHeadersReaderState');
 

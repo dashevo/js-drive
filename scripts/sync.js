@@ -4,11 +4,12 @@ const zmq = require('zeromq');
 
 const SyncAppOptions = require('../lib/app/SyncAppOptions');
 const SyncApp = require('../lib/app/SyncApp');
+
 const attachStorageHandlers = require('../lib/storage/attachStorageHandlers');
 const attachSyncHandlers = require('../lib/sync/state/attachSyncHandlers');
 const attachStateViewHandlers = require('../lib/stateView/attachStateViewHandlers');
-const readChainFactory = require('../lib/blockchain/reader/readChainFactory');
-const readChainWithThrottlingFactory = require('../lib/blockchain/reader/readChainWithThrottlingFactory');
+
+const throttleFactory = require('../lib/util/throttleFactory');
 const errorHandler = require('../lib/util/errorHandler');
 
 (async function main() {
@@ -16,47 +17,44 @@ const errorHandler = require('../lib/util/errorHandler');
   const syncApp = new SyncApp(syncAppOptions);
   await syncApp.init();
 
-  const stHeaderReader = syncApp.createSTHeadersReader();
-  const rpcClient = syncApp.getRpcClient();
-  const ipfsAPI = syncApp.getIpfsApi();
-  const unpinAllIpfsPackets = syncApp.createUnpinAllIpfsPackets();
-  const syncState = syncApp.getSyncState();
-  const syncStateRepository = syncApp.getSyncStateRepository();
-  const applyStateTransition = syncApp.createApplyStateTransition();
-  const dropMongoDatabasesWithPrefix = syncApp.createDropMongoDatabasesWithPrefix();
+  const stReader = syncApp.createSTReader();
+  const syncEventBus = syncApp.createSyncEventBus();
 
-  // Attach listeners to ST Header Reader
+  // Attach listeners to SyncEventBus
   attachStorageHandlers(
-    stHeaderReader,
-    ipfsAPI,
-    unpinAllIpfsPackets,
+    syncEventBus,
+    syncApp.getIpfsApi(),
+    syncApp.getRpcClient(),
+    syncApp.createUnpinAllIpfsPackets(),
     syncAppOptions.getStorageIpfsTimeout(),
   );
 
   attachSyncHandlers(
-    stHeaderReader,
-    syncState,
-    syncStateRepository,
+    syncEventBus,
+    stReader,
+    syncApp.getSyncState(),
+    syncApp.getSyncStateRepository(),
   );
 
   attachStateViewHandlers(
-    stHeaderReader,
-    applyStateTransition,
-    dropMongoDatabasesWithPrefix,
+    syncEventBus,
+    syncApp.createApplyStateTransition(),
+    syncApp.createDropMongoDatabasesWithPrefix(),
+    syncAppOptions.getMongoDbPrefix(),
   );
 
-  const readChain = readChainFactory(stHeaderReader, rpcClient);
-  const readChainWithThrottling = readChainWithThrottlingFactory(readChain);
+  const sync = syncApp.createReadChain();
+  const syncWithThrottling = throttleFactory(sync);
 
   // Sync arriving ST packets
   const zmqSocket = zmq.createSocket('sub');
   zmqSocket.connect(syncAppOptions.getDashCoreZmqPubHashBlock());
 
   zmqSocket.on('message', () => {
-    readChainWithThrottling().catch(errorHandler);
+    syncWithThrottling().catch(errorHandler);
   });
 
   zmqSocket.subscribe('hashblock');
 
-  await readChainWithThrottling();
+  await syncWithThrottling();
 }()).catch(errorHandler);

@@ -2,4 +2,5 @@
 describe('Reader', () => {
   require('./STHeadersReader');
   require('./STHeadersReaderState');
+  require('./validateBlockSequenceFactory');
 });
