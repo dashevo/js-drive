@@ -1,6 +1,8 @@
 /* eslint-disable global-require */
 describe('Reader', () => {
-  require('./STHeadersReader');
-  require('./STHeadersReaderState');
-  require('./validateBlockSequenceFactory');
+  require('./eventHandlers');
+  require('./BlockchainReader');
+  require('./BlockchainReaderMediator');
+  require('./BlockchainReaderState');
+  require('./readBlockchainFactory');
 });

@@ -1,13 +1,13 @@
-const Emitter = require('emittery');
+const Emittery = require('emittery');
 const proxyquire = require('proxyquire');
 
-const { EVENTS: STHeadersReaderEvents } = require('../../../lib/blockchain/reader/header/STHeadersReader');
+const ReaderMediator = require('../../../lib/blockchain/reader/BlockchainReaderMediator');
 const RpcClientMock = require('../../../lib/test/mock/RpcClientMock');
 
 describe('attachStorageHandlers', () => {
   let rpcClientMock;
   let ipfsAPIMock;
-  let stHeadersReaderMock;
+  let readerMediatorMock;
   let rejectAfterMock;
   let attachStorageHandlers;
   let unpinAllIpfsPackets;
@@ -29,18 +29,7 @@ describe('attachStorageHandlers', () => {
 
     ipfsAPIMock = new IpfsAPI();
 
-    // Mock STHeadersReader
-    class STHeadersReaderMock extends Emitter {
-      constructor() {
-        super();
-
-        this.stHeaderIterator = {
-          rpcClient: rpcClientMock,
-        };
-      }
-    }
-
-    stHeadersReaderMock = new STHeadersReaderMock();
+    readerMediatorMock = new Emittery();
     unpinAllIpfsPackets = this.sinon.stub();
 
     rejectAfterMock = this.sinon.stub();
@@ -51,22 +40,28 @@ describe('attachStorageHandlers', () => {
     ipfsTimeout = 1;
 
     attachStorageHandlers(
-      stHeadersReaderMock,
+      readerMediatorMock,
       ipfsAPIMock,
+      rpcClientMock,
       unpinAllIpfsPackets,
       ipfsTimeout,
     );
   });
 
-  it('should pin ST packets when new header appears', async () => {
-    const [header] = rpcClientMock.transitionHeaders;
+  it('should pin ST packet when new state transition appears', async () => {
+    const [stateTransition] = rpcClientMock.transitionHeaders;
+    const [block] = rpcClientMock.blocks;
 
     const pinPromise = Promise.resolve();
     ipfsAPIMock.pin.add.returns(pinPromise);
 
-    await stHeadersReaderMock.emitSerial(STHeadersReaderEvents.HEADER, { header });
+    await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.STATE_TRANSITION, {
+      stateTransition,
+      block,
+    });
 
-    const packetPath = header.getPacketCID().toBaseEncodedString();
+    const packetPath = stateTransition.getPacketCID().toBaseEncodedString();
+
     expect(ipfsAPIMock.pin.add).to.be.calledOnce();
     expect(ipfsAPIMock.pin.add).to.be.calledWith(packetPath, { recursive: true });
 
@@ -80,20 +75,23 @@ describe('attachStorageHandlers', () => {
   });
 
   it('should unpin ST packets in case of reorg', async () => {
+    const [stateTransition] = rpcClientMock.transitionHeaders;
     const [block] = rpcClientMock.blocks;
 
-    await stHeadersReaderMock.emitSerial(STHeadersReaderEvents.STALE_BLOCK, block);
-
-    expect(ipfsAPIMock.pin.rm).has.callCount(block.tx.length);
-
-    rpcClientMock.transitionHeaders.slice(0, block.tx.length).forEach((header) => {
-      const packetPath = header.getPacketCID().toBaseEncodedString();
-      expect(ipfsAPIMock.pin.rm).to.be.calledWith(packetPath, { recursive: true });
+    await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.STATE_TRANSITION_STALE, {
+      stateTransition,
+      block,
     });
+
+    const packetPath = stateTransition.getPacketCID().toBaseEncodedString();
+
+    expect(ipfsAPIMock.pin.rm).to.be.calledOnce();
+    expect(ipfsAPIMock.pin.rm).to.be.calledWith(packetPath, { recursive: true });
   });
 
   it('should call unpinAllIpfsPackets on stHeadersReader reset event', async () => {
-    await stHeadersReaderMock.emit(STHeadersReaderEvents.RESET);
+    await readerMediatorMock.emit(ReaderMediator.EVENTS.RESET);
+
     expect(unpinAllIpfsPackets).to.be.calledOnce();
   });
 });

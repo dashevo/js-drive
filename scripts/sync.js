@@ -5,6 +5,8 @@ const zmq = require('zeromq');
 const SyncAppOptions = require('../lib/app/SyncAppOptions');
 const SyncApp = require('../lib/app/SyncApp');
 
+const attachSequenceValidationHandler = require('../lib/blockchain/reader/eventHandlers/attachSequenceValidationHandler');
+const attachBlockErrorsHandler = require('../lib/blockchain/reader/eventHandlers/attachBlockErrorsHandler');
 const attachStorageHandlers = require('../lib/storage/attachStorageHandlers');
 const attachSyncHandlers = require('../lib/sync/state/attachSyncHandlers');
 const attachStateViewHandlers = require('../lib/stateView/attachStateViewHandlers');
@@ -17,44 +19,51 @@ const errorHandler = require('../lib/util/errorHandler');
   const syncApp = new SyncApp(syncAppOptions);
   await syncApp.init();
 
-  const stReader = syncApp.createSTReader();
-  const syncEventBus = syncApp.createSyncEventBus();
+  const readerMediator = syncApp.createBlockchainReaderMediator();
 
   // Attach listeners to SyncEventBus
+  attachSequenceValidationHandler(
+    readerMediator,
+    syncApp.createStateTransitionsFromBlock(),
+  );
+
   attachStorageHandlers(
-    syncEventBus,
+    readerMediator,
     syncApp.getIpfsApi(),
     syncApp.getRpcClient(),
     syncApp.createUnpinAllIpfsPackets(),
     syncAppOptions.getStorageIpfsTimeout(),
   );
 
-  attachSyncHandlers(
-    syncEventBus,
-    stReader,
-    syncApp.getSyncState(),
-    syncApp.getSyncStateRepository(),
-  );
-
   attachStateViewHandlers(
-    syncEventBus,
+    readerMediator,
     syncApp.createApplyStateTransition(),
     syncApp.createDropMongoDatabasesWithPrefix(),
     syncAppOptions.getMongoDbPrefix(),
   );
 
-  const sync = syncApp.createReadChain();
-  const syncWithThrottling = throttleFactory(sync);
+  attachSyncHandlers(
+    readerMediator,
+    syncApp.getSyncState(),
+    syncApp.getSyncStateRepository(),
+  );
+
+  attachBlockErrorsHandler(
+    readerMediator,
+    { skipBlockWithErrors: syncAppOptions.getSyncBlockSkipWithErrors() },
+  );
+
+  const readBlockchainWithThrottling = throttleFactory(syncApp.createReadBlockchain());
 
   // Sync arriving ST packets
   const zmqSocket = zmq.createSocket('sub');
   zmqSocket.connect(syncAppOptions.getDashCoreZmqPubHashBlock());
 
   zmqSocket.on('message', () => {
-    syncWithThrottling().catch(errorHandler);
+    readBlockchainWithThrottling().catch(errorHandler);
   });
 
   zmqSocket.subscribe('hashblock');
 
-  await syncWithThrottling();
+  await readBlockchainWithThrottling();
 }()).catch(errorHandler);

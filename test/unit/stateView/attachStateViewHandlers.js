@@ -1,33 +1,49 @@
-const Emitter = require('emittery');
-const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
+const Emittery = require('emittery');
+
+const ReaderMediator = require('../../../lib/blockchain/reader/BlockchainReaderMediator');
+
 const attachStateViewHandlers = require('../../../lib/stateView/attachStateViewHandlers');
-const STHeadersReader = require('../../../lib/blockchain/reader/header/STHeadersReader');
+
+const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
+const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 
 describe('attachStateViewHandlers', () => {
-  let stHeadersReaderMock;
+  let readerMediator;
   let applyStateTransition;
   let dropMongoDatabasesWithPrefixStub;
+  let mongoDbPrefix;
 
   beforeEach(function beforeEach() {
-    class STHeadersReaderMock extends Emitter {}
-    stHeadersReaderMock = new STHeadersReaderMock();
+    readerMediator = new Emittery();
     applyStateTransition = this.sinon.stub();
     dropMongoDatabasesWithPrefixStub = this.sinon.stub();
+    mongoDbPrefix = 'test';
+
     attachStateViewHandlers(
-      stHeadersReaderMock,
+      readerMediator,
       applyStateTransition,
       dropMongoDatabasesWithPrefixStub,
+      mongoDbPrefix,
     );
   });
 
-  it('should call attachStateViewHandlers on new block header', async () => {
-    const header = getTransitionHeaderFixtures()[0];
-    await stHeadersReaderMock.emitSerial(STHeadersReader.EVENTS.HEADER, { header });
+  it('should call applyStateTransition on the state transition event', async () => {
+    const [stateTransition] = getTransitionHeaderFixtures();
+    const [block] = getBlockFixtures();
+
+    await readerMediator.emitSerial(ReaderMediator.EVENTS.STATE_TRANSITION, {
+      stateTransition,
+      block,
+    });
+
     expect(applyStateTransition).to.be.calledOnce();
+    expect(applyStateTransition).to.be.calledWith(stateTransition, block);
   });
 
-  it('should call dropMongoDatabasesWithPrefix on reset event', async () => {
-    await stHeadersReaderMock.emit(STHeadersReader.EVENTS.RESET);
+  it('should call dropMongoDatabasesWithPrefix on the reset event', async () => {
+    await readerMediator.emit(ReaderMediator.EVENTS.RESET);
+
     expect(dropMongoDatabasesWithPrefixStub).to.be.calledOnce();
+    expect(dropMongoDatabasesWithPrefixStub).to.be.calledWith(mongoDbPrefix);
   });
 });

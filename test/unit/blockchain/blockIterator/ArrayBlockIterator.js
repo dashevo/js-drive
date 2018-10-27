@@ -1,5 +1,5 @@
 const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
-const ArrayBlockIterator = require('../../../../lib/blockchain/iterator/ArrayBlockIterator');
+const ArrayBlockIterator = require('../../../../lib/blockchain/blockIterator/ArrayBlockIterator');
 
 describe('ArrayBlockIterator', () => {
   let blocks;
