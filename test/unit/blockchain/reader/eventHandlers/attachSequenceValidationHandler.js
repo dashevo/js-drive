@@ -1,10 +1,357 @@
-describe('validateBlockSequenceFactory', () => {
-  it('should restart reader from initial block if previous synced block is not present'
-    + 'and current block is not initial');
-  it('should restart reader from initial block if current block less than previous synced block'
-  + 'and out of synced block limit');
-  it('should restart from reader from previous block if blocks sequence is not correct');
-  it('should restart from reader from current block if it lower than last synced block');
-  it('should pass if previous block is not present and current is initial');
-  it('should pass if blocks sequence is correct');
+const Emittery = require('emittery');
+
+const ReaderMediator = require('../../../../../lib/blockchain/reader/BlockchainReaderMediator');
+const RestartBlockchainReaderError = require('../../../../../lib/blockchain/reader/RestartBlockchainReaderError');
+
+const WrongSequenceError = require('../../../../../lib/blockchain/reader/eventHandlers/errors/WrongSequenceError');
+const NotAbleToValidateSequenceError = require('../../../../../lib/blockchain/reader/eventHandlers/errors/NotAbleToValidateSequenceError');
+
+const attachSequenceValidationHandler = require('../../../../../lib/blockchain/reader/eventHandlers/attachSequenceValidationHandler');
+
+const getBlockFixtures = require('../../../../../lib/test/fixtures/getBlockFixtures');
+const getTransitionHeaderFixtures = require('../../../../../lib/test/fixtures/getTransitionHeaderFixtures');
+
+describe('attachSequenceValidationHandler', () => {
+  let readerMediatorMock;
+  let createStateTransitionsMock;
+  let blocks;
+
+  beforeEach(function beforeEach() {
+    const readerStateMock = {
+      getBlocksLimit: this.sinon.stub(),
+      getLastBlock: this.sinon.stub(),
+      removeLastBlock: this.sinon.stub(),
+    };
+    readerMediatorMock = new Emittery();
+    readerMediatorMock.getState = () => readerStateMock;
+    readerMediatorMock.reset = this.sinon.stub();
+    readerMediatorMock.getInitialBlockHeight = this.sinon.stub();
+
+    createStateTransitionsMock = this.sinon.stub();
+
+    attachSequenceValidationHandler(
+      readerMediatorMock,
+      createStateTransitionsMock,
+    );
+
+    blocks = getBlockFixtures();
+  });
+
+  describe('sequence validation', () => {
+    it('should not able to validate sequence if the last synced block is not present'
+      + 'and current block is not initial', async () => {
+      const [currentBlock] = blocks;
+      currentBlock.height = 5;
+
+      readerMediatorMock.getInitialBlockHeight.returns(1);
+
+      try {
+        await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.BLOCK_BEGIN, currentBlock);
+      } catch (e) {
+        if (e instanceof NotAbleToValidateSequenceError) {
+          expect(readerMediatorMock.getState().getLastBlock).to.be.calledOnce();
+          expect(readerMediatorMock.getState().getBlocksLimit).to.be.calledOnce();
+
+          expect(readerMediatorMock.getInitialBlockHeight).to.be.calledOnce();
+
+          return;
+        }
+
+        throw e;
+      }
+
+      expect.fail('sequence is correct');
+    });
+
+    it('should detect sequence as correct if this last synced block is not present'
+      + 'and current block is initial', async () => {
+      const [currentBlock] = blocks;
+      currentBlock.height = 1;
+
+      readerMediatorMock.getInitialBlockHeight.returns(1);
+
+      await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.BLOCK_BEGIN, currentBlock);
+
+      expect(readerMediatorMock.getState().getLastBlock).to.be.calledOnce();
+      expect(readerMediatorMock.getState().getBlocksLimit).to.be.calledOnce();
+
+      expect(readerMediatorMock.getInitialBlockHeight).to.be.calledOnce();
+    });
+
+    it('should detect sequence as correct if current block higher than the last synced block', async () => {
+      const [currentBlock, lastSyncedBlock] = blocks;
+      currentBlock.height = 2;
+      currentBlock.previousblockhash = 'hash';
+
+      lastSyncedBlock.height = 1;
+      lastSyncedBlock.hash = 'hash';
+
+      readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
+      readerMediatorMock.getState().getBlocksLimit.returns(12);
+
+      await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.BLOCK_BEGIN, currentBlock);
+
+      expect(readerMediatorMock.getState().getLastBlock).to.be.calledOnce();
+      expect(readerMediatorMock.getState().getBlocksLimit).to.be.calledOnce();
+
+      expect(readerMediatorMock.getInitialBlockHeight).to.be.not.called();
+    });
+
+    it('should not able to validate sequence if current block lower than the last synced block'
+      + 'and out of the synced block limit', async () => {
+      const [currentBlock, lastSyncedBlock] = blocks;
+      currentBlock.height = 1;
+      lastSyncedBlock.height = 5;
+
+      readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
+      readerMediatorMock.getState().getBlocksLimit.returns(1);
+
+      try {
+        await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.BLOCK_BEGIN, currentBlock);
+      } catch (e) {
+        if (e instanceof NotAbleToValidateSequenceError) {
+          expect(readerMediatorMock.getState().getLastBlock).to.be.calledOnce();
+          expect(readerMediatorMock.getState().getBlocksLimit).to.be.calledOnce();
+
+          expect(readerMediatorMock.getInitialBlockHeight).to.be.not.called();
+
+          return;
+        }
+
+        throw e;
+      }
+
+      expect.fail('sequence is correct');
+    });
+
+    it('should detect sequence as correct if current block lower than the last synced block'
+      + 'and under the synced block limit', async () => {
+      const [currentBlock, lastSyncedBlock] = blocks;
+      currentBlock.height = 1;
+      lastSyncedBlock.height = 5;
+
+      readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
+      readerMediatorMock.getState().getBlocksLimit.returns(12);
+
+      await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.BLOCK_BEGIN, currentBlock);
+
+      expect(readerMediatorMock.getState().getLastBlock).to.be.calledOnce();
+      expect(readerMediatorMock.getState().getBlocksLimit).to.be.calledOnce();
+
+      expect(readerMediatorMock.getInitialBlockHeight).to.be.not.called();
+    });
+
+    it('should detect sequence as wrong if the last synced block hash is not equal'
+      + ' to the current block\'s "previousblockhash"', async () => {
+      const [currentBlock, lastSyncedBlock] = blocks;
+      currentBlock.height = 2;
+      currentBlock.previousblockhash = 'differentHash';
+
+      lastSyncedBlock.height = 1;
+      lastSyncedBlock.hash = 'hash';
+
+      readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
+      readerMediatorMock.getState().getBlocksLimit.returns(5);
+
+      try {
+        await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.BLOCK_BEGIN, currentBlock);
+      } catch (e) {
+        if (e instanceof WrongSequenceError) {
+          expect(readerMediatorMock.getState().getLastBlock).to.be.calledOnce();
+          expect(readerMediatorMock.getState().getBlocksLimit).to.be.calledOnce();
+
+          expect(readerMediatorMock.getInitialBlockHeight).to.be.not.called();
+
+          return;
+        }
+
+        throw e;
+      }
+
+      expect.fail('sequence is correct');
+    });
+  });
+
+  describe('validation errors handler', () => {
+    it('should do nothing if no validation errors', async () => {
+      const error = new Error();
+
+      await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.BLOCK_ERROR, error);
+    });
+
+    it('should restart reader from initial block if not able not validate sequence', async () => {
+      const initialBlockHeight = 1;
+
+      readerMediatorMock.getInitialBlockHeight.returns(initialBlockHeight);
+
+      try {
+        const error = new NotAbleToValidateSequenceError();
+
+        await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.BLOCK_ERROR, { error });
+      } catch (e) {
+        if (e instanceof RestartBlockchainReaderError) {
+          expect(readerMediatorMock.reset).to.be.calledOnce();
+
+          expect(readerMediatorMock.getInitialBlockHeight).to.be.calledOnce();
+
+          expect(e.getHeight()).to.be.equal(initialBlockHeight);
+
+          return;
+        }
+
+        throw e;
+      }
+
+      expect.fail('reader was not restarted');
+    });
+
+    it('should restart reader from the next block after the last synced if the current block height'
+      + ' greater than one', async function it() {
+      const [currentBlock, lastSyncedBlock] = blocks;
+      currentBlock.height = 3;
+      lastSyncedBlock.height = 1;
+
+      readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
+
+      const emitSerial = readerMediatorMock.emitSerial.bind(readerMediatorMock);
+      readerMediatorMock.emitSerial = this.sinon.stub();
+
+      try {
+        const error = new WrongSequenceError();
+
+        await emitSerial(ReaderMediator.EVENTS.BLOCK_ERROR, {
+          block: currentBlock,
+          error,
+        });
+      } catch (e) {
+        if (e instanceof RestartBlockchainReaderError) {
+          expect(readerMediatorMock.getState().removeLastBlock).to.be.not.called();
+
+          expect(readerMediatorMock.emitSerial).to.be.not.called();
+
+          expect(e.getHeight()).to.be.equal(lastSyncedBlock.height + 1);
+
+          expect(readerMediatorMock.reset).to.be.not.called();
+
+          return;
+        }
+
+        throw e;
+      }
+
+      expect.fail('reader was not restarted');
+    });
+
+    it('should restart reader form the previous block if the last synced block height is lower than'
+      + ' the current block height', async function it() {
+      const [currentBlock, lastSyncedBlock] = blocks;
+      currentBlock.height = 2;
+      lastSyncedBlock.height = 1;
+
+      const stateTransitions = getTransitionHeaderFixtures();
+
+      readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
+
+      createStateTransitionsMock.returns(stateTransitions);
+
+      const emitSerial = readerMediatorMock.emitSerial.bind(readerMediatorMock);
+      readerMediatorMock.emitSerial = this.sinon.stub();
+
+      try {
+        const error = new WrongSequenceError();
+
+        await emitSerial(ReaderMediator.EVENTS.BLOCK_ERROR, {
+          block: currentBlock,
+          error,
+        });
+      } catch (e) {
+        if (e instanceof RestartBlockchainReaderError) {
+          expect(readerMediatorMock.getState().removeLastBlock).to.be.calledOnce();
+
+          expect(readerMediatorMock.emitSerial).to.have.callCount(stateTransitions.length + 1);
+
+          expect(readerMediatorMock.emitSerial).to.be.calledWith(
+            ReaderMediator.EVENTS.BLOCK_STALE,
+            lastSyncedBlock,
+          );
+
+          for (const stateTransition of stateTransitions) {
+            expect(readerMediatorMock.emitSerial).to.be.calledWith(
+              ReaderMediator.EVENTS.STATE_TRANSITION_STALE,
+              {
+                stateTransition,
+                block: lastSyncedBlock,
+              },
+            );
+          }
+
+          expect(e.getHeight()).to.be.equal(currentBlock.height - 1);
+
+          expect(readerMediatorMock.reset).to.be.not.called();
+
+          return;
+        }
+
+        throw e;
+      }
+
+      expect.fail('reader was not restarted');
+    });
+
+    it('should restart reader from the current block if the last synced block height is greater or equal to'
+      + ' the current block height', async function it() {
+      const [currentBlock, lastSyncedBlock] = blocks;
+      currentBlock.height = 2;
+      lastSyncedBlock.height = 3;
+
+      const stateTransitions = getTransitionHeaderFixtures();
+
+      readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
+
+      createStateTransitionsMock.returns(stateTransitions);
+
+      const emitSerial = readerMediatorMock.emitSerial.bind(readerMediatorMock);
+      readerMediatorMock.emitSerial = this.sinon.stub();
+
+      try {
+        const error = new WrongSequenceError();
+
+        await emitSerial(ReaderMediator.EVENTS.BLOCK_ERROR, {
+          block: currentBlock,
+          error,
+        });
+      } catch (e) {
+        if (e instanceof RestartBlockchainReaderError) {
+          expect(readerMediatorMock.getState().removeLastBlock).to.be.calledOnce();
+
+          expect(readerMediatorMock.emitSerial).to.have.callCount(stateTransitions.length + 1);
+
+          expect(readerMediatorMock.emitSerial).to.be.calledWith(
+            ReaderMediator.EVENTS.BLOCK_STALE,
+            lastSyncedBlock,
+          );
+
+          for (const stateTransition of stateTransitions) {
+            expect(readerMediatorMock.emitSerial).to.be.calledWith(
+              ReaderMediator.EVENTS.STATE_TRANSITION_STALE,
+              {
+                stateTransition,
+                block: lastSyncedBlock,
+              },
+            );
+          }
+
+          expect(e.getHeight()).to.be.equal(currentBlock.height);
+
+          expect(readerMediatorMock.reset).to.be.not.called();
+
+          return;
+        }
+
+        throw e;
+      }
+
+      expect.fail('reader was not restarted');
+    });
+  });
 });
