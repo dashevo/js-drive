@@ -1,4 +1,4 @@
-const Emittery = require('emittery');
+const BlockchainReaderMediatorMock = require('../../../../../lib/test/mock/BlockchainReaderMediatorMock');
 
 const ReaderMediator = require('../../../../../lib/blockchain/reader/BlockchainReaderMediator');
 const RestartBlockchainReaderError = require('../../../../../lib/blockchain/reader/RestartBlockchainReaderError');
@@ -17,15 +17,7 @@ describe('attachSequenceValidationHandler', () => {
   let blocks;
 
   beforeEach(function beforeEach() {
-    const readerStateMock = {
-      getBlocksLimit: this.sinon.stub(),
-      getLastBlock: this.sinon.stub(),
-      removeLastBlock: this.sinon.stub(),
-    };
-    readerMediatorMock = new Emittery();
-    readerMediatorMock.getState = () => readerStateMock;
-    readerMediatorMock.reset = this.sinon.stub();
-    readerMediatorMock.getInitialBlockHeight = this.sinon.stub();
+    readerMediatorMock = new BlockchainReaderMediatorMock(this.sinon);
 
     createStateTransitionsMock = this.sinon.stub();
 
