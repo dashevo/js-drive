@@ -4,5 +4,5 @@ describe('readBlockchainFactory', () => {
   it('should emit the fully synced event if the last synced block and the last block from the chain are the same');
   it('should read from the blockchain height if it less than the last sync block');
   it('should read from the next block after the last synced block');
-  it('should read from initial block height');
+  it('should read from initial block height if it less than the blockchain height and there is no synced blocks');
 });
