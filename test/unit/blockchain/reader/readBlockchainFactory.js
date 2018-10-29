@@ -137,29 +137,59 @@ describe('readBlockchainFactory', () => {
     );
   });
 
-  it('should read from the blockchain height if it less than the last sync block', async () => {
+  it('should reset the state if in case of reorg and there is'
+    + ' no previous block to rely onto', async () => {
     const [lastSyncedBlock] = blocks;
 
-    // TODO sequence validation should figure out with that
-    // Probably we should figure out here instead of validate sequence
-    // Or it will be duplication????
+    lastSyncedBlock.height = 7;
 
-    lastSyncedBlock.height = 5;
-
-    readerMock.read.returns(10);
+    readerMock.read.returns(currentBlockCount);
 
     readerMediatorMock.getInitialBlockHeight.returns(initialBlockHeight);
+    readerMediatorMock.getState().getFirstBlockHeight.returns(4);
+    readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
 
+    await readBlockchain();
+
+    expect(readerMediatorMock.reset).to.be.calledOnce();
+
+    expect(readerMock.read).to.be.calledOnce();
+    expect(readerMock.read).to.be.calledWith(initialBlockHeight);
+
+    expect(readerMediatorMock.emitSerial).to.be.calledTwice();
+
+    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+      ReaderMediator.EVENTS.BEGIN,
+      initialBlockHeight,
+    );
+    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+      ReaderMediator.EVENTS.END,
+      currentBlockCount,
+    );
+  });
+
+
+  it('should continue from the current blockchain height if it is less then'
+    + ' last synced block height but higher then first synced block', async () => {
+    const readBlockCount = 10;
+    const [lastSyncedBlock] = blocks;
+
+    lastSyncedBlock.height = 7;
+
+    readerMock.read.returns(readBlockCount);
+
+    readerMediatorMock.getInitialBlockHeight.returns(initialBlockHeight);
+    readerMediatorMock.getState().getFirstBlockHeight.returns(2);
     readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
 
     await readBlockchain();
 
     expect(readerMediatorMock.reset).to.be.not.called();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledTwice();
-
     expect(readerMock.read).to.be.calledOnce();
     expect(readerMock.read).to.be.calledWith(currentBlockCount);
+
+    expect(readerMediatorMock.emitSerial).to.be.calledTwice();
 
     expect(readerMediatorMock.emitSerial).to.be.calledWith(
       ReaderMediator.EVENTS.BEGIN,
@@ -167,7 +197,7 @@ describe('readBlockchainFactory', () => {
     );
     expect(readerMediatorMock.emitSerial).to.be.calledWith(
       ReaderMediator.EVENTS.END,
-      currentBlockCount,
+      readBlockCount,
     );
   });
 
