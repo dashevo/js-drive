@@ -1,5 +1,6 @@
-const Emittery = require('emittery');
 const proxyquire = require('proxyquire');
+
+const BlockchainReaderMediatorMock = require('../../../lib/test/mock/BlockchainReaderMediatorMock');
 
 const ReaderMediator = require('../../../lib/blockchain/reader/BlockchainReaderMediator');
 const RpcClientMock = require('../../../lib/test/mock/RpcClientMock');
@@ -29,7 +30,7 @@ describe('attachStorageHandlers', () => {
 
     ipfsAPIMock = new IpfsAPI();
 
-    readerMediatorMock = new Emittery();
+    readerMediatorMock = new BlockchainReaderMediatorMock(this.sinon);
     unpinAllIpfsPackets = this.sinon.stub();
 
     rejectAfterMock = this.sinon.stub();
@@ -55,7 +56,7 @@ describe('attachStorageHandlers', () => {
     const pinPromise = Promise.resolve();
     ipfsAPIMock.pin.add.returns(pinPromise);
 
-    await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.STATE_TRANSITION, {
+    await readerMediatorMock.originalEmitSerial(ReaderMediator.EVENTS.STATE_TRANSITION, {
       stateTransition,
       block,
     });
@@ -78,7 +79,7 @@ describe('attachStorageHandlers', () => {
     const [stateTransition] = rpcClientMock.transitionHeaders;
     const [block] = rpcClientMock.blocks;
 
-    await readerMediatorMock.emitSerial(ReaderMediator.EVENTS.STATE_TRANSITION_STALE, {
+    await readerMediatorMock.originalEmitSerial(ReaderMediator.EVENTS.STATE_TRANSITION_STALE, {
       stateTransition,
       block,
     });
@@ -90,7 +91,7 @@ describe('attachStorageHandlers', () => {
   });
 
   it('should call unpinAllIpfsPackets on stHeadersReader reset event', async () => {
-    await readerMediatorMock.emit(ReaderMediator.EVENTS.RESET);
+    await readerMediatorMock.originalEmitSerial(ReaderMediator.EVENTS.RESET);
 
     expect(unpinAllIpfsPackets).to.be.calledOnce();
   });

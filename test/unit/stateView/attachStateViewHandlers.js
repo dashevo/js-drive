@@ -1,6 +1,6 @@
-const Emittery = require('emittery');
-
 const ReaderMediator = require('../../../lib/blockchain/reader/BlockchainReaderMediator');
+
+const BlockchainReaderMediatorMock = require('../../../lib/test/mock/BlockchainReaderMediatorMock');
 
 const attachStateViewHandlers = require('../../../lib/stateView/attachStateViewHandlers');
 
@@ -8,19 +8,19 @@ const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTrans
 const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 
 describe('attachStateViewHandlers', () => {
-  let readerMediator;
+  let readerMediatorMock;
   let applyStateTransition;
   let dropMongoDatabasesWithPrefixStub;
   let mongoDbPrefix;
 
   beforeEach(function beforeEach() {
-    readerMediator = new Emittery();
+    readerMediatorMock = new BlockchainReaderMediatorMock(this.sinon);
     applyStateTransition = this.sinon.stub();
     dropMongoDatabasesWithPrefixStub = this.sinon.stub();
     mongoDbPrefix = 'test';
 
     attachStateViewHandlers(
-      readerMediator,
+      readerMediatorMock,
       applyStateTransition,
       dropMongoDatabasesWithPrefixStub,
       mongoDbPrefix,
@@ -31,7 +31,7 @@ describe('attachStateViewHandlers', () => {
     const [stateTransition] = getTransitionHeaderFixtures();
     const [block] = getBlockFixtures();
 
-    await readerMediator.emitSerial(ReaderMediator.EVENTS.STATE_TRANSITION, {
+    await readerMediatorMock.originalEmitSerial(ReaderMediator.EVENTS.STATE_TRANSITION, {
       stateTransition,
       block,
     });
@@ -41,7 +41,7 @@ describe('attachStateViewHandlers', () => {
   });
 
   it('should call dropMongoDatabasesWithPrefix on the reset event', async () => {
-    await readerMediator.emit(ReaderMediator.EVENTS.RESET);
+    await readerMediatorMock.emit(ReaderMediator.EVENTS.RESET);
 
     expect(dropMongoDatabasesWithPrefixStub).to.be.calledOnce();
     expect(dropMongoDatabasesWithPrefixStub).to.be.calledWith(mongoDbPrefix);
