@@ -1,5 +1,6 @@
 const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
 const ArrayBlockIterator = require('../../../../lib/blockchain/blockIterator/ArrayBlockIterator');
+const InvalidBlockHeightError = require('../../../../lib/blockchain/blockIterator/InvalidBlockHeightError');
 
 describe('ArrayBlockIterator', () => {
   let blocks;
@@ -13,15 +14,7 @@ describe('ArrayBlockIterator', () => {
   it('should iterate over blocks', async () => {
     const obtainedBlocks = [];
 
-    let done;
-    let block;
-
-    // eslint-disable-next-line no-cond-assign
-    while ({ done, value: block } = await blockIterator.next()) {
-      if (done) {
-        break;
-      }
-
+    for await (const block of blockIterator) {
       obtainedBlocks.push(block);
     }
 
@@ -38,19 +31,37 @@ describe('ArrayBlockIterator', () => {
     expect(firstBlock).to.be.equal(secondBlock);
   });
 
-  it("should emit 'block' event", async function it() {
-    const blockHandlerStub = this.sinon.stub();
+  describe('setBlockHeight', () => {
+    it('should set block height', async () => {
+      const { value: firstBlock } = await blockIterator.next();
 
-    blockIterator.on('block', blockHandlerStub);
+      blockIterator.setBlockHeight(blocks[2].height);
 
-    const { value: firstBlock } = await blockIterator.next();
+      const { value: thirdBlock } = await blockIterator.next();
 
-    expect(blockHandlerStub).to.be.calledOnce();
-    expect(blockHandlerStub).to.be.calledWith(firstBlock);
+      expect(firstBlock).to.be.equal(blocks[0]);
+      expect(thirdBlock).to.be.equal(blocks[2]);
+    });
+    it('should throw error if there is no block with specified height', () => {
+      expect(() => blockIterator.setBlockHeight(999)).to.throw(InvalidBlockHeightError);
+    });
+  });
 
-    const { value: secondBlock } = await blockIterator.next();
+  describe('getBlockHeight', () => {
+    it('should returns block height', async () => {
+      const firstBlockHeight = blockIterator.getBlockHeight();
 
-    expect(blockHandlerStub).to.be.calledTwice();
-    expect(blockHandlerStub).to.be.calledWith(secondBlock);
+      await blockIterator.next();
+
+      const secondBlockHeight = blockIterator.getBlockHeight();
+
+      expect(firstBlockHeight).to.be.equal(blocks[0].height);
+      expect(secondBlockHeight).to.be.equal(blocks[1].height);
+    });
+
+    it('should throw error if there are no blocks', async () => {
+      blockIterator = new ArrayBlockIterator([]);
+      expect(() => blockIterator.getBlockHeight()).to.throw(InvalidBlockHeightError);
+    });
   });
 });
