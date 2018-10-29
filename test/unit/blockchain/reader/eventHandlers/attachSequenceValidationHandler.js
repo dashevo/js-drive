@@ -124,8 +124,7 @@ describe('attachSequenceValidationHandler', () => {
       expect.fail('sequence is correct');
     });
 
-    it('should detect sequence as correct if current block'
-      + ' higher then the first synced block', async () => {
+    it('should detect sequence as correct if current block higher then the first synced block', async () => {
       const [currentBlock, lastSyncedBlock] = blocks;
       currentBlock.height = 2;
       lastSyncedBlock.height = 5;

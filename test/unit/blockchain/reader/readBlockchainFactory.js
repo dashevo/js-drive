@@ -38,8 +38,8 @@ describe('readBlockchainFactory', () => {
     );
   });
 
-  it('should emit the out of bounds event if initial block height'
-    + ' less than number of blocks in blockchain', async () => {
+  it('should emit the out of bounds event if initial block height less than'
+    + ' number of blocks in blockchain', async () => {
     initialBlockHeight = 6;
 
     readerMediatorMock.getInitialBlockHeight.returns(initialBlockHeight);
@@ -48,11 +48,13 @@ describe('readBlockchainFactory', () => {
 
     expect(readerMediatorMock.reset).to.be.not.called();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledOnce();
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(ReaderMediator.EVENTS.OUT_OF_BOUNDS, {
-      initialBlockHeight,
-      currentBlockCount,
-    });
+    expect(readerMediatorMock.emitSerial).to.be.calledOnceWith(
+      ReaderMediator.EVENTS.OUT_OF_BOUNDS,
+      {
+        initialBlockHeight,
+        currentBlockCount,
+      },
+    );
 
     expect(readerMock.read).to.be.not.called();
   });
@@ -69,17 +71,19 @@ describe('readBlockchainFactory', () => {
 
     expect(readerMediatorMock.reset).to.be.calledOnce();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledOnce();
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(ReaderMediator.EVENTS.OUT_OF_BOUNDS, {
-      initialBlockHeight,
-      currentBlockCount,
-    });
+    expect(readerMediatorMock.emitSerial).to.be.calledOnceWith(
+      ReaderMediator.EVENTS.OUT_OF_BOUNDS,
+      {
+        initialBlockHeight,
+        currentBlockCount,
+      },
+    );
 
     expect(readerMock.read).to.be.not.called();
   });
 
-  it('should emit the fully synced event if the last synced block'
-    + ' and the last block from the chain are the same', async () => {
+  it('should emit the fully synced event if the last synced block and the last block'
+    + ' from the chain are the same', async () => {
     initialBlockHeight = currentBlockCount;
 
     readerMediatorMock.getInitialBlockHeight.returns(initialBlockHeight);
@@ -90,8 +94,7 @@ describe('readBlockchainFactory', () => {
 
     expect(readerMediatorMock.reset).to.be.not.called();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledOnce();
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.be.calledOnceWith(
       ReaderMediator.EVENTS.FULLY_SYNCED,
       currentBlockCount,
     );
@@ -103,7 +106,7 @@ describe('readBlockchainFactory', () => {
     + ' block hashes are different', async () => {
     initialBlockHeight = currentBlockCount;
 
-    const [,,, lastSyncedBlock] = blocks;
+    const [, , , lastSyncedBlock] = blocks;
 
     lastSyncedBlock.hash = 'wrong';
 
@@ -121,8 +124,7 @@ describe('readBlockchainFactory', () => {
 
     expect(readerMediatorMock.reset).to.be.not.called();
 
-    expect(readerMock.read).to.be.calledOnce();
-    expect(readerMock.read).to.be.calledWith(nextBlockHeight);
+    expect(readerMock.read).to.be.calledOnceWith(nextBlockHeight);
 
     expect(readerMediatorMock.emitSerial).to.be.calledTwice();
 
@@ -137,8 +139,7 @@ describe('readBlockchainFactory', () => {
     );
   });
 
-  it('should reset the state if in case of reorg and there is'
-    + ' no previous block to rely onto', async () => {
+  it('should reset the state if in case of reorg and there is no previous block to rely onto', async () => {
     const [lastSyncedBlock] = blocks;
 
     lastSyncedBlock.height = 7;
@@ -153,8 +154,7 @@ describe('readBlockchainFactory', () => {
 
     expect(readerMediatorMock.reset).to.be.calledOnce();
 
-    expect(readerMock.read).to.be.calledOnce();
-    expect(readerMock.read).to.be.calledWith(initialBlockHeight);
+    expect(readerMock.read).to.be.calledOnceWith(initialBlockHeight);
 
     expect(readerMediatorMock.emitSerial).to.be.calledTwice();
 
@@ -186,8 +186,7 @@ describe('readBlockchainFactory', () => {
 
     expect(readerMediatorMock.reset).to.be.not.called();
 
-    expect(readerMock.read).to.be.calledOnce();
-    expect(readerMock.read).to.be.calledWith(currentBlockCount);
+    expect(readerMock.read).to.be.calledOnceWith(currentBlockCount);
 
     expect(readerMediatorMock.emitSerial).to.be.calledTwice();
 
@@ -217,8 +216,7 @@ describe('readBlockchainFactory', () => {
 
     expect(readerMediatorMock.reset).to.be.not.called();
 
-    expect(readerMock.read).to.be.calledOnce();
-    expect(readerMock.read).to.be.calledWith(nextBlockHeight);
+    expect(readerMock.read).to.be.calledOnceWith(nextBlockHeight);
 
     expect(readerMediatorMock.emitSerial).to.be.calledTwice();
 
@@ -233,8 +231,8 @@ describe('readBlockchainFactory', () => {
     );
   });
 
-  it('should read from initial block height if it less'
-    + ' than the blockchain height and there is no synced blocks', async () => {
+  it('should read from initial block height if it less than the blockchain height'
+    + ' and there is no synced blocks', async () => {
     const readBlockCount = 10;
 
     readerMock.read.returns(readBlockCount);
@@ -247,8 +245,7 @@ describe('readBlockchainFactory', () => {
 
     expect(readerMediatorMock.emitSerial).to.be.calledTwice();
 
-    expect(readerMock.read).to.be.calledOnce();
-    expect(readerMock.read).to.be.calledWith(initialBlockHeight);
+    expect(readerMock.read).to.be.calledOnceWith(initialBlockHeight);
 
     expect(readerMediatorMock.emitSerial).to.be.calledWith(
       ReaderMediator.EVENTS.BEGIN,
