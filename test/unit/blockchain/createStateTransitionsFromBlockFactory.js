@@ -20,7 +20,7 @@ describe('createStateTransitionsFromBlockFactory', () => {
     createStateTransitionsFromBlock = createStateTransitionsFromBlockFactory(rpcClientMock);
   });
 
-  it('should create only accepted types of state transitions from a block', async () => {
+  it('should create only state transitions from a block', async () => {
     const [someBlock] = blocks;
     const [transitionOne, transitionTwo] = transitions;
 
