@@ -13,11 +13,6 @@ addons:
       - docker-ce
 
 before_install:
-  # Install Node.js
-#  - nvm install 8
-#  - nvm use 8
-#  - node --version
-
   # Add token for @dashevo private npm registry
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
