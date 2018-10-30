@@ -32,7 +32,7 @@ const errorHandler = require('../lib/util/errorHandler');
     syncApp.getIpfsApi(),
     syncApp.getRpcClient(),
     syncApp.createUnpinAllIpfsPackets(),
-    syncAppOptions.getStorageIpfsTimeout(),
+    syncAppOptions.getStorageIpfsTimeout() * 1000,
   );
 
   attachStateViewHandlers(
