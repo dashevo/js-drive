@@ -5,7 +5,7 @@ const RestartBlockchainReaderError = require('../../../../../lib/blockchain/read
 
 const getBlockFixtures = require('../../../../../lib/test/fixtures/getBlockFixtures');
 
-const attachBlockErrorHandler = require('../../../../../lib/blockchain/reader/eventHandlers/attachBlockErrorHandler');
+const attachBlockErrorHandler = require('../../../../../lib/blockchain/reader/eventHandlers/attachErrorHandler');
 
 describe('attachBlockErrorHandler', () => {
   let readerMediatorMock;
