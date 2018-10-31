@@ -4,7 +4,7 @@ const ArrayBlockIterator = require('../../../../lib/blockchain/blockIterator/Arr
 const BlockchainReaderMediatorMock = require('../../../../lib/test/mock/BlockchainReaderMediatorMock');
 
 const ReaderMediator = require('../../../../lib/blockchain/reader/BlockchainReaderMediator');
-const RestartBlockchainReaderError = require('../../../../lib/blockchain/reader/RestartBlockchainReaderError');
+const RestartBlockchainReaderError = require('../../../../lib/blockchain/reader/errors/RestartBlockchainReaderError');
 
 const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
 

@@ -50,7 +50,10 @@ const errorHandler = require('../lib/util/errorHandler');
 
   attachBlockErrorHandler(
     readerMediator,
-    { skipBlockWithErrors: syncAppOptions.getSyncBlockSkipWithErrors() },
+    {
+      skipBlockWithErrors: syncAppOptions.getSyncBlockSkipWithErrors(),
+      skipStateTransitionWithErrors: syncAppOptions.getSyncStateTransitionSkipWithErrors(),
+    },
   );
 
   const readBlockchainWithThrottling = throttleFactory(syncApp.createReadBlockchain());
