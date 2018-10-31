@@ -4,10 +4,15 @@ const zmq = require('zeromq');
 
 const SyncAppOptions = require('../lib/app/SyncAppOptions');
 const SyncApp = require('../lib/app/SyncApp');
+
+const attachSyncLogger = require('../lib/sync/attachSyncLogger');
+const attachSequenceValidationHandler = require('../lib/blockchain/reader/eventHandlers/attachSequenceValidationHandler');
+const attachBlockErrorHandler = require('../lib/blockchain/reader/eventHandlers/attachErrorHandler');
 const attachStorageHandlers = require('../lib/storage/attachStorageHandlers');
 const attachSyncHandlers = require('../lib/sync/state/attachSyncHandlers');
 const attachStateViewHandlers = require('../lib/stateView/attachStateViewHandlers');
-const readChainFactory = require('../lib/blockchain/readChainFactory');
+
+const throttleFactory = require('../lib/util/throttleFactory');
 const errorHandler = require('../lib/util/errorHandler');
 
 (async function main() {
@@ -15,51 +20,59 @@ const errorHandler = require('../lib/util/errorHandler');
   const syncApp = new SyncApp(syncAppOptions);
   await syncApp.init();
 
-  const stHeaderReader = syncApp.createSTHeadersReader();
-  const rpcClient = syncApp.getRpcClient();
-  const ipfsAPI = syncApp.getIpfsApi();
-  const unpinAllIpfsPackets = syncApp.createUnpinAllIpfsPackets();
-  const syncState = syncApp.getSyncState();
-  const syncStateRepository = syncApp.getSyncStateRepository();
-  const applyStateTransition = syncApp.createApplyStateTransition();
-  const revertDapContractsForHeader = syncApp
-    .createRevertDapContractsForHeader(applyStateTransition);
-  const dropMongoDatabasesWithPrefix = syncApp.createDropMongoDatabasesWithPrefix();
-  const cleanDashDrive = syncApp.createCleanDashDrive();
+  const readerMediator = syncApp.createBlockchainReaderMediator();
 
-  // Attach listeners to ST Header Reader
+  attachSyncLogger(
+    readerMediator,
+    syncApp.createLogger(),
+  );
+
+  // Attach listeners to SyncEventBus
+  attachSequenceValidationHandler(
+    readerMediator,
+    syncApp.createStateTransitionsFromBlock(),
+  );
+
   attachStorageHandlers(
-    stHeaderReader,
-    ipfsAPI,
-    unpinAllIpfsPackets,
+    readerMediator,
+    syncApp.getIpfsApi(),
+    syncApp.getRpcClient(),
+    syncApp.createUnpinAllIpfsPackets(),
     syncAppOptions.getStorageIpfsTimeout(),
   );
 
-  attachSyncHandlers(
-    stHeaderReader,
-    syncState,
-    syncStateRepository,
-  );
-
   attachStateViewHandlers(
-    stHeaderReader,
-    applyStateTransition,
-    revertDapContractsForHeader,
-    dropMongoDatabasesWithPrefix,
+    readerMediator,
+    syncApp.createApplyStateTransition(),
+    syncApp.createDropMongoDatabasesWithPrefix(),
+    syncAppOptions.getMongoDbPrefix(),
   );
 
-  const readChain = readChainFactory(stHeaderReader, rpcClient, syncState, cleanDashDrive);
+  attachSyncHandlers(
+    readerMediator,
+    syncApp.getSyncState(),
+    syncApp.getSyncStateRepository(),
+  );
+
+  attachBlockErrorHandler(
+    readerMediator,
+    {
+      skipBlockWithErrors: syncAppOptions.getSyncBlockSkipWithErrors(),
+      skipStateTransitionWithErrors: syncAppOptions.getSyncStateTransitionSkipWithErrors(),
+    },
+  );
+
+  const readBlockchainWithThrottling = throttleFactory(syncApp.createReadBlockchain());
 
   // Sync arriving ST packets
   const zmqSocket = zmq.createSocket('sub');
   zmqSocket.connect(syncAppOptions.getDashCoreZmqPubHashBlock());
 
-  zmqSocket.on('message', (topic, blockHash) => {
-    const sinceBlockHash = blockHash.toString('hex');
-    readChain(sinceBlockHash).catch(errorHandler);
+  zmqSocket.on('message', () => {
+    readBlockchainWithThrottling().catch(errorHandler);
   });
 
   zmqSocket.subscribe('hashblock');
 
-  await readChain();
+  await readBlockchainWithThrottling();
 }()).catch(errorHandler);

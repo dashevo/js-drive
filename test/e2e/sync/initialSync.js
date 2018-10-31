@@ -31,7 +31,7 @@ async function dashDriveSyncToFinish(instance) {
 
       if (syncInfo.status === 'synced') {
         finished = true;
-        await wait(apiAppOptions.getSyncStateCheckInterval() * 1000);
+        await wait(apiAppOptions.getSyncStateCheckInterval());
       } else {
         await wait(1000);
       }
@@ -149,8 +149,8 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
             aboutme: user.aboutMe,
             pver: 1,
             idx: 0,
-            rev: 1,
-            act: 1,
+            rev: 0,
+            act: 0,
           },
         ],
       });
