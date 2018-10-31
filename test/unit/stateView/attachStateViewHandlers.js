@@ -10,18 +10,21 @@ const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
 describe('attachStateViewHandlers', () => {
   let readerMediatorMock;
   let applyStateTransition;
+  let revertDapContractsForStateTransition;
   let dropMongoDatabasesWithPrefixStub;
   let mongoDbPrefix;
 
   beforeEach(function beforeEach() {
     readerMediatorMock = new BlockchainReaderMediatorMock(this.sinon);
     applyStateTransition = this.sinon.stub();
+    revertDapContractsForStateTransition = this.sinon.stub();
     dropMongoDatabasesWithPrefixStub = this.sinon.stub();
     mongoDbPrefix = 'test';
 
     attachStateViewHandlers(
       readerMediatorMock,
       applyStateTransition,
+      revertDapContractsForStateTransition,
       dropMongoDatabasesWithPrefixStub,
       mongoDbPrefix,
     );
