@@ -52,41 +52,51 @@ describe('createStateTransitionsFromBlockFactory', () => {
 
   it('should return state transition in a sorted order', async () => {
     const [someBlock] = blocks;
-    const [transitionOne, transitionTwo, transitionThree, transitionFour] = transitions;
 
-    transitionTwo.extraPayload.hashPrevSubTx = transitionOne.hash;
-    transitionThree.extraPayload.hashPrevSubTx = transitionTwo.hash;
-    transitionFour.extraPayload.hashPrevSubTx = transitionThree.hash;
+    const groupOneRegTxId = 'c4970326400177ce67ec582425a698b85ae03cae2b0d168e87eed697f1388e4b';
+    const groupTwoRegTxId = 'e1cc3672035d3db961885a0511a87d798cbcbcfa73392d7aa822b0bed6a285b1';
 
-    rpcClientMock.getRawTransaction
-      .withArgs(transitionTwo.hash)
-      .resolves({
-        result: transitionTwo.serialize(),
-      });
+    const createTransitionGroup = (regTxId, transitionArray) => {
+      const result = [];
 
-    rpcClientMock.getRawTransaction
-      .withArgs(transitionThree.hash)
-      .resolves({
-        result: transitionThree.serialize(),
-      });
+      for (const transition of transitionArray) {
+        const lastAddedTransition = result[result.length - 1];
 
-    rpcClientMock.getRawTransaction
-      .withArgs(transitionFour.hash)
-      .resolves({
-        result: transitionFour.serialize(),
-      });
+        transition.extraPayload.regTxId = regTxId;
 
-    someBlock.tx = [
-      transitionFour.hash,
-      transitionOne.hash,
-      transitionThree.hash,
-      transitionTwo.hash,
-    ];
+        if (lastAddedTransition) {
+          transition.extraPayload.hashPrevSubTx = lastAddedTransition.hash;
+        }
+
+        rpcClientMock.getRawTransaction
+          .withArgs(transition.hash)
+          .resolves({
+            result: transition.serialize(),
+          });
+
+        result.push(new StateTransitionHeader(transition));
+      }
+
+      return result;
+    };
+
+    const groupOne = createTransitionGroup(groupOneRegTxId, transitions);
+    const groupTwo = createTransitionGroup(groupTwoRegTxId, transitions);
+
+    const transitionArray = groupOne.concat(groupTwo);
+
+    someBlock.tx = transitionArray.map(t => t.hash);
 
     const stateTransitions = await createStateTransitionsFromBlock(someBlock);
 
-    expect(stateTransitions[3].extraPayload.hashPrevSubTx).to.be.equal(stateTransitions[2].hash);
-    expect(stateTransitions[2].extraPayload.hashPrevSubTx).to.be.equal(stateTransitions[1].hash);
-    expect(stateTransitions[1].extraPayload.hashPrevSubTx).to.be.equal(stateTransitions[0].hash);
+    for (let i = 1; i < groupOne.length; i++) {
+      expect(stateTransitions[i].extraPayload.hashPrevSubTx).to.be
+        .equal(stateTransitions[i - 1].hash);
+    }
+
+    for (let i = groupOne.length + 1; i < groupOne.length + groupTwo.length; i++) {
+      expect(stateTransitions[i].extraPayload.hashPrevSubTx).to.be
+        .equal(stateTransitions[i - 1].hash);
+    }
   });
 });
