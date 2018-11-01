@@ -57,7 +57,7 @@ const errorHandler = require('../lib/util/errorHandler');
   attachBlockErrorHandler(
     readerMediator,
     {
-      skipStateTransitionWithErrors: syncAppOptions.getSyncStateTransitionSkipWithErrors(),
+      skipStateTransitionWithErrors: syncAppOptions.getSyncSkipStateTransitionWithErrors(),
     },
   );
 
