@@ -7,6 +7,8 @@ const RpcClientMock = require('../../../lib/test/mock/RpcClientMock');
 
 const createStateTransitionsFromBlockFactory = require('../../../lib/blockchain/createStateTransitionsFromBlockFactory');
 
+const shuffleArray = require('../../../lib/util/shuffleArray');
+
 describe('createStateTransitionsFromBlockFactory', () => {
   let rpcClientMock;
   let blocks;
@@ -84,6 +86,8 @@ describe('createStateTransitionsFromBlockFactory', () => {
     const groupTwo = createTransitionGroup(groupTwoRegTxId, transitions);
 
     const transitionArray = groupOne.concat(groupTwo);
+
+    shuffleArray(transitionArray);
 
     someBlock.tx = transitionArray.map(t => t.hash);
 
