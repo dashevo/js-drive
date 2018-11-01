@@ -31,22 +31,62 @@ describe('createStateTransitionsFromBlockFactory', () => {
     // it replaces itself. So we're using it to not construct a proper Transaction,
     // and not deal with `serialize` checks
     rpcClientMock.getRawTransaction
-      .withArgs(nonStateTransitionTx.id)
+      .withArgs(nonStateTransitionTx.hash)
       .resolves({
         result: nonStateTransitionTx,
       });
 
     someBlock.tx = [
-      transitionOne.id,
-      nonStateTransitionTx.id,
-      transitionTwo.id,
+      transitionOne.hash,
+      nonStateTransitionTx.hash,
+      transitionTwo.hash,
     ];
 
     const stateTransitions = await createStateTransitionsFromBlock(someBlock);
     const stateTransitionHashes = stateTransitions.map(t => t.hash);
 
-    expect(stateTransitionHashes).to.deep.equal([transitionOne.hash, transitionTwo.hash]);
+    expect(stateTransitionHashes).to.include(transitionOne.hash);
+    expect(stateTransitionHashes).to.include(transitionTwo.hash);
+    expect(stateTransitionHashes).to.not.include(nonStateTransitionTx.hash);
   });
 
-  it('should return state transition in a sorted order');
+  it('should return state transition in a sorted order', async () => {
+    const [someBlock] = blocks;
+    const [transitionOne, transitionTwo, transitionThree, transitionFour] = transitions;
+
+    transitionTwo.extraPayload.hashPrevSubTx = transitionOne.hash;
+    transitionThree.extraPayload.hashPrevSubTx = transitionTwo.hash;
+    transitionFour.extraPayload.hashPrevSubTx = transitionThree.hash;
+
+    rpcClientMock.getRawTransaction
+      .withArgs(transitionTwo.hash)
+      .resolves({
+        result: transitionTwo.serialize(),
+      });
+
+    rpcClientMock.getRawTransaction
+      .withArgs(transitionThree.hash)
+      .resolves({
+        result: transitionThree.serialize(),
+      });
+
+    rpcClientMock.getRawTransaction
+      .withArgs(transitionFour.hash)
+      .resolves({
+        result: transitionFour.serialize(),
+      });
+
+    someBlock.tx = [
+      transitionFour.hash,
+      transitionOne.hash,
+      transitionThree.hash,
+      transitionTwo.hash,
+    ];
+
+    const stateTransitions = await createStateTransitionsFromBlock(someBlock);
+
+    expect(stateTransitions[3].extraPayload.hashPrevSubTx).to.be.equal(stateTransitions[2].hash);
+    expect(stateTransitions[2].extraPayload.hashPrevSubTx).to.be.equal(stateTransitions[1].hash);
+    expect(stateTransitions[1].extraPayload.hashPrevSubTx).to.be.equal(stateTransitions[0].hash);
+  });
 });
