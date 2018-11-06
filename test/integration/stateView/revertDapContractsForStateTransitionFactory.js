@@ -24,7 +24,7 @@ const revertDapContractsForStateTransitionFactory = require('../../../lib/stateV
 
 const doubleSha256 = require('../../../lib/util/doubleSha256');
 
-describe('revertDapContractsForStateTransitionFactory', function main() {
+describe('revertDapContractsForStateTransitionFactory', () => {
   let mongoDb;
   startMongoDb().then(async (mongoDbInstance) => {
     mongoDb = await mongoDbInstance.getDb();
