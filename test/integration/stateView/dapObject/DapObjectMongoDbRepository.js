@@ -73,6 +73,12 @@ describe('DapObjectMongoDbRepository', () => {
     expect(result).to.be.deep.equal([dapObject]);
   });
 
+  it('should find all dap objects by stHeaderHash', async () => {
+    const { reference: { stHeaderHash } } = dapObject;
+    const result = await dapObjectRepository.findAllBySTHeaderHash(stHeaderHash);
+    expect(result).to.be.deep.equal([dapObject]);
+  });
+
   it('should throw InvalidWhereError if where is not an object', async () => {
     const type = 'DashPayContact';
     const options = {
