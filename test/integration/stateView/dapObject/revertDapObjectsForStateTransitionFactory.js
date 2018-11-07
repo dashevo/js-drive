@@ -7,6 +7,7 @@ const {
 
 const Reference = require('../../../../lib/stateView/Reference');
 const DapObjectMongoDbRepository = require('../../../../lib/stateView/dapObject/DapObjectMongoDbRepository');
+const DapObject = require('../../../../lib/stateView/dapObject/DapObject');
 
 const revertDapObjectsForStateTransitionFactory = require('../../../../lib/stateView/dapObject/revertDapObjectsForStateTransitionFactory');
 const createDapObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
@@ -118,7 +119,7 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
       const transition = transitions[i];
 
       const [dapObjectData] = packet.dapobjects;
-      dapObjectData.act = (i === 0 ? 0 : 1);
+      dapObjectData.act = (i === 0 ? DapObject.ACTION_CREATE : DapObject.ACTION_UPDATE);
       dapObjectData.rev = i + 1;
 
       transition.extraPayload.regTxId = blockchainUserId;
