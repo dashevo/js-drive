@@ -59,6 +59,19 @@ describe('attachStateViewHandlers', () => {
     expect(revertDapObjectsForStateTransition).to.be.calledWith({ stateTransition, block });
   });
 
+  it('should call revertDapContractsForStateTransition on the stale state transition event', async () => {
+    const [stateTransition] = getTransitionHeaderFixtures();
+    const [block] = getBlockFixtures();
+
+    await readerMediatorMock.originalEmitSerial(ReaderMediator.EVENTS.STATE_TRANSITION_STALE, {
+      stateTransition,
+      block,
+    });
+
+    expect(revertDapContractsForStateTransition).to.be.calledOnce();
+    expect(revertDapContractsForStateTransition).to.be.calledWith({ stateTransition, block });
+  });
+
   it('should call dropMongoDatabasesWithPrefix on the reset event', async () => {
     await readerMediatorMock.emit(ReaderMediator.EVENTS.RESET);
 
