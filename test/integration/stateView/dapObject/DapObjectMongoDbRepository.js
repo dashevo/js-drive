@@ -39,7 +39,7 @@ function createDapObjectWithAge(age) {
       reference,
     },
   ];
-  return new DapObject(blockchainUserId, isDeleted, objectData, reference, previousRevisions);
+  return new DapObject(blockchainUserId, objectData, reference, isDeleted, previousRevisions);
 }
 
 describe('DapObjectMongoDbRepository', () => {
