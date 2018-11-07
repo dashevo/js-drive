@@ -41,21 +41,11 @@ const errorHandler = require('../lib/util/errorHandler');
     syncAppOptions.getStorageIpfsTimeout(),
   );
 
-  const applyStateTransition = syncApp.createApplyStateTransition();
-  const applyStateTransitionFromReference = syncApp.createApplyStateTransitionFromReference(
-    applyStateTransition,
-  );
   attachStateViewHandlers(
     readerMediator,
-    applyStateTransition,
-    syncApp.createRevertDapObjectsForStateTransition(
-      applyStateTransition,
-      applyStateTransitionFromReference,
-    ),
-    syncApp.createRevertDapContractsForStateTransition(
-      applyStateTransition,
-      applyStateTransitionFromReference,
-    ),
+    syncApp.createApplyStateTransition(),
+    syncApp.createRevertDapObjectsForStateTransition(),
+    syncApp.createRevertDapContractsForStateTransition(),
     syncApp.createDropMongoDatabasesWithPrefix(),
     syncAppOptions.getMongoDbPrefix(),
   );
