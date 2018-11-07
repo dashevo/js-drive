@@ -42,9 +42,16 @@ const errorHandler = require('../lib/util/errorHandler');
   );
 
   const applyStateTransition = syncApp.createApplyStateTransition();
+  const applyStateTransitionFromReference = syncApp.createApplyStateTransitionFromReference(
+    applyStateTransition,
+  );
   attachStateViewHandlers(
     readerMediator,
     applyStateTransition,
+    syncApp.createRevertDapObjectsForStateTransition(
+      applyStateTransition,
+      applyStateTransitionFromReference,
+    ),
     syncApp.createRevertDapContractsForStateTransition(
       applyStateTransition,
     ),
