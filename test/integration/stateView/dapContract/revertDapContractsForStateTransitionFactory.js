@@ -5,24 +5,24 @@ const {
   },
 } = require('@dashevo/js-evo-services-ctl');
 
-const Reference = require('../../../lib/stateView/Reference');
-const DapContract = require('../../../lib/stateView/dapContract/DapContract');
-const DapContractMongoDbRepository = require('../../../lib/stateView/dapContract/DapContractMongoDbRepository');
+const Reference = require('../../../../lib/stateView/Reference');
+const DapContract = require('../../../../lib/stateView/dapContract/DapContract');
+const DapContractMongoDbRepository = require('../../../../lib/stateView/dapContract/DapContractMongoDbRepository');
 
-const getBlockFixtures = require('../../../lib/test/fixtures/getBlockFixtures');
-const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
-const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
+const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
+const getTransitionPacketFixtures = require('../../../../lib/test/fixtures/getTransitionPacketFixtures');
+const getTransitionHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHeaderFixtures');
 
-const sanitizeData = require('../../../lib/mongoDb/sanitizeData');
+const sanitizeData = require('../../../../lib/mongoDb/sanitizeData');
 
-const RpcClientMock = require('../../../lib/test/mock/RpcClientMock');
+const RpcClientMock = require('../../../../lib/test/mock/RpcClientMock');
 
-const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory');
-const updateDapContractFactory = require('../../../lib/stateView/dapContract/updateDapContractFactory');
-const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
-const revertDapContractsForStateTransitionFactory = require('../../../lib/stateView/revertDapContractsForStateTransitionFactory');
+const addSTPacketFactory = require('../../../../lib/storage/ipfs/addSTPacketFactory');
+const updateDapContractFactory = require('../../../../lib/stateView/dapContract/updateDapContractFactory');
+const applyStateTransitionFactory = require('../../../../lib/stateView/applyStateTransitionFactory');
+const revertDapContractsForStateTransitionFactory = require('../../../../lib/stateView/dapContract/revertDapContractsForStateTransitionFactory');
 
-const doubleSha256 = require('../../../lib/util/doubleSha256');
+const doubleSha256 = require('../../../../lib/util/doubleSha256');
 
 describe('revertDapContractsForStateTransitionFactory', () => {
   let mongoDb;
