@@ -51,7 +51,7 @@ describe('DapObject', () => {
     const dapObjectSerialized = dapObject.toJSON();
     expect(dapObjectSerialized).to.deep.equal({
       blockchainUserId,
-      markAsDeleted: isDeleted,
+      isDeleted,
       type: dapObjectData.objtype,
       object: dapObjectData,
       revision: dapObjectData.rev,
