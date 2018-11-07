@@ -193,7 +193,10 @@ describe('attachSequenceValidationHandler', () => {
 
         await readerMediatorMock.originalEmitSerial(
           ReaderMediator.EVENTS.BLOCK_ERROR,
-          { error },
+          {
+            error,
+            block: blocks[0],
+          },
         );
       } catch (e) {
         if (e instanceof RestartBlockchainReaderError) {
@@ -256,7 +259,7 @@ describe('attachSequenceValidationHandler', () => {
 
       readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
 
-      createStateTransitionsMock.returns(stateTransitions);
+      createStateTransitionsMock.returns(stateTransitions.slice());
 
       try {
         const error = new WrongSequenceError();
@@ -276,8 +279,9 @@ describe('attachSequenceValidationHandler', () => {
             lastSyncedBlock,
           );
 
-          for (const stateTransition of stateTransitions) {
-            expect(readerMediatorMock.emitSerial).to.be.calledWith(
+          for (const [index, stateTransition] of stateTransitions.reverse().entries()) {
+            const callIndex = 1 + index;
+            expect(readerMediatorMock.emitSerial.getCall(callIndex)).to.be.calledWith(
               ReaderMediator.EVENTS.STATE_TRANSITION_STALE,
               {
                 stateTransition,
@@ -309,7 +313,7 @@ describe('attachSequenceValidationHandler', () => {
 
       readerMediatorMock.getState().getLastBlock.returns(lastSyncedBlock);
 
-      createStateTransitionsMock.returns(stateTransitions);
+      createStateTransitionsMock.returns(stateTransitions.slice());
 
       try {
         const error = new WrongSequenceError();
@@ -329,8 +333,9 @@ describe('attachSequenceValidationHandler', () => {
             lastSyncedBlock,
           );
 
-          for (const stateTransition of stateTransitions) {
-            expect(readerMediatorMock.emitSerial).to.be.calledWith(
+          for (const [index, stateTransition] of stateTransitions.reverse().entries()) {
+            const callIndex = 1 + index;
+            expect(readerMediatorMock.emitSerial.getCall(callIndex)).to.be.calledWith(
               ReaderMediator.EVENTS.STATE_TRANSITION_STALE,
               {
                 stateTransition,
