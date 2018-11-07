@@ -54,6 +54,7 @@ const errorHandler = require('../lib/util/errorHandler');
     ),
     syncApp.createRevertDapContractsForStateTransition(
       applyStateTransition,
+      applyStateTransitionFromReference,
     ),
     syncApp.createDropMongoDatabasesWithPrefix(),
     syncAppOptions.getMongoDbPrefix(),

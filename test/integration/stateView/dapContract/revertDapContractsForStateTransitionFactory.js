@@ -19,8 +19,9 @@ const RpcClientMock = require('../../../../lib/test/mock/RpcClientMock');
 
 const addSTPacketFactory = require('../../../../lib/storage/ipfs/addSTPacketFactory');
 const updateDapContractFactory = require('../../../../lib/stateView/dapContract/updateDapContractFactory');
-const applyStateTransitionFactory = require('../../../../lib/stateView/applyStateTransitionFactory');
 const revertDapContractsForStateTransitionFactory = require('../../../../lib/stateView/dapContract/revertDapContractsForStateTransitionFactory');
+const applyStateTransitionFactory = require('../../../../lib/stateView/applyStateTransitionFactory');
+const applyStateTransitionFromReferenceFactory = require('../../../../lib/stateView/applyStateTransitionFromReferenceFactory');
 
 const doubleSha256 = require('../../../../lib/util/doubleSha256');
 
@@ -38,7 +39,9 @@ describe('revertDapContractsForStateTransitionFactory', () => {
   let addSTPacket;
   let dapContractMongoDbRepository;
   let applyStateTransition;
-  beforeEach(() => {
+  let rpcClientMock;
+  let revertDapContractsForStateTransition;
+  beforeEach(function beforeEach() {
     addSTPacket = addSTPacketFactory(ipfsClient);
     dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
@@ -48,11 +51,17 @@ describe('revertDapContractsForStateTransitionFactory', () => {
       null,
       30 * 1000,
     );
-  });
-
-  let rpcClientMock;
-  beforeEach(function beforeEach() {
     rpcClientMock = new RpcClientMock(this.sinon);
+    const applyStateTransitionFromReference = applyStateTransitionFromReferenceFactory(
+      applyStateTransition,
+      rpcClientMock,
+    );
+    revertDapContractsForStateTransition = revertDapContractsForStateTransitionFactory(
+      dapContractMongoDbRepository,
+      rpcClientMock,
+      applyStateTransition,
+      applyStateTransitionFromReference,
+    );
   });
 
   it('should remove last version of DapContract and re-apply previous versions in order', async () => {
@@ -117,14 +126,8 @@ describe('revertDapContractsForStateTransitionFactory', () => {
     );
     await dapContractMongoDbRepository.store(dapContract);
 
-    const revertDapContractsForHeader = revertDapContractsForStateTransitionFactory(
-      dapContractMongoDbRepository,
-      rpcClientMock,
-      applyStateTransition,
-    );
-
     const lastDapContractVersion = dapContractVersions[dapContractVersions.length - 1];
-    await revertDapContractsForHeader({
+    await revertDapContractsForStateTransition({
       stateTransition: lastDapContractVersion.header,
       block: lastDapContractVersion.block,
     });
@@ -173,13 +176,7 @@ describe('revertDapContractsForStateTransitionFactory', () => {
     );
     await dapContractMongoDbRepository.store(dapContract);
 
-    const revertDapContractsForHeader = revertDapContractsForStateTransitionFactory(
-      dapContractMongoDbRepository,
-      rpcClientMock,
-      applyStateTransition,
-    );
-
-    await revertDapContractsForHeader({
+    await revertDapContractsForStateTransition({
       stateTransition: header,
       block,
     });
