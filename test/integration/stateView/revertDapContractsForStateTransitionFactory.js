@@ -88,6 +88,12 @@ describe('revertDapContractsForStateTransitionFactory', () => {
         packet,
         reference,
       });
+
+      rpcClientMock.getRawTransaction
+        .withArgs(header.hash)
+        .resolves({
+          result: header,
+        });
     }
 
     const dapId = doubleSha256(dapContractVersions[0].packet.dapcontract);
@@ -110,12 +116,6 @@ describe('revertDapContractsForStateTransitionFactory', () => {
       previousVersions,
     );
     await dapContractMongoDbRepository.store(dapContract);
-
-    // Apply `hashSTPacket` for RpcClientMock's fixtures as they have been changed
-    for (let i = 0; i < dapContractVersions.length; i++) {
-      rpcClientMock.transitionHeaders[i].extraPayload.hashSTPacket = dapContractVersions[i]
-        .header.extraPayload.hashSTPacket;
-    }
 
     const revertDapContractsForHeader = revertDapContractsForStateTransitionFactory(
       dapContractMongoDbRepository,
