@@ -13,6 +13,7 @@ const revertDapObjectsForStateTransitionFactory = require('../../../../lib/state
 const createDapObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
 const updateDapObjectFactory = require('../../../../lib/stateView/dapObject/updateDapObjectFactory');
 const applyStateTransitionFactory = require('../../../../lib/stateView/applyStateTransitionFactory');
+const applyStateTransitionFromReferenceFactory = require('../../../../lib/stateView/applyStateTransitionFromReferenceFactory');
 
 const addSTPacketFactory = require('../../../../lib/storage/ipfs/addSTPacketFactory');
 
@@ -55,11 +56,16 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
       1000,
     );
     rpcClientMock = new RpcClientMock(this.sinon);
+    const applyStateTransitionFromReference = applyStateTransitionFromReferenceFactory(
+      applyStateTransition,
+      rpcClientMock,
+    );
     revertDapObjectsForStateTransition = revertDapObjectsForStateTransitionFactory(
       ipfsAPI,
       rpcClientMock,
       createDapObjectMongoDbRepository,
       applyStateTransition,
+      applyStateTransitionFromReference,
       30 * 1000,
     );
   });
