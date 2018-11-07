@@ -8,7 +8,7 @@ describe('DapContract', () => {
     const reference = new Reference();
     const schema = {};
     const version = 2;
-    const deleted = false;
+    const isDeleted = false;
     const previousVersions = [];
     const dapContract = new DapContract(
       dapId,
@@ -16,7 +16,7 @@ describe('DapContract', () => {
       reference,
       schema,
       version,
-      deleted,
+      isDeleted,
       previousVersions,
     );
 
@@ -27,7 +27,7 @@ describe('DapContract', () => {
       reference,
       schema,
       version,
-      deleted,
+      isDeleted,
       previousVersions,
     });
   });
