@@ -11,10 +11,14 @@ describe('DapContractRepository', () => {
     dapContractRepository = new DapContractMongoDbRepository(mongoDb, sanitizeData);
   });
 
+  let dapContract;
+
   it('should store DapContract entity', async () => {
     const dapId = '123456';
     const dapName = 'DashPay';
-    const reference = new Reference();
+    const reference = new Reference(
+      null, null, 'someSTHeaderHash', null, null,
+    );
     const schema = {};
     const version = 2;
     const deleted = false;
@@ -22,7 +26,7 @@ describe('DapContractRepository', () => {
       version: 1,
       reference: new Reference(),
     }];
-    const dapContract = new DapContract(
+    dapContract = new DapContract(
       dapId,
       dapName,
       reference,
@@ -43,29 +47,19 @@ describe('DapContractRepository', () => {
     expect(contract).to.be.null();
   });
 
-  it('should return null if contract was marked as deleted', async () => {
-    const dapId = '123456';
-    const dapName = 'DashPay';
-    const reference = new Reference();
-    const schema = {};
-    const version = 2;
-    const deleted = true;
-    const previousVersions = [{
-      version: 1,
-      reference: new Reference(),
-    }];
-    const dapContract = new DapContract(
-      dapId,
-      dapName,
-      reference,
-      schema,
-      version,
-      deleted,
-      previousVersions,
-    );
-
+  it('should find all contracts by stHeaderHash', async () => {
     await dapContractRepository.store(dapContract);
-    const contract = await dapContractRepository.find(dapId);
+    const dapContracts = await dapContractRepository.findAllByReferenceSTHeaderHash(
+      dapContract.reference.stHeaderHash,
+    );
+    expect(dapContracts.length).to.be.equal(1);
+    expect(dapContracts).to.be.deep.equal([dapContract]);
+  });
+
+  it('should return null if contract was marked as deleted', async () => {
+    dapContract.markAsDeleted();
+    await dapContractRepository.store(dapContract);
+    const contract = await dapContractRepository.find(dapContract.getDapId());
     expect(contract).to.be.null();
   });
 });
