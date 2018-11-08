@@ -10,7 +10,6 @@ const getPacketFixtures = require('../../../../lib/test/fixtures/getTransitionPa
 const serializer = require('../../../../lib/util/serializer');
 
 describe('fetchDapContractFactory', () => {
-
   let mongoDb;
   startMongoDb().then(async (instance) => {
     mongoDb = await instance.getDb();
