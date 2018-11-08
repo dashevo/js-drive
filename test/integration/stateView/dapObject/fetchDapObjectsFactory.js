@@ -11,6 +11,8 @@ describe('fetchDapObjectsFactory', () => {
   const id = '123456';
   const objectData = {
     id,
+    pver: 1,
+    idx: 0,
     act: 0,
     objtype: 'DashPayContact',
     user: 'dashy',
@@ -55,7 +57,7 @@ describe('fetchDapObjectsFactory', () => {
     const type = 'DashPayContact';
     const dapObjectRepository = createDapObjectMongoDbRepository(dapId);
     await dapObjectRepository.store(dapObject);
-    const options = { where: { 'object.user': 'dashy' } };
+    const options = { where: { 'data.user': 'dashy' } };
     const result = await fetchDapObjects(dapId, type, options);
     expect(result).to.be.deep.equal([dapObject]);
   });
@@ -64,7 +66,7 @@ describe('fetchDapObjectsFactory', () => {
     const type = 'DashPayContact';
     const dapObjectRepository = createDapObjectMongoDbRepository(dapId);
     await dapObjectRepository.store(dapObject);
-    const options = { where: { 'object.user': 'unknown' } };
+    const options = { where: { 'data.user': 'unknown' } };
     const result = await fetchDapObjects(dapId, type, options);
     expect(result).to.be.deep.equal([]);
   });
