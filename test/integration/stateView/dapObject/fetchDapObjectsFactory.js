@@ -8,9 +8,7 @@ const fetchDapObjectsFactory = require('../../../../lib/stateView/dapObject/fetc
 
 describe('fetchDapObjectsFactory', () => {
   const dapId = '9876';
-  const id = '123456';
   const objectData = {
-    id,
     pver: 1,
     idx: 0,
     act: 0,
@@ -50,7 +48,7 @@ describe('fetchDapObjectsFactory', () => {
     const dapObjectRepository = createDapObjectMongoDbRepository(dapId);
     await dapObjectRepository.store(dapObject);
     const result = await fetchDapObjects(dapId, type);
-    expect(result).to.be.deep.equal([dapObject]);
+    expect(result).to.be.deep.equal([dapObject.getOriginalData()]);
   });
 
   it('should fetch DAP objects for specific DAP id, object type and user', async () => {
@@ -59,7 +57,7 @@ describe('fetchDapObjectsFactory', () => {
     await dapObjectRepository.store(dapObject);
     const options = { where: { 'data.user': 'dashy' } };
     const result = await fetchDapObjects(dapId, type, options);
-    expect(result).to.be.deep.equal([dapObject]);
+    expect(result).to.be.deep.equal([dapObject.getOriginalData()]);
   });
 
   it('should return empty array for specific DAP ID, object type and user not exist', async () => {
