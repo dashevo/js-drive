@@ -1,7 +1,7 @@
 const { serialize, deserialize } = require('../../../lib/util/serializer');
 
 describe('serializer', () => {
-  it('should successfully encode and decode an object', async () => {
+  it('should successfully encode and decode an object', () => {
     const data = {
       a: 1,
       b: 2,
@@ -14,7 +14,7 @@ describe('serializer', () => {
     };
 
     const encoded = serialize(data);
-    const decoded = await deserialize(encoded);
+    const decoded = deserialize(encoded);
 
     expect(decoded).to.be.deep.equal(data);
   });
