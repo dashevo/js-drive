@@ -14,6 +14,10 @@ describe('serializer', () => {
     };
 
     const encoded = encode(data);
+
+    expect(encoded).to.be.not.null();
+    expect(encoded).to.be.not.deep.equal(data);
+
     const decoded = decode(encoded);
 
     expect(decoded).to.be.deep.equal(data);
