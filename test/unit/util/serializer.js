@@ -1,4 +1,4 @@
-const { serialize, deserialize } = require('../../../lib/util/serializer');
+const { encode, decode } = require('../../../lib/util/serializer');
 
 describe('serializer', () => {
   it('should successfully encode and decode an object', () => {
@@ -13,8 +13,8 @@ describe('serializer', () => {
       $some: 'message',
     };
 
-    const encoded = serialize(data);
-    const decoded = deserialize(encoded);
+    const encoded = encode(data);
+    const decoded = decode(encoded);
 
     expect(decoded).to.be.deep.equal(data);
   });
