@@ -9,9 +9,9 @@
     "api": "node scripts/api",
     "sync": "node scripts/sync",
     "lint": "eslint .",
-    "test": "mocha './test/**/*.spec.js'",
-    "test:unit": "mocha './test/unit/**/*.spec.js'",
-    "test:integration": "mocha './test/integration/**/*.spec.js'",
+    "test": "nyc mocha './test/**/*.spec.js'",
+    "test:unit": "nyc mocha './test/unit/**/*.spec.js'",
+    "test:integration": "nyc mocha './test/integration/**/*.spec.js'",
     "test:e2e": "mocha './test/e2e/**/*.spec.js'"
   },
   "repository": {
@@ -34,9 +34,11 @@
     "eslint": "^5.6.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.13.0",
+    "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
     "mocha-sinon": "^2.1.0",
     "multihashing-async": "^0.5.1",
+    "nyc": "^13.1.0",
     "proxyquire": "^2.1.0",
     "sinon": "^6.3.5",
     "sinon-chai": "^3.2.0"
