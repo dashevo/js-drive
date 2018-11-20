@@ -10,7 +10,7 @@
     "sync": "node scripts/sync",
     "lint": "eslint .",
     "test": "(EXIT_CODE=0; npm run test:coverage || EXIT_CODE=$?; npm run test:e2e || EXIT_CODE=$?; exit $EXIT_CODE)",
-    "test:coverage": "nyc --stmts=95 --branch=86 --funcs=93 --lines=95 mocha './test/unit/**/*.spec.js' './test/integration/**/*.spec.js'",
+    "test:coverage": "nyc --check-coverage --stmts=95 --branch=86 --funcs=93 --lines=95 mocha './test/unit/**/*.spec.js' './test/integration/**/*.spec.js'",
     "test:unit": "mocha './test/unit/**/*.spec.js'",
     "test:integration": "mocha './test/integration/**/*.spec.js'",
     "test:e2e": "mocha './test/e2e/**/*.spec.js'"
