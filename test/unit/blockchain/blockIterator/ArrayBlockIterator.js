@@ -11,8 +11,6 @@ describe('ArrayBlockIterator', () => {
     blockIterator = new ArrayBlockIterator(blocks);
   });
 
-  it('should create a proper instance using constructor');
-
   it('should iterate over blocks', async () => {
     const obtainedBlocks = [];
 
