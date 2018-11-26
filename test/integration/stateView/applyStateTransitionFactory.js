@@ -4,6 +4,7 @@ const {
     startIPFS,
   },
 } = require('@dashevo/js-evo-services-ctl');
+
 const Reference = require('../../../lib/stateView/Reference');
 const DapContract = require('../../../lib/stateView/dapContract/DapContract');
 const createDapObjectMongoDbRepositoryFactory = require('../../../lib/stateView/dapObject/createDapObjectMongoDbRepositoryFactory');
@@ -19,6 +20,8 @@ const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTrans
 const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
 const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory');
 const generateDapObjectId = require('../../../lib/stateView/dapObject/generateDapObjectId');
+
+const ReaderMediatorMock = require('../../../lib/test/mock/BlockchainReaderMediatorMock');
 
 const doubleSha256 = require('../../../lib/util/doubleSha256');
 
@@ -39,7 +42,7 @@ describe('applyStateTransitionFactory', () => {
   let dapContractMongoDbRepository;
   let createDapObjectMongoDbRepository;
   let applyStateTransition;
-  beforeEach(() => {
+  beforeEach(beforeEachMethod () => {
     addSTPacket = addSTPacketFactory(ipfsClient);
     dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, serializer);
     createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
@@ -48,6 +51,7 @@ describe('applyStateTransitionFactory', () => {
     );
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
     const updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
+    const readerMediator = new ReaderMediatorMock(this.sinon);
     applyStateTransition = applyStateTransitionFactory(
       ipfsClient,
       updateDapContract,
