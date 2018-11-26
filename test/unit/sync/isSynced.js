@@ -42,7 +42,8 @@ describe('isSynced', () => {
     const state = new SyncState(rpcClientMock.blocks, new Date());
     syncStateRepositoryMock.fetch.returns(state);
 
-    const info = new SyncInfo(null, null, new Date(), null, null, null, true);
+    const blockHash = 'somehash';
+    const info = new SyncInfo(null, blockHash, new Date(), null, null, blockHash, true);
 
     getSyncInfo.onCall(0).resolves(
       new SyncInfo(null, null, null, null, null, null, false),
@@ -58,7 +59,8 @@ describe('isSynced', () => {
     const state = new SyncState(rpcClientMock.blocks, new Date());
     syncStateRepositoryMock.fetch.returns(state);
 
-    const info = new SyncInfo(null, null, new Date(), null, null, null, true);
+    const blockHash = 'somehash';
+    const info = new SyncInfo(null, blockHash, new Date(), null, null, blockHash, true);
     getSyncInfo.resolves(info);
 
     const syncInfo = await isSynced(getSyncInfo, changeListenerMock, checkInterval);
@@ -73,7 +75,6 @@ describe('isSynced', () => {
     const blockHash = 'somehash';
     const info = new SyncInfo(null, blockHash, new Date(), null, null, null, true);
     getSyncInfo.resolves(info);
-
     const isSyncedPromise = isSynced(getSyncInfo, changeListenerMock, checkInterval);
 
     setImmediate(() => {
@@ -89,6 +90,10 @@ describe('isSynced', () => {
       // State changed and sync is completed
       const changeTime = new Date();
       changeTime.setSeconds(changeTime.getSeconds() + 1);
+
+      const blockHash = 'somehash';
+      const info = new SyncInfo(null, blockHash, changeTime, null, null, null, true);
+      getSyncInfo.resolves(info);
 
       const changedState = new SyncState(rpcClientMock.blocks, changeTime);
       changeListenerMock.emit('change', changedState);
