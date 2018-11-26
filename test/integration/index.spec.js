@@ -3,6 +3,7 @@ describe('Integration', () => {
   require('./blockchain');
   require('./stateView');
   require('./storage');
-  require('./sync');
+  require('./sync/index.js');
+  require('./sync.js');
   require('./util');
 });
