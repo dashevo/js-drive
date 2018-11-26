@@ -296,7 +296,57 @@ describe('Blockchain reorganization', function main() {
     await dashDriveSyncToFinish(firstDashDrive.driveApi);
     await dashDriveSyncToFinish(secondDashDrive.driveApi);
 
+    //
+    // Check first contract and object are in place on both nodes
+    //
+    // Check the first node
+    const { result: firstDriveFirstContract } = await firstDashDrive.driveApi.getApi()
+      .request('fetchDapContract', { dapId: firstDapId });
+
+    const { result: [firstDriveFirstObject] } = await firstDashDrive.driveApi.getApi()
+      .request('fetchDapObjects', { dapId: firstDapId, type: 'user' });
+
+    expect(firstDriveFirstContract).to.be.deep.equal(firstContractPacket.dapcontract);
+    expect(firstDriveFirstObject).to.be.deep.equal(firstObjectPacket.dapobjects[0]);
+
+    // Check the second node
+    const { result: secondDriveFirstContract } = await secondDashDrive.driveApi.getApi()
+      .request('fetchDapContract', { dapId: firstDapId });
+
+    const { result: [secondDriveFirstObject] } = await secondDashDrive.driveApi.getApi()
+      .request('fetchDapObjects', { dapId: firstDapId, type: 'user' });
+
+    expect(secondDriveFirstContract).to.be.deep.equal(firstContractPacket.dapcontract);
+    expect(secondDriveFirstObject).to.be.deep.equal(firstObjectPacket.dapobjects[0]);
+
+    //
+    // Check third contract is on the both nodes now
+    //
+    // Check the first node
+    const { result: firstDriveThirdContract } = await firstDashDrive.driveApi.getApi()
+      .request('fetchDapContract', { dapId: thirdDapId });
+
+    const { result: [firstDriveThirdObject] } = await firstDashDrive.driveApi.getApi()
+      .request('fetchDapObjects', { dapId: thirdDapId, type: 'user' });
+
+    expect(firstDriveThirdContract).to.be.deep.equal(thirdContractPacket.dapcontract);
+    expect(firstDriveThirdObject).to.be.deep.equal(thirdObjectPacket.dapobjects[0]);
+
+    // Check the second node
+    const { result: secondDriveThirdContract } = await secondDashDrive.driveApi.getApi()
+      .request('fetchDapContract', { dapId: thirdDapId });
+
+    const { result: [secondDriveThirdObject] } = await secondDashDrive.driveApi.getApi()
+      .request('fetchDapObjects', { dapId: thirdDapId, type: 'user' });
+
+    expect(secondDriveThirdContract).to.be.deep.equal(thirdContractPacket.dapcontract);
+    expect(secondDriveThirdObject).to.be.deep.equal(thirdObjectPacket.dapobjects[0]);
+
+    //
     // Check second contract and object are gone from the first Drive node
+    // and they are not on the second node as well
+    //
+    // Check the first node
     const { result: firstDriveSecondContract } = await firstDashDrive.driveApi.getApi()
       .request('fetchDapContract', { dapId: secondDapId });
 
@@ -306,7 +356,7 @@ describe('Blockchain reorganization', function main() {
     expect(firstDriveSecondContract).to.be.undefined();
     expect(firstDriveSecondObject).to.be.undefined();
 
-    // Check second contract and object are not on the second Drive node as well
+    // Check the second node
     const { result: secondDriveSecondContract } = await secondDashDrive.driveApi.getApi()
       .request('fetchDapContract', { dapId: secondDapId });
 
@@ -329,7 +379,11 @@ describe('Blockchain reorganization', function main() {
     await dashDriveSyncToFinish(firstDashDrive.driveApi);
     await dashDriveSyncToFinish(secondDashDrive.driveApi);
 
-    // Check data is back after generating more blocks
+    //
+    // Check data is back from the mempool after generating more blocks
+    // On both nodes
+    //
+    // Check the first node
     const { result: firstDriveSecondContractAfter } = await firstDashDrive.driveApi.getApi()
       .request('fetchDapContract', { dapId: secondDapId });
 
@@ -339,7 +393,7 @@ describe('Blockchain reorganization', function main() {
     expect(firstDriveSecondContractAfter).to.be.deep.equal(secondContractPacket.dapcontract);
     expect(firstDriveSecondObjectAfter).to.be.deep.equal(secondObjectPacket.dapobjects[0]);
 
-    // Check second Drive node have this data as well now
+    // Check the second node
     const { result: secondDriveSecondContractAfter } = await secondDashDrive.driveApi.getApi()
       .request('fetchDapContract', { dapId: secondDapId });
 
@@ -349,7 +403,9 @@ describe('Blockchain reorganization', function main() {
     expect(secondDriveSecondContractAfter).to.be.deep.equal(secondContractPacket.dapcontract);
     expect(secondDriveSecondObjectAfter).to.be.deep.equal(secondObjectPacket.dapobjects[0]);
 
+    //
     // Check there was no initial sync
+    //
     const {
       result: {
         lastInitialSyncAt: lastInitialSyncAtAfter,
