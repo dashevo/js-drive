@@ -45,10 +45,14 @@ describe('revertDapContractsForStateTransitionFactory', () => {
     addSTPacket = addSTPacketFactory(ipfsClient);
     dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, serializer);
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
+    const readerMediator = {
+      emitSerial: this.sinon.stub(),
+    };
     applyStateTransition = applyStateTransitionFactory(
       ipfsClient,
       updateDapContract,
       null,
+      readerMediator,
       30 * 1000,
     );
     rpcClientMock = new RpcClientMock(this.sinon);

@@ -49,10 +49,14 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
       DapObjectMongoDbRepository,
     );
     updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
+    const readerMediator = {
+      emitSerial: this.sinon.stub(),
+    };
     applyStateTransition = applyStateTransitionFactory(
       ipfsAPI,
       null,
       updateDapObject,
+      readerMediator,
       1000,
     );
     rpcClientMock = new RpcClientMock(this.sinon);
