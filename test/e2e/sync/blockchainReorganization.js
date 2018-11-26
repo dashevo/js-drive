@@ -296,8 +296,8 @@ describe('Blockchain reorganization', function main() {
     const { result: [firstDriveSecondObject] } = await firstDashDrive.driveApi.getApi()
       .request('fetchDapObjects', { dapId: secondDapId, type: 'user' });
 
-    expect(firstDriveSecondContract).to.be.deep.equal(undefined);
-    expect(firstDriveSecondObject).to.be.deep.equal(undefined);
+    expect(firstDriveSecondContract).to.be.undefined();
+    expect(firstDriveSecondObject).to.be.undefined();
 
     // Check second contract and object are not on the second Drive node as well
     const { result: secondDriveSecondContract } = await secondDashDrive.driveApi.getApi()
@@ -306,8 +306,8 @@ describe('Blockchain reorganization', function main() {
     const { result: [secondDriveSecondObject] } = await secondDashDrive.driveApi.getApi()
       .request('fetchDapObjects', { dapId: secondDapId, type: 'user' });
 
-    expect(secondDriveSecondContract).to.be.deep.equal(undefined);
-    expect(secondDriveSecondObject).to.be.deep.equal(undefined);
+    expect(secondDriveSecondContract).to.be.undefined();
+    expect(secondDriveSecondObject).to.be.undefined();
 
     // Generate more blocks
     await firstDashDrive.dashCore.getApi().generate(5);
