@@ -73,7 +73,7 @@ describe('isSynced', () => {
     syncStateRepositoryMock.fetch.returns(state);
 
     const blockHash = 'somehash';
-    const info = new SyncInfo(null, blockHash, new Date(), null, null, null, true);
+    let info = new SyncInfo(null, blockHash, new Date(), null, null, null, true);
     getSyncInfo.resolves(info);
     const isSyncedPromise = isSynced(getSyncInfo, changeListenerMock, checkInterval);
 
@@ -91,8 +91,7 @@ describe('isSynced', () => {
       const changeTime = new Date();
       changeTime.setSeconds(changeTime.getSeconds() + 1);
 
-      const blockHash = 'somehash';
-      const info = new SyncInfo(null, blockHash, changeTime, null, null, null, true);
+      info = new SyncInfo(null, blockHash, changeTime, null, null, null, true);
       getSyncInfo.resolves(info);
 
       const changedState = new SyncState(rpcClientMock.blocks, changeTime);
