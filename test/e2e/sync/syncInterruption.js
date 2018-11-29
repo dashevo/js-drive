@@ -48,7 +48,17 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
 
   before('having Dash Drive node #1 up and running', async () => {
     // 1. Start first Dash Drive node
-    firstDashDrive = await startDashDrive();
+    const cwd = process.cwd();
+    const driveOptions = {
+      dashDrive: {
+        container: {
+          volumes: [
+            `${cwd}/node_modules.alpine:/node_modules`,
+          ],
+        },
+      },
+    };
+    firstDashDrive = await startDashDrive(driveOptions);
 
     // 1.1 Activate Special Transactions
     await firstDashDrive.dashCore.getApi().generate(1000);
@@ -95,7 +105,17 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
 
   it('Dash Drive should save sync state and continue from saved point after resume', async () => {
     // 3. Start 2nd Dash Drive node and connect to the first one
-    secondDashDrive = await startDashDrive();
+    const cwd = process.cwd();
+    const driveOptions = {
+      dashDrive: {
+        container: {
+          volumes: [
+            `${cwd}/node_modules.alpine:/node_modules`,
+          ],
+        },
+      },
+    };
+    secondDashDrive = await startDashDrive(driveOptions);
 
     await secondDashDrive.ipfs.connect(firstDashDrive.ipfs);
     await secondDashDrive.dashCore.connect(firstDashDrive.dashCore);
