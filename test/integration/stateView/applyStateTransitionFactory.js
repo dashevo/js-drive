@@ -83,7 +83,7 @@ describe('applyStateTransitionFactory', () => {
       ReaderMediator.EVENTS.DAP_CONTRACT_APPLIED,
       {
         userId: header.extraPayload.regTxId,
-        dapId: packet.dapid,
+        dapId: doubleSha256(packet.dapcontract),
         reference,
         contract: packet.dapcontract,
       },
@@ -140,7 +140,7 @@ describe('applyStateTransitionFactory', () => {
       ReaderMediator.EVENTS.DAP_CONTRACT_APPLIED,
       {
         userId: header.extraPayload.regTxId,
-        dapId: packet.dapid,
+        dapId,
         reference,
         contract: packet.dapcontract,
       },
