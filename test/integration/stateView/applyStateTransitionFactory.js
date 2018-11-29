@@ -179,6 +179,10 @@ describe('applyStateTransitionFactory', () => {
       {
         userId: header.extraPayload.regTxId,
         dapId: packet.dapid,
+        objectId: generateDapObjectId(
+          header.extraPayload.regTxId,
+          packet.dapobjects[0].idx,
+        ),
         reference,
         object: packet.dapobjects[0],
       },
