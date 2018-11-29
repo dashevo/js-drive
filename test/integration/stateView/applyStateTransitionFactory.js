@@ -68,16 +68,24 @@ describe('applyStateTransitionFactory', () => {
     const packet = getTransitionPacketFixtures()[0];
     const header = getTransitionHeaderFixtures()[0];
     header.extraPayload.hashSTPacket = packet.getHash();
+    const reference = new Reference(
+      block.hash,
+      block.height,
+      header.hash,
+      packet.getHash(),
+      undefined,
+    );
 
     await addSTPacket(packet);
     await applyStateTransition(header, block);
 
     expect(readerMediator.emitSerial).to.be.calledWith(
-      ReaderMediator.EVENTS.STATE_TRANSITION_APPLIED,
+      ReaderMediator.EVENTS.DAP_CONTRACT_APPLIED,
       {
-        block,
-        stateTransition: header,
-        packet: packet.toJSON({ skipMeta: true }),
+        userId: header.extraPayload.regTxId,
+        dapId: packet.dapid,
+        reference,
+        contract: packet.dapcontract,
       },
     );
 
@@ -117,16 +125,24 @@ describe('applyStateTransitionFactory', () => {
     packet.dapcontract.upgradedapid = dapId;
     const header = getTransitionHeaderFixtures()[0];
     header.extraPayload.hashSTPacket = packet.getHash();
+    const reference = new Reference(
+      block.hash,
+      block.height,
+      header.hash,
+      packet.getHash(),
+      undefined,
+    );
 
     await addSTPacket(packet);
     await applyStateTransition(header, block);
 
     expect(readerMediator.emitSerial).to.be.calledWith(
-      ReaderMediator.EVENTS.STATE_TRANSITION_APPLIED,
+      ReaderMediator.EVENTS.DAP_CONTRACT_APPLIED,
       {
-        block,
-        stateTransition: header,
-        packet: packet.toJSON({ skipMeta: true }),
+        userId: header.extraPayload.regTxId,
+        dapId: packet.dapid,
+        reference,
+        contract: packet.dapcontract,
       },
     );
 
@@ -147,16 +163,24 @@ describe('applyStateTransitionFactory', () => {
     packet.dapobjects[0].act = 0;
     const header = getTransitionHeaderFixtures()[1];
     header.extraPayload.hashSTPacket = packet.getHash();
+    const reference = new Reference(
+      block.hash,
+      block.height,
+      header.hash,
+      packet.getHash(),
+      undefined,
+    );
 
     await addSTPacket(packet);
     await applyStateTransition(header, block);
 
     expect(readerMediator.emitSerial).to.be.calledWith(
-      ReaderMediator.EVENTS.STATE_TRANSITION_APPLIED,
+      ReaderMediator.EVENTS.DAP_OBJECT_APPLIED,
       {
-        block,
-        stateTransition: header,
-        packet: packet.toJSON({ skipMeta: true }),
+        userId: header.extraPayload.regTxId,
+        dapId: packet.dapid,
+        reference,
+        object: packet.dapobjects[0],
       },
     );
 

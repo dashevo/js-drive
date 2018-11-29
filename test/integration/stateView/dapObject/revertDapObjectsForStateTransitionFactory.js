@@ -22,6 +22,7 @@ const getHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHe
 const getPacketFixtures = require('../../../../lib/test/fixtures/getTransitionPacketFixtures');
 
 const RpcClientMock = require('../../../../lib/test/mock/RpcClientMock');
+const ReaderMediatorMock = require('../../../../lib/test/mock/BlockchainReaderMediatorMock');
 
 describe('revertDapObjectsForStateTransitionFactory', () => {
   const blockchainUserId = '3557b9a8dfcc1ef9674b50d8d232e0e3e9020f49fa44f89cace622a01f43d03e';
@@ -49,9 +50,7 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
       DapObjectMongoDbRepository,
     );
     updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
-    const readerMediator = {
-      emitSerial: this.sinon.stub(),
-    };
+    const readerMediator = new ReaderMediatorMock(this.sinon);
     applyStateTransition = applyStateTransitionFactory(
       ipfsAPI,
       null,
@@ -70,6 +69,7 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
       createDapObjectMongoDbRepository,
       applyStateTransition,
       applyStateTransitionFromReference,
+      readerMediator,
       30 * 1000,
     );
   });
