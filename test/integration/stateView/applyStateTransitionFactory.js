@@ -44,7 +44,7 @@ describe('applyStateTransitionFactory', () => {
   let createDapObjectMongoDbRepository;
   let readerMediator;
   let applyStateTransition;
-  beforeEach(function beforeEachFunction() {
+  beforeEach(function beforeEach() {
     addSTPacket = addSTPacketFactory(ipfsClient);
     dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, serializer);
     createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
