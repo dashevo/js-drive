@@ -83,17 +83,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     users = [];
 
     // 1. Start first Dash Drive node
-    const cwd = process.cwd();
-    const driveOptions = {
-      dashDrive: {
-        container: {
-          volumes: [
-            `${cwd}/node_modules.alpine:/node_modules`,
-          ],
-        },
-      },
-    };
-    firstDashDrive = await startDashDrive(driveOptions);
+    firstDashDrive = await startDashDrive();
 
     // 1.1 Activate Special Transactions
     await firstDashDrive.dashCore.getApi().generate(1000);

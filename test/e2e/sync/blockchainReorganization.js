@@ -127,17 +127,7 @@ describe('Blockchain reorganization', function main() {
       .map(packet => doubleSha256(packet.dapcontract));
 
     // Start two full Dash Drive instances
-    const cwd = process.cwd();
-    const driveOptions = {
-      dashDrive: {
-        container: {
-          volumes: [
-            `${cwd}/node_modules.alpine:/node_modules`,
-          ],
-        },
-      },
-    };
-    [firstDashDrive, secondDashDrive] = await startDashDrive.many(2, driveOptions);
+    [firstDashDrive, secondDashDrive] = await startDashDrive.many(2);
 
     // Activate Special Transactions
     await firstDashDrive.dashCore.getApi().generate(BLOCKS_ST_ACTIVATION);
