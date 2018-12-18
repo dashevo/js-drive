@@ -150,6 +150,68 @@ describe('DapObject', () => {
     ]);
   });
 
+  it('should remove specified revisions of DapObject', () => {
+    const blockchainUserId = '3557b9a8dfcc1ef9674b50d8d232e0e3e9020f49fa44f89cace622a01f43d03e';
+    const isDeleted = false;
+
+    const firstDapObjectData = {
+      id: '1234',
+      objtype: 'user',
+      idx: 0,
+      rev: 1,
+      act: 0,
+    };
+    const firstReference = new Reference();
+    const firstPreviousRevisions = [];
+    const firstDapObject = new DapObject(
+      blockchainUserId,
+      firstDapObjectData,
+      firstReference,
+      isDeleted,
+      firstPreviousRevisions,
+    );
+
+    const secondDapObjectData = {
+      id: '1234',
+      objtype: 'user',
+      idx: 0,
+      rev: 2,
+      act: 0,
+    };
+    const secondReference = new Reference();
+    const secondPreviousVersions = [firstDapObject.currentRevision()];
+    const secondDapObject = new DapObject(
+      blockchainUserId,
+      secondDapObjectData,
+      secondReference,
+      isDeleted,
+      secondPreviousVersions,
+    );
+
+    const thirdDapObjectData = {
+      id: '1234',
+      objtype: 'user',
+      idx: 0,
+      rev: 3,
+      act: 0,
+    };
+    const thirdReference = new Reference();
+    const thirdPreviousVersions = [];
+    const thirdDapObject = new DapObject(
+      blockchainUserId,
+      thirdDapObjectData,
+      thirdReference,
+      isDeleted,
+      thirdPreviousVersions,
+    );
+    thirdDapObject.addRevision(secondDapObject);
+    thirdDapObject.removeRevisions(2);
+
+    expect(thirdDapObject.getPreviousRevisions()).to.be.deep.equal([
+      firstDapObject.currentRevision(),
+    ]);
+  });
+
   it('should return original data by calling getOriginalData', () => {
     const originalData = {
       objtype: 'user',

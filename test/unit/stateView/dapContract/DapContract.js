@@ -80,5 +80,49 @@ describe('DapContract', () => {
     ]);
   });
 
+  it('should remove specified revisions of DapContract', () => {
+    const firstReference = new Reference();
+    const firstData = {
+      dapver: 1,
+    };
+    const firstDapContract = new DapContract(
+      null,
+      firstData,
+      firstReference,
+      false,
+    );
+
+    const secondReference = new Reference();
+    const secondData = {
+      dapver: 2,
+    };
+    const secondDapContract = new DapContract(
+      null,
+      secondData,
+      secondReference,
+      false,
+    );
+
+    secondDapContract.addRevision(firstDapContract);
+
+    const thirdReference = new Reference();
+    const thirdData = {
+      dapver: 3,
+    };
+    const thirdDapContract = new DapContract(
+      null,
+      thirdData,
+      thirdReference,
+      false,
+    );
+
+    thirdDapContract.addRevision(secondDapContract);
+    thirdDapContract.removeRevisions(2);
+
+    expect(thirdDapContract.getPreviousVersions()).to.be.deep.equal([
+      firstDapContract.currentRevision(),
+    ]);
+  });
+
   it('should be able to check `deleted` flag by calling isDeleted');
 });
