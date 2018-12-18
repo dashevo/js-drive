@@ -57,7 +57,7 @@ describe('attachStorageHandlers', () => {
     expect(stPacketRepositoryMock.delete).to.be.calledWith(packetPath);
   });
 
-  it('should call unpinAllIpfsPackets on stHeadersReader reset event', async () => {
+  it('should unpin all packets on stHeadersReader reset event', async () => {
     await readerMediatorMock.originalEmitSerial(ReaderMediator.EVENTS.RESET);
 
     expect(stPacketRepositoryMock.deleteAll).to.be.calledOnce();

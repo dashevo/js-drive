@@ -20,6 +20,7 @@ const serializer = require('../../../../lib/util/serializer');
 const RpcClientMock = require('../../../../lib/test/mock/RpcClientMock');
 const ReaderMediatorMock = require('../../../../lib/test/mock/BlockchainReaderMediatorMock');
 
+const StateTransitionPacketIpfsRepository = require('../../../../lib/storage/stPacket/StateTransitionPacketIpfsRepository');
 const addSTPacketFactory = require('../../../../lib/storage/ipfs/addSTPacketFactory');
 const updateDapContractFactory = require('../../../../lib/stateView/dapContract/updateDapContractFactory');
 const revertDapContractsForStateTransitionFactory = require('../../../../lib/stateView/dapContract/revertDapContractsForStateTransitionFactory');
@@ -46,16 +47,19 @@ describe('revertDapContractsForStateTransitionFactory', () => {
   let readerMediator;
   let revertDapContractsForStateTransition;
   beforeEach(function beforeEach() {
-    addSTPacket = addSTPacketFactory(ipfsClient);
+    const stPacketRepository = new StateTransitionPacketIpfsRepository(
+      ipfsClient,
+      1000,
+    );
+    addSTPacket = addSTPacketFactory(stPacketRepository);
     dapContractMongoDbRepository = new DapContractMongoDbRepository(mongoDb, serializer);
     const updateDapContract = updateDapContractFactory(dapContractMongoDbRepository);
     readerMediator = new ReaderMediatorMock(this.sinon);
     applyStateTransition = applyStateTransitionFactory(
-      ipfsClient,
+      stPacketRepository,
       updateDapContract,
       null,
       readerMediator,
-      30 * 1000,
     );
     rpcClientMock = new RpcClientMock(this.sinon);
     const applyStateTransitionFromReference = applyStateTransitionFromReferenceFactory(

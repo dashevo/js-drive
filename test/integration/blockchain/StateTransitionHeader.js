@@ -1,5 +1,6 @@
 const { mocha: { startIPFS } } = require('@dashevo/js-evo-services-ctl');
 const addSTPacketFactory = require('../../../lib/storage/ipfs/addSTPacketFactory');
+const StateTransitionPacketIpfsRepository = require('../../../lib/storage/stPacket/StateTransitionPacketIpfsRepository');
 const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
 const getTransitionHeaderFixtures = require('../../../lib/test/fixtures/getTransitionHeaderFixtures');
 
@@ -9,7 +10,11 @@ describe('StateTransitionHeader', () => {
 
   let addSTPacket;
   startIPFS().then((instance) => {
-    addSTPacket = addSTPacketFactory(instance.getApi());
+    const stPacketRepository = new StateTransitionPacketIpfsRepository(
+      instance.getApi(),
+      1000,
+    );
+    addSTPacket = addSTPacketFactory(stPacketRepository);
   });
 
   it('should StateTransitionHeader CID equal to IPFS CID', async () => {
@@ -18,6 +23,6 @@ describe('StateTransitionHeader', () => {
     const ipfsCid = await addSTPacket(packet);
 
     const stHeaderCid = header.getPacketCID();
-    expect(stHeaderCid.toBaseEncodedString()).to.equal(ipfsCid.toBaseEncodedString());
+    expect(stHeaderCid.toBaseEncodedString()).to.equal(ipfsCid);
   });
 });

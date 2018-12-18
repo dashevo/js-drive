@@ -1,5 +1,6 @@
 const { mocha: { startIPFS } } = require('@dashevo/js-evo-services-ctl');
 
+const StateTransitionPacketIpfsRepository = require('../../../../lib/storage/stPacket/StateTransitionPacketIpfsRepository');
 const addSTPacketFactory = require('../../../../lib/storage/ipfs/addSTPacketFactory');
 const getTransitionPacketFixtures = require('../../../../lib/test/fixtures/getTransitionPacketFixtures');
 
@@ -12,7 +13,11 @@ describe('addSTPacket', () => {
   });
 
   beforeEach(() => {
-    addSTPacket = addSTPacketFactory(ipfsApi);
+    const stPacketRepository = new StateTransitionPacketIpfsRepository(
+      ipfsApi,
+      1000,
+    );
+    addSTPacket = addSTPacketFactory(stPacketRepository);
   });
 
   it('should add packets to storage and returns hash', async () => {
