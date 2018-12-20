@@ -119,7 +119,7 @@ describe('DapContract', () => {
     ];
 
     secondDapContract.addRevision(thirdDapContract);
-    secondDapContract.removeFutureRevisions();
+    secondDapContract.removeAheadRevisions();
 
     expect(secondDapContract.getPreviousVersions()).to.be.deep.equal([
       firstDapContract.currentRevision(),

@@ -208,7 +208,7 @@ describe('DapObject', () => {
     );
 
     secondDapObject.addRevision(thirdDapObject);
-    secondDapObject.removeFutureRevisions();
+    secondDapObject.removeAheadRevisions();
 
     expect(secondDapObject.getPreviousRevisions()).to.be.deep.equal([
       firstDapObject.currentRevision(),
