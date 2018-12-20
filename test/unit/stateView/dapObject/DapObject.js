@@ -179,13 +179,12 @@ describe('DapObject', () => {
       act: 0,
     };
     const secondReference = new Reference();
-    const secondPreviousVersions = [firstDapObject.currentRevision()];
     const secondDapObject = new DapObject(
       blockchainUserId,
       secondDapObjectData,
       secondReference,
       isDeleted,
-      secondPreviousVersions,
+      [],
     );
 
     const thirdDapObjectData = {
@@ -196,7 +195,10 @@ describe('DapObject', () => {
       act: 0,
     };
     const thirdReference = new Reference();
-    const thirdPreviousVersions = [];
+    const thirdPreviousVersions = [
+      firstDapObject.currentRevision(),
+      secondDapObject.currentRevision(),
+    ];
     const thirdDapObject = new DapObject(
       blockchainUserId,
       thirdDapObjectData,
@@ -204,10 +206,11 @@ describe('DapObject', () => {
       isDeleted,
       thirdPreviousVersions,
     );
-    thirdDapObject.addRevision(secondDapObject);
-    thirdDapObject.removeRevisions(2);
 
-    expect(thirdDapObject.getPreviousRevisions()).to.be.deep.equal([
+    secondDapObject.addRevision(thirdDapObject);
+    secondDapObject.removeFutureRevisions();
+
+    expect(secondDapObject.getPreviousRevisions()).to.be.deep.equal([
       firstDapObject.currentRevision(),
     ]);
   });

@@ -103,8 +103,6 @@ describe('DapContract', () => {
       false,
     );
 
-    secondDapContract.addRevision(firstDapContract);
-
     const thirdReference = new Reference();
     const thirdData = {
       dapver: 3,
@@ -115,11 +113,15 @@ describe('DapContract', () => {
       thirdReference,
       false,
     );
+    thirdDapContract.previousVersions = [
+      firstDapContract.currentRevision(),
+      secondDapContract.currentRevision(),
+    ];
 
-    thirdDapContract.addRevision(secondDapContract);
-    thirdDapContract.removeRevisions(2);
+    secondDapContract.addRevision(thirdDapContract);
+    secondDapContract.removeFutureRevisions();
 
-    expect(thirdDapContract.getPreviousVersions()).to.be.deep.equal([
+    expect(secondDapContract.getPreviousVersions()).to.be.deep.equal([
       firstDapContract.currentRevision(),
     ]);
   });
