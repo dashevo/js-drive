@@ -23,6 +23,6 @@ describe('StateTransitionHeader', () => {
     const ipfsCid = await addSTPacket(packet);
 
     const stHeaderCid = header.getPacketCID();
-    expect(stHeaderCid.toBaseEncodedString()).to.equal(ipfsCid);
+    expect(stHeaderCid.toBaseEncodedString()).to.equal(ipfsCid.toBaseEncodedString());
   });
 });
