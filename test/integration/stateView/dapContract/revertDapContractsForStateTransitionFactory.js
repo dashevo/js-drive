@@ -155,7 +155,7 @@ describe('revertDapContractsForStateTransitionFactory', () => {
       },
     ]);
 
-    expect(readerMediator.emitSerial.getCall(2)).to.be.calledWith(
+    expect(readerMediator.emitSerial.getCall(1)).to.be.calledWith(
       ReaderMediator.EVENTS.DAP_CONTRACT_REVERTED,
       {
         userId: lastDapContractVersion.header.extraPayload.regTxId,
