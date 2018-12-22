@@ -21,7 +21,7 @@ const RpcClientMock = require('../../../../lib/test/mock/RpcClientMock');
 const ReaderMediatorMock = require('../../../../lib/test/mock/BlockchainReaderMediatorMock');
 
 const StateTransitionPacketIpfsRepository = require('../../../../lib/storage/stPacket/StateTransitionPacketIpfsRepository');
-const addSTPacketFactory = require('../../../../lib/storage/ipfs/addSTPacketFactory');
+const addSTPacketFactory = require('../../../../lib/storage/stPacket/addSTPacketFactory');
 const updateDapContractFactory = require('../../../../lib/stateView/dapContract/updateDapContractFactory');
 const revertDapContractsForStateTransitionFactory = require('../../../../lib/stateView/dapContract/revertDapContractsForStateTransitionFactory');
 const applyStateTransitionFactory = require('../../../../lib/stateView/applyStateTransitionFactory');

@@ -18,7 +18,7 @@ const updateDapObjectFactory = require('../../../../lib/stateView/dapObject/upda
 const applyStateTransitionFactory = require('../../../../lib/stateView/applyStateTransitionFactory');
 const applyStateTransitionFromReferenceFactory = require('../../../../lib/stateView/applyStateTransitionFromReferenceFactory');
 
-const addSTPacketFactory = require('../../../../lib/storage/ipfs/addSTPacketFactory');
+const addSTPacketFactory = require('../../../../lib/storage/stPacket/addSTPacketFactory');
 const StateTransitionPacketIpfsRepository = require('../../../../lib/storage/stPacket/StateTransitionPacketIpfsRepository');
 
 const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
