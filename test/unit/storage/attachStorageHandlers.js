@@ -16,7 +16,7 @@ describe('attachStorageHandlers', () => {
     readerMediatorMock = new BlockchainReaderMediatorMock(this.sinon);
 
     stPacketRepositoryMock = {
-      update: this.sinon.stub(),
+      download: this.sinon.stub(),
       delete: this.sinon.stub(),
       deleteAll: this.sinon.stub(),
     };
@@ -36,10 +36,10 @@ describe('attachStorageHandlers', () => {
       block,
     });
 
-    const packetPath = stateTransition.getPacketCID().toBaseEncodedString();
+    const packetCid = stateTransition.getPacketCID();
 
-    expect(stPacketRepositoryMock.update).to.be.calledOnce();
-    expect(stPacketRepositoryMock.update).to.be.calledWith(packetPath);
+    expect(stPacketRepositoryMock.download).to.be.calledOnce();
+    expect(stPacketRepositoryMock.download).to.be.calledWith(packetCid);
   });
 
   it('should unpin ST packets in case of reorg', async () => {
@@ -51,10 +51,10 @@ describe('attachStorageHandlers', () => {
       block,
     });
 
-    const packetPath = stateTransition.getPacketCID().toBaseEncodedString();
+    const packetCid = stateTransition.getPacketCID();
 
     expect(stPacketRepositoryMock.delete).to.be.calledOnce();
-    expect(stPacketRepositoryMock.delete).to.be.calledWith(packetPath);
+    expect(stPacketRepositoryMock.delete).to.be.calledWith(packetCid);
   });
 
   it('should unpin all packets on stHeadersReader reset event', async () => {
