@@ -44,7 +44,12 @@ describe('StateTransitionPacketIpfsRepository', () => {
     ipfsApiMock.dag.put.returns(putPromise);
     const cid = 'some_cid'; // not technically a CID
 
-    await stPacketRepository.store(cid, somePacketData);
+    const packetMock = {
+      getCID: () => cid,
+      toJSON: () => somePacketData,
+    };
+
+    await stPacketRepository.store(packetMock);
 
     expect(ipfsApiMock.dag.put).to.be.calledOnce();
     expect(ipfsApiMock.dag.put).to.be.calledWith(somePacketData, { cid });
@@ -53,23 +58,27 @@ describe('StateTransitionPacketIpfsRepository', () => {
   it('should call IPFS pin.add method upon calling download', async () => {
     const pinPromise = Promise.resolve();
     ipfsApiMock.pin.add.returns(pinPromise);
-    const cid = 'some_cid'; // not technically a CID
+    const cid = {
+      toBaseEncodedString: () => 'some_cid',
+    }; // not technically a CID
 
     await stPacketRepository.download(cid);
 
     expect(ipfsApiMock.pin.add).to.be.calledOnce();
-    expect(ipfsApiMock.pin.add).to.be.calledWith(cid, { recursive: true });
+    expect(ipfsApiMock.pin.add).to.be.calledWith(cid.toBaseEncodedString(), { recursive: true });
   });
 
   it('should call IPFS pin.rm method upon calling delete', async () => {
     const pinPromise = Promise.resolve();
     ipfsApiMock.pin.rm.returns(pinPromise);
-    const cid = 'some_cid';
+    const cid = {
+      toBaseEncodedString: () => 'some_cid',
+    }; // not technically a CID
 
     await stPacketRepository.delete(cid);
 
     expect(ipfsApiMock.pin.rm).to.be.calledOnce();
-    expect(ipfsApiMock.pin.rm).to.be.calledWith(cid, { recursive: true });
+    expect(ipfsApiMock.pin.rm).to.be.calledWith(cid.toBaseEncodedString(), { recursive: true });
   });
 
   it('should call IPFS pin.ls and pin.rm methods upon calling deleteAll', async () => {
