@@ -91,6 +91,7 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
 
     const dapObjectRepository = createDapObjectMongoDbRepository(
       packet.dapid,
+      'user',
     );
 
     const [dapObjectData] = packet.dapobjects;
@@ -131,6 +132,7 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
 
     const dapObjectRepository = createDapObjectMongoDbRepository(
       packet.dapid,
+      'user',
     );
 
     const references = [];
