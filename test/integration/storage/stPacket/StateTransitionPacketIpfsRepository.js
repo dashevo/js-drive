@@ -99,7 +99,7 @@ describe('StateTransitionPacketIpfsRepository', function main() {
       await stPacketRepository.delete(packet.getCID());
       expect.fail('the error have not been thrown');
     } catch (e) {
-      expect(e.message).to.be.equal('not pinned');
+      expect(e.name).to.be.equal('PacketNotPinnedError');
     }
   });
 });
