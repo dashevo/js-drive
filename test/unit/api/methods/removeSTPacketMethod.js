@@ -62,7 +62,6 @@ describe('removeSTPacketMethod', () => {
 
     await removeSTPacketMethod({ packetHash: 'some_packet_hash' });
 
-    expect(removeSTPacket).to.be.calledOnce();
-    expect(removeSTPacket).to.be.calledWith(cid);
+    expect(removeSTPacket).to.be.calledOnceWith(cid);
   });
 });
