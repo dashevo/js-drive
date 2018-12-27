@@ -1,7 +1,7 @@
 const proxyquire = require('proxyquire');
 
 const PacketNotPinnedError = require('../../../../lib/storage/errors/PacketNotPinnedError');
-const CIDCreationFailedError = require('../../../../lib/storage/errors/CIDCreationFailedError');
+const InvalidHashError = require('../../../../lib/storage/errors/InvalidHashError');
 const InvalidParamsError = require('../../../../lib/api/InvalidParamsError');
 
 describe('removeSTPacketMethod', () => {
@@ -30,12 +30,12 @@ describe('removeSTPacketMethod', () => {
   });
 
   it('should throw error if "packetHash" params is not a valid CID hash', () => {
-    stateTransitonPacketMock.createCIDFromHash.throws(new CIDCreationFailedError());
+    stateTransitonPacketMock.createCIDFromHash.throws(new InvalidHashError());
     expect(removeSTPacketMethod({ packetHash: 'wrong' })).to.be.rejectedWith(InvalidParamsError);
     expect(removeSTPacket).to.not.be.called();
   });
 
-  it('should throw an original error if error is not CIDCreationFailedError', () => {
+  it('should throw an original error if error is not InvalidHashError', () => {
     const error = new Error('Some unknown error');
     stateTransitonPacketMock.createCIDFromHash.throws(error);
     expect(removeSTPacketMethod({ packetHash: 'other' })).to.be.rejectedWith(error);

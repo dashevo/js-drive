@@ -12,12 +12,12 @@ describe('StateTransitionPacket', () => {
     expect(cid.toBaseEncodedString()).to.be.equal(packetCIDString);
   });
 
-  it('should throw CIDCreationFailedError if packet hash is wrong', () => {
+  it('should throw InvalidHashError if packet hash is wrong', () => {
     try {
       StateTransitionPacket.createCIDFromHash('wrong');
       expect.fail('the error have not been thrown');
     } catch (e) {
-      expect(e.name).to.be.equal('CIDCreationFailedError');
+      expect(e.name).to.be.equal('InvalidHashError');
     }
   });
 });
