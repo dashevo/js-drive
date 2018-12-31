@@ -71,7 +71,7 @@ describe('DapContractRepository', () => {
     expect(contract).to.be.null();
   });
 
-  it.only('should convert dapId to it\'s base58 counterpart using createIdFromDapId', () => {
+  it.only('should convert dapId to its base58 counterpart using createIdFromDapId', () => {
     const dapId = '1234567';
     const dbId = '77em';
     const converted = dapContractRepository.createIdFromDapId(dapId);
