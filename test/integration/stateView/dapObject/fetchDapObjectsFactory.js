@@ -80,7 +80,7 @@ describe('fetchDapObjectsFactory', () => {
 
   it('should return empty array if repository with specified type have not been created yet', async () => {
     const type = 'Unknown';
-    const dapObjectRepository = createDapObjectMongoDbRepository(dapId, type);
+    createDapObjectMongoDbRepository(dapId, type);
     const result = await fetchDapObjects(dapId, type);
     expect(result).to.be.deep.equal([]);
   });
