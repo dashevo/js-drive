@@ -1,41 +1,52 @@
 const { mocha: { startIPFS } } = require('@dashevo/js-evo-services-ctl');
 
-const StateTransitionPacket = require('../../../../lib/storage/stPacket/StateTransitionPacket');
-const StateTransitionPacketIpfsRepository = require('../../../../lib/storage/stPacket/StateTransitionPacketIpfsRepository');
-const getPacketFixtures = require('../../../../lib/test/fixtures/getTransitionPacketFixtures');
+const DashPlatformProtocol = require('@dashevo/dpp');
 
-describe('StateTransitionPacketIpfsRepository', function main() {
+const STPacketIpfsRepository = require('../../../../lib/storage/stPacket/STPacketIpfsRepository');
+
+const getSTPacketsFixture = require('../../../../lib/test/fixtures/getSTPacketsFixture');
+
+const createCIDFromHash = require('../../../../lib/storage/stPacket/createCIDFromHash');
+
+const GetPacketTimeoutError = require('../../../../lib/storage/errors/GetPacketTimeoutError');
+const PacketNotPinnedError = require('../../../../lib/storage/errors/PacketNotPinnedError');
+
+describe('STPacketIpfsRepository', function main() {
+  let stPacketRepository;
+  let ipfsApi;
+  let stPacket;
+
   this.timeout(60000);
 
-  let ipfsApi;
-  startIPFS().then((_instance) => {
-    ipfsApi = _instance.getApi();
+  startIPFS().then((instance) => {
+    ipfsApi = instance.getApi();
   });
 
-  let stPacketRepository;
   beforeEach(() => {
-    stPacketRepository = new StateTransitionPacketIpfsRepository(
+    const dataProviderMock = {};
+
+    const dpp = new DashPlatformProtocol({
+      dataProvider: dataProviderMock,
+    });
+
+    stPacketRepository = new STPacketIpfsRepository(
       ipfsApi,
+      dpp,
       1000,
     );
+
+    ([stPacket] = getSTPacketsFixture());
   });
 
   it('should store and find a packet', async () => {
-    const [packetData] = getPacketFixtures();
-    const packet = new StateTransitionPacket(packetData);
-
-    const storedCid = await stPacketRepository.store(packet);
+    const storedCid = await stPacketRepository.store(stPacket);
     const storedPacket = await stPacketRepository.find(storedCid);
 
-    expect(storedPacket.toJSON({ skipMeta: true })).to.be
-      .deep.equal(packet.toJSON({ skipMeta: true }));
+    expect(storedPacket.toJSON()).to.be.deep.equal(stPacket.toJSON());
   });
 
   it('should unpin previously stored and pinned packet', async () => {
-    const [packetData] = getPacketFixtures();
-    const packet = new StateTransitionPacket(packetData);
-
-    const storedCid = await stPacketRepository.store(packet);
+    const storedCid = await stPacketRepository.store(stPacket);
     await stPacketRepository.download(storedCid);
 
     let pinnedHashes = await ipfsApi.pin.ls();
@@ -52,12 +63,10 @@ describe('StateTransitionPacketIpfsRepository', function main() {
   });
 
   it('should unpin all of the previously stored and pinned packets', async () => {
-    const [packetDataOne, packetDataTwo] = getPacketFixtures();
-    const packetOne = new StateTransitionPacket(packetDataOne);
-    const packetTwo = new StateTransitionPacket(packetDataTwo);
+    const [stPacketOne, stPacketTwo] = getSTPacketsFixture();
 
-    const storedCidOne = await stPacketRepository.store(packetOne);
-    const storedCidTwo = await stPacketRepository.store(packetTwo);
+    const storedCidOne = await stPacketRepository.store(stPacketOne);
+    const storedCidTwo = await stPacketRepository.store(stPacketTwo);
 
     await stPacketRepository.download(storedCidOne);
     await stPacketRepository.download(storedCidTwo);
@@ -78,28 +87,24 @@ describe('StateTransitionPacketIpfsRepository', function main() {
   });
 
   it('should not find a packet if it was not stored', async () => {
-    const packet = new StateTransitionPacket({
-      pver: 42,
-    });
+    const cid = createCIDFromHash(stPacket.hash());
 
     try {
-      await stPacketRepository.find(packet.getCID());
+      await stPacketRepository.find(cid);
       expect.fail('the error have not been thrown');
     } catch (e) {
-      expect(e.name).to.be.equal('GetPacketTimeoutError');
+      expect(e).to.be.instanceOf(GetPacketTimeoutError);
     }
   });
 
   it('should throw an error if trying to remove packet not pinned', async () => {
-    const packet = new StateTransitionPacket({
-      pver: 42,
-    });
+    const cid = createCIDFromHash(stPacket.hash());
 
     try {
-      await stPacketRepository.delete(packet.getCID());
+      await stPacketRepository.delete(cid);
       expect.fail('the error have not been thrown');
     } catch (e) {
-      expect(e.name).to.be.equal('PacketNotPinnedError');
+      expect(e).to.be.instanceOf(PacketNotPinnedError);
     }
   });
 });
