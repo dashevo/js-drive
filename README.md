@@ -86,30 +86,30 @@ Remove State Transition Packet from DashDrive storage
 
 #### fetchDPContact
 
-Fetch DAP Contract from DashDrive State View
+Fetch DP Contract from DashDrive State View
 
 ##### Params
 
 | name    | type   | description  |
 |---------|--------|--------------|
-| contractId   | string | DAP ID       |
+| contractId   | string | DP Contract ID       |
 
 ##### Response
 
 | name    | type   | description         |
 |---------|--------|---------------------|
-| result  | object | DAP Contact object  |
+| result  | object | DP Contact object  |
 
 #### fetchDPObjects
 
-Fetch DAP Objects from DashDrive State View
+Fetch DP Objects from DashDrive State View
 
 ##### Params
 
 | name    | type   | description          |
 |---------|--------|----------------------|
-| contractId   | string | DAP ID               |
-| type    | string | DAP Objects type     |
+| contractId   | string | DP ID               |
+| type    | string | DP Objects type     |
 | options | object | Options              |
 
 Fetch method options:
@@ -126,7 +126,7 @@ Fetch method options:
 
 | name    | type   | description  |
 |---------|--------|--------------|
-| result  | array  | DAP objects  |
+| result  | array  | DP objects  |
 
 #### getSyncInfo
 

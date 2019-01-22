@@ -31,7 +31,7 @@ describe('fetchDPContractMethod', () => {
     expect(fetchDPContractMock).not.to.be.called();
   });
 
-  it('should throw error if DAP Contract not found', async () => {
+  it('should throw error if DP Contract not found', async () => {
     fetchDPContractMock.returns(null);
 
     let error;
@@ -46,7 +46,7 @@ describe('fetchDPContractMethod', () => {
     expect(fetchDPContractMock).to.be.calledOnceWith(contractId);
   });
 
-  it('should return DAP contract', async () => {
+  it('should return DP contract', async () => {
     fetchDPContractMock.returns(dpContract);
 
     const result = await fetchDPContractMethod({ contractId });

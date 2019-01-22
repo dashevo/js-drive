@@ -1,7 +1,7 @@
 const cbor = require('cbor');
 const { startDashDrive } = require('@dashevo/js-evo-services-ctl');
 
-const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
+const getStateTransitionPackets = require('../../../lib/test/fixtures/getSTPacketsFixture');
 
 const ApiAppOptions = require('../../../lib/app/ApiAppOptions');
 
@@ -62,7 +62,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
       const [packetOne] = packetsData;
       packetOne.dapcontract.description = `Valid registration for ${username}`;
 
-      // 2.2 Register user and create DAP Contract State Transition packet and header
+      // 2.2 Register user and create DP Contract State Transition packet and header
       const {
         userId,
         privateKeyString,

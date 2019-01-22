@@ -42,12 +42,12 @@ describe('SVContractMongoDbRepository', () => {
   it('should find all contracts by stHeaderHash', async () => {
     await svContractRepository.store(svContract);
 
-    const dapContracts = await svContractRepository.findAllByReferenceSTHeaderHash(
+    const svContracts = await svContractRepository.findAllByReferenceSTHeaderHash(
       svContract.getReference().getSTHeaderHash(),
     );
 
-    expect(dapContracts.length).to.be.equal(1);
-    expect(dapContracts).to.be.deep.equal([svContract]);
+    expect(svContracts.length).to.be.equal(1);
+    expect(svContracts).to.be.deep.equal([svContract]);
   });
 
   it('should return null if contract was marked as deleted', async () => {

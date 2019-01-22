@@ -1,7 +1,7 @@
 const cbor = require('cbor');
 const { startDashDrive } = require('@dashevo/js-evo-services-ctl');
 
-const getStateTransitionPackets = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
+const getStateTransitionPackets = require('../../../lib/test/fixtures/getSTPacketsFixture');
 const StateTransitionPacket = require('../../../lib/storage/stPacket/StateTransitionPacket');
 
 const ApiAppOptions = require('../../../lib/app/ApiAppOptions');
@@ -101,9 +101,9 @@ describe('Blockchain reorganization', function main() {
   let secondObjectPacket;
   let thirdObjectPacket;
 
-  let firstDapId;
-  let secondDapId;
-  let thirdDapId;
+  let firstContractId;
+  let secondContractId;
+  let thirdContractId;
 
   const BLOCKS_ST_ACTIVATION = 1000;
 
@@ -123,7 +123,7 @@ describe('Blockchain reorganization', function main() {
       contractPackets.push(contract);
     }
     [firstContractPacket, secondContractPacket, thirdContractPacket] = contractPackets;
-    [firstDapId, secondDapId, thirdDapId] = contractPackets
+    [firstContractId, secondContractId, thirdContractId] = contractPackets
       .map(packet => doubleSha256(packet.dapcontract));
 
     // Start two full Dash Drive instances
@@ -158,7 +158,7 @@ describe('Blockchain reorganization', function main() {
     );
 
     firstObjectPacket = Object.assign({}, baseObjectPacket, {
-      dapid: firstDapId,
+      dapid: firstContractId,
     });
 
     // Register first object
@@ -183,20 +183,20 @@ describe('Blockchain reorganization', function main() {
     // Check data is on both Drive nodes
     // Check data on first node
     const { result: firstDriveFirstContract } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: firstDapId });
+      .request('fetchDPContract', { contractId: firstContractId });
 
     const { result: [firstDriveFirstObject] } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: firstDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: firstContractId, type: 'user' });
 
     expect(firstDriveFirstContract).to.be.deep.equal(firstContractPacket.dapcontract);
     expect(firstDriveFirstObject).to.be.deep.equal(firstObjectPacket.dapobjects[0]);
 
     // Check data on the second node
     const { result: secondDriveFirstContract } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: firstDapId });
+      .request('fetchDPContract', { contractId: firstContractId });
 
     const { result: [secondDriveFirstObject] } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: firstDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: firstContractId, type: 'user' });
 
     expect(secondDriveFirstContract).to.be.deep.equal(firstContractPacket.dapcontract);
     expect(secondDriveFirstObject).to.be.deep.equal(firstObjectPacket.dapobjects[0]);
@@ -213,7 +213,7 @@ describe('Blockchain reorganization', function main() {
     );
 
     secondObjectPacket = Object.assign({}, baseObjectPacket, {
-      dapid: secondDapId,
+      dapid: secondContractId,
     });
 
     // Register an object
@@ -229,10 +229,10 @@ describe('Blockchain reorganization', function main() {
 
     // Check second contract and object is created on the first node
     const { result: firstDriveSecondContract } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: secondDapId });
+      .request('fetchDPContract', { contractId: secondContractId });
 
     const { result: [firstDriveSecondObject] } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: secondDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: secondContractId, type: 'user' });
 
     expect(firstDriveSecondContract).to.be.deep.equal(secondContractPacket.dapcontract);
     expect(firstDriveSecondObject).to.be.deep.equal(secondObjectPacket.dapobjects[0]);
@@ -249,7 +249,7 @@ describe('Blockchain reorganization', function main() {
     );
 
     thirdObjectPacket = Object.assign({}, baseObjectPacket, {
-      dapid: thirdDapId,
+      dapid: thirdContractId,
     });
 
     // Register an object
@@ -265,10 +265,10 @@ describe('Blockchain reorganization', function main() {
 
     // Check third contract and object are created on the second node
     const { result: secondDriveThirdContract } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: thirdDapId });
+      .request('fetchDPContract', { contractId: thirdContractId });
 
     const { result: [secondDriveThirdObject] } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: thirdDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: thirdContractId, type: 'user' });
 
     expect(secondDriveThirdContract).to.be.deep.equal(thirdContractPacket.dapcontract);
     expect(secondDriveThirdObject).to.be.deep.equal(thirdObjectPacket.dapobjects[0]);
@@ -301,20 +301,20 @@ describe('Blockchain reorganization', function main() {
     //
     // Check the first node
     const { result: firstDriveFirstContract } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: firstDapId });
+      .request('fetchDPContract', { contractId: firstContractId });
 
     const { result: [firstDriveFirstObject] } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: firstDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: firstContractId, type: 'user' });
 
     expect(firstDriveFirstContract).to.be.deep.equal(firstContractPacket.dapcontract);
     expect(firstDriveFirstObject).to.be.deep.equal(firstObjectPacket.dapobjects[0]);
 
     // Check the second node
     const { result: secondDriveFirstContract } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: firstDapId });
+      .request('fetchDPContract', { contractId: firstContractId });
 
     const { result: [secondDriveFirstObject] } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: firstDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: firstContractId, type: 'user' });
 
     expect(secondDriveFirstContract).to.be.deep.equal(firstContractPacket.dapcontract);
     expect(secondDriveFirstObject).to.be.deep.equal(firstObjectPacket.dapobjects[0]);
@@ -324,20 +324,20 @@ describe('Blockchain reorganization', function main() {
     //
     // Check the first node
     const { result: firstDriveThirdContract } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: thirdDapId });
+      .request('fetchDPContract', { contractId: thirdContractId });
 
     const { result: [firstDriveThirdObject] } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: thirdDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: thirdContractId, type: 'user' });
 
     expect(firstDriveThirdContract).to.be.deep.equal(thirdContractPacket.dapcontract);
     expect(firstDriveThirdObject).to.be.deep.equal(thirdObjectPacket.dapobjects[0]);
 
     // Check the second node
     const { result: secondDriveThirdContract } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: thirdDapId });
+      .request('fetchDPContract', { contractId: thirdContractId });
 
     const { result: [secondDriveThirdObject] } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: thirdDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: thirdContractId, type: 'user' });
 
     expect(secondDriveThirdContract).to.be.deep.equal(thirdContractPacket.dapcontract);
     expect(secondDriveThirdObject).to.be.deep.equal(thirdObjectPacket.dapobjects[0]);
@@ -348,20 +348,20 @@ describe('Blockchain reorganization', function main() {
     //
     // Check the first node
     const { result: firstDriveSecondContract } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: secondDapId });
+      .request('fetchDPContract', { contractId: secondContractId });
 
     const { result: [firstDriveSecondObject] } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: secondDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: secondContractId, type: 'user' });
 
     expect(firstDriveSecondContract).to.be.undefined();
     expect(firstDriveSecondObject).to.be.undefined();
 
     // Check the second node
     const { result: secondDriveSecondContract } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: secondDapId });
+      .request('fetchDPContract', { contractId: secondContractId });
 
     const { result: [secondDriveSecondObject] } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: secondDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: secondContractId, type: 'user' });
 
     expect(secondDriveSecondContract).to.be.undefined();
     expect(secondDriveSecondObject).to.be.undefined();
@@ -385,20 +385,20 @@ describe('Blockchain reorganization', function main() {
     //
     // Check the first node
     const { result: firstDriveSecondContractAfter } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: secondDapId });
+      .request('fetchDPContract', { contractId: secondContractId });
 
     const { result: [firstDriveSecondObjectAfter] } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: secondDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: secondContractId, type: 'user' });
 
     expect(firstDriveSecondContractAfter).to.be.deep.equal(secondContractPacket.dapcontract);
     expect(firstDriveSecondObjectAfter).to.be.deep.equal(secondObjectPacket.dapobjects[0]);
 
     // Check the second node
     const { result: secondDriveSecondContractAfter } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: secondDapId });
+      .request('fetchDPContract', { contractId: secondContractId });
 
     const { result: [secondDriveSecondObjectAfter] } = await secondDashDrive.driveApi.getApi()
-      .request('fetchDapObjects', { dapId: secondDapId, type: 'user' });
+      .request('fetchDPObjects', { contractId: secondContractId, type: 'user' });
 
     expect(secondDriveSecondContractAfter).to.be.deep.equal(secondContractPacket.dapcontract);
     expect(secondDriveSecondObjectAfter).to.be.deep.equal(secondObjectPacket.dapobjects[0]);

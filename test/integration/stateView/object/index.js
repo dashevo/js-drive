@@ -1,5 +1,5 @@
 /* eslint-disable global-require */
-describe('DapObject', () => {
+describe('SVObject', () => {
   require('./SVObjectMongoDbRepository');
   require('./fetchDPObjectsFactory');
   require('./revertSVObjectsForStateTransitionFactory');

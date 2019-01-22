@@ -1,5 +1,5 @@
 /* eslint-disable global-require */
-describe('DapContract', () => {
+describe('SVContract', () => {
   require('./SVContractMongoDbRepository');
   require('./updateSVContractFactory');
   require('./revertSVContractsForStateTransitionFactory');

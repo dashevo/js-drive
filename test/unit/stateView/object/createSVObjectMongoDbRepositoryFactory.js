@@ -5,7 +5,7 @@ const createSVObjectMongoDbRepositoryFactory = require('../../../../lib/stateVie
 describe('createSVObjectMongoDbRepositoryFactory', () => {
   let mongoClient;
   let mongoDb;
-  let createDapObjectMongoDbRepository;
+  let createSVObjectMongoDbRepository;
   let contractId;
   let objectType;
   let SVObjectMongoDbRepositoryMock;
@@ -24,7 +24,7 @@ describe('createSVObjectMongoDbRepositoryFactory', () => {
 
     SVObjectMongoDbRepositoryMock = this.sinon.stub();
 
-    createDapObjectMongoDbRepository = createSVObjectMongoDbRepositoryFactory(
+    createSVObjectMongoDbRepository = createSVObjectMongoDbRepositoryFactory(
       mongoClient,
       SVObjectMongoDbRepositoryMock,
       sanitizerMock,
@@ -35,7 +35,7 @@ describe('createSVObjectMongoDbRepositoryFactory', () => {
     const contractIdEncoded = bs58.encode(Buffer.from(contractId, 'hex'));
     const dbName = `${process.env.MONGODB_DB_PREFIX}dpa_${contractIdEncoded}`;
 
-    const result = createDapObjectMongoDbRepository(contractId, objectType);
+    const result = createSVObjectMongoDbRepository(contractId, objectType);
 
     expect(result).to.be.an.instanceof(SVObjectMongoDbRepositoryMock);
 

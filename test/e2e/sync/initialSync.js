@@ -2,7 +2,7 @@ const cbor = require('cbor');
 
 const { startDashDrive } = require('@dashevo/js-evo-services-ctl');
 
-const getTransitionPacketFixtures = require('../../../lib/test/fixtures/getTransitionPacketFixtures');
+const getSTPacketsFixture = require('../../../lib/test/fixtures/getSTPacketsFixture');
 
 const ApiAppOptions = require('../../../lib/app/ApiAppOptions');
 const StateTransitionPacket = require('../../../lib/storage/stPacket/StateTransitionPacket');
@@ -69,17 +69,14 @@ async function createAndSubmitST(
 describe('Initial sync of Dash Drive and Dash Core', function main() {
   let firstDashDrive;
   let secondDashDrive;
-
   let packetsData;
-
   let users;
-
-  let dapId;
+  let contractId;
 
   this.timeout(900000);
 
   before('having Dash Drive node #1 up and ready, some amount of STs generated and Dash Drive on node #1 fully synced', async () => {
-    packetsData = getTransitionPacketFixtures();
+    packetsData = getSTPacketsFixture();
     users = [];
 
     // 1. Start first Dash Drive node
@@ -106,8 +103,8 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       users.push(user);
     }
 
-    // 3. Create DAP Contract
-    ({ tsId: dapId } = await createAndSubmitST(
+    // 3. Create DP Contract
+    ({ tsId: contractId } = await createAndSubmitST(
       users[0].userId,
       users[0].privateKeyString,
       users[0].username,
@@ -118,29 +115,29 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     // 3.1 Await Drive to sync
     await dashDriveSyncToFinish(firstDashDrive.driveApi);
 
-    // 3.2 Check DAP Contract is in Drive and ok
-    const otherDapId = doubleSha256(packetsData[0].dapcontract);
-    const { result: dapContract } = await firstDashDrive.driveApi.getApi()
-      .request('fetchDapContract', { dapId: otherDapId });
+    // 3.2 Check DP Contract is in Drive and ok
+    const otherContractId = doubleSha256(packetsData[0].dapcontract);
+    const { result: dpContract } = await firstDashDrive.driveApi.getApi()
+      .request('fetchDPContract', { contractId: otherContractId });
 
-    expect(dapContract).to.be.deep.equal(packetsData[0].dapcontract);
+    expect(dpContract).to.be.deep.equal(packetsData[0].dapcontract);
 
-    // 4. Register a bunch of `user` DAP Objects (for every blockchain user)
+    // 4. Register a bunch of `user` DP Objects (for every blockchain user)
     let prevTransitionId;
 
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
 
-      // if it's the user used to register dapId, use it
+      // if it's the user used to register contractId, use it
       // use nothing if else
       if (i === 0) {
-        prevTransitionId = dapId;
+        prevTransitionId = contractId;
       } else {
         prevTransitionId = undefined;
       }
 
       const userData = Object.assign({}, packetsData[1], {
-        dapid: dapId,
+        dapid: contractId,
         dapobjects: [
           {
             objtype: 'user',
@@ -173,7 +170,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     await secondDashDrive.dashCore.connect(firstDashDrive.dashCore);
 
     // 4. Add ST packet to Drive
-    const packet = getTransitionPacketFixtures()[0];
+    const packet = getSTPacketsFixture()[0];
     const serializedPacket = cbor.encodeCanonical(packet.toJSON({ skipMeta: true }));
     const serializedPacketJson = {
       packet: serializedPacket.toString('hex'),
@@ -187,7 +184,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     // 6. Ensure second Dash Drive have a proper data
     {
       const { result: objects } = await secondDashDrive.driveApi.getApi()
-        .request('fetchDapObjects', { dapId, type: 'user' });
+        .request('fetchDPObjects', { contractId: contractId, type: 'user' });
       expect(objects).to.have.lengthOf(users.length);
 
       const aboutMes = objects.map(o => o.aboutme);
