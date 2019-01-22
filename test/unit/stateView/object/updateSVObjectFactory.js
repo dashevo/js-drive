@@ -1,4 +1,4 @@
-const DPObject = require('dpp/lib/object/DPObject');
+const DPObject = require('@dashevo/dpp/lib/object/DPObject');
 const SVObject = require('../../../../lib/stateView/object/SVObject');
 
 const Revision = require('../../../../lib/stateView/revisions/Revision');

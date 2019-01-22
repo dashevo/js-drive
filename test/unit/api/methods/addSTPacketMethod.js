@@ -1,6 +1,6 @@
 const cbor = require('cbor');
 
-const InvalidSTPacketError = require('dpp/lib/stPacket/errors/InvalidSTPacketError');
+const InvalidSTPacketError = require('@dashevo/dpp/lib/stPacket/errors/InvalidSTPacketError');
 
 const addSTPacketMethodFactory = require('../../../../lib/api/methods/addSTPacketMethodFactory');
 const createCIDFromHash = require('../../../../lib/storage/stPacket/createCIDFromHash');
