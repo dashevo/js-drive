@@ -47,13 +47,11 @@ describe('fetchDPContractMethod', () => {
   });
 
   it('should return DAP contract', async () => {
-    const rawDPContract = dpContract.toJSON();
-
-    fetchDPContractMock.returns(rawDPContract);
+    fetchDPContractMock.returns(dpContract);
 
     const result = await fetchDPContractMethod({ contractId });
 
-    expect(result).to.be.deep.equal(rawDPContract);
+    expect(result).to.be.deep.equal(dpContract.toJSON());
 
     expect(fetchDPContractMock).to.be.calledOnceWith(contractId);
   });
