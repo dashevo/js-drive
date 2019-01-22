@@ -50,7 +50,10 @@ describe('updateDapObjectFactory', () => {
     };
     await updateDapObject(dapId, blockchainUserId, reference, dapObjectData);
 
-    const dapObjectMongoDbRepository = createDapObjectMongoDbRepository(dapId);
+    const dapObjectMongoDbRepository = createDapObjectMongoDbRepository(
+      dapId,
+      dapObjectData.objtype,
+    );
     const id = generateDapObjectId(blockchainUserId, dapObjectData.idx);
     const dapObject = await dapObjectMongoDbRepository.find(id);
     expect(dapObject.getOriginalData()).to.be.deep.equal(dapObjectData);
@@ -74,7 +77,10 @@ describe('updateDapObjectFactory', () => {
     };
     await updateDapObject(dapId, blockchainUserId, reference, revisionTwoDapObjectData);
 
-    const dapObjectMongoDbRepository = createDapObjectMongoDbRepository(dapId);
+    const dapObjectMongoDbRepository = createDapObjectMongoDbRepository(
+      dapId,
+      revisionOneDapObjectData.objtype,
+    );
     const id = generateDapObjectId(blockchainUserId, revisionOneDapObjectData.idx);
     const dapObject = await dapObjectMongoDbRepository.find(id);
     expect(dapObject.getRevision()).to.be.equal(revisionTwoDapObjectData.rev);
@@ -96,9 +102,55 @@ describe('updateDapObjectFactory', () => {
     };
     await updateDapObject(dapId, blockchainUserId, reference, dapObjectData);
 
-    const dapObjectMongoDbRepository = createDapObjectMongoDbRepository(dapId);
+    const dapObjectMongoDbRepository = createDapObjectMongoDbRepository(
+      dapId,
+      dapObjectData.objtype,
+    );
     const id = generateDapObjectId(blockchainUserId, dapObjectData.idx);
     const dapObject = await dapObjectMongoDbRepository.find(id);
     expect(dapObject.isDeleted()).to.be.true();
+  });
+
+  it('should remove unnecessary revisions of DapObject upon reverting', async () => {
+    const revisionOneDapObjectData = {
+      objtype: 'user',
+      pver: 1,
+      idx: 0,
+      rev: 0,
+      act: 0,
+    };
+    await updateDapObject(dapId, blockchainUserId, reference, revisionOneDapObjectData);
+    const revisionTwoDapObjectData = {
+      objtype: 'user',
+      pver: 1,
+      idx: 0,
+      rev: 1,
+      act: 1,
+    };
+    await updateDapObject(dapId, blockchainUserId, reference, revisionTwoDapObjectData);
+    const revisionThreeDapObjectData = {
+      objtype: 'user',
+      pver: 1,
+      idx: 0,
+      rev: 2,
+      act: 1,
+    };
+    await updateDapObject(dapId, blockchainUserId, reference, revisionThreeDapObjectData);
+
+    await updateDapObject(dapId, blockchainUserId, reference, revisionTwoDapObjectData, true);
+
+    const dapObjectMongoDbRepository = createDapObjectMongoDbRepository(
+      dapId,
+      revisionOneDapObjectData.objtype,
+    );
+    const id = generateDapObjectId(blockchainUserId, revisionOneDapObjectData.idx);
+    const dapObject = await dapObjectMongoDbRepository.find(id);
+    expect(dapObject.getRevision()).to.be.equal(revisionTwoDapObjectData.rev);
+    expect(dapObject.getPreviousRevisions()).to.be.deep.equal([
+      {
+        revision: revisionOneDapObjectData.rev,
+        reference,
+      },
+    ]);
   });
 });

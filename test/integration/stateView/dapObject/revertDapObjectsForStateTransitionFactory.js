@@ -18,7 +18,8 @@ const updateDapObjectFactory = require('../../../../lib/stateView/dapObject/upda
 const applyStateTransitionFactory = require('../../../../lib/stateView/applyStateTransitionFactory');
 const applyStateTransitionFromReferenceFactory = require('../../../../lib/stateView/applyStateTransitionFromReferenceFactory');
 
-const addSTPacketFactory = require('../../../../lib/storage/ipfs/addSTPacketFactory');
+const addSTPacketFactory = require('../../../../lib/storage/stPacket/addSTPacketFactory');
+const StateTransitionPacketIpfsRepository = require('../../../../lib/storage/stPacket/StateTransitionPacketIpfsRepository');
 
 const getBlockFixtures = require('../../../../lib/test/fixtures/getBlockFixtures');
 const getHeaderFixtures = require('../../../../lib/test/fixtures/getTransitionHeaderFixtures');
@@ -48,7 +49,11 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
   let readerMediator;
   let revertDapObjectsForStateTransition;
   beforeEach(function beforeEach() {
-    addSTPacket = addSTPacketFactory(ipfsAPI);
+    const stPacketRepository = new StateTransitionPacketIpfsRepository(
+      ipfsAPI,
+      1000,
+    );
+    addSTPacket = addSTPacketFactory(stPacketRepository);
     createDapObjectMongoDbRepository = createDapObjectMongoDbRepositoryFactory(
       mongoClient,
       DapObjectMongoDbRepository,
@@ -56,11 +61,10 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
     updateDapObject = updateDapObjectFactory(createDapObjectMongoDbRepository);
     readerMediator = new ReaderMediatorMock(this.sinon);
     applyStateTransition = applyStateTransitionFactory(
-      ipfsAPI,
+      stPacketRepository,
       null,
       updateDapObject,
       readerMediator,
-      1000,
     );
     rpcClientMock = new RpcClientMock(this.sinon);
     const applyStateTransitionFromReference = applyStateTransitionFromReferenceFactory(
@@ -68,13 +72,12 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
       rpcClientMock,
     );
     revertDapObjectsForStateTransition = revertDapObjectsForStateTransitionFactory(
-      ipfsAPI,
+      stPacketRepository,
       rpcClientMock,
       createDapObjectMongoDbRepository,
       applyStateTransition,
       applyStateTransitionFromReference,
       readerMediator,
-      30 * 1000,
     );
   });
 
@@ -88,6 +91,7 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
 
     const dapObjectRepository = createDapObjectMongoDbRepository(
       packet.dapid,
+      'user',
     );
 
     const [dapObjectData] = packet.dapobjects;
@@ -106,7 +110,7 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
       stateTransition: transition,
     });
 
-    const dapObjectList = await dapObjectRepository.fetch('user');
+    const dapObjectList = await dapObjectRepository.fetch();
 
     expect(dapObjectList).to.be.empty();
 
@@ -128,6 +132,7 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
 
     const dapObjectRepository = createDapObjectMongoDbRepository(
       packet.dapid,
+      'user',
     );
 
     const references = [];
@@ -170,7 +175,7 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
       stateTransition: lastTransition,
     });
 
-    const dapObjectList = await dapObjectRepository.fetch('user');
+    const dapObjectList = await dapObjectRepository.fetch();
 
     expect(dapObjectList.length).to.be.equal(1);
 
@@ -184,7 +189,7 @@ describe('revertDapObjectsForStateTransitionFactory', () => {
     expect(previousRevision.revision).to.be.equal(1);
     expect(previousRevision.reference).to.be.deep.equal(references[0]);
 
-    expect(readerMediator.emitSerial.getCall(2)).to.be.calledWith(
+    expect(readerMediator.emitSerial.getCall(1)).to.be.calledWith(
       ReaderMediator.EVENTS.DAP_OBJECT_REVERTED,
       {
         userId: lastTransition.extraPayload.regTxId,
