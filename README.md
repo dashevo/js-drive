@@ -84,7 +84,7 @@ Remove State Transition Packet from DashDrive storage
 |------------|--------|----------------------------------------------|
 | packetHash | string | ST Packet hash previously submitted to Drive |
 
-#### fetchDapContact
+#### fetchDPContact
 
 Fetch DAP Contract from DashDrive State View
 
@@ -92,7 +92,7 @@ Fetch DAP Contract from DashDrive State View
 
 | name    | type   | description  |
 |---------|--------|--------------|
-| dapId   | string | DAP ID       |
+| contractId   | string | DAP ID       |
 
 ##### Response
 
@@ -100,7 +100,7 @@ Fetch DAP Contract from DashDrive State View
 |---------|--------|---------------------|
 | result  | object | DAP Contact object  |
 
-#### fetchDapObjects
+#### fetchDPObjects
 
 Fetch DAP Objects from DashDrive State View
 
@@ -108,7 +108,7 @@ Fetch DAP Objects from DashDrive State View
 
 | name    | type   | description          |
 |---------|--------|----------------------|
-| dapId   | string | DAP ID               |
+| contractId   | string | DAP ID               |
 | type    | string | DAP Objects type     |
 | options | object | Options              |
 

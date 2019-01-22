@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/dashevo/dashdrive",
   "devDependencies": {
-    "@dashevo/js-evo-services-ctl": "^1.0.0-alpha.11",
+    "@dashevo/js-evo-services-ctl": "^1.0.0-alpha.12",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dirty-chai": "^2.0.1",
@@ -52,6 +52,7 @@
     "connect": "^3.6.6",
     "dotenv-expand": "^4.2.0",
     "dotenv-safe": "^6.1.0",
+    "dpp": "github:dashevo/js-dpp#v0.4.0",
     "emittery": "^0.4.1",
     "ipfs-api": "^24.0.2",
     "jayson": "^2.1.0",
