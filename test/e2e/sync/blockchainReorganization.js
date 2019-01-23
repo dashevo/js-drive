@@ -8,7 +8,7 @@ const ApiAppOptions = require('../../../lib/app/ApiAppOptions');
 
 const registerUser = require('../../../lib/test/registerUser');
 
-const createSTHeader = require('../../../lib/test/createSTHeader');
+const createSTHeader = require('../../../lib/test/createStateTransition');
 const wait = require('../../../lib/util/wait');
 
 const doubleSha256 = require('../../../lib/util/doubleSha256');
