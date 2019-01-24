@@ -11,8 +11,6 @@ const registerUser = require('../../../lib/test/registerUser');
 const createSTHeader = require('../../../lib/test/createStateTransition');
 const wait = require('../../../lib/util/wait');
 
-const doubleSha256 = require('../../../lib/util/doubleSha256');
-
 const apiAppOptions = new ApiAppOptions(process.env);
 
 async function createAndSubmitST(

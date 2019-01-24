@@ -1,4 +1,4 @@
-const cbor = require('cbor');
+const serializer = require('@dashevo/dpp/lib/util/serializer');
 
 const InvalidSTPacketError = require('@dashevo/dpp/lib/stPacket/errors/InvalidSTPacketError');
 
@@ -67,7 +67,7 @@ describe('addSTPacketMethod', () => {
   it('should throw error if "packet" params is not valid ST Packet', async () => {
     const invalidSTPacket = { ...stPacket.toJSON(), wrongField: true };
 
-    const serializedSTPacket = cbor.encode(invalidSTPacket);
+    const serializedSTPacket = serializer.encode(invalidSTPacket);
 
     const validationError = new InvalidSTPacketError([], invalidSTPacket);
 
