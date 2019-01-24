@@ -127,13 +127,7 @@ describe('Blockchain reorganization', function main() {
       .map(packet => doubleSha256(packet.dapcontract));
 
     // Start two full Dash Drive instances
-    [firstDashDrive, secondDashDrive] = await startDashDrive.many(2, {
-      dashDrive: {
-        container: {
-          throwErrorsFromLog: false,
-        },
-      },
-    });
+    [firstDashDrive, secondDashDrive] = await startDashDrive.many(2);
 
     // Activate Special Transactions
     await firstDashDrive.dashCore.getApi().generate(BLOCKS_ST_ACTIVATION);
