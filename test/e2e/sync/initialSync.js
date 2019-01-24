@@ -1,10 +1,6 @@
-const cbor = require('cbor');
-
 const DashPlatformProtocol = require('@dashevo/dpp');
 
 const { startDashDrive } = require('@dashevo/js-evo-services-ctl');
-
-const getSTPacketsFixture = require('../../../lib/test/fixtures/getSTPacketsFixture');
 
 const ApiAppOptions = require('../../../lib/app/ApiAppOptions');
 
@@ -179,20 +175,10 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     await secondDashDrive.ipfs.connect(firstDashDrive.ipfs);
     await secondDashDrive.dashCore.connect(firstDashDrive.dashCore);
 
-    // 4. Add ST packet to Drive
-    // TODO Why we are adding one more packet?
-    const packet = getSTPacketsFixture()[0];
-    const serializedPacket = cbor.encodeCanonical(packet.toJSON({ skipMeta: true }));
-    const serializedPacketJson = {
-      packet: serializedPacket.toString('hex'),
-    };
-    await secondDashDrive.driveApi.getApi()
-      .request('addSTPacket', serializedPacketJson);
-
-    // 5. Await Dash Drive on the 2nd node to finish syncing
+    // 4. Await Dash Drive on the 2nd node to finish syncing
     await dashDriveSyncToFinish(secondDashDrive.driveApi);
 
-    // 6. Ensure second Dash Drive have a proper data
+    // 5. Ensure second Dash Drive have a proper data
     const params = {
       contractId: dpContract.getId(),
       type: objectType,
