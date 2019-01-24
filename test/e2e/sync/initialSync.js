@@ -179,6 +179,8 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     await dashDriveSyncToFinish(secondDashDrive.driveApi);
 
     // 5. Ensure second Dash Drive have a proper data
+    // TODO check contract too
+
     const params = {
       contractId: dpContract.getId(),
       type: objectType,
