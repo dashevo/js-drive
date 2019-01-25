@@ -56,11 +56,11 @@ describe('applyStateTransitionFactory', () => {
 
     svContractMongoDbRepository = new SVContractMongoDbRepository(mongoDb, dpp);
 
-    const fetchDPContract = fetchDPContractFactory(svContractMongoDbRepository);
+    const createFetchDPContract = () => fetchDPContractFactory(svContractMongoDbRepository);
 
     const dataProvider = new DriveDataProvider(
       null,
-      fetchDPContract,
+      createFetchDPContract,
       null,
     );
 
