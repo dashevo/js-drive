@@ -1,7 +1,6 @@
-const cbor = require('cbor');
 const { startDashDrive } = require('@dashevo/js-evo-services-ctl');
 
-const getStateTransitionPackets = require('../../../lib/test/fixtures/getSTPacketsFixture');
+const getSTPacketsFixture = require('../../../lib/test/fixtures/getSTPacketsFixture');
 
 const ApiAppOptions = require('../../../lib/app/ApiAppOptions');
 
@@ -37,12 +36,9 @@ async function dashDriveSyncToFinish(instance) {
   }
 }
 
-describe('Sync interruption and resume between Dash Drive and Dash Core', function main() {
+describe('Sync interruption and resume between Dash Drive and Dash Core', function describe() {
   let firstDashDrive;
   let secondDashDrive;
-
-  let packetsCids;
-  let packetsData;
 
   this.timeout(900000);
 
@@ -53,14 +49,12 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     // 1.1 Activate Special Transactions
     await firstDashDrive.dashCore.getApi().generate(1000);
 
-    packetsCids = [];
-    packetsData = getStateTransitionPackets();
+    const [stPacket] = getSTPacketsFixture();
 
     // 2. Populate Dash Drive and Dash Core with data
     async function createAndSubmitST(username) {
-      // 2.1 Get packet data with random object description
-      const [packetOne] = packetsData;
-      packetOne.dapcontract.description = `Valid registration for ${username}`;
+      // 2.1 Set ST Packet name
+      stPacket.getDPContract().setName(`${username}Contract`);
 
       // 2.2 Register user and create DP Contract State Transition packet and header
       const {
@@ -68,20 +62,19 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
         privateKeyString,
       } = await registerUser(username, firstDashDrive.dashCore.getApi());
 
-      const header = await createSTHeader(userId, privateKeyString, packetOne);
+      const header = await createSTHeader(userId, privateKeyString, stPacket);
 
       // 2.3 Add ST packet
-      const serializedPacket = cbor.encodeCanonical(packetOne.toJSON({ skipMeta: true }));
-      const serializedPacketJson = {
-        packet: serializedPacket.toString('hex'),
-      };
-      const { result: packetCid } = await firstDashDrive.driveApi.getApi()
-        .request('addSTPacket', serializedPacketJson);
+      const driveApi = firstDashDrive.driveApi.getApi();
+      const { error } = await driveApi.request('addSTPacket', {
+        packet: stPacket.serialize().toString('hex'),
+      });
 
-      // 2.4 Save CID of freshly added packet for future use
-      packetsCids.push(packetCid);
+      if (error) {
+        throw new Error(`Can't add ST Packet: ${JSON.stringify(error)}`);
+      }
 
-      // 2.5 Send ST header to Dash Core and generate a block with it
+      // 2.4 Send ST header to Dash Core and generate a block with it
       await firstDashDrive.dashCore.getApi().sendRawTransaction(header.serialize());
       await firstDashDrive.dashCore.getApi().generate(1);
     }
