@@ -146,6 +146,8 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     const hashesAfterResume = lsResult.map(item => item.hash);
 
     expect(hashesAfterResume).to.not.contain.members(pinnedHashes);
+
+    // TODO Check that all contracts are available
   });
 
   after('cleanup lone services', async () => {
