@@ -1,4 +1,4 @@
-FROM 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/v13-node-base:10
+FROM 103738324493.dkr.ecr.us-west-2.amazonaws.com/dashevo/node:10-alpine
 
 LABEL maintainer="Dash Developers <dev@dash.org>"
 LABEL description="DashDrive Node.JS"
