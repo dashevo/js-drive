@@ -28,8 +28,7 @@
   },
   "homepage": "https://github.com/dashevo/dashdrive",
   "devDependencies": {
-    "@dashevo/dapi-client": "git+ssh://git@github.com/dashevo/dapi-client#develop",
-    "@dashevo/js-evo-services-ctl": "1.0.0-alpha.16",
+    "@dashevo/js-evo-services-ctl": "1.0.0-alpha.17",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dirty-chai": "^2.0.1",
