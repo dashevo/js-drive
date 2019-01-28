@@ -2,15 +2,15 @@ const { mocha: { startDashCore } } = require('@dashevo/js-evo-services-ctl');
 const isDashCoreRunningFactory = require('../../../lib/sync/isDashCoreRunningFactory');
 
 describe('IsDashCoreRunning', () => {
-  let dashCoreInstance;
+  let dashCoreApi;
   let isDashCoreRunning;
 
-  startDashCore().then((instance) => {
-    dashCoreInstance = instance;
+  startDashCore().then((dashCore) => {
+    dashCoreApi = dashCore.getApi();
   });
 
   beforeEach(() => {
-    isDashCoreRunning = isDashCoreRunningFactory(dashCoreInstance.getApi());
+    isDashCoreRunning = isDashCoreRunningFactory(dashCoreApi);
   });
 
   it('should return true if DashCore is running', async () => {
@@ -19,7 +19,7 @@ describe('IsDashCoreRunning', () => {
   });
 
   it('should return false if DashCore is down', async () => {
-    await dashCoreInstance.stop();
+    await dashCoreApi.stop();
 
     const retries = null;
     const retryDelay = 0.1;
