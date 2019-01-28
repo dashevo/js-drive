@@ -19,6 +19,7 @@ describe('updateSVContractFactory', () => {
   let svContract;
   let dpp;
   let contractId;
+  let userId;
   let dpContract;
 
   startMongoDb().then((mongoDbInstance) => {
@@ -32,6 +33,7 @@ describe('updateSVContractFactory', () => {
     dpContract = svContract.getDPContract();
 
     contractId = svContract.getContractId();
+    userId = svContract.getUserId();
 
     svContractRepository = new SVContractMongoDbRepository(mongoDb, dpp);
     updateSVContract = updateSVContractFactory(svContractRepository);
@@ -57,7 +59,7 @@ describe('updateSVContractFactory', () => {
 
     const secondSVContract = new SVContract(
       contractId,
-      svContract.getUserId(),
+      userId,
       dpContract,
       getReferenceFixture(2),
       false,
@@ -72,7 +74,7 @@ describe('updateSVContractFactory', () => {
 
     await updateSVContract(
       contractId,
-      svContract.getUserId(),
+      userId,
       getReferenceFixture(3),
       thirdDPContract,
     );
@@ -97,7 +99,7 @@ describe('updateSVContractFactory', () => {
 
     const thirdSVContract = new SVContract(
       contractId,
-      svContract.getUserId(),
+      userId,
       thirdDPOContract,
       getReferenceFixture(3),
       false,
@@ -112,7 +114,7 @@ describe('updateSVContractFactory', () => {
 
     await updateSVContract(
       contractId,
-      svContract.getUserId(),
+      userId,
       secondRevision.getReference(),
       secondDPContract,
       true,
