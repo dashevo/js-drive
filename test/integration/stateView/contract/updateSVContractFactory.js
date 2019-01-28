@@ -15,15 +15,15 @@ const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceF
 describe('updateSVContractFactory', () => {
   let svContractRepository;
   let updateSVContract;
-  let mongoDb;
+  let mongoDatabase;
   let svContract;
   let dpp;
   let contractId;
   let userId;
   let dpContract;
 
-  startMongoDb().then((mongoDbInstance) => {
-    mongoDb = mongoDbInstance.getDb();
+  startMongoDb().then((mongoDb) => {
+    mongoDatabase = mongoDb.getDb();
   });
 
   beforeEach(() => {
@@ -35,7 +35,7 @@ describe('updateSVContractFactory', () => {
     contractId = svContract.getContractId();
     userId = svContract.getUserId();
 
-    svContractRepository = new SVContractMongoDbRepository(mongoDb, dpp);
+    svContractRepository = new SVContractMongoDbRepository(mongoDatabase, dpp);
     updateSVContract = updateSVContractFactory(svContractRepository);
   });
 
