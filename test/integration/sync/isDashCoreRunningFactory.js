@@ -1,6 +1,8 @@
 const { mocha: { startDashCore } } = require('@dashevo/js-evo-services-ctl');
 const isDashCoreRunningFactory = require('../../../lib/sync/isDashCoreRunningFactory');
 
+const wait = require('../../../lib/util/wait');
+
 describe('IsDashCoreRunning', () => {
   let dashCoreApi;
   let isDashCoreRunning;
@@ -20,6 +22,8 @@ describe('IsDashCoreRunning', () => {
 
   it('should return false if DashCore is down', async () => {
     await dashCoreApi.stop();
+
+    await wait(100);
 
     const retries = null;
     const retryDelay = 0.1;
