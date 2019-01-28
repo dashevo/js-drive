@@ -40,6 +40,7 @@ describe('updateSVContractFactory', () => {
   it('should store SVContract', async () => {
     await updateSVContract(
       svContract.getContractId(),
+      svContract.getUserId(),
       svContract.getReference(),
       svContract.getDPContract(),
     );
@@ -56,6 +57,7 @@ describe('updateSVContractFactory', () => {
 
     const secondSVContract = new SVContract(
       contractId,
+      svContract.getUserId(),
       dpContract,
       getReferenceFixture(2),
       false,
@@ -70,6 +72,7 @@ describe('updateSVContractFactory', () => {
 
     await updateSVContract(
       contractId,
+      svContract.getUserId(),
       getReferenceFixture(3),
       thirdDPContract,
     );
@@ -94,6 +97,7 @@ describe('updateSVContractFactory', () => {
 
     const thirdSVContract = new SVContract(
       contractId,
+      svContract.getUserId(),
       thirdDPOContract,
       getReferenceFixture(3),
       false,
@@ -108,6 +112,7 @@ describe('updateSVContractFactory', () => {
 
     await updateSVContract(
       contractId,
+      svContract.getUserId(),
       secondRevision.getReference(),
       secondDPContract,
       true,
