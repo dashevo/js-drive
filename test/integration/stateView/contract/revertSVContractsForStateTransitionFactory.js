@@ -36,11 +36,11 @@ describe('revertSVContractsForStateTransitionFactory', () => {
   let rpcClientMock;
   let readerMediator;
   let revertSVContractsForStateTransition;
-  let mongoDb;
+  let mongoDatabase;
   let ipfsClient;
 
-  startMongoDb().then((mongoDbInstance) => {
-    mongoDb = mongoDbInstance.getDb();
+  startMongoDb().then((mongoDb) => {
+    mongoDatabase = mongoDb.getDb();
   });
 
   startIPFS().then((ipfs) => {
@@ -58,7 +58,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
       1000,
     );
 
-    svContractMongoDbRepository = new SVContractMongoDbRepository(mongoDb, dpp);
+    svContractMongoDbRepository = new SVContractMongoDbRepository(mongoDatabase, dpp);
 
     const updateSVContract = updateSVContractFactory(svContractMongoDbRepository);
 

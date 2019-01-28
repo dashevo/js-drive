@@ -33,7 +33,7 @@ const getSVContractFixture = require('../../../lib/test/fixtures/getSVContractFi
 
 describe('applyStateTransitionFactory', () => {
   let mongoClient;
-  let mongoDb;
+  let mongoDatabase;
   let ipfsClient;
   let stPacketRepository;
   let svContractMongoDbRepository;
@@ -41,9 +41,9 @@ describe('applyStateTransitionFactory', () => {
   let readerMediator;
   let applyStateTransition;
 
-  startMongoDb().then((mongoDbInstance) => {
-    mongoClient = mongoDbInstance.getClient();
-    mongoDb = mongoDbInstance.getDb();
+  startMongoDb().then((mongoDb) => {
+    mongoClient = mongoDb.getClient();
+    mongoDatabase = mongoDb.getDb();
   });
 
   startIPFS().then((ipfs) => {
@@ -53,7 +53,7 @@ describe('applyStateTransitionFactory', () => {
   beforeEach(function beforeEach() {
     const dpp = new DashPlatformProtocol();
 
-    svContractMongoDbRepository = new SVContractMongoDbRepository(mongoDb, dpp);
+    svContractMongoDbRepository = new SVContractMongoDbRepository(mongoDatabase, dpp);
 
     const createFetchDPContract = () => fetchDPContractFactory(svContractMongoDbRepository);
 
