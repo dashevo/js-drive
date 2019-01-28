@@ -67,7 +67,8 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
       // 2.3 Add ST packet
       const driveApi = firstDashDrive.driveApi.getApi();
       const { error } = await driveApi.request('addSTPacket', {
-        packet: stPacket.serialize().toString('hex'),
+        stPacket: stPacket.serialize().toString('hex'),
+        stateTransition: stateTransition.serialize(),
       });
 
       if (error) {

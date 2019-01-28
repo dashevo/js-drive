@@ -22,7 +22,8 @@ async function createAndSubmitST(
   );
 
   const { error } = await instance.driveApi.getApi().request('addSTPacket', {
-    packet: stPacket.serialize().toString('hex'),
+    stPacket: stPacket.serialize().toString('hex'),
+    stateTransition: stateTransition.serialize(),
   });
 
   if (error) {

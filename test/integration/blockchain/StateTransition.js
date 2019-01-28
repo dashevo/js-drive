@@ -1,7 +1,5 @@
 const { mocha: { startIPFS } } = require('@dashevo/js-evo-services-ctl');
 
-const addSTPacketFactory = require('../../../lib/storage/stPacket/addSTPacketFactory');
-
 const STPacketIpfsRepository = require('../../../lib/storage/stPacket/STPacketIpfsRepository');
 
 const getSTPacketsFixture = require('../../../lib/test/fixtures/getSTPacketsFixture');
@@ -13,34 +11,34 @@ describe('StateTransition', () => {
   let dppMock;
   let stPacket;
   let stateTransition;
-  let addSTPacket;
+  let stPacketRepository;
   let ipfsApi;
 
-  startIPFS().then((instance) => {
-    ipfsApi = instance.getApi();
+  startIPFS().then((ipfs) => {
+    ipfsApi = ipfs.getApi();
   });
 
   beforeEach(function beforeEach() {
     dppMock = createDPPMock(this.sinon);
 
-    ([stPacket] = getSTPacketsFixture());
-    ([stateTransition] = getStateTransitionsFixture());
+    [stPacket] = getSTPacketsFixture();
+    [stateTransition] = getStateTransitionsFixture();
 
-    const stPacketRepository = new STPacketIpfsRepository(
+    stPacketRepository = new STPacketIpfsRepository(
       ipfsApi,
       dppMock,
       1000,
     );
-
-    addSTPacket = addSTPacketFactory(stPacketRepository);
   });
 
-  it('should StateTransition packet CID equal to IPFS CID', async () => {
-    stateTransition.extraPayload.setHashSTPacket(stPacket.hash());
+  describe('#getPacketCID', () => {
+    it('should create packet CID', async () => {
+      stateTransition.extraPayload.setHashSTPacket(stPacket.hash());
+      const stPacketCID = stateTransition.getPacketCID();
 
-    const ipfsCid = await addSTPacket(stPacket);
+      const ipfsCID = await stPacketRepository.store(stPacket);
 
-    const stPacketCid = stateTransition.getPacketCID();
-    expect(stPacketCid.toBaseEncodedString()).to.equal(ipfsCid.toBaseEncodedString());
+      expect(stPacketCID.equals(ipfsCID)).to.be.true();
+    });
   });
 });

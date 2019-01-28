@@ -24,14 +24,13 @@ const RpcClientMock = require('../../../../lib/test/mock/RpcClientMock');
 const ReaderMediatorMock = require('../../../../lib/test/mock/BlockchainReaderMediatorMock');
 
 const STPacketIpfsRepository = require('../../../../lib/storage/stPacket/STPacketIpfsRepository');
-const addSTPacketFactory = require('../../../../lib/storage/stPacket/addSTPacketFactory');
 const updateSVContractFactory = require('../../../../lib/stateView/contract/updateSVContractFactory');
 const revertSVContractsForStateTransitionFactory = require('../../../../lib/stateView/contract/revertSVContractsForStateTransitionFactory');
 const applyStateTransitionFactory = require('../../../../lib/stateView/applyStateTransitionFactory');
 const applyStateTransitionFromReferenceFactory = require('../../../../lib/stateView/applyStateTransitionFromReferenceFactory');
 
 describe('revertSVContractsForStateTransitionFactory', () => {
-  let addSTPacket;
+  let stPacketRepository;
   let svContractMongoDbRepository;
   let applyStateTransition;
   let rpcClientMock;
@@ -44,8 +43,8 @@ describe('revertSVContractsForStateTransitionFactory', () => {
     mongoDb = mongoDbInstance.getDb();
   });
 
-  startIPFS().then((ipfsInstance) => {
-    ipfsClient = ipfsInstance.getApi();
+  startIPFS().then((ipfs) => {
+    ipfsClient = ipfs.getApi();
   });
 
   beforeEach(function beforeEach() {
@@ -53,13 +52,11 @@ describe('revertSVContractsForStateTransitionFactory', () => {
       dataProvider: {},
     });
 
-    const stPacketRepository = new STPacketIpfsRepository(
+    stPacketRepository = new STPacketIpfsRepository(
       ipfsClient,
       dpp,
       1000,
     );
-
-    addSTPacket = addSTPacketFactory(stPacketRepository);
 
     svContractMongoDbRepository = new SVContractMongoDbRepository(mongoDb, dpp);
 
@@ -107,7 +104,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
 
       dpContract.setVersion(i + 1);
 
-      await addSTPacket(stPacket);
+      await stPacketRepository.store(stPacket);
 
       stateTransition.extraPayload.hashSTPacket = stPacket.hash();
 
