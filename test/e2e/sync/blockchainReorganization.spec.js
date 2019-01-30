@@ -273,6 +273,10 @@ describe('Blockchain reorganization', function main() {
       secondObjectPacket.getDPObjects()[0].toJSON(),
     );
 
+    // Generate 2 more blocks, 3rd contract and object on the second Drive node
+    // To introduce a slightly bigger fork
+    await secondDashDrive.dashCore.getApi().generate(1);
+
     const thirdContractTxId = await createAndSubmitST(
       thirdUser.userId,
       thirdUser.privateKeyString,
