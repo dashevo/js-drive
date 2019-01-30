@@ -19,6 +19,7 @@ const getSTPacketsFixture = require('../../../../lib/test/fixtures/getSTPacketsF
 const getStateTransitionsFixture = require('../../../../lib/test/fixtures/getStateTransitionsFixture');
 const getSVContractFixture = require('../../../../lib/test/fixtures/getSVContractFixture');
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
+const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');
 
 const RpcClientMock = require('../../../../lib/test/mock/RpcClientMock');
 const ReaderMediatorMock = require('../../../../lib/test/mock/BlockchainReaderMediatorMock');
@@ -38,6 +39,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
   let revertSVContractsForStateTransition;
   let mongoDatabase;
   let ipfsClient;
+  let userId;
 
   startMongoDb().then((mongoDb) => {
     mongoDatabase = mongoDb.getDb();
@@ -48,6 +50,8 @@ describe('revertSVContractsForStateTransitionFactory', () => {
   });
 
   beforeEach(function beforeEach() {
+    ({ userId } = getDPObjectsFixture);
+
     const dpp = new DashPlatformProtocol({
       dataProvider: {},
     });
@@ -139,6 +143,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
 
     const svContract = new SVContract(
       contractId,
+      userId,
       dpContract,
       dpContractVersions[dpContractVersions.length - 1].reference,
       false,

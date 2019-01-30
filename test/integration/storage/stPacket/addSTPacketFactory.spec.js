@@ -13,7 +13,7 @@ const getStateTransitionsFixture = require('../../../../lib/test/fixtures/getSta
 
 const InvalidSTPacketDataError = require('../../../../lib/storage/stPacket/errors/InvalidSTPacketDataError');
 
-describe('addSTPacket', () => {
+describe('addSTPacketFactory', () => {
   let ipfsApi;
   let addSTPacket;
   let stPacket;

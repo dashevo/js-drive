@@ -11,7 +11,7 @@ const getStateTransitionsFixture = require('../../../../lib/test/fixtures/getSta
 
 const InvalidParamsError = require('../../../../lib/api/InvalidParamsError');
 
-describe('addSTPacketMethod', () => {
+describe('addSTPacketMethodFactory', () => {
   let stPacket;
   let serializedSTPacket;
   let stateTransition;
