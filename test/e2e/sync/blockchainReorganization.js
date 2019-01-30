@@ -153,20 +153,14 @@ describe('Blockchain reorganization', function main() {
 
     [firstUser, secondUser, thirdUser] = registeredUsers;
 
-    // Mine block with SubTx
-    await firstDashDrive.dashCore.getApi().generate(1);
-
-    // Wait until block will be mined
-    await wait(20000);
+    // Mine block with SubTx + 6 blocks on top of it
+    await firstDashDrive.dashCore.getApi().generate(7);
 
     // Await number of blocks even on both nodes
     await blockCountEvenAndEqual(
       firstDashDrive.dashCore,
       secondDashDrive.dashCore,
     );
-
-    // TODO Users are not present on the second node
-    const transaction = await secondDashDrive.dashCore.getApi().getTransaction(firstUser.userId);
 
     // Register first contract
     const firstContractTxId = await createAndSubmitST(
@@ -278,10 +272,6 @@ describe('Blockchain reorganization', function main() {
     expect(firstDriveSecondObject).to.be.deep.equal(
       secondObjectPacket.getDPObjects()[0].toJSON(),
     );
-
-    // Generate 2 more blocks, 3rd contract and object on the second Drive node
-    // To introduce a slightly bigger fork
-    await secondDashDrive.dashCore.getApi().generate(1);
 
     const thirdContractTxId = await createAndSubmitST(
       thirdUser.userId,
