@@ -326,7 +326,7 @@ describe('Blockchain reorganization', function main() {
 
   it('Dash Drive should sync data after blockchain reorganization, removing missing STs. Adding them back after they reappear in the blockchain.', async () => {
     // Save initialSyncAt to test it later and make sure
-    // There was no intial sync
+    // There was no initial sync
     const {
       result: {
         lastInitialSyncAt: lastInitialSyncAtBefore,
