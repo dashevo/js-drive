@@ -141,21 +141,32 @@ describe('Blockchain reorganization', function main() {
     // Do that here so major part of blocks are in the beginning
     const registeredUsers = [];
     for (let i = 1; i <= 3; i++) {
-      const instance = firstDashDrive;
       const username = `user${i}`;
 
-      const { userId, privateKeyString } = await registerUser(username, instance.dashCore.getApi());
+      const { userId, privateKeyString } = await registerUser(
+        username,
+        firstDashDrive.dashCore.getApi(),
+      );
 
       registeredUsers.push({ username, userId, privateKeyString });
     }
 
     [firstUser, secondUser, thirdUser] = registeredUsers;
 
+    // Mine block with SubTx
+    await firstDashDrive.dashCore.getApi().generate(1);
+
+    // Wait until block will be mined
+    await wait(20000);
+
     // Await number of blocks even on both nodes
     await blockCountEvenAndEqual(
       firstDashDrive.dashCore,
       secondDashDrive.dashCore,
     );
+
+    // TODO Users are not present on the second node
+    const transaction = await secondDashDrive.dashCore.getApi().getTransaction(firstUser.userId);
 
     // Register first contract
     const firstContractTxId = await createAndSubmitST(
