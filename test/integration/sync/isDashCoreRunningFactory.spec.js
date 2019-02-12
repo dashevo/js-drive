@@ -3,7 +3,9 @@ const isDashCoreRunningFactory = require('../../../lib/sync/isDashCoreRunningFac
 
 const wait = require('../../../lib/util/wait');
 
-describe('IsDashCoreRunning', () => {
+describe('IsDashCoreRunning', function main() {
+  this.timeout(10000);
+
   let dashCoreApi;
   let isDashCoreRunning;
 
@@ -23,7 +25,7 @@ describe('IsDashCoreRunning', () => {
   it('should return false if DashCore is down', async () => {
     await dashCoreApi.stop();
 
-    await wait(100);
+    await wait(1000);
 
     const retries = null;
     const retryDelay = 0.1;
