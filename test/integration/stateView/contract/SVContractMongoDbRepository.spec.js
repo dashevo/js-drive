@@ -33,7 +33,7 @@ describe('SVContractMongoDbRepository', () => {
     expect(result.toJSON()).to.deep.equal(svContract.toJSON());
   });
 
-  it('should return null if not found', async () => {
+  it('should return null if SV Contract is not found', async () => {
     const result = await svContractRepository.find('unknown');
 
     expect(result).to.be.null();

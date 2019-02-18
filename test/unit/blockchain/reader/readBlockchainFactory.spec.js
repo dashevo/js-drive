@@ -38,8 +38,8 @@ describe('readBlockchainFactory', () => {
     );
   });
 
-  it('should emit the out of bounds event if initial block height less than'
-    + ' number of blocks in blockchain', async () => {
+  it('should emit the out of bounds event if the initial block height is less than'
+    + ' the number of blocks on the blockchain', async () => {
     initialBlockHeight = 6;
 
     readerMediatorMock.getInitialBlockHeight.returns(initialBlockHeight);
@@ -59,8 +59,8 @@ describe('readBlockchainFactory', () => {
     expect(readerMock.read).to.be.not.called();
   });
 
-  it('should reset state and emit out of bounds events if initial block height'
-    + ' less and Drive synced something before', async () => {
+  it('should reset state and emit the out of bounds event if the initial block height'
+    + ' less that the current height and Drive synced something before', async () => {
     initialBlockHeight = 6;
 
     readerMediatorMock.getInitialBlockHeight.returns(initialBlockHeight);
@@ -178,8 +178,8 @@ describe('readBlockchainFactory', () => {
     );
   });
 
-  it('should continue from the current blockchain height if it is less then'
-    + ' last synced block height but higher then first synced block', async () => {
+  it('should continue from the current blockchain height if it is less than'
+    + ' the last synced block height but higher than the first synced block', async () => {
     const readBlockCount = 10;
     const [lastSyncedBlock] = blocks;
 
@@ -240,8 +240,8 @@ describe('readBlockchainFactory', () => {
     );
   });
 
-  it('should read from initial block height if it less than the blockchain height'
-    + ' and there is no synced blocks', async () => {
+  it('should read from the initial block height if it less than the blockchain height'
+    + ' and there are no synced blocks', async () => {
     const readBlockCount = 10;
 
     readerMock.read.returns(readBlockCount);

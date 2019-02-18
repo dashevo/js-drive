@@ -210,7 +210,7 @@ describe('BlockchainReader', () => {
     );
   });
 
-  it('should continue ST iteration if IgnoreStateTransitionError thrown'
+  it('should continue ST iteration if IgnoreStateTransitionError is thrown'
     + ' from State Transition error handler', async () => {
     const stPerBlocks = [
       [
@@ -266,7 +266,7 @@ describe('BlockchainReader', () => {
     }
   });
 
-  it('should throw and emit error if that error happens during block iteration', async () => {
+  it('should throw and emit error if that error is happening during block iteration', async () => {
     const error = new Error();
 
     readerMediatorMock.emitSerial.onCall(0).throws(error);
@@ -302,7 +302,7 @@ describe('BlockchainReader', () => {
     );
   });
 
-  it('should restart reading if RestartBlockchainReaderError thrown from the block error event handlers', async () => {
+  it('should restart reading if RestartBlockchainReaderError is thrown from the block error event handlers', async () => {
     const error = new Error();
     const restartError = new RestartBlockchainReaderError(blocks[3].height);
 
@@ -324,7 +324,7 @@ describe('BlockchainReader', () => {
     );
   });
 
-  it('should throw error from block error handler', async () => {
+  it('should throw an error received from the block error handler', async () => {
     const error = new Error();
     const errorFromErrorHandler = new Error();
 

@@ -12,7 +12,7 @@ describe('RpcBlockIterator', () => {
     blockIterator = new RpcBlockIterator(rpcClientMock, fromBlockHeight);
   });
 
-  it('should iterate over blocks from blockchain', async () => {
+  it('should iterate over blocks from a blockchain', async () => {
     const obtainedBlocks = [];
 
     for await (const block of blockIterator) {
@@ -24,7 +24,7 @@ describe('RpcBlockIterator', () => {
     expect(obtainedBlocks).to.be.deep.equal(rpcClientMock.blocks);
   });
 
-  it('should iterate from begging when "reset" method is called', async () => {
+  it('should iterate from beginning when "reset" method is called', async () => {
     const { value: firstBlock } = await blockIterator.next();
 
     blockIterator.reset();
@@ -34,7 +34,7 @@ describe('RpcBlockIterator', () => {
     expect(firstBlock).to.be.equal(secondBlock);
   });
 
-  it('should iterate since new block height', async () => {
+  it('should continue iteration from new block height', async () => {
     const { value: firstBlock } = await blockIterator.next();
 
     expect(blockIterator.getBlockHeight()).to.be.equal(firstBlock.height);
@@ -54,5 +54,5 @@ describe('RpcBlockIterator', () => {
 
   it('should return fromBlockHeight if there is no current block');
   it('should throw InvalidBlockHeightError if block height is out of range');
-  it('should escalate an unknown error while getting next block hash');
+  it('should escalate an unknown error if any thrown during retrieval of the next block hash');
 });

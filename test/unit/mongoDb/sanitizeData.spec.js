@@ -41,7 +41,7 @@ describe('sanitizeData', () => {
   });
 
   describe('sanitize', () => {
-    it('should add more dollar char to dollar-prefixed fields', () => {
+    it('should add an internal prefix to a dollar-prefixed fields', () => {
       const result = sanitize(unsanitizedData);
 
       expect(result).to.be.deep.equal(sanitizedData);
@@ -49,7 +49,7 @@ describe('sanitizeData', () => {
   });
 
   describe('unsanitize', () => {
-    it('should remove dollar-char from dollar-prefixed fields', () => {
+    it('should remove an internal prefix from a dollar-prefixed fields', () => {
       const result = unsanitize(sanitizedData);
 
       expect(result).to.be.deep.equal(unsanitizedData);

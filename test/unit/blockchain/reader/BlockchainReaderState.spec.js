@@ -10,7 +10,7 @@ describe('BlockchainReaderState', () => {
     state = new BlockchainReaderState();
   });
 
-  it('should add block and return last of them', () => {
+  it('should add a block and return the last of them', () => {
     state.addBlock(blocks[0]);
 
     expect(state.getLastBlock()).to.be.equal(blocks[0]);
@@ -20,13 +20,13 @@ describe('BlockchainReaderState', () => {
     expect(state.getLastBlock()).to.be.equal(blocks[1]);
   });
 
-  it('should set blocks and return all of them', () => {
+  it('should set the blocks and return all of them', () => {
     state.setBlocks(blocks);
 
     expect(state.getBlocks()).to.deep.be.equal(blocks);
   });
 
-  it('should validate blocks sequence', () => {
+  it('should validate the blocks sequence', () => {
     state.addBlock(blocks[0]);
 
     expect(() => {
@@ -34,14 +34,14 @@ describe('BlockchainReaderState', () => {
     }).to.be.throws('Wrong block sequence');
   });
 
-  it('should trim blocks to limit', () => {
+  it('should trim the blocks to a specified limit', () => {
     const limit = 2;
     const stateWithBlocks = new BlockchainReaderState(blocks, limit);
 
     expect(stateWithBlocks.getBlocks()).to.be.deep.equal(blocks.slice(blocks.length - limit));
   });
 
-  it('should change blocks limit', () => {
+  it('should be able to change the blocks limit', () => {
     const limit = 4;
     const stateWithBlocks = new BlockchainReaderState(blocks, limit);
     expect(stateWithBlocks.getBlocks()).to.have.lengthOf(limit);
@@ -52,7 +52,7 @@ describe('BlockchainReaderState', () => {
     expect(stateWithBlocks.getBlocks()).to.be.deep.equal(blocks.slice(blocks.length - newLimit));
   });
 
-  it('should return blocks limit', () => {
+  it('should return the blocks limit', () => {
     const limit = 2;
     const stateWithLimit = new BlockchainReaderState([], limit);
 
@@ -61,7 +61,7 @@ describe('BlockchainReaderState', () => {
 
   it('should return first synced block height');
 
-  it('should clear state', () => {
+  it('should clear its state', () => {
     state.addBlock(blocks[0]);
 
     expect(state.getLastBlock()).to.be.equal(blocks[0]);

@@ -31,7 +31,7 @@ describe('attachSequenceValidationHandler', () => {
 
   describe('sequence validation', () => {
     it('should not able to validate sequence if the last synced block is not present'
-      + 'and current block is not initial', async () => {
+      + ' and current block is not initial', async () => {
       const [currentBlock] = blocks;
       currentBlock.height = 5;
 
@@ -58,8 +58,8 @@ describe('attachSequenceValidationHandler', () => {
       expect.fail('sequence is correct');
     });
 
-    it('should detect sequence as correct if this last synced block is not present'
-      + 'and current block is initial', async () => {
+    it('should detect sequence as correct if the last synced block is not present'
+      + ' and current block is initial', async () => {
       const [currentBlock] = blocks;
       currentBlock.height = 1;
 
@@ -73,7 +73,7 @@ describe('attachSequenceValidationHandler', () => {
       expect(readerMediatorMock.getInitialBlockHeight).to.be.calledOnce();
     });
 
-    it('should detect sequence as correct if current block higher than the last synced block', async () => {
+    it('should detect sequence as correct if current block is higher than the last synced block', async () => {
       const [currentBlock, lastSyncedBlock] = blocks;
       currentBlock.height = 2;
       currentBlock.previousblockhash = 'hash';
@@ -124,7 +124,7 @@ describe('attachSequenceValidationHandler', () => {
       expect.fail('sequence is correct');
     });
 
-    it('should detect sequence as correct if current block higher then the first synced block', async () => {
+    it('should detect sequence as correct if the current block is higher then the first synced block', async () => {
       const [currentBlock, lastSyncedBlock] = blocks;
       currentBlock.height = 2;
       lastSyncedBlock.height = 5;
@@ -177,13 +177,13 @@ describe('attachSequenceValidationHandler', () => {
   });
 
   describe('validation errors handler', () => {
-    it('should do nothing if no validation errors', async () => {
+    it('should do nothing if there are no validation errors', async () => {
       const error = new Error();
 
       await readerMediatorMock.originalEmitSerial(ReaderMediator.EVENTS.BLOCK_ERROR, error);
     });
 
-    it('should restart reader from initial block if not able not validate sequence', async () => {
+    it('should restart reader from the initial block if not able to validate sequence', async () => {
       const initialBlockHeight = 1;
 
       readerMediatorMock.getInitialBlockHeight.returns(initialBlockHeight);

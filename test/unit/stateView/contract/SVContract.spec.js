@@ -76,7 +76,7 @@ describe('SVContract', () => {
   });
 
   describe('#toJSON', () => {
-    it('should return SV Contract as plain object', () => {
+    it('should return SV Contract as a plain object', () => {
       svContract = new SVContract(
         contractId,
         userId,

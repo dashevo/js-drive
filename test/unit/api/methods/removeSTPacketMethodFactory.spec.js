@@ -24,7 +24,7 @@ describe('removeSTPacketMethodFactory', () => {
     );
   });
 
-  it('should throw error if "packetHash" params is missing', async () => {
+  it('should throw error if "packetHash" parameter is missing', async () => {
     let error;
     try {
       await removeSTPacketMethod({});
@@ -38,7 +38,7 @@ describe('removeSTPacketMethodFactory', () => {
     expect(removeSTPacketMock).not.to.be.called();
   });
 
-  it('should throw error if "packetHash" params is not a valid CID hash', async () => {
+  it('should throw error if "packetHash" parameter is not a valid CID hash', async () => {
     packetHash = 'wrong';
 
     createCIDFromHashMock.throws(new InvalidHashError());
@@ -74,7 +74,7 @@ describe('removeSTPacketMethodFactory', () => {
     expect(removeSTPacketMock).not.to.be.called();
   });
 
-  it('should throw error if packet is not pinned', async () => {
+  it('should throw an error if packet is not pinned', async () => {
     removeSTPacketMock.throws(new PacketNotPinnedError(cid));
 
     let error;

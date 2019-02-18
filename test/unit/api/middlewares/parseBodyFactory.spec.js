@@ -20,5 +20,5 @@ describe('parseBodyFactory', () => {
     request.end(JSON.stringify(params));
   });
 
-  it('should call next in case of error');
+  it('should call next in case of an error');
 });

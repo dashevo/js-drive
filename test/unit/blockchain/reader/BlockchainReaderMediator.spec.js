@@ -13,7 +13,7 @@ describe('BlockchainReaderMediator', () => {
     readerMediator = new BlockchainReaderMediator(stateMock, initialBlockHeight);
   });
 
-  it('should be events bus', () => {
+  it('should behave like an event bus', () => {
     expect(readerMediator).to.be.instanceOf(Emittery);
   });
 

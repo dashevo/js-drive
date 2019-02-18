@@ -62,7 +62,7 @@ describe('SVObject', () => {
   });
 
   describe('#toJSON', () => {
-    it('should return SVObject as plain object', () => {
+    it('should return SVObject as a plain object', () => {
       const result = svObject.toJSON();
 
       expect(result).to.deep.equal({

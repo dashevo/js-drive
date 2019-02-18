@@ -23,7 +23,7 @@ describe('SyncStateRepository', function main() {
     syncStateRepository = new SyncStateRepository(mongoDatabase);
   });
 
-  it('should store state', async () => {
+  it('should store a state', async () => {
     await syncStateRepository.store(syncState);
 
     const dataFromMongoDb = await syncStateCollection.findOne(
@@ -36,7 +36,7 @@ describe('SyncStateRepository', function main() {
     expect(dataFromMongoDb).to.be.deep.equals(syncState.toJSON());
   });
 
-  it('should fetch updated state', async () => {
+  it('should fetch an updated state', async () => {
     syncState.setLastInitialSyncAt(new Date('2018-01-01'));
     await syncStateCollection.updateOne(
       SyncStateRepository.mongoDbCondition,
@@ -49,7 +49,7 @@ describe('SyncStateRepository', function main() {
     expect(stateFromMongo.toJSON()).to.be.deep.equals(syncState);
   });
 
-  it('should fetch empty state if not present', async () => {
+  it('should fetch an empty state if it is not present', async () => {
     const stateFromMongo = await syncStateRepository.fetch();
 
     expect(stateFromMongo.toJSON()).to.be.deep.equals({

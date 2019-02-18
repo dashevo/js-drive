@@ -49,7 +49,7 @@ describe('updateSVObjectFactory', () => {
     expect(svObject.isDeleted()).to.be.false();
   });
 
-  it('should store SVObject if action is "update" and has previous version', async () => {
+  it('should store SVObject if action is "update" and it has a previous version', async () => {
     const [previousSVObject] = getSVObjectsFixture();
 
     svObjectRepository.find.returns(previousSVObject);
@@ -74,7 +74,7 @@ describe('updateSVObjectFactory', () => {
     expect(svObject.isDeleted()).to.be.false();
   });
 
-  it('should throw error if action is "update" and there is no previous version', async () => {
+  it('should throw an error if action is "update" and there is no previous version', async () => {
     svObjectRepository.find.returns(null);
 
     dpObject.setAction(DPObject.ACTIONS.UPDATE);
@@ -92,7 +92,7 @@ describe('updateSVObjectFactory', () => {
     expect(svObjectRepository.store).not.to.be.called();
   });
 
-  it('should store SVObject remove ahead versions if action is "update" upon reverting', async () => {
+  it('should store SVObject and remove ahead versions if action is "update" upon reverting', async () => {
     const previousRevisions = [
       new Revision(0, reference),
       new Revision(1, reference),
@@ -156,7 +156,7 @@ describe('updateSVObjectFactory', () => {
   });
 
 
-  it('should throw error if action is not supported', async () => {
+  it('should throw an error if action is not supported', async () => {
     dpObject.setAction(100);
 
     let error;

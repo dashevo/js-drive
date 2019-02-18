@@ -324,7 +324,7 @@ describe('Blockchain reorganization', function main() {
     );
   });
 
-  it('Dash Drive should sync data after blockchain reorganization, removing missing STs. Adding them back after they reappear in the blockchain.', async () => {
+  it('Dash Drive should sync data after blockchain reorganization, removing missing STs. Adding them back after they reappear on the blockchain.', async () => {
     // Save initialSyncAt to test it later and make sure
     // There was no initial sync
     const {
@@ -489,7 +489,7 @@ describe('Blockchain reorganization', function main() {
     expect(lastInitialSyncAtBefore).to.be.equal(lastInitialSyncAtAfter);
   });
 
-  after('cleanup lone services', async () => {
+  after('cleanup services', async () => {
     const instances = [
       firstDashDrive,
       secondDashDrive,

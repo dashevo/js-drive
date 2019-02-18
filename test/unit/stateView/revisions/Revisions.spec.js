@@ -31,7 +31,7 @@ describe('Revisions', () => {
     oldRevisions.getRevisionNumber = this.sinon.stub();
   });
 
-  it('should add and get revisions', () => {
+  it('should be able to add and get revisions', () => {
     oldRevisions.getRevisionNumber.returns(4);
 
     const result = newRevisions.addRevision(oldRevisions);
@@ -43,7 +43,7 @@ describe('Revisions', () => {
     );
   });
 
-  it('should remove specified revisions', () => {
+  it('should remove revisions that are ahead of the current one', () => {
     newRevisions.getRevisionNumber.returns(2);
 
     newRevisions.addRevision(oldRevisions);

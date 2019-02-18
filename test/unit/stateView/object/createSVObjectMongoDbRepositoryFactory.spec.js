@@ -31,7 +31,7 @@ describe('createSVObjectMongoDbRepositoryFactory', () => {
     );
   });
 
-  it('should create Mongo database with prefix + contractId', async () => {
+  it('should create a MongoDb database with a prefix + contractId', async () => {
     const contractIdEncoded = bs58.encode(Buffer.from(contractId, 'hex'));
     const dbName = `${process.env.MONGODB_DB_PREFIX}dpa_${contractIdEncoded}`;
 

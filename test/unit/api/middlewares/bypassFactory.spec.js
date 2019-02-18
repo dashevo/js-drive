@@ -9,7 +9,7 @@ describe('bypassFactory', () => {
     method = this.sinon.spy();
   });
 
-  it('should bypass method calling next if request method is in the whitelist', () => {
+  it('should bypass method call calling next if request method is in the whitelist', () => {
     const req = {
       body: {
         method: 'getSyncInfo',
@@ -24,7 +24,7 @@ describe('bypassFactory', () => {
     expect(method).to.not.be.calledOnce();
   });
 
-  it('should not bypass method and call method if request method is not in the whitelist', () => {
+  it('should not bypass method call if request method is not in the whitelist', () => {
     const req = {
       body: {
         method: 'fetchDPObjects',

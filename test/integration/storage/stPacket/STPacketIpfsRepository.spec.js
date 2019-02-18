@@ -97,7 +97,7 @@ describe('STPacketIpfsRepository', function main() {
     }
   });
 
-  it('should throw an error if trying to remove packet not pinned', async () => {
+  it('should throw an error if trying to remove a packet that is not pinned', async () => {
     const cid = createCIDFromHash(stPacket.hash());
 
     try {

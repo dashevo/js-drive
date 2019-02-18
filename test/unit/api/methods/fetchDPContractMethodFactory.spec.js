@@ -31,7 +31,7 @@ describe('fetchDPContractMethodFactory', () => {
     expect(fetchDPContractMock).not.to.be.called();
   });
 
-  it('should throw error if DP Contract not found', async () => {
+  it('should throw error if DP Contract is not found', async () => {
     fetchDPContractMock.returns(null);
 
     let error;

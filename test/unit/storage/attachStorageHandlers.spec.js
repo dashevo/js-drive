@@ -27,7 +27,7 @@ describe('attachStorageHandlers', () => {
     );
   });
 
-  it('should pin ST packet when new state transition appears', async () => {
+  it('should pin ST packet when new the state transition appears', async () => {
     const [stateTransition] = rpcClientMock.transactions;
     const [block] = rpcClientMock.blocks;
 
@@ -42,7 +42,7 @@ describe('attachStorageHandlers', () => {
     expect(stPacketRepositoryMock.download).to.be.calledWith(packetCid);
   });
 
-  it('should unpin ST packets in case of reorg', async () => {
+  it('should unpin ST packets in case of blockchain reorganization happened', async () => {
     const [stateTransition] = rpcClientMock.transactions;
     const [block] = rpcClientMock.blocks;
 

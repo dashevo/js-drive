@@ -208,7 +208,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     }
   });
 
-  after('cleanup lone services', async () => {
+  after('cleanup services', async () => {
     const instances = [
       firstDashDrive,
       secondDashDrive,

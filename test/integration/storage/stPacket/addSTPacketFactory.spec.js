@@ -46,7 +46,7 @@ describe('addSTPacketFactory', () => {
     addSTPacket = addSTPacketFactory(stPacketRepository, dpp);
   });
 
-  it('should throw error if ST or ST Packet is invalid', async () => {
+  it('should throw an error if ST or ST Packet is invalid', async () => {
     try {
       await addSTPacket(stPacket, stateTransition);
       expect.fail('should throw InvalidSTPacketDataError');

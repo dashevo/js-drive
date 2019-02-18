@@ -34,7 +34,7 @@ describe('addSTPacketMethodFactory', () => {
     addSTPacketMethod = addSTPacketMethodFactory(addSTPacketMock, dppMock);
   });
 
-  it('should throw error if "stPacket" params is missing', async () => {
+  it('should throw error if "stPacket" parameter is missing', async () => {
     let error;
     try {
       await addSTPacketMethod({
@@ -49,7 +49,7 @@ describe('addSTPacketMethodFactory', () => {
     expect(addSTPacketMock).to.not.be.called();
   });
 
-  it('should throw error if "stateTransition" params is missing', async () => {
+  it('should throw error if "stateTransition" parameter is missing', async () => {
     let error;
     try {
       await addSTPacketMethod({
@@ -64,7 +64,7 @@ describe('addSTPacketMethodFactory', () => {
     expect(addSTPacketMock).to.not.be.called();
   });
 
-  it('should throw error if "stPacket" param is not a serialized ST Packet', async () => {
+  it('should throw error if "stPacket" parameter is not a serialized ST Packet', async () => {
     const wrongString = 'something';
 
     const cborError = new Error();
@@ -88,7 +88,7 @@ describe('addSTPacketMethodFactory', () => {
     expect(addSTPacketMock).to.not.be.called();
   });
 
-  it('should throw error if "stateTransition" param is not a serialized ST', async () => {
+  it('should throw error if "stateTransition" parameter is not a serialized ST', async () => {
     const wrongString = 'something';
 
     const cborError = new Error();
@@ -112,7 +112,7 @@ describe('addSTPacketMethodFactory', () => {
     expect(addSTPacketMock).to.not.be.called();
   });
 
-  it('should throw error if "stPacket" param is not valid ST Packet', async () => {
+  it('should throw error if "stPacket" parameter is not valid ST Packet', async () => {
     const invalidSTPacket = { ...stPacket.toJSON(), wrongField: true };
 
     const validationError = new InvalidSTPacketError([], invalidSTPacket);
