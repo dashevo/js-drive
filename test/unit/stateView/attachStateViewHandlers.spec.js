@@ -54,7 +54,10 @@ describe('attachStateViewHandlers', () => {
       block,
     });
 
-    expect(revertSVObjectsForStateTransition).to.have.been.calledOnceWith({ stateTransition, block });
+    expect(revertSVObjectsForStateTransition).to.have.been.calledOnceWith({
+      stateTransition,
+      block,
+    });
   });
 
   it('should call revertSVContractsForStateTransition on the orphaned state transition event', async () => {
@@ -66,7 +69,10 @@ describe('attachStateViewHandlers', () => {
       block,
     });
 
-    expect(revertSVContractsForStateTransition).to.have.been.calledOnceWith({ stateTransition, block });
+    expect(revertSVContractsForStateTransition).to.have.been.calledOnceWith({
+      stateTransition,
+      block,
+    });
   });
 
   it('should call dropMongoDatabasesWithPrefix on the reset event', async () => {

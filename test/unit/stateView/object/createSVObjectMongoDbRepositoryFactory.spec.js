@@ -41,6 +41,10 @@ describe('createSVObjectMongoDbRepositoryFactory', () => {
 
     expect(mongoClient.db).to.have.been.calledOnceWith(dbName);
 
-    expect(SVObjectMongoDbRepositoryMock).to.have.been.calledOnceWith(mongoDb, sanitizerMock, objectType);
+    expect(SVObjectMongoDbRepositoryMock).to.have.been.calledOnceWith(
+      mongoDb,
+      sanitizerMock,
+      objectType,
+    );
   });
 });
