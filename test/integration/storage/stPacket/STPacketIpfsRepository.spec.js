@@ -42,7 +42,7 @@ describe('STPacketIpfsRepository', function main() {
     const storedCid = await stPacketRepository.store(stPacket);
     const storedPacket = await stPacketRepository.find(storedCid);
 
-    expect(storedPacket.toJSON()).to.be.deep.equal(stPacket.toJSON());
+    expect(storedPacket.toJSON()).to.deep.equal(stPacket.toJSON());
   });
 
   it('should unpin previously stored and pinned packet', async () => {
@@ -93,7 +93,7 @@ describe('STPacketIpfsRepository', function main() {
       await stPacketRepository.find(cid);
       expect.fail('the error have not been thrown');
     } catch (e) {
-      expect(e).to.be.instanceOf(GetPacketTimeoutError);
+      expect(e).to.be.an.instanceOf(GetPacketTimeoutError);
     }
   });
 
@@ -104,7 +104,7 @@ describe('STPacketIpfsRepository', function main() {
       await stPacketRepository.delete(cid);
       expect.fail('the error have not been thrown');
     } catch (e) {
-      expect(e).to.be.instanceOf(PacketNotPinnedError);
+      expect(e).to.be.an.instanceOf(PacketNotPinnedError);
     }
   });
 });

@@ -32,10 +32,10 @@ describe('removeSTPacketMethodFactory', () => {
       error = e;
     }
 
-    expect(error).to.be.instanceOf(InvalidParamsError);
+    expect(error).to.be.an.instanceOf(InvalidParamsError);
 
-    expect(createCIDFromHashMock).not.to.be.called();
-    expect(removeSTPacketMock).not.to.be.called();
+    expect(createCIDFromHashMock).to.have.not.been.called();
+    expect(removeSTPacketMock).to.have.not.been.called();
   });
 
   it('should throw error if "packetHash" parameter is not a valid CID hash', async () => {
@@ -50,10 +50,10 @@ describe('removeSTPacketMethodFactory', () => {
       error = e;
     }
 
-    expect(error).to.be.instanceOf(InvalidParamsError);
+    expect(error).to.be.an.instanceOf(InvalidParamsError);
 
-    expect(createCIDFromHashMock).to.be.calledOnceWith(packetHash);
-    expect(removeSTPacketMock).not.to.be.called();
+    expect(createCIDFromHashMock).to.have.been.calledOnceWith(packetHash);
+    expect(removeSTPacketMock).to.have.not.been.called();
   });
 
   it('should throw an original error if error is not InvalidHashError', async () => {
@@ -68,10 +68,10 @@ describe('removeSTPacketMethodFactory', () => {
       error = e;
     }
 
-    expect(error).to.be.equal(someError);
+    expect(error).to.equal(someError);
 
-    expect(createCIDFromHashMock).to.be.calledOnceWith(packetHash);
-    expect(removeSTPacketMock).not.to.be.called();
+    expect(createCIDFromHashMock).to.have.been.calledOnceWith(packetHash);
+    expect(removeSTPacketMock).to.have.not.been.called();
   });
 
   it('should throw an error if packet is not pinned', async () => {
@@ -84,10 +84,10 @@ describe('removeSTPacketMethodFactory', () => {
       error = e;
     }
 
-    expect(error).to.be.instanceOf(InvalidParamsError);
+    expect(error).to.be.an.instanceOf(InvalidParamsError);
 
-    expect(createCIDFromHashMock).to.be.calledOnceWith(packetHash);
-    expect(removeSTPacketMock).to.be.calledOnceWith(cid);
+    expect(createCIDFromHashMock).to.have.been.calledOnceWith(packetHash);
+    expect(removeSTPacketMock).to.have.been.calledOnceWith(cid);
   });
 
   it('should throw an original error if error is not PacketNotPinnedError', async () => {
@@ -102,10 +102,10 @@ describe('removeSTPacketMethodFactory', () => {
       error = e;
     }
 
-    expect(error).to.be.equal(otherError);
+    expect(error).to.equal(otherError);
 
-    expect(createCIDFromHashMock).to.be.calledOnceWith(packetHash);
-    expect(removeSTPacketMock).to.be.calledOnceWith(cid);
+    expect(createCIDFromHashMock).to.have.been.calledOnceWith(packetHash);
+    expect(removeSTPacketMock).to.have.been.calledOnceWith(cid);
   });
 
   it('should delete ST Packet', async () => {
@@ -113,7 +113,7 @@ describe('removeSTPacketMethodFactory', () => {
 
     await removeSTPacketMethod({ packetHash });
 
-    expect(createCIDFromHashMock).to.be.calledOnceWith(packetHash);
-    expect(removeSTPacketMock).to.be.calledOnceWith(cid);
+    expect(createCIDFromHashMock).to.have.been.calledOnceWith(packetHash);
+    expect(removeSTPacketMock).to.have.been.calledOnceWith(cid);
   });
 });

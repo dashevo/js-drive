@@ -14,15 +14,15 @@ describe('BlockchainReaderMediator', () => {
   });
 
   it('should behave like an event bus', () => {
-    expect(readerMediator).to.be.instanceOf(Emittery);
+    expect(readerMediator).to.be.an.instanceOf(Emittery);
   });
 
   it('should return initial block height', () => {
-    expect(readerMediator.getInitialBlockHeight()).to.be.equal(initialBlockHeight);
+    expect(readerMediator.getInitialBlockHeight()).to.equal(initialBlockHeight);
   });
 
   it('should return reader state', () => {
-    expect(readerMediator.getState()).to.be.equal(stateMock);
+    expect(readerMediator.getState()).to.equal(stateMock);
   });
 
   it('should reset the state and emit an event');

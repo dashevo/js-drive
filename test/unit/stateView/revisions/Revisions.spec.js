@@ -36,9 +36,9 @@ describe('Revisions', () => {
 
     const result = newRevisions.addRevision(oldRevisions);
 
-    expect(result).to.be.equal(newRevisions);
+    expect(result).to.equal(newRevisions);
 
-    expect(newRevisions.getPreviousRevisions()).to.be.deep.equal(
+    expect(newRevisions.getPreviousRevisions()).to.deep.equal(
       previousRevisions.concat([oldRevisions.getCurrentRevision()]),
     );
   });
@@ -50,7 +50,7 @@ describe('Revisions', () => {
 
     newRevisions.removeAheadRevisions();
 
-    expect(newRevisions.getPreviousRevisions()).to.be.deep.equal(
+    expect(newRevisions.getPreviousRevisions()).to.deep.equal(
       previousRevisions.slice(0, 2),
     );
   });

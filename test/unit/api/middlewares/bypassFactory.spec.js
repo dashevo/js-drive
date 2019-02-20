@@ -20,8 +20,8 @@ describe('bypassFactory', () => {
     const bypass = bypassFactory(method, whitelist);
     bypass(req, null, next);
 
-    expect(next).to.be.calledOnce();
-    expect(method).to.not.be.calledOnce();
+    expect(next).to.have.been.calledOnce();
+    expect(method).to.have.not.been.calledOnce();
   });
 
   it('should not bypass method call if request method is not in the whitelist', () => {
@@ -35,7 +35,7 @@ describe('bypassFactory', () => {
     const bypass = bypassFactory(method, whitelist);
     bypass(req, null, next);
 
-    expect(next).to.not.be.calledOnce();
-    expect(method).to.be.calledOnce();
+    expect(next).to.have.not.been.calledOnce();
+    expect(method).to.have.been.calledOnce();
   });
 });

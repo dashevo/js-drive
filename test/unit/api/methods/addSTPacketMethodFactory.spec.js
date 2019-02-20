@@ -44,9 +44,9 @@ describe('addSTPacketMethodFactory', () => {
       error = e;
     }
 
-    expect(error).to.be.instanceOf(InvalidParamsError);
+    expect(error).to.be.an.instanceOf(InvalidParamsError);
 
-    expect(addSTPacketMock).to.not.be.called();
+    expect(addSTPacketMock).to.have.not.been.called();
   });
 
   it('should throw error if "stateTransition" parameter is missing', async () => {
@@ -59,9 +59,9 @@ describe('addSTPacketMethodFactory', () => {
       error = e;
     }
 
-    expect(error).to.be.instanceOf(InvalidParamsError);
+    expect(error).to.be.an.instanceOf(InvalidParamsError);
 
-    expect(addSTPacketMock).to.not.be.called();
+    expect(addSTPacketMock).to.have.not.been.called();
   });
 
   it('should throw error if "stPacket" parameter is not a serialized ST Packet', async () => {
@@ -81,11 +81,11 @@ describe('addSTPacketMethodFactory', () => {
       error = e;
     }
 
-    expect(error).to.be.equal(cborError);
+    expect(error).to.equal(cborError);
 
-    expect(dppMock.packet.createFromSerialized).to.be.calledOnceWith(wrongString);
+    expect(dppMock.packet.createFromSerialized).to.have.been.calledOnceWith(wrongString);
 
-    expect(addSTPacketMock).to.not.be.called();
+    expect(addSTPacketMock).to.have.not.been.called();
   });
 
   it('should throw error if "stateTransition" parameter is not a serialized ST', async () => {
@@ -105,11 +105,11 @@ describe('addSTPacketMethodFactory', () => {
       error = e;
     }
 
-    expect(error).to.be.equal(cborError);
+    expect(error).to.equal(cborError);
 
-    expect(dppMock.packet.createFromSerialized).to.be.calledOnceWith(serializedSTPacket);
+    expect(dppMock.packet.createFromSerialized).to.have.been.calledOnceWith(serializedSTPacket);
 
-    expect(addSTPacketMock).to.not.be.called();
+    expect(addSTPacketMock).to.have.not.been.called();
   });
 
   it('should throw error if "stPacket" parameter is not valid ST Packet', async () => {
@@ -129,11 +129,11 @@ describe('addSTPacketMethodFactory', () => {
       error = e;
     }
 
-    expect(error).to.be.instanceOf(InvalidParamsError);
+    expect(error).to.be.an.instanceOf(InvalidParamsError);
 
-    expect(dppMock.packet.createFromSerialized).to.be.calledOnceWith(serializedSTPacket);
+    expect(dppMock.packet.createFromSerialized).to.have.been.calledOnceWith(serializedSTPacket);
 
-    expect(addSTPacketMock).to.not.be.called();
+    expect(addSTPacketMock).to.have.not.been.called();
   });
 
   it('should add ST Packet', async () => {
@@ -144,14 +144,14 @@ describe('addSTPacketMethodFactory', () => {
       stPacket: serializedSTPacket,
     });
 
-    expect(dppMock.packet.createFromSerialized).to.be.calledOnceWith(serializedSTPacket);
+    expect(dppMock.packet.createFromSerialized).to.have.been.calledOnceWith(serializedSTPacket);
 
-    expect(addSTPacketMock).to.be.calledOnceWith(stPacket);
+    expect(addSTPacketMock).to.have.been.calledOnceWith(stPacket);
     expect(addSTPacketMock.getCall(0).args).to.have.lengthOf(2);
 
     const passedStateTransition = addSTPacketMock.getCall(0).args[1];
 
-    expect(passedStateTransition).to.be.instanceOf(StateTransition);
-    expect(passedStateTransition.hash).to.be.equal(stateTransition.hash);
+    expect(passedStateTransition).to.be.an.instanceOf(StateTransition);
+    expect(passedStateTransition.hash).to.equal(stateTransition.hash);
   });
 });

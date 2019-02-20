@@ -46,9 +46,9 @@ describe('readBlockchainFactory', () => {
 
     await readBlockchain();
 
-    expect(readerMediatorMock.reset).to.be.not.called();
+    expect(readerMediatorMock.reset).to.have.not.been.called();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledOnceWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledOnceWith(
       ReaderMediator.EVENTS.OUT_OF_BOUNDS,
       {
         initialBlockHeight,
@@ -56,7 +56,7 @@ describe('readBlockchainFactory', () => {
       },
     );
 
-    expect(readerMock.read).to.be.not.called();
+    expect(readerMock.read).to.have.not.been.called();
   });
 
   it('should reset state and emit the out of bounds event if the initial block height'
@@ -69,9 +69,9 @@ describe('readBlockchainFactory', () => {
 
     await readBlockchain();
 
-    expect(readerMediatorMock.reset).to.be.calledOnce();
+    expect(readerMediatorMock.reset).to.have.been.calledOnce();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledOnceWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledOnceWith(
       ReaderMediator.EVENTS.OUT_OF_BOUNDS,
       {
         initialBlockHeight,
@@ -79,7 +79,7 @@ describe('readBlockchainFactory', () => {
       },
     );
 
-    expect(readerMock.read).to.be.not.called();
+    expect(readerMock.read).to.have.not.been.called();
   });
 
   it('should emit the fully synced event if the last synced block and the last block'
@@ -92,14 +92,14 @@ describe('readBlockchainFactory', () => {
 
     await readBlockchain();
 
-    expect(readerMediatorMock.reset).to.be.not.called();
+    expect(readerMediatorMock.reset).to.have.not.been.called();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledOnceWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledOnceWith(
       ReaderMediator.EVENTS.FULLY_SYNCED,
       currentBlockCount,
     );
 
-    expect(readerMock.read).to.be.not.called();
+    expect(readerMock.read).to.have.not.been.called();
   });
 
   it('should read from the next block after the last synced block if the blockchain height is the same but'
@@ -122,18 +122,18 @@ describe('readBlockchainFactory', () => {
 
     await readBlockchain();
 
-    expect(readerMediatorMock.reset).to.be.not.called();
+    expect(readerMediatorMock.reset).to.have.not.been.called();
 
-    expect(readerMock.read).to.be.calledOnceWith(nextBlockHeight);
+    expect(readerMock.read).to.have.been.calledOnceWith(nextBlockHeight);
 
-    expect(readerMediatorMock.emitSerial).to.be.calledTwice();
+    expect(readerMediatorMock.emitSerial).to.have.been.calledTwice();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.BEGIN,
       nextBlockHeight,
     );
 
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.END,
       readBlockCount,
     );
@@ -153,18 +153,18 @@ describe('readBlockchainFactory', () => {
 
     await readBlockchain();
 
-    expect(readerMediatorMock.reset).to.be.calledOnce();
+    expect(readerMediatorMock.reset).to.have.been.calledOnce();
 
-    expect(readerMock.read).to.be.calledOnceWith(initialBlockHeight);
+    expect(readerMock.read).to.have.been.calledOnceWith(initialBlockHeight);
 
     expect(readerMediatorMock.emitSerial).to.have.callCount(3);
 
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.BEGIN,
       initialBlockHeight,
     );
 
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.BLOCK_SEQUENCE_VALIDATION_IMPOSSIBLE,
       {
         height: currentBlockCount,
@@ -172,7 +172,7 @@ describe('readBlockchainFactory', () => {
       },
     );
 
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.END,
       currentBlockCount,
     );
@@ -193,17 +193,17 @@ describe('readBlockchainFactory', () => {
 
     await readBlockchain();
 
-    expect(readerMediatorMock.reset).to.be.not.called();
+    expect(readerMediatorMock.reset).to.have.not.been.called();
 
-    expect(readerMock.read).to.be.calledOnceWith(currentBlockCount);
+    expect(readerMock.read).to.have.been.calledOnceWith(currentBlockCount);
 
-    expect(readerMediatorMock.emitSerial).to.be.calledTwice();
+    expect(readerMediatorMock.emitSerial).to.have.been.calledTwice();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.BEGIN,
       currentBlockCount,
     );
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.END,
       readBlockCount,
     );
@@ -223,18 +223,18 @@ describe('readBlockchainFactory', () => {
 
     await readBlockchain();
 
-    expect(readerMediatorMock.reset).to.be.not.called();
+    expect(readerMediatorMock.reset).to.have.not.been.called();
 
-    expect(readerMock.read).to.be.calledOnceWith(nextBlockHeight);
+    expect(readerMock.read).to.have.been.calledOnceWith(nextBlockHeight);
 
-    expect(readerMediatorMock.emitSerial).to.be.calledTwice();
+    expect(readerMediatorMock.emitSerial).to.have.been.calledTwice();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.BEGIN,
       nextBlockHeight,
     );
 
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.END,
       readBlockCount,
     );
@@ -250,18 +250,18 @@ describe('readBlockchainFactory', () => {
 
     await readBlockchain();
 
-    expect(readerMediatorMock.reset).to.be.not.called();
+    expect(readerMediatorMock.reset).to.have.not.been.called();
 
-    expect(readerMediatorMock.emitSerial).to.be.calledTwice();
+    expect(readerMediatorMock.emitSerial).to.have.been.calledTwice();
 
-    expect(readerMock.read).to.be.calledOnceWith(initialBlockHeight);
+    expect(readerMock.read).to.have.been.calledOnceWith(initialBlockHeight);
 
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.BEGIN,
       initialBlockHeight,
     );
 
-    expect(readerMediatorMock.emitSerial).to.be.calledWith(
+    expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.END,
       readBlockCount,
     );

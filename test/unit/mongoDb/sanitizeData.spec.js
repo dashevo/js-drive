@@ -44,7 +44,7 @@ describe('sanitizeData', () => {
     it('should add an internal prefix to a dollar-prefixed fields', () => {
       const result = sanitize(unsanitizedData);
 
-      expect(result).to.be.deep.equal(sanitizedData);
+      expect(result).to.deep.equal(sanitizedData);
     });
   });
 
@@ -52,7 +52,7 @@ describe('sanitizeData', () => {
     it('should remove an internal prefix from a dollar-prefixed fields', () => {
       const result = unsanitize(sanitizedData);
 
-      expect(result).to.be.deep.equal(unsanitizedData);
+      expect(result).to.deep.equal(unsanitizedData);
     });
   });
 });

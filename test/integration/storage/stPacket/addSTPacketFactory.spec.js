@@ -51,12 +51,12 @@ describe('addSTPacketFactory', () => {
       await addSTPacket(stPacket, stateTransition);
       expect.fail('should throw InvalidSTPacketDataError');
     } catch (e) {
-      expect(e).to.be.instanceOf(InvalidSTPacketDataError);
+      expect(e).to.be.an.instanceOf(InvalidSTPacketDataError);
       expect(e.getErrors()).to.lengthOf(1);
 
       const [consensusError] = e.getErrors();
 
-      expect(consensusError.name).to.be.equal('UserNotFoundError');
+      expect(consensusError.name).to.equal('UserNotFoundError');
     }
   });
 

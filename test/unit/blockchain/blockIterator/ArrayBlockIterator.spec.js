@@ -18,7 +18,7 @@ describe('ArrayBlockIterator', () => {
       obtainedBlocks.push(block);
     }
 
-    expect(obtainedBlocks).to.be.deep.equal(blocks);
+    expect(obtainedBlocks).to.deep.equal(blocks);
   });
 
   it('should iterate from beginning when "reset" method is called', async () => {
@@ -28,7 +28,7 @@ describe('ArrayBlockIterator', () => {
 
     const { value: secondBlock } = await blockIterator.next();
 
-    expect(firstBlock).to.be.equal(secondBlock);
+    expect(firstBlock).to.equal(secondBlock);
   });
 
   describe('setBlockHeight', () => {
@@ -39,8 +39,8 @@ describe('ArrayBlockIterator', () => {
 
       const { value: thirdBlock } = await blockIterator.next();
 
-      expect(firstBlock).to.be.equal(blocks[0]);
-      expect(thirdBlock).to.be.equal(blocks[2]);
+      expect(firstBlock).to.equal(blocks[0]);
+      expect(thirdBlock).to.equal(blocks[2]);
     });
     it('should throw an error if there is no block with specified height', () => {
       expect(() => blockIterator.setBlockHeight(999)).to.throw(InvalidBlockHeightError);
@@ -55,8 +55,8 @@ describe('ArrayBlockIterator', () => {
 
       const secondBlockHeight = blockIterator.getBlockHeight();
 
-      expect(firstBlockHeight).to.be.equal(blocks[0].height);
-      expect(secondBlockHeight).to.be.equal(blocks[1].height);
+      expect(firstBlockHeight).to.equal(blocks[0].height);
+      expect(secondBlockHeight).to.equal(blocks[1].height);
     });
 
     it('should throw an error if there are no blocks', async () => {
