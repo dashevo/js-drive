@@ -49,7 +49,7 @@ describe('sanitizeData', () => {
   });
 
   describe('unsanitize', () => {
-    it('should remove an internal prefix from a dollar-prefixed fields', () => {
+    it('should remove an internal prefix from any dollar-prefixed fields', () => {
       const result = unsanitize(sanitizedData);
 
       expect(result).to.deep.equal(unsanitizedData);

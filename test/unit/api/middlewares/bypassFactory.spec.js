@@ -9,7 +9,7 @@ describe('bypassFactory', () => {
     method = this.sinon.spy();
   });
 
-  it('should bypass method call calling next if request method is in the whitelist', () => {
+  it('should bypass method call, calling next(), if request method is in the whitelist', () => {
     const req = {
       body: {
         method: 'getSyncInfo',

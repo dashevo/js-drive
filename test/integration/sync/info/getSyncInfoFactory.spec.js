@@ -29,7 +29,7 @@ describe('getSyncInfoFactory', () => {
     getSyncInfo = getSyncInfoFactory(syncStateRepository, getChainInfo);
   });
 
-  it('should be having status equal to initialSync if there is no SyncState yet', async () => {
+  it('should have a status equal to initialSync if there is no SyncState yet', async () => {
     const syncInfo = await getSyncInfo();
     expect(syncInfo.toJSON()).to.deep.equal({
       lastSyncedBlockHeight: undefined,

@@ -12,7 +12,7 @@ describe('RpcBlockIterator', () => {
     blockIterator = new RpcBlockIterator(rpcClientMock, fromBlockHeight);
   });
 
-  it('should iterate over blocks from a blockchain', async () => {
+  it('should iterate over blocks from the blockchain', async () => {
     const obtainedBlocks = [];
 
     for await (const block of blockIterator) {

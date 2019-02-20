@@ -10,7 +10,7 @@ describe('BlockchainReaderState', () => {
     state = new BlockchainReaderState();
   });
 
-  it('should add a block and return the last of them', () => {
+  it('should add a block and return it if getLastBlock() is called after', () => {
     state.addBlock(blocks[0]);
 
     expect(state.getLastBlock()).to.equal(blocks[0]);
@@ -26,7 +26,7 @@ describe('BlockchainReaderState', () => {
     expect(state.getBlocks()).to.deep.equal(blocks);
   });
 
-  it('should validate the blocks sequence', () => {
+  it('should validate the block sequence', () => {
     state.addBlock(blocks[0]);
 
     expect(() => {
@@ -61,7 +61,7 @@ describe('BlockchainReaderState', () => {
 
   it('should return first synced block height');
 
-  it('should clear its state', () => {
+  it('should clear an internal data if clear() is called', () => {
     state.addBlock(blocks[0]);
 
     expect(state.getLastBlock()).to.equal(blocks[0]);
