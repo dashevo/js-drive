@@ -60,12 +60,12 @@ We use [js-evo-services-ctl](https://github.com/dashevo/js-evo-services-ctl) lib
 
 Fixtures are located in [fixtures/](fixtures) directory:
 - [blocks.json](fixtures/blocks.json)
-- [stateTransitionHeaders.json](fixtures/stateTransitionHeaders.json)
-- [stateTransitionPackets.json](fixtures/stateTransitionPackets.json)
+- [stateTransitions.json](fixtures/stateTransitions.json)
 
 There are several helpers for loading fixtures:
-- [getBlockFixtures](../lib/test/fixtures/getBlockFixtures.js)
-- [getTransitionHeaderFixtures](../lib/test/fixtures/getTransitionHeaderFixtures.js)
+- [getBlockFixtures](../lib/test/fixtures/getBlocksFixture.js)
+- [getStateTransitionsFixture](../lib/test/fixtures/getStateTransitionsFixture.js)
+- [getSTPacketsFixture](../lib/test/fixtures/getSTPacketsFixture.js)
 
 ## Other tools
 
