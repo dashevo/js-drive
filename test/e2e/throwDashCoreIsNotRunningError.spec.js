@@ -5,7 +5,7 @@ const {
 
 const wait = require('../../lib/util/wait');
 
-describe('DashDrive throws DashCoreIsNotRunningError', function main() {
+describe('Drive throws DashCoreIsNotRunningError', function main() {
   this.timeout(200000);
 
   let driveApi;
