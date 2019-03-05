@@ -1,6 +1,6 @@
 {
   "name": "drive",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A layer 2 data backend for Dash",
   "engines": {
     "node": ">=8"
