@@ -1,7 +1,7 @@
 const {
   createDriveApi,
   createDriveSync,
-} = require('@dashevo/js-evo-services-ctl');
+} = require('@dashevo/dp-services-ctl');
 
 const wait = require('../../lib/util/wait');
 

@@ -1,4 +1,4 @@
-const { startDrive } = require('@dashevo/js-evo-services-ctl');
+const { startDrive } = require('@dashevo/dp-services-ctl');
 const DashPlatformPlatform = require('@dashevo/dpp');
 
 const ApiAppOptions = require('../../../lib/app/ApiAppOptions');
