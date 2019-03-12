@@ -1,7 +1,8 @@
 {
-  "name": "drive",
-  "version": "0.3.0",
-  "description": "A layer 2 data backend for Dash",
+  "name": "@dashevo/drive",
+  "version": "0.2.0",
+  "description": "Drive",
+  "private": true,
   "engines": {
     "node": ">=8"
   },
@@ -21,20 +22,6 @@
   },
   "authors": [
     "Nathan Marley"
-  ],
-  "contributors": [
-    {
-      "name": "David Rey Acosta",
-      "url": "https://github.com/dreyacosta"
-    },
-    {
-      "name": "Ivan Shumkov",
-      "url": "https://github.com/shumkov"
-    },
-    {
-      "name": "Djavid Gabibiyan",
-      "url": "https://github.com/jawid-h"
-    }
   ],
   "license": "MIT",
   "bugs": {
