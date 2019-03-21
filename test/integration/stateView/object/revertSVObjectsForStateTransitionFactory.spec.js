@@ -6,7 +6,7 @@ const {
 } = require('@dashevo/dp-services-ctl');
 
 const DashPlatformProtocol = require('@dashevo/dpp');
-const DPObject = require('@dashevo/dpp/lib/object/DPObject');
+const DPObject = require('@dashevo/dpp/lib/document/Document');
 
 const sanitizer = require('../../../../lib/mongoDb/sanitizer');
 
