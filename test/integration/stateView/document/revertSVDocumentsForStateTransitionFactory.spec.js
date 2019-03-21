@@ -14,12 +14,12 @@ const ReaderMediator = require('../../../../lib/blockchain/reader/BlockchainRead
 
 const Revision = require('../../../../lib/stateView/revisions/Revision');
 const Reference = require('../../../../lib/stateView/revisions/Reference');
-const SVObjectMongoDbRepository = require('../../../../lib/stateView/document/SVObjectMongoDbRepository');
-const SVObject = require('../../../../lib/stateView/document/SVObject');
+const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/SVDocumentMongoDbRepository');
+const SVDocument = require('../../../../lib/stateView/document/SVDocument');
 
-const revertSVObjectsForStateTransitionFactory = require('../../../../lib/stateView/document/revertSVObjectsForStateTransitionFactory');
-const createSVObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVObjectMongoDbRepositoryFactory');
-const updateSVObjectFactory = require('../../../../lib/stateView/document/updateSVObjectFactory');
+const revertSVDocumentsForStateTransitionFactory = require('../../../../lib/stateView/document/revertSVDocumentsForStateTransitionFactory');
+const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
+const updateSVDocumentFactory = require('../../../../lib/stateView/document/updateSVDocumentFactory');
 const applyStateTransitionFactory = require('../../../../lib/stateView/applyStateTransitionFactory');
 const applyStateTransitionFromReferenceFactory = require('../../../../lib/stateView/applyStateTransitionFromReferenceFactory');
 
@@ -33,15 +33,15 @@ const getStateTransitionsFixture = require('../../../../lib/test/fixtures/getSta
 const getSTPacketsFixture = require('../../../../lib/test/fixtures/getSTPacketsFixture');
 const getContractFixture = require('../../../../lib/test/fixtures/getContractFixture');
 
-describe('revertSVObjectsForStateTransitionFactory', () => {
+describe('revertSVDocumentsForStateTransitionFactory', () => {
   let userId;
   let stPacketRepository;
-  let createSVObjectMongoDbRepository;
-  let updateSVObject;
+  let createSVDocumentMongoDbRepository;
+  let updateSVDocument;
   let applyStateTransition;
   let rpcClientMock;
   let readerMediatorMock;
-  let revertSVObjectsForStateTransition;
+  let revertSVDocumentsForStateTransition;
   let mongoClient;
   let ipfsAPI;
   let stPacket;
@@ -75,20 +75,20 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
       1000,
     );
 
-    createSVObjectMongoDbRepository = createSVObjectMongoDbRepositoryFactory(
+    createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
       mongoClient,
-      SVObjectMongoDbRepository,
+      SVDocumentMongoDbRepository,
       sanitizer,
     );
 
-    updateSVObject = updateSVObjectFactory(createSVObjectMongoDbRepository);
+    updateSVDocument = updateSVDocumentFactory(createSVDocumentMongoDbRepository);
 
     readerMediatorMock = new ReaderMediatorMock(this.sinon);
 
     applyStateTransition = applyStateTransitionFactory(
       stPacketRepository,
       null,
-      updateSVObject,
+      updateSVDocument,
       readerMediatorMock,
     );
 
@@ -99,10 +99,10 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
       rpcClientMock,
     );
 
-    revertSVObjectsForStateTransition = revertSVObjectsForStateTransitionFactory(
+    revertSVDocumentsForStateTransition = revertSVDocumentsForStateTransitionFactory(
       stPacketRepository,
       rpcClientMock,
-      createSVObjectMongoDbRepository,
+      createSVDocumentMongoDbRepository,
       applyStateTransition,
       applyStateTransitionFromReference,
       readerMediatorMock,
@@ -119,7 +119,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
 
     await stPacketRepository.store(stPacket);
 
-    const svObjectRepository = createSVObjectMongoDbRepository(
+    const svObjectRepository = createSVDocumentMongoDbRepository(
       stPacket.getContractId(),
       document.getType(),
     );
@@ -132,7 +132,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
       hash: document.hash(),
     });
 
-    await updateSVObject(
+    await updateSVDocument(
       stPacket.getContractId(),
       userId,
       reference,
@@ -143,7 +143,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
 
     expect(svObjects).to.be.not.empty();
 
-    await revertSVObjectsForStateTransition({
+    await revertSVDocumentsForStateTransition({
       stateTransition,
     });
 
@@ -224,7 +224,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
 
     const thirdDocumentRevision = documentRevisions[documentRevisions.length - 1];
 
-    const svObject = new SVObject(
+    const svObject = new SVDocument(
       userId,
       thirdDocumentRevision.document,
       thirdDocumentRevision.reference,
@@ -232,7 +232,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
       previousRevisions,
     );
 
-    const svObjectRepository = createSVObjectMongoDbRepository(
+    const svObjectRepository = createSVDocumentMongoDbRepository(
       stPacket.getContractId(),
       document.getType(),
     );
@@ -240,22 +240,22 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     await svObjectRepository.store(svObject);
 
     // 3. Revert 3rd version of contract to 2nd
-    await revertSVObjectsForStateTransition({
+    await revertSVDocumentsForStateTransition({
       stateTransition: thirdDocumentRevision.stateTransition,
       block: thirdDocumentRevision.block,
     });
 
-    const revertedSVObjects = await svObjectRepository.fetch(document.getId());
+    const revertedSVDocuments = await svObjectRepository.fetch(document.getId());
 
-    expect(revertedSVObjects).to.be.an('array');
+    expect(revertedSVDocuments).to.be.an('array');
 
-    const [revertedSVObject] = revertedSVObjects;
+    const [revertedSVDocument] = revertedSVDocuments;
 
-    expect(revertedSVObject).to.be.an.instanceOf(SVObject);
+    expect(revertedSVDocument).to.be.an.instanceOf(SVDocument);
 
-    expect(revertedSVObject.getDocument().getRevision()).to.equal(1);
+    expect(revertedSVDocument.getDocument().getRevision()).to.equal(1);
 
-    expect(revertedSVObject.getPreviousRevisions()).to.deep.equal([
+    expect(revertedSVDocument.getPreviousRevisions()).to.deep.equal([
       previousRevisions[0],
     ]);
 

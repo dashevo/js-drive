@@ -1,14 +1,14 @@
 const bs58 = require('bs58');
 
-const createSVObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVObjectMongoDbRepositoryFactory');
+const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
 
-describe('createSVObjectMongoDbRepositoryFactory', () => {
+describe('createSVDocumentMongoDbRepositoryFactory', () => {
   let mongoClient;
   let mongoDb;
-  let createSVObjectMongoDbRepository;
+  let createSVDocumentMongoDbRepository;
   let contractId;
   let objectType;
-  let SVObjectMongoDbRepositoryMock;
+  let SVDocumentMongoDbRepositoryMock;
   let sanitizerMock;
 
   beforeEach(function beforeEach() {
@@ -22,11 +22,11 @@ describe('createSVObjectMongoDbRepositoryFactory', () => {
 
     sanitizerMock = {};
 
-    SVObjectMongoDbRepositoryMock = this.sinon.stub();
+    SVDocumentMongoDbRepositoryMock = this.sinon.stub();
 
-    createSVObjectMongoDbRepository = createSVObjectMongoDbRepositoryFactory(
+    createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
       mongoClient,
-      SVObjectMongoDbRepositoryMock,
+      SVDocumentMongoDbRepositoryMock,
       sanitizerMock,
     );
   });
@@ -35,13 +35,13 @@ describe('createSVObjectMongoDbRepositoryFactory', () => {
     const contractIdEncoded = bs58.encode(Buffer.from(contractId, 'hex'));
     const dbName = `${process.env.MONGODB_DB_PREFIX}dpa_${contractIdEncoded}`;
 
-    const result = createSVObjectMongoDbRepository(contractId, objectType);
+    const result = createSVDocumentMongoDbRepository(contractId, objectType);
 
-    expect(result).to.be.an.instanceof(SVObjectMongoDbRepositoryMock);
+    expect(result).to.be.an.instanceof(SVDocumentMongoDbRepositoryMock);
 
     expect(mongoClient.db).to.have.been.calledOnceWith(dbName);
 
-    expect(SVObjectMongoDbRepositoryMock).to.have.been.calledOnceWith(
+    expect(SVDocumentMongoDbRepositoryMock).to.have.been.calledOnceWith(
       mongoDb,
       sanitizerMock,
       objectType,

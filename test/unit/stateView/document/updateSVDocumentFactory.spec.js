@@ -1,17 +1,17 @@
 const Document = require('@dashevo/dpp/lib/document/Document');
-const SVObject = require('../../../../lib/stateView/document/SVObject');
+const SVDocument = require('../../../../lib/stateView/document/SVDocument');
 
 const Revision = require('../../../../lib/stateView/revisions/Revision');
 
-const updateSVObjectFactory = require('../../../../lib/stateView/document/updateSVObjectFactory');
+const updateSVDocumentFactory = require('../../../../lib/stateView/document/updateSVDocumentFactory');
 
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
 const getDocumentsFixture = require('../../../../lib/test/fixtures/getDocumentsFixture');
-const getSVObjectsFixture = require('../../../../lib/test/fixtures/getSVObjectsFixture');
+const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');
 
-describe('updateSVObjectFactory', () => {
+describe('updateSVDocumentFactory', () => {
   let svObjectRepository;
-  let updateSVObject;
+  let updateSVDocument;
   let reference;
   let document;
   let userId;
@@ -27,21 +27,21 @@ describe('updateSVObjectFactory', () => {
     ({ userId } = getDocumentsFixture);
     [document] = getDocumentsFixture();
 
-    const createSVObjectRepository = () => svObjectRepository;
+    const createSVDocumentRepository = () => svObjectRepository;
 
-    updateSVObject = updateSVObjectFactory(createSVObjectRepository);
+    updateSVDocument = updateSVDocumentFactory(createSVDocumentRepository);
 
     reference = getReferenceFixture();
   });
 
-  it('should store SVObject if action is "create"', async () => {
-    await updateSVObject(contractId, userId, reference, document);
+  it('should store SVDocument if action is "create"', async () => {
+    await updateSVDocument(contractId, userId, reference, document);
 
     expect(svObjectRepository.store).to.have.been.calledOnce();
 
     const svObject = svObjectRepository.store.getCall(0).args[0];
 
-    expect(svObject).to.be.an.instanceOf(SVObject);
+    expect(svObject).to.be.an.instanceOf(SVDocument);
     expect(svObject.getUserId()).to.equal(userId);
     expect(svObject.getDocument()).to.equal(document);
     expect(svObject.getReference()).to.equal(reference);
@@ -49,27 +49,27 @@ describe('updateSVObjectFactory', () => {
     expect(svObject.isDeleted()).to.be.false();
   });
 
-  it('should store SVObject if action is "update" and it has a previous version', async () => {
-    const [previousSVObject] = getSVObjectsFixture();
+  it('should store SVDocument if action is "update" and it has a previous version', async () => {
+    const [previousSVDocument] = getSVDocumentsFixture();
 
-    svObjectRepository.find.returns(previousSVObject);
+    svObjectRepository.find.returns(previousSVDocument);
 
     document.setRevision(1);
     document.setAction(Document.ACTIONS.UPDATE);
 
-    await updateSVObject(contractId, userId, reference, document);
+    await updateSVDocument(contractId, userId, reference, document);
 
     expect(svObjectRepository.find).to.have.been.calledOnceWith(document.getId());
     expect(svObjectRepository.store).to.have.been.calledOnce();
 
     const svObject = svObjectRepository.store.getCall(0).args[0];
 
-    expect(svObject).to.be.an.instanceOf(SVObject);
+    expect(svObject).to.be.an.instanceOf(SVDocument);
     expect(svObject.getUserId()).to.equal(userId);
     expect(svObject.getDocument()).to.equal(document);
     expect(svObject.getReference()).to.equal(reference);
     expect(svObject.getPreviousRevisions()).to.deep.equal([
-      previousSVObject.getCurrentRevision(),
+      previousSVDocument.getCurrentRevision(),
     ]);
     expect(svObject.isDeleted()).to.be.false();
   });
@@ -81,7 +81,7 @@ describe('updateSVObjectFactory', () => {
 
     let error;
     try {
-      await updateSVObject(contractId, userId, reference, document);
+      await updateSVDocument(contractId, userId, reference, document);
     } catch (e) {
       error = e;
     }
@@ -92,7 +92,7 @@ describe('updateSVObjectFactory', () => {
     expect(svObjectRepository.store).to.have.not.been.called();
   });
 
-  it('should store SVObject and remove ahead versions if action is "update" upon reverting', async () => {
+  it('should store SVDocument and remove ahead versions if action is "update" upon reverting', async () => {
     const previousRevisions = [
       new Revision(0, reference),
       new Revision(1, reference),
@@ -102,7 +102,7 @@ describe('updateSVObjectFactory', () => {
 
     const isDeleted = false;
 
-    const previousSVObject = new SVObject(
+    const previousSVDocument = new SVDocument(
       userId,
       document,
       reference,
@@ -110,19 +110,19 @@ describe('updateSVObjectFactory', () => {
       previousRevisions,
     );
 
-    svObjectRepository.find.returns(previousSVObject);
+    svObjectRepository.find.returns(previousSVDocument);
 
     document.setAction(Document.ACTIONS.UPDATE);
     document.setRevision(2);
 
-    await updateSVObject(contractId, userId, reference, document, true);
+    await updateSVDocument(contractId, userId, reference, document, true);
 
     expect(svObjectRepository.find).to.have.been.calledOnceWith(document.getId());
     expect(svObjectRepository.store).to.have.been.calledOnce();
 
     const svObject = svObjectRepository.store.getCall(0).args[0];
 
-    expect(svObject).to.be.an.instanceOf(SVObject);
+    expect(svObject).to.be.an.instanceOf(SVDocument);
     expect(svObject.getUserId()).to.equal(userId);
     expect(svObject.getDocument()).to.equal(document);
     expect(svObject.getReference()).to.equal(reference);
@@ -130,27 +130,27 @@ describe('updateSVObjectFactory', () => {
     expect(svObject.isDeleted()).to.be.false();
   });
 
-  it('should delete SVObject if action is "delete"', async () => {
-    const [previousSVObject] = getSVObjectsFixture();
+  it('should delete SVDocument if action is "delete"', async () => {
+    const [previousSVDocument] = getSVDocumentsFixture();
 
-    svObjectRepository.find.returns(previousSVObject);
+    svObjectRepository.find.returns(previousSVDocument);
 
     document.setRevision(1);
     document.setData({});
     document.setAction(Document.ACTIONS.DELETE);
 
-    await updateSVObject(contractId, userId, reference, document);
+    await updateSVDocument(contractId, userId, reference, document);
 
     expect(svObjectRepository.store).to.have.been.calledOnce();
 
     const svObject = svObjectRepository.store.getCall(0).args[0];
 
-    expect(svObject).to.be.an.instanceOf(SVObject);
+    expect(svObject).to.be.an.instanceOf(SVDocument);
     expect(svObject.getUserId()).to.equal(userId);
     expect(svObject.getDocument()).to.equal(document);
     expect(svObject.getReference()).to.equal(reference);
     expect(svObject.getPreviousRevisions()).to.deep.equal([
-      previousSVObject.getCurrentRevision(),
+      previousSVDocument.getCurrentRevision(),
     ]);
     expect(svObject.isDeleted()).to.be.true();
   });
@@ -161,7 +161,7 @@ describe('updateSVObjectFactory', () => {
 
     let error;
     try {
-      await updateSVObject(contractId, userId, reference, document);
+      await updateSVDocument(contractId, userId, reference, document);
     } catch (e) {
       error = e;
     }

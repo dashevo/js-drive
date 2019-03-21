@@ -1,7 +1,7 @@
 const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
 
-const SVObject = require('../../../../lib/stateView/document/SVObject');
-const SVObjectMongoDbRepository = require('../../../../lib/stateView/document/SVObjectMongoDbRepository');
+const SVDocument = require('../../../../lib/stateView/document/SVDocument');
+const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/SVDocumentMongoDbRepository');
 
 const sanitizer = require('../../../../lib/mongoDb/sanitizer');
 
@@ -12,15 +12,15 @@ const InvalidStartAtError = require('../../../../lib/stateView/document/errors/I
 const InvalidStartAfterError = require('../../../../lib/stateView/document/errors/InvalidStartAfterError');
 const AmbiguousStartError = require('../../../../lib/stateView/document/errors/AmbiguousStartError');
 
-const getSVObjectsFixture = require('../../../../lib/test/fixtures/getSVObjectsFixture');
+const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');
 
-function sortAndJsonizeSVObjects(svObjects) {
+function sortAndJsonizeSVDocuments(svObjects) {
   return svObjects.sort((prev, next) => (
     prev.getDocument().getId() > next.getDocument().getId()
   )).map(o => o.toJSON());
 }
 
-describe('SVObjectMongoDbRepository', function main() {
+describe('SVDocumentMongoDbRepository', function main() {
   this.timeout(10000);
 
   let svObjectRepository;
@@ -33,10 +33,10 @@ describe('SVObjectMongoDbRepository', function main() {
   });
 
   beforeEach(async () => {
-    svObjects = getSVObjectsFixture();
+    svObjects = getSVDocumentsFixture();
     [svObject] = svObjects;
 
-    svObjectRepository = new SVObjectMongoDbRepository(
+    svObjectRepository = new SVDocumentMongoDbRepository(
       mongoDatabase,
       sanitizer,
       svObject.getDocument().getType(),
@@ -51,7 +51,7 @@ describe('SVObjectMongoDbRepository', function main() {
     it('should store SV Object', async () => {
       const result = await svObjectRepository.find(svObject.getDocument().getId());
 
-      expect(result).to.be.an.instanceOf(SVObject);
+      expect(result).to.be.an.instanceOf(SVDocument);
       expect(result.toJSON()).to.deep.equal(svObject.toJSON());
     });
   });
@@ -62,10 +62,10 @@ describe('SVObjectMongoDbRepository', function main() {
 
       expect(result).to.be.an('array');
 
-      const actualRawSVObjects = sortAndJsonizeSVObjects(result);
-      const expectedRawSVObjects = sortAndJsonizeSVObjects(svObjects);
+      const actualRawSVDocuments = sortAndJsonizeSVDocuments(result);
+      const expectedRawSVDocuments = sortAndJsonizeSVDocuments(svObjects);
 
-      expect(actualRawSVObjects).to.have.deep.members(expectedRawSVObjects);
+      expect(actualRawSVDocuments).to.have.deep.members(expectedRawSVDocuments);
     });
 
     it('should not fetch SV Object that is marked as deleted');
@@ -80,9 +80,9 @@ describe('SVObjectMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const [expectedSVObject] = result;
+        const [expectedSVDocument] = result;
 
-        expect(expectedSVObject.toJSON()).to.deep.equal(svObject.toJSON());
+        expect(expectedSVDocument.toJSON()).to.deep.equal(svObject.toJSON());
       });
 
       it('should throw InvalidWhereError if where clause is not an object', async () => {
@@ -217,10 +217,10 @@ describe('SVObjectMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawSVObjects = result.map(o => o.toJSON());
-        const expectedRawSVObjects = svObjects.reverse().map(o => o.toJSON());
+        const actualRawSVDocuments = result.map(o => o.toJSON());
+        const expectedRawSVDocuments = svObjects.reverse().map(o => o.toJSON());
 
-        expect(actualRawSVObjects).to.deep.equal(expectedRawSVObjects);
+        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
 
       it('should order asc', async () => {
@@ -240,10 +240,10 @@ describe('SVObjectMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawSVObjects = result.map(o => o.toJSON());
-        const expectedRawSVObjects = svObjects.map(o => o.toJSON());
+        const actualRawSVDocuments = result.map(o => o.toJSON());
+        const expectedRawSVDocuments = svObjects.map(o => o.toJSON());
 
-        expect(actualRawSVObjects).to.deep.equal(expectedRawSVObjects);
+        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
 
       it('should throw InvalidOrderBy if orderBy is not an object', async () => {
@@ -296,10 +296,10 @@ describe('SVObjectMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawSVObjects = result.map(o => o.toJSON());
-        const expectedRawSVObjects = svObjects.splice(1).map(o => o.toJSON());
+        const actualRawSVDocuments = result.map(o => o.toJSON());
+        const expectedRawSVDocuments = svObjects.splice(1).map(o => o.toJSON());
 
-        expect(actualRawSVObjects).to.deep.equal(expectedRawSVObjects);
+        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
 
       it('should throw InvalidStartAtError if startAt is not a number', async () => {
@@ -350,10 +350,10 @@ describe('SVObjectMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawSVObjects = result.map(o => o.toJSON());
-        const expectedRawSVObjects = svObjects.splice(1).map(o => o.toJSON());
+        const actualRawSVDocuments = result.map(o => o.toJSON());
+        const expectedRawSVDocuments = svObjects.splice(1).map(o => o.toJSON());
 
-        expect(actualRawSVObjects).to.deep.equal(expectedRawSVObjects);
+        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
 
       it('should throw InvalidStartAfterError if startAfter is not a number', async () => {
@@ -408,9 +408,9 @@ describe('SVObjectMongoDbRepository', function main() {
 
       expect(result).to.be.an('array');
 
-      const [expectedSVObject] = result;
+      const [expectedSVDocument] = result;
 
-      expect(expectedSVObject.toJSON()).to.deep.equal(svObject.toJSON());
+      expect(expectedSVDocument.toJSON()).to.deep.equal(svObject.toJSON());
     });
   });
 

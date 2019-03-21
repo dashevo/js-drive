@@ -1,9 +1,9 @@
-const SVObject = require('../../../../lib/stateView/document/SVObject');
+const SVDocument = require('../../../../lib/stateView/document/SVDocument');
 
 const getDocumentsFixture = require('../../../../lib/test/fixtures/getDocumentsFixture');
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
 
-describe('SVObject', () => {
+describe('SVDocument', () => {
   let svObject;
   let userId;
   let document;
@@ -18,7 +18,7 @@ describe('SVObject', () => {
     isDeleted = false;
     previousRevisions = [];
 
-    svObject = new SVObject(
+    svObject = new SVDocument(
       userId,
       document,
       reference,
@@ -62,7 +62,7 @@ describe('SVObject', () => {
   });
 
   describe('#toJSON', () => {
-    it('should return SVObject as a plain object', () => {
+    it('should return SVDocument as a plain object', () => {
       const result = svObject.toJSON();
 
       expect(result).to.deep.equal({

@@ -1,15 +1,15 @@
 const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
 
-const SVObjectMongoDbRepository = require('../../../../lib/stateView/document/SVObjectMongoDbRepository');
+const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/SVDocumentMongoDbRepository');
 
 const sanitizer = require('../../../../lib/mongoDb/sanitizer');
-const createSVObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVObjectMongoDbRepositoryFactory');
+const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
 const fetchDocumentsFactory = require('../../../../lib/stateView/document/fetchDocumentsFactory');
 
-const getSVObjectsFixture = require('../../../../lib/test/fixtures/getSVObjectsFixture');
+const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');
 
 describe('fetchDocumentsFactory', () => {
-  let createSVObjectMongoDbRepository;
+  let createSVDocumentMongoDbRepository;
   let fetchDocuments;
   let mongoClient;
   let svObject;
@@ -22,15 +22,15 @@ describe('fetchDocumentsFactory', () => {
   });
 
   beforeEach(() => {
-    createSVObjectMongoDbRepository = createSVObjectMongoDbRepositoryFactory(
+    createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
       mongoClient,
-      SVObjectMongoDbRepository,
+      SVDocumentMongoDbRepository,
       sanitizer,
     );
 
-    fetchDocuments = fetchDocumentsFactory(createSVObjectMongoDbRepository);
+    fetchDocuments = fetchDocumentsFactory(createSVDocumentMongoDbRepository);
 
-    [svObject] = getSVObjectsFixture();
+    [svObject] = getSVDocumentsFixture();
 
     document = svObject.getDocument();
     type = document.getType();
@@ -38,7 +38,7 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should fetch Documents for specified contract ID and object type', async () => {
-    const svObjectRepository = createSVObjectMongoDbRepository(contractId, type);
+    const svObjectRepository = createSVDocumentMongoDbRepository(contractId, type);
     await svObjectRepository.store(svObject);
 
     const result = await fetchDocuments(contractId, type);
@@ -56,7 +56,7 @@ describe('fetchDocumentsFactory', () => {
 
     expect(result).to.deep.equal([]);
 
-    const svObjectRepository = createSVObjectMongoDbRepository(contractId, type);
+    const svObjectRepository = createSVDocumentMongoDbRepository(contractId, type);
     await svObjectRepository.store(svObject);
 
     const options = { where: { 'document.name': document.get('name') } };
@@ -71,7 +71,7 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should return empty array for specified contract ID, object type and name not exist', async () => {
-    const svObjectRepository = createSVObjectMongoDbRepository(contractId, type);
+    const svObjectRepository = createSVDocumentMongoDbRepository(contractId, type);
     await svObjectRepository.store(svObject);
 
     const options = { where: { 'document.name': 'unknown' } };
@@ -82,7 +82,7 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should return empty array if contract ID does not exist', async () => {
-    const svObjectRepository = createSVObjectMongoDbRepository(contractId, type);
+    const svObjectRepository = createSVDocumentMongoDbRepository(contractId, type);
 
     await svObjectRepository.store(svObject);
 
@@ -94,7 +94,7 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should return empty array if type does not exist', async () => {
-    const svObjectRepository = createSVObjectMongoDbRepository(contractId, type);
+    const svObjectRepository = createSVDocumentMongoDbRepository(contractId, type);
 
     await svObjectRepository.store(svObject);
 

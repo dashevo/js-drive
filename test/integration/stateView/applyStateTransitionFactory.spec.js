@@ -13,11 +13,11 @@ const Reference = require('../../../lib/stateView/revisions/Reference');
 
 const sanitizer = require('../../../lib/mongoDb/sanitizer');
 
-const createSVObjectMongoDbRepositoryFactory = require('../../../lib/stateView/document/createSVObjectMongoDbRepositoryFactory');
-const SVObjectMongoDbRepository = require('../../../lib/stateView/document/SVObjectMongoDbRepository');
+const createSVDocumentMongoDbRepositoryFactory = require('../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
+const SVDocumentMongoDbRepository = require('../../../lib/stateView/document/SVDocumentMongoDbRepository');
 const SVContractMongoDbRepository = require('../../../lib/stateView/contract/SVContractMongoDbRepository');
 const updateSVContractFactory = require('../../../lib/stateView/contract/updateSVContractFactory');
-const updateSVObjectFactory = require('../../../lib/stateView/document/updateSVObjectFactory');
+const updateSVDocumentFactory = require('../../../lib/stateView/document/updateSVDocumentFactory');
 const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
 
 const fetchContractFactory = require('../../../lib/stateView/contract/fetchContractFactory');
@@ -37,7 +37,7 @@ describe('applyStateTransitionFactory', () => {
   let ipfsClient;
   let stPacketRepository;
   let svContractMongoDbRepository;
-  let createSVObjectMongoDbRepository;
+  let createSVDocumentMongoDbRepository;
   let readerMediator;
   let applyStateTransition;
 
@@ -71,19 +71,19 @@ describe('applyStateTransitionFactory', () => {
       1000,
     );
 
-    createSVObjectMongoDbRepository = createSVObjectMongoDbRepositoryFactory(
+    createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
       mongoClient,
-      SVObjectMongoDbRepository,
+      SVDocumentMongoDbRepository,
       sanitizer,
     );
 
     const updateSVContract = updateSVContractFactory(svContractMongoDbRepository);
-    const updateSVObject = updateSVObjectFactory(createSVObjectMongoDbRepository);
+    const updateSVDocument = updateSVDocumentFactory(createSVDocumentMongoDbRepository);
     readerMediator = new ReaderMediatorMock(this.sinon);
     applyStateTransition = applyStateTransitionFactory(
       stPacketRepository,
       updateSVContract,
-      updateSVObject,
+      updateSVDocument,
       readerMediator,
     );
   });
@@ -144,7 +144,7 @@ describe('applyStateTransitionFactory', () => {
     expect(readerMediator.emitSerial).to.have.been.calledTwice();
 
     for (const document of stPacket.getDocuments()) {
-      const svObjectRepository = createSVObjectMongoDbRepository(
+      const svObjectRepository = createSVDocumentMongoDbRepository(
         stPacket.getContractId(),
         document.getType(),
       );
