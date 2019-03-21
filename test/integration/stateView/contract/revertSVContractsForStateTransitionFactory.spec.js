@@ -19,7 +19,7 @@ const getSTPacketsFixture = require('../../../../lib/test/fixtures/getSTPacketsF
 const getStateTransitionsFixture = require('../../../../lib/test/fixtures/getStateTransitionsFixture');
 const getSVContractFixture = require('../../../../lib/test/fixtures/getSVContractFixture');
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
-const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');
+const getDocumentsFixture = require('../../../../lib/test/fixtures/getDocumentsFixture');
 
 const RpcClientMock = require('../../../../lib/test/mock/RpcClientMock');
 const ReaderMediatorMock = require('../../../../lib/test/mock/BlockchainReaderMediatorMock');
@@ -50,7 +50,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
   });
 
   beforeEach(function beforeEach() {
-    ({ userId } = getDPObjectsFixture);
+    ({ userId } = getDocumentsFixture);
 
     const dpp = new DashPlatformProtocol({
       dataProvider: {},

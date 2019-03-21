@@ -6,7 +6,7 @@ const Revision = require('../../../../lib/stateView/revisions/Revision');
 const updateSVObjectFactory = require('../../../../lib/stateView/document/updateSVObjectFactory');
 
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
-const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');
+const getDocumentsFixture = require('../../../../lib/test/fixtures/getDocumentsFixture');
 const getSVObjectsFixture = require('../../../../lib/test/fixtures/getSVObjectsFixture');
 
 describe('updateSVObjectFactory', () => {
@@ -24,8 +24,8 @@ describe('updateSVObjectFactory', () => {
     };
 
     contractId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
-    ({ userId } = getDPObjectsFixture);
-    [dpObject] = getDPObjectsFixture();
+    ({ userId } = getDocumentsFixture);
+    [dpObject] = getDocumentsFixture();
 
     const createSVObjectRepository = () => svObjectRepository;
 

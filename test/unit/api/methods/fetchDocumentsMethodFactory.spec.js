@@ -1,6 +1,6 @@
 const fetchDocumentsMethodFactory = require('../../../../lib/api/methods/fetchDocumentsMethodFactory');
 
-const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');
+const getDocumentsFixture = require('../../../../lib/test/fixtures/getDocumentsFixture');
 
 const InvalidParamsError = require('../../../../lib/api/InvalidParamsError');
 const InvalidWhereError = require('../../../../lib/stateView/document/errors/InvalidWhereError');
@@ -96,7 +96,7 @@ describe('fetchDocumentsMethodFactory', () => {
   });
 
   it('should return DP Objects', async () => {
-    const dpObjects = getDPObjectsFixture();
+    const dpObjects = getDocumentsFixture();
     const rawDPObjects = dpObjects.map(o => o.toJSON());
 
     fetchDocumentsMock.resolves(dpObjects);

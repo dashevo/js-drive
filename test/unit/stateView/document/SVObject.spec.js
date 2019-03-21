@@ -1,6 +1,6 @@
 const SVObject = require('../../../../lib/stateView/document/SVObject');
 
-const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');
+const getDocumentsFixture = require('../../../../lib/test/fixtures/getDocumentsFixture');
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
 
 describe('SVObject', () => {
@@ -12,8 +12,8 @@ describe('SVObject', () => {
   let previousRevisions;
 
   beforeEach(() => {
-    ({ userId } = getDPObjectsFixture);
-    [dpObject] = getDPObjectsFixture();
+    ({ userId } = getDocumentsFixture);
+    [dpObject] = getDocumentsFixture();
     reference = getReferenceFixture();
     isDeleted = false;
     previousRevisions = [];

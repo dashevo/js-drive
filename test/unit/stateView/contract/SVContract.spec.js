@@ -2,7 +2,7 @@ const SVContract = require('../../../../lib/stateView/contract/SVContract');
 
 const getContractFixture = require('../../../../lib/test/fixtures/getContractFixture');
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
-const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');
+const getDocumentsFixture = require('../../../../lib/test/fixtures/getDocumentsFixture');
 
 describe('SVContract', () => {
   let svContract;
@@ -14,7 +14,7 @@ describe('SVContract', () => {
   let previousRevisions;
 
   beforeEach(() => {
-    ({ userId } = getDPObjectsFixture);
+    ({ userId } = getDocumentsFixture);
 
     contract = getContractFixture();
     reference = getReferenceFixture();
