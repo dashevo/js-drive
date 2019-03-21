@@ -55,11 +55,11 @@ describe('applyStateTransitionFactory', () => {
 
     svContractMongoDbRepository = new SVContractMongoDbRepository(mongoDatabase, dpp);
 
-    const createFetchDPContract = () => fetchContractFactory(svContractMongoDbRepository);
+    const createFetchContract = () => fetchContractFactory(svContractMongoDbRepository);
 
     const dataProvider = new DriveDataProvider(
       null,
-      createFetchDPContract,
+      createFetchContract,
       null,
     );
 
@@ -92,7 +92,7 @@ describe('applyStateTransitionFactory', () => {
     const block = getBlocksFixture()[0];
     const stPacket = getSTPacketsFixture()[0];
     const stateTransition = getStateTransitionsFixture()[0];
-    const contractId = stPacket.getDPContractId();
+    const contractId = stPacket.getContractId();
 
     stateTransition.extraPayload.hashSTPacket = stPacket.hash();
 
@@ -101,7 +101,7 @@ describe('applyStateTransitionFactory', () => {
       blockHeight: block.height,
       stHash: stateTransition.hash,
       stPacketHash: stPacket.hash(),
-      hash: stPacket.getDPContract().hash(),
+      hash: stPacket.getContract().hash(),
     });
 
     await stPacketRepository.store(stPacket);
@@ -114,14 +114,14 @@ describe('applyStateTransitionFactory', () => {
         userId: stateTransition.extraPayload.regTxId,
         contractId,
         reference,
-        contract: stPacket.getDPContract().toJSON(),
+        contract: stPacket.getContract().toJSON(),
       },
     );
 
     const svContract = await svContractMongoDbRepository.find(contractId);
 
     expect(svContract.getContractId()).to.equal(contractId);
-    expect(svContract.getDPContract().toJSON()).to.deep.equal(stPacket.getDPContract().toJSON());
+    expect(svContract.getContract().toJSON()).to.deep.equal(stPacket.getContract().toJSON());
     expect(svContract.getReference()).to.deep.equal(reference);
     expect(svContract.getPreviousRevisions()).to.deep.equal([]);
   });
@@ -145,7 +145,7 @@ describe('applyStateTransitionFactory', () => {
 
     for (const dpObject of stPacket.getDPObjects()) {
       const svObjectRepository = createSVObjectMongoDbRepository(
-        stPacket.getDPContractId(),
+        stPacket.getContractId(),
         dpObject.getType(),
       );
       const svObjects = await svObjectRepository.fetch();
@@ -169,7 +169,7 @@ describe('applyStateTransitionFactory', () => {
         ReaderMediator.EVENTS.DP_OBJECT_APPLIED,
         {
           userId: stateTransition.extraPayload.regTxId,
-          contractId: stPacket.getDPContractId(),
+          contractId: stPacket.getContractId(),
           objectId: dpObject.getId(),
           reference,
           object: dpObject.toJSON(),

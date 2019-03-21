@@ -99,8 +99,8 @@ describe('revertSVContractsForStateTransitionFactory', () => {
     const stateTransitions = getStateTransitionsFixture();
     const [stPacket] = getSTPacketsFixture();
 
-    const contractId = stPacket.getDPContractId();
-    const dpContract = stPacket.getDPContract();
+    const contractId = stPacket.getContractId();
+    const dpContract = stPacket.getContract();
 
     for (let i = 0; i < 3; i++) {
       const block = blocks[i];
@@ -153,16 +153,16 @@ describe('revertSVContractsForStateTransitionFactory', () => {
     await svContractMongoDbRepository.store(svContract);
 
     // 3. Revert 3rd version of contract to 2nd
-    const thirdDPContractVersion = dpContractVersions[dpContractVersions.length - 1];
+    const thirdContractVersion = dpContractVersions[dpContractVersions.length - 1];
 
     await revertSVContractsForStateTransition({
-      stateTransition: thirdDPContractVersion.stateTransition,
-      block: thirdDPContractVersion.block,
+      stateTransition: thirdContractVersion.stateTransition,
+      block: thirdContractVersion.block,
     });
 
     const revertedSVContract = await svContractMongoDbRepository.find(contractId);
 
-    expect(revertedSVContract.getDPContract().getVersion()).to.equal(2);
+    expect(revertedSVContract.getContract().getVersion()).to.equal(2);
 
     expect(revertedSVContract.getPreviousRevisions()).to.deep.equal([
       previousRevisions[0],
@@ -171,9 +171,9 @@ describe('revertSVContractsForStateTransitionFactory', () => {
     expect(readerMediator.emitSerial.getCall(1)).to.have.been.calledWith(
       ReaderMediator.EVENTS.DP_CONTRACT_REVERTED,
       {
-        userId: thirdDPContractVersion.stateTransition.extraPayload.regTxId,
+        userId: thirdContractVersion.stateTransition.extraPayload.regTxId,
         contractId,
-        reference: thirdDPContractVersion.reference,
+        reference: thirdContractVersion.reference,
         contract: dpContract.toJSON(),
         previousRevision: previousRevisions[previousRevisions.length - 1],
       },
@@ -205,7 +205,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
         userId: stateTransition.extraPayload.regTxId,
         contractId,
         reference,
-        contract: svContract.getDPContract().toJSON(),
+        contract: svContract.getContract().toJSON(),
       },
     );
   });

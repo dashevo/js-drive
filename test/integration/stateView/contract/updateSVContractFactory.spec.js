@@ -30,7 +30,7 @@ describe('updateSVContractFactory', () => {
     dpp = new DashPlatformProtocol();
 
     svContract = getSVContractFixture();
-    dpContract = svContract.getDPContract();
+    dpContract = svContract.getContract();
 
     contractId = svContract.getContractId();
     userId = svContract.getUserId();
@@ -44,7 +44,7 @@ describe('updateSVContractFactory', () => {
       svContract.getContractId(),
       svContract.getUserId(),
       svContract.getReference(),
-      svContract.getDPContract(),
+      svContract.getContract(),
     );
 
     const fetchedSVContract = await svContractRepository.find(svContract.getContractId());
@@ -69,20 +69,20 @@ describe('updateSVContractFactory', () => {
     await svContractRepository.store(secondSVContract);
 
     // Update to the third contract version
-    const thirdDPContract = dpp.contract.createFromObject(dpContract.toJSON());
-    thirdDPContract.setVersion(3);
+    const thirdContract = dpp.contract.createFromObject(dpContract.toJSON());
+    thirdContract.setVersion(3);
 
     await updateSVContract(
       contractId,
       userId,
       getReferenceFixture(3),
-      thirdDPContract,
+      thirdContract,
     );
 
     const thirdSVContract = await svContractRepository.find(contractId);
 
     expect(thirdSVContract).to.be.an.instanceOf(SVContract);
-    expect(thirdSVContract.getDPContract()).to.deep.equal(thirdDPContract);
+    expect(thirdSVContract.getContract()).to.deep.equal(thirdContract);
     expect(thirdSVContract.getPreviousRevisions()).to.deep.equal([
       svContract.getCurrentRevision(),
       secondSVContract.getCurrentRevision(),
@@ -109,21 +109,21 @@ describe('updateSVContractFactory', () => {
     await svContractRepository.store(thirdSVContract);
 
     // Revert to second contract version
-    const secondDPContract = dpp.contract.createFromObject(dpContract.toJSON());
-    secondDPContract.setVersion(2);
+    const secondContract = dpp.contract.createFromObject(dpContract.toJSON());
+    secondContract.setVersion(2);
 
     await updateSVContract(
       contractId,
       userId,
       secondRevision.getReference(),
-      secondDPContract,
+      secondContract,
       true,
     );
 
     const secondSVContract = await svContractRepository.find(contractId);
 
     expect(secondSVContract).to.be.an.instanceOf(SVContract);
-    expect(secondSVContract.getDPContract()).to.deep.equal(secondDPContract);
+    expect(secondSVContract.getContract()).to.deep.equal(secondContract);
     expect(secondSVContract.getPreviousRevisions()).to.deep.equal([
       firstRevision,
     ]);

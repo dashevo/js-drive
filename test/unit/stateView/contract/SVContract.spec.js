@@ -49,9 +49,9 @@ describe('SVContract', () => {
     });
   });
 
-  describe('#getDPContract', () => {
+  describe('#getContract', () => {
     it('should return DP Contract', () => {
-      const result = svContract.getDPContract();
+      const result = svContract.getContract();
 
       expect(result.toJSON()).to.deep.equal(dpContract.toJSON());
     });

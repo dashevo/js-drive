@@ -120,7 +120,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     await stPacketRepository.store(stPacket);
 
     const svObjectRepository = createSVObjectMongoDbRepository(
-      stPacket.getDPContractId(),
+      stPacket.getContractId(),
       dpObject.getType(),
     );
 
@@ -133,7 +133,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     });
 
     await updateSVObject(
-      stPacket.getDPContractId(),
+      stPacket.getContractId(),
       userId,
       reference,
       dpObject,
@@ -233,7 +233,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     );
 
     const svObjectRepository = createSVObjectMongoDbRepository(
-      stPacket.getDPContractId(),
+      stPacket.getContractId(),
       dpObject.getType(),
     );
 
