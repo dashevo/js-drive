@@ -48,7 +48,7 @@ describe('SVDocumentMongoDbRepository', function main() {
   });
 
   describe('#store', () => {
-    it('should store SV Object', async () => {
+    it('should store SVDocument', async () => {
       const result = await svDocumentRepository.find(svDocument.getDocument().getId());
 
       expect(result).to.be.an.instanceOf(SVDocument);
@@ -57,7 +57,7 @@ describe('SVDocumentMongoDbRepository', function main() {
   });
 
   describe('#fetch', () => {
-    it('should fetch SV Objects', async () => {
+    it('should fetch SVDocuments', async () => {
       const result = await svDocumentRepository.fetch();
 
       expect(result).to.be.an('array');
@@ -68,10 +68,10 @@ describe('SVDocumentMongoDbRepository', function main() {
       expect(actualRawSVDocuments).to.have.deep.members(expectedRawSVDocuments);
     });
 
-    it('should not fetch SV Object that is marked as deleted');
+    it('should not fetch SVDocument that is marked as deleted');
 
     describe('where', () => {
-      it('should fetch SV Objects by where condition', async () => {
+      it('should fetch SVDocuments by where condition', async () => {
         const options = {
           where: { 'document.name': svDocument.getDocument().get('name') },
         };
@@ -157,7 +157,7 @@ describe('SVDocumentMongoDbRepository', function main() {
     });
 
     describe('limit', () => {
-      it('should limit return to 1 SV Object if limit is set', async () => {
+      it('should limit return to 1 SVDocument if limit is set', async () => {
         const options = {
           limit: 1,
         };
@@ -401,7 +401,7 @@ describe('SVDocumentMongoDbRepository', function main() {
   });
 
   describe('#findAllBySTHash', () => {
-    it('should find all SV Objects by stHash', async () => {
+    it('should find all SVDocuments by stHash', async () => {
       const stHash = svDocument.getReference().getSTHash();
 
       const result = await svDocumentRepository.findAllBySTHash(stHash);
@@ -415,7 +415,7 @@ describe('SVDocumentMongoDbRepository', function main() {
   });
 
   describe('#delete', () => {
-    it('should delete SV Object', async () => {
+    it('should delete SVDocument', async () => {
       await svDocumentRepository.delete(svDocument);
 
       const result = await svDocumentRepository.find(svDocument.getDocument().getId());
@@ -425,11 +425,11 @@ describe('SVDocumentMongoDbRepository', function main() {
   });
 
   describe('#find', () => {
-    it('should find SV Object by ID');
+    it('should find SVDocument by ID');
 
-    it('should find SV Object marked as deleted by ID');
+    it('should find SVDocument marked as deleted by ID');
 
-    it('should return null if SV object was not found', async () => {
+    it('should return null if SVDocument was not found', async () => {
       const object = await svDocumentRepository.find('unknown');
 
       expect(object).to.be.null();

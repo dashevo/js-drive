@@ -109,7 +109,7 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
     );
   });
 
-  it('should mark SV Objects as deleted if there is no previous version', async () => {
+  it('should mark SVDocuments as deleted if there is no previous version', async () => {
     const [block] = getBlocksFixture();
     const [stateTransition] = getStateTransitionsFixture();
     const [document] = stPacket.getDocuments();
@@ -162,7 +162,7 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
     );
   });
 
-  it('should revert SV Object to its previous revision if any', async () => {
+  it('should revert SVDocument to its previous revision if any', async () => {
     // TODO Revert several objects
 
     // 1. Store 3 revisions of Document in IPFS
@@ -216,7 +216,7 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
         });
     }
 
-    // 2. Create ans store SV Object
+    // 2. Create ans store SVDocument
     const previousRevisions = documentRevisions.slice(0, 2)
       .map(({ revision, reference }) => (
         new Revision(revision, reference)
