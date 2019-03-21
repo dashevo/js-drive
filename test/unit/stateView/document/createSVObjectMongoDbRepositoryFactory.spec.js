@@ -13,7 +13,7 @@ describe('createSVObjectMongoDbRepositoryFactory', () => {
 
   beforeEach(function beforeEach() {
     contractId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
-    objectType = 'niceObject';
+    objectType = 'niceDocument';
 
     mongoDb = {};
     mongoClient = {

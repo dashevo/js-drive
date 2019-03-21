@@ -34,7 +34,7 @@ describe('fetchDocumentsMethodFactory', () => {
 
   beforeEach(function beforeEach() {
     contractId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
-    type = 'niceObject';
+    type = 'niceDocument';
     options = {};
 
     fetchDocumentsMock = this.sinon.stub();
