@@ -152,7 +152,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     expect(svObjectsAfterReverting).to.be.empty();
 
     expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
-      ReaderMediator.EVENTS.DP_OBJECT_MARKED_DELETED,
+      ReaderMediator.EVENTS.DOCUMENT_MARKED_DELETED,
       {
         userId,
         objectId: document.getId(),
@@ -260,7 +260,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     ]);
 
     expect(readerMediatorMock.emitSerial.getCall(1)).to.have.been.calledWith(
-      ReaderMediator.EVENTS.DP_OBJECT_REVERTED,
+      ReaderMediator.EVENTS.DOCUMENT_REVERTED,
       {
         userId: svObject.getUserId(),
         objectId: svObject.getDocument().getId(),

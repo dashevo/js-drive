@@ -166,7 +166,7 @@ describe('applyStateTransitionFactory', () => {
       });
 
       expect(readerMediator.emitSerial).to.have.been.calledWith(
-        ReaderMediator.EVENTS.DP_OBJECT_APPLIED,
+        ReaderMediator.EVENTS.DOCUMENT_APPLIED,
         {
           userId: stateTransition.extraPayload.regTxId,
           contractId: stPacket.getContractId(),
