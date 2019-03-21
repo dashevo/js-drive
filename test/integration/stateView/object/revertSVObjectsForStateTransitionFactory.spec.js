@@ -31,7 +31,7 @@ const ReaderMediatorMock = require('../../../../lib/test/mock/BlockchainReaderMe
 const getBlocksFixture = require('../../../../lib/test/fixtures/getBlocksFixture');
 const getStateTransitionsFixture = require('../../../../lib/test/fixtures/getStateTransitionsFixture');
 const getSTPacketsFixture = require('../../../../lib/test/fixtures/getSTPacketsFixture');
-const getDPContractFixture = require('../../../../lib/test/fixtures/getDPContractFixture');
+const getContractFixture = require('../../../../lib/test/fixtures/getContractFixture');
 
 describe('revertSVObjectsForStateTransitionFactory', () => {
   let userId;
@@ -59,7 +59,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
 
     [, stPacket] = getSTPacketsFixture();
 
-    const dpContract = getDPContractFixture();
+    const dpContract = getContractFixture();
 
     const dataProviderMock = {
       fetchContract: this.sinon.stub().returns(dpContract),

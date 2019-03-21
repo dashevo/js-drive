@@ -1,6 +1,6 @@
 const SVContract = require('../../../../lib/stateView/contract/SVContract');
 
-const getDPContractFixture = require('../../../../lib/test/fixtures/getDPContractFixture');
+const getContractFixture = require('../../../../lib/test/fixtures/getContractFixture');
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
 const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');
 
@@ -16,7 +16,7 @@ describe('SVContract', () => {
   beforeEach(() => {
     ({ userId } = getDPObjectsFixture);
 
-    dpContract = getDPContractFixture();
+    dpContract = getContractFixture();
     reference = getReferenceFixture();
 
     contractId = dpContract.getId();
