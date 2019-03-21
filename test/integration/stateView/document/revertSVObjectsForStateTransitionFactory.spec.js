@@ -112,7 +112,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
   it('should mark SV Objects as deleted if there is no previous version', async () => {
     const [block] = getBlocksFixture();
     const [stateTransition] = getStateTransitionsFixture();
-    const [dpObject] = stPacket.getDocuments();
+    const [document] = stPacket.getDocuments();
 
     stateTransition.extraPayload.regTxId = userId;
     stateTransition.extraPayload.hashSTPacket = stPacket.hash();
@@ -121,7 +121,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
 
     const svObjectRepository = createSVObjectMongoDbRepository(
       stPacket.getContractId(),
-      dpObject.getType(),
+      document.getType(),
     );
 
     const reference = new Reference({
@@ -129,14 +129,14 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
       blockHeight: block.height,
       stHash: stateTransition.hash,
       stPacketHash: stPacket.hash(),
-      hash: dpObject.hash(),
+      hash: document.hash(),
     });
 
     await updateSVObject(
       stPacket.getContractId(),
       userId,
       reference,
-      dpObject,
+      document,
     );
 
     const svObjects = await svObjectRepository.fetch();
@@ -155,9 +155,9 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
       ReaderMediator.EVENTS.DP_OBJECT_MARKED_DELETED,
       {
         userId,
-        objectId: dpObject.getId(),
+        objectId: document.getId(),
         reference,
-        object: dpObject.toJSON(),
+        object: document.toJSON(),
       },
     );
   });
@@ -166,18 +166,18 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     // TODO Revert several objects
 
     // 1. Store 3 revisions of DP Object in IPFS
-    const dpObjectRevisions = [];
+    const documentRevisions = [];
 
     const blocks = getBlocksFixture();
     const stateTransitions = getStateTransitionsFixture();
 
-    const [dpObject] = stPacket.getDocuments();
+    const [document] = stPacket.getDocuments();
 
     for (let i = 0; i < 3; i++) {
       const block = blocks[i];
       const stateTransition = stateTransitions[i];
 
-      const updatedDocument = new Document(dpObject.toJSON());
+      const updatedDocument = new Document(document.toJSON());
 
       if (i > 0) {
         updatedDocument.setAction(Document.ACTIONS.UPDATE);
@@ -200,9 +200,9 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
         hash: updatedDocument.hash(),
       });
 
-      dpObjectRevisions.push({
+      documentRevisions.push({
         revision: i,
-        dpObject: updatedDocument,
+        document: updatedDocument,
         block,
         stateTransition,
         stPacket,
@@ -217,16 +217,16 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     }
 
     // 2. Create ans store SV Object
-    const previousRevisions = dpObjectRevisions.slice(0, 2)
+    const previousRevisions = documentRevisions.slice(0, 2)
       .map(({ revision, reference }) => (
         new Revision(revision, reference)
       ));
 
-    const thirdDocumentRevision = dpObjectRevisions[dpObjectRevisions.length - 1];
+    const thirdDocumentRevision = documentRevisions[documentRevisions.length - 1];
 
     const svObject = new SVObject(
       userId,
-      thirdDocumentRevision.dpObject,
+      thirdDocumentRevision.document,
       thirdDocumentRevision.reference,
       false,
       previousRevisions,
@@ -234,7 +234,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
 
     const svObjectRepository = createSVObjectMongoDbRepository(
       stPacket.getContractId(),
-      dpObject.getType(),
+      document.getType(),
     );
 
     await svObjectRepository.store(svObject);
@@ -245,7 +245,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
       block: thirdDocumentRevision.block,
     });
 
-    const revertedSVObjects = await svObjectRepository.fetch(dpObject.getId());
+    const revertedSVObjects = await svObjectRepository.fetch(document.getId());
 
     expect(revertedSVObjects).to.be.an('array');
 

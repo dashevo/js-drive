@@ -73,7 +73,7 @@ describe('SVObjectMongoDbRepository', function main() {
     describe('where', () => {
       it('should fetch SV Objects by where condition', async () => {
         const options = {
-          where: { 'dpObject.name': svObject.getDocument().get('name') },
+          where: { 'document.name': svObject.getDocument().get('name') },
         };
 
         const result = await svObjectRepository.fetch(options);
@@ -117,7 +117,7 @@ describe('SVObjectMongoDbRepository', function main() {
 
       it('should return empty array if where clause conditions do not match', async () => {
         const options = {
-          where: { 'dpObject.name': 'Dash enthusiast' },
+          where: { 'document.name': 'Dash enthusiast' },
         };
 
         const result = await svObjectRepository.fetch(options);
@@ -127,7 +127,7 @@ describe('SVObjectMongoDbRepository', function main() {
 
       it('should throw an unknown operator error if where clause conditions are invalid', async () => {
         const options = {
-          where: { 'dpObject.name': { $dirty: true } },
+          where: { 'document.name': { $dirty: true } },
         };
 
         let error;
@@ -142,7 +142,7 @@ describe('SVObjectMongoDbRepository', function main() {
 
       it('should throw an unknown operator error if where clause conditions are invalid', async () => {
         const options = {
-          where: { 'dpObject.name': { $dirty: true } },
+          where: { 'document.name': { $dirty: true } },
         };
 
         let error;
@@ -209,7 +209,7 @@ describe('SVObjectMongoDbRepository', function main() {
 
         const options = {
           orderBy: {
-            'dpObject.age': -1,
+            'document.age': -1,
           },
         };
 
@@ -232,7 +232,7 @@ describe('SVObjectMongoDbRepository', function main() {
 
         const options = {
           orderBy: {
-            'dpObject.age': 1,
+            'document.age': 1,
           },
         };
 
@@ -287,7 +287,7 @@ describe('SVObjectMongoDbRepository', function main() {
 
         const options = {
           orderBy: {
-            'dpObject.age': 1,
+            'document.age': 1,
           },
           startAt: 2,
         };
@@ -341,7 +341,7 @@ describe('SVObjectMongoDbRepository', function main() {
 
         const options = {
           orderBy: {
-            'dpObject.age': 1,
+            'document.age': 1,
           },
           startAfter: 1,
         };

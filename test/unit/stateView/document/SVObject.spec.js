@@ -6,21 +6,21 @@ const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceF
 describe('SVObject', () => {
   let svObject;
   let userId;
-  let dpObject;
+  let document;
   let reference;
   let isDeleted;
   let previousRevisions;
 
   beforeEach(() => {
     ({ userId } = getDocumentsFixture);
-    [dpObject] = getDocumentsFixture();
+    [document] = getDocumentsFixture();
     reference = getReferenceFixture();
     isDeleted = false;
     previousRevisions = [];
 
     svObject = new SVObject(
       userId,
-      dpObject,
+      document,
       reference,
       isDeleted,
       previousRevisions,
@@ -39,7 +39,7 @@ describe('SVObject', () => {
     it('should return DP Object', () => {
       const result = svObject.getDocument();
 
-      expect(result.toJSON()).to.deep.equal(dpObject.toJSON());
+      expect(result.toJSON()).to.deep.equal(document.toJSON());
     });
   });
 
@@ -67,7 +67,7 @@ describe('SVObject', () => {
 
       expect(result).to.deep.equal({
         userId,
-        dpObject: dpObject.toJSON(),
+        document: document.toJSON(),
         reference: reference.toJSON(),
         isDeleted,
         previousRevisions,

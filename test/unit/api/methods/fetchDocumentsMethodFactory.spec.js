@@ -96,10 +96,10 @@ describe('fetchDocumentsMethodFactory', () => {
   });
 
   it('should return DP Objects', async () => {
-    const dpObjects = getDocumentsFixture();
-    const rawDocuments = dpObjects.map(o => o.toJSON());
+    const documents = getDocumentsFixture();
+    const rawDocuments = documents.map(o => o.toJSON());
 
-    fetchDocumentsMock.resolves(dpObjects);
+    fetchDocumentsMock.resolves(documents);
 
     const result = await fetchDocumentsMethod({ contractId, type, options });
 

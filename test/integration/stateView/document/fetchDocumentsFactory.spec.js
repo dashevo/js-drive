@@ -15,7 +15,7 @@ describe('fetchDocumentsFactory', () => {
   let svObject;
   let type;
   let contractId;
-  let dpObject;
+  let document;
 
   startMongoDb().then((mongoDb) => {
     mongoClient = mongoDb.getClient();
@@ -32,8 +32,8 @@ describe('fetchDocumentsFactory', () => {
 
     [svObject] = getSVObjectsFixture();
 
-    dpObject = svObject.getDocument();
-    type = dpObject.getType();
+    document = svObject.getDocument();
+    type = document.getType();
     contractId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
   });
 
@@ -48,7 +48,7 @@ describe('fetchDocumentsFactory', () => {
 
     const [actualDocument] = result;
 
-    expect(actualDocument.toJSON()).to.deep.equal(dpObject.toJSON());
+    expect(actualDocument.toJSON()).to.deep.equal(document.toJSON());
   });
 
   it('should fetch DP objects for specified contract id, object type and name', async () => {
@@ -59,7 +59,7 @@ describe('fetchDocumentsFactory', () => {
     const svObjectRepository = createSVObjectMongoDbRepository(contractId, type);
     await svObjectRepository.store(svObject);
 
-    const options = { where: { 'dpObject.name': dpObject.get('name') } };
+    const options = { where: { 'document.name': document.get('name') } };
     result = await fetchDocuments(contractId, type, options);
 
     expect(result).to.be.an('array');
@@ -67,14 +67,14 @@ describe('fetchDocumentsFactory', () => {
 
     const [actualDocument] = result;
 
-    expect(actualDocument.toJSON()).to.deep.equal(dpObject.toJSON());
+    expect(actualDocument.toJSON()).to.deep.equal(document.toJSON());
   });
 
   it('should return empty array for specified contract ID, object type and name not exist', async () => {
     const svObjectRepository = createSVObjectMongoDbRepository(contractId, type);
     await svObjectRepository.store(svObject);
 
-    const options = { where: { 'dpObject.name': 'unknown' } };
+    const options = { where: { 'document.name': 'unknown' } };
 
     const result = await fetchDocuments(contractId, type, options);
 
