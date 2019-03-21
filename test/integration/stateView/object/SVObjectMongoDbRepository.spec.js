@@ -1,16 +1,16 @@
 const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
 
-const SVObject = require('../../../../lib/stateView/object/SVObject');
-const SVObjectMongoDbRepository = require('../../../../lib/stateView/object/SVObjectMongoDbRepository');
+const SVObject = require('../../../../lib/stateView/document/SVObject');
+const SVObjectMongoDbRepository = require('../../../../lib/stateView/document/SVObjectMongoDbRepository');
 
 const sanitizer = require('../../../../lib/mongoDb/sanitizer');
 
-const InvalidWhereError = require('../../../../lib/stateView/object/errors/InvalidWhereError');
-const InvalidOrderBy = require('../../../../lib/stateView/object/errors/InvalidOrderByError');
-const InvalidLimitError = require('../../../../lib/stateView/object/errors/InvalidLimitError');
-const InvalidStartAtError = require('../../../../lib/stateView/object/errors/InvalidStartAtError');
-const InvalidStartAfterError = require('../../../../lib/stateView/object/errors/InvalidStartAfterError');
-const AmbiguousStartError = require('../../../../lib/stateView/object/errors/AmbiguousStartError');
+const InvalidWhereError = require('../../../../lib/stateView/document/errors/InvalidWhereError');
+const InvalidOrderBy = require('../../../../lib/stateView/document/errors/InvalidOrderByError');
+const InvalidLimitError = require('../../../../lib/stateView/document/errors/InvalidLimitError');
+const InvalidStartAtError = require('../../../../lib/stateView/document/errors/InvalidStartAtError');
+const InvalidStartAfterError = require('../../../../lib/stateView/document/errors/InvalidStartAfterError');
+const AmbiguousStartError = require('../../../../lib/stateView/document/errors/AmbiguousStartError');
 
 const getSVObjectsFixture = require('../../../../lib/test/fixtures/getSVObjectsFixture');
 

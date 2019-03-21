@@ -13,11 +13,11 @@ const Reference = require('../../../lib/stateView/revisions/Reference');
 
 const sanitizer = require('../../../lib/mongoDb/sanitizer');
 
-const createSVObjectMongoDbRepositoryFactory = require('../../../lib/stateView/object/createSVObjectMongoDbRepositoryFactory');
-const SVObjectMongoDbRepository = require('../../../lib/stateView/object/SVObjectMongoDbRepository');
+const createSVObjectMongoDbRepositoryFactory = require('../../../lib/stateView/document/createSVObjectMongoDbRepositoryFactory');
+const SVObjectMongoDbRepository = require('../../../lib/stateView/document/SVObjectMongoDbRepository');
 const SVContractMongoDbRepository = require('../../../lib/stateView/contract/SVContractMongoDbRepository');
 const updateSVContractFactory = require('../../../lib/stateView/contract/updateSVContractFactory');
-const updateSVObjectFactory = require('../../../lib/stateView/object/updateSVObjectFactory');
+const updateSVObjectFactory = require('../../../lib/stateView/document/updateSVObjectFactory');
 const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
 
 const fetchContractFactory = require('../../../lib/stateView/contract/fetchContractFactory');

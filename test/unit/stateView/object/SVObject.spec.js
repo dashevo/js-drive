@@ -1,4 +1,4 @@
-const SVObject = require('../../../../lib/stateView/object/SVObject');
+const SVObject = require('../../../../lib/stateView/document/SVObject');
 
 const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');

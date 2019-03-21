@@ -3,12 +3,12 @@ const fetchDPObjectsMethodFactory = require('../../../../lib/api/methods/fetchDP
 const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');
 
 const InvalidParamsError = require('../../../../lib/api/InvalidParamsError');
-const InvalidWhereError = require('../../../../lib/stateView/object/errors/InvalidWhereError');
-const InvalidOrderByError = require('../../../../lib/stateView/object/errors/InvalidOrderByError');
-const InvalidLimitError = require('../../../../lib/stateView/object/errors/InvalidLimitError');
-const InvalidStartAtError = require('../../../../lib/stateView/object/errors/InvalidStartAtError');
-const InvalidStartAfterError = require('../../../../lib/stateView/object/errors/InvalidStartAfterError');
-const AmbiguousStartError = require('../../../../lib/stateView/object/errors/AmbiguousStartError');
+const InvalidWhereError = require('../../../../lib/stateView/document/errors/InvalidWhereError');
+const InvalidOrderByError = require('../../../../lib/stateView/document/errors/InvalidOrderByError');
+const InvalidLimitError = require('../../../../lib/stateView/document/errors/InvalidLimitError');
+const InvalidStartAtError = require('../../../../lib/stateView/document/errors/InvalidStartAtError');
+const InvalidStartAfterError = require('../../../../lib/stateView/document/errors/InvalidStartAfterError');
+const AmbiguousStartError = require('../../../../lib/stateView/document/errors/AmbiguousStartError');
 
 describe('fetchDPObjectsMethodFactory', () => {
   let contractId;

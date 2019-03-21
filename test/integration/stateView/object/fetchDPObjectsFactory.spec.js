@@ -1,10 +1,10 @@
 const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
 
-const SVObjectMongoDbRepository = require('../../../../lib/stateView/object/SVObjectMongoDbRepository');
+const SVObjectMongoDbRepository = require('../../../../lib/stateView/document/SVObjectMongoDbRepository');
 
 const sanitizer = require('../../../../lib/mongoDb/sanitizer');
-const createSVObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/object/createSVObjectMongoDbRepositoryFactory');
-const fetchDPObjectsFactory = require('../../../../lib/stateView/object/fetchDPObjectsFactory');
+const createSVObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVObjectMongoDbRepositoryFactory');
+const fetchDPObjectsFactory = require('../../../../lib/stateView/document/fetchDPObjectsFactory');
 
 const getSVObjectsFixture = require('../../../../lib/test/fixtures/getSVObjectsFixture');
 

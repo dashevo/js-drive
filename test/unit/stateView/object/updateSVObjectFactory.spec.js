@@ -1,9 +1,9 @@
 const DPObject = require('@dashevo/dpp/lib/document/Document');
-const SVObject = require('../../../../lib/stateView/object/SVObject');
+const SVObject = require('../../../../lib/stateView/document/SVObject');
 
 const Revision = require('../../../../lib/stateView/revisions/Revision');
 
-const updateSVObjectFactory = require('../../../../lib/stateView/object/updateSVObjectFactory');
+const updateSVObjectFactory = require('../../../../lib/stateView/document/updateSVObjectFactory');
 
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
 const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');

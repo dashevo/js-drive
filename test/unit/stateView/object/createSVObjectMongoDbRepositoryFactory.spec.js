@@ -1,6 +1,6 @@
 const bs58 = require('bs58');
 
-const createSVObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/object/createSVObjectMongoDbRepositoryFactory');
+const createSVObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVObjectMongoDbRepositoryFactory');
 
 describe('createSVObjectMongoDbRepositoryFactory', () => {
   let mongoClient;
