@@ -75,7 +75,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   let secondDrive;
   let users;
   let dpp;
-  let dpContract;
+  let contract;
   let objectType;
 
   this.timeout(900000);
@@ -111,7 +111,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     // 3. Create DP Contract
     objectType = 'user';
-    dpContract = dpp.contract.create('TestContract', {
+    contract = dpp.contract.create('TestContract', {
       [objectType]: {
         properties: {
           aboutMe: {
@@ -122,15 +122,15 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       },
     });
 
-    dpp.setContract(dpContract);
+    dpp.setContract(contract);
 
-    const dpContractPacket = dpp.packet.create(dpContract);
+    const contractPacket = dpp.packet.create(contract);
 
-    const { tsId: dpContractTsId } = await sendSTPacket(
+    const { tsId: contractTsId } = await sendSTPacket(
       users[0].userId,
       users[0].privateKeyString,
       users[0].username,
-      dpContractPacket,
+      contractPacket,
       firstDrive,
     );
 
@@ -139,9 +139,9 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     // 3.2 Check DP Contract is in Drive and ok
     const { result: rawContract } = await firstDrive.driveApi.getApi()
-      .request('fetchContract', { contractId: dpContract.getId() });
+      .request('fetchContract', { contractId: contract.getId() });
 
-    expect(rawContract).to.deep.equal(dpContract.toJSON());
+    expect(rawContract).to.deep.equal(contract.toJSON());
 
     // 4. Create a bunch of `user` DP Objects (for every blockchain user)
     let prevTransitionId;
@@ -152,7 +152,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       // if it's the user used to register contractId, use it
       // use nothing if else
       if (i === 0) {
-        prevTransitionId = dpContractTsId;
+        prevTransitionId = contractTsId;
       } else {
         prevTransitionId = user.userId;
       }
@@ -189,13 +189,13 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     const driveApi = secondDrive.driveApi.getApi();
 
     const { result: fetchedContract } = await driveApi.request('fetchContract', {
-      contractId: dpContract.getId(),
+      contractId: contract.getId(),
     });
 
-    expect(fetchedContract).to.deep.equal(dpContract.toJSON());
+    expect(fetchedContract).to.deep.equal(contract.toJSON());
 
     const { result: fetchedDPObjects } = await driveApi.request('fetchDPObjects', {
-      contractId: dpContract.getId(),
+      contractId: contract.getId(),
       type: objectType,
     });
 

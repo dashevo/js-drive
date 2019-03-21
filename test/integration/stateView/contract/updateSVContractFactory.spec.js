@@ -20,7 +20,7 @@ describe('updateSVContractFactory', () => {
   let dpp;
   let contractId;
   let userId;
-  let dpContract;
+  let contract;
 
   startMongoDb().then((mongoDb) => {
     mongoDatabase = mongoDb.getDb();
@@ -30,7 +30,7 @@ describe('updateSVContractFactory', () => {
     dpp = new DashPlatformProtocol();
 
     svContract = getSVContractFixture();
-    dpContract = svContract.getContract();
+    contract = svContract.getContract();
 
     contractId = svContract.getContractId();
     userId = svContract.getUserId();
@@ -54,13 +54,13 @@ describe('updateSVContractFactory', () => {
 
   it('should maintain SVContract previous revisions and add new one', async () => {
     // Create and store the second contract version
-    const secondDPOContract = dpp.contract.createFromObject(dpContract.toJSON());
+    const secondDPOContract = dpp.contract.createFromObject(contract.toJSON());
     secondDPOContract.setVersion(2);
 
     const secondSVContract = new SVContract(
       contractId,
       userId,
-      dpContract,
+      contract,
       getReferenceFixture(2),
       false,
       [svContract.getCurrentRevision()],
@@ -69,7 +69,7 @@ describe('updateSVContractFactory', () => {
     await svContractRepository.store(secondSVContract);
 
     // Update to the third contract version
-    const thirdContract = dpp.contract.createFromObject(dpContract.toJSON());
+    const thirdContract = dpp.contract.createFromObject(contract.toJSON());
     thirdContract.setVersion(3);
 
     await updateSVContract(
@@ -91,7 +91,7 @@ describe('updateSVContractFactory', () => {
 
   it('should remove unnecessary previous versions of SVContract upon reverting', async () => {
     // Create and store the third contract version
-    const thirdDPOContract = dpp.contract.createFromObject(dpContract.toJSON());
+    const thirdDPOContract = dpp.contract.createFromObject(contract.toJSON());
     thirdDPOContract.setVersion(3);
 
     const firstRevision = new Revision(1, getReferenceFixture(1));
@@ -109,7 +109,7 @@ describe('updateSVContractFactory', () => {
     await svContractRepository.store(thirdSVContract);
 
     // Revert to second contract version
-    const secondContract = dpp.contract.createFromObject(dpContract.toJSON());
+    const secondContract = dpp.contract.createFromObject(contract.toJSON());
     secondContract.setVersion(2);
 
     await updateSVContract(

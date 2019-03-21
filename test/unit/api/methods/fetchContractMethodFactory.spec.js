@@ -5,14 +5,14 @@ const getContractFixture = require('../../../../lib/test/fixtures/getContractFix
 const InvalidParamsError = require('../../../../lib/api/InvalidParamsError');
 
 describe('fetchContractMethodFactory', () => {
-  let dpContract;
+  let contract;
   let contractId;
   let fetchContractMethod;
   let fetchContractMock;
 
   beforeEach(function beforeEach() {
-    dpContract = getContractFixture();
-    contractId = dpContract.getId();
+    contract = getContractFixture();
+    contractId = contract.getId();
 
     fetchContractMock = this.sinon.stub();
     fetchContractMethod = fetchContractMethodFactory(fetchContractMock);
@@ -47,11 +47,11 @@ describe('fetchContractMethodFactory', () => {
   });
 
   it('should return DP contract', async () => {
-    fetchContractMock.returns(dpContract);
+    fetchContractMock.returns(contract);
 
     const result = await fetchContractMethod({ contractId });
 
-    expect(result).to.deep.equal(dpContract.toJSON());
+    expect(result).to.deep.equal(contract.toJSON());
 
     expect(fetchContractMock).to.have.been.calledOnceWith(contractId);
   });

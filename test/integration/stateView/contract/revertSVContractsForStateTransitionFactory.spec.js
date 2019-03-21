@@ -93,20 +93,20 @@ describe('revertSVContractsForStateTransitionFactory', () => {
 
   it('should remove last version of SV Contract and re-apply previous versions in order', async () => {
     // 1. Store 3 versions of DP Contracts in IPFS
-    const dpContractVersions = [];
+    const contractVersions = [];
 
     const blocks = getBlocksFixture();
     const stateTransitions = getStateTransitionsFixture();
     const [stPacket] = getSTPacketsFixture();
 
     const contractId = stPacket.getContractId();
-    const dpContract = stPacket.getContract();
+    const contract = stPacket.getContract();
 
     for (let i = 0; i < 3; i++) {
       const block = blocks[i];
       const stateTransition = stateTransitions[i];
 
-      dpContract.setVersion(i + 1);
+      contract.setVersion(i + 1);
 
       await stPacketRepository.store(stPacket);
 
@@ -117,10 +117,10 @@ describe('revertSVContractsForStateTransitionFactory', () => {
         blockHeight: block.height,
         stHash: stateTransition.hash,
         stPacketHash: stPacket.hash(),
-        hash: dpContract.hash(),
+        hash: contract.hash(),
       });
 
-      dpContractVersions.push({
+      contractVersions.push({
         version: (i + 1),
         block,
         stateTransition,
@@ -136,7 +136,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
     }
 
     // 2. Create ans store SV Contract
-    const previousRevisions = dpContractVersions.slice(0, 2)
+    const previousRevisions = contractVersions.slice(0, 2)
       .map(({ version, reference }) => (
         new Revision(version, reference)
       ));
@@ -144,8 +144,8 @@ describe('revertSVContractsForStateTransitionFactory', () => {
     const svContract = new SVContract(
       contractId,
       userId,
-      dpContract,
-      dpContractVersions[dpContractVersions.length - 1].reference,
+      contract,
+      contractVersions[contractVersions.length - 1].reference,
       false,
       previousRevisions,
     );
@@ -153,7 +153,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
     await svContractMongoDbRepository.store(svContract);
 
     // 3. Revert 3rd version of contract to 2nd
-    const thirdContractVersion = dpContractVersions[dpContractVersions.length - 1];
+    const thirdContractVersion = contractVersions[contractVersions.length - 1];
 
     await revertSVContractsForStateTransition({
       stateTransition: thirdContractVersion.stateTransition,
@@ -174,7 +174,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
         userId: thirdContractVersion.stateTransition.extraPayload.regTxId,
         contractId,
         reference: thirdContractVersion.reference,
-        contract: dpContract.toJSON(),
+        contract: contract.toJSON(),
         previousRevision: previousRevisions[previousRevisions.length - 1],
       },
     );

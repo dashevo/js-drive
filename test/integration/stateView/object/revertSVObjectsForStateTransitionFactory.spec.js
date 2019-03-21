@@ -59,10 +59,10 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
 
     [, stPacket] = getSTPacketsFixture();
 
-    const dpContract = getContractFixture();
+    const contract = getContractFixture();
 
     const dataProviderMock = {
-      fetchContract: this.sinon.stub().returns(dpContract),
+      fetchContract: this.sinon.stub().returns(contract),
     };
 
     const dpp = new DashPlatformProtocol({

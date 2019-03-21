@@ -6,7 +6,7 @@ const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsF
 
 describe('SVContract', () => {
   let svContract;
-  let dpContract;
+  let contract;
   let contractId;
   let reference;
   let isDeleted;
@@ -16,17 +16,17 @@ describe('SVContract', () => {
   beforeEach(() => {
     ({ userId } = getDPObjectsFixture);
 
-    dpContract = getContractFixture();
+    contract = getContractFixture();
     reference = getReferenceFixture();
 
-    contractId = dpContract.getId();
+    contractId = contract.getId();
     isDeleted = false;
     previousRevisions = [];
 
     svContract = new SVContract(
       contractId,
       userId,
-      dpContract,
+      contract,
       reference,
       isDeleted,
       previousRevisions,
@@ -53,7 +53,7 @@ describe('SVContract', () => {
     it('should return DP Contract', () => {
       const result = svContract.getContract();
 
-      expect(result.toJSON()).to.deep.equal(dpContract.toJSON());
+      expect(result.toJSON()).to.deep.equal(contract.toJSON());
     });
   });
 
@@ -80,7 +80,7 @@ describe('SVContract', () => {
       svContract = new SVContract(
         contractId,
         userId,
-        dpContract,
+        contract,
         reference,
         isDeleted,
         previousRevisions,
@@ -89,7 +89,7 @@ describe('SVContract', () => {
       expect(svContract.toJSON()).to.deep.equal({
         contractId,
         userId,
-        dpContract: dpContract.toJSON(),
+        contract: contract.toJSON(),
         reference: reference.toJSON(),
         isDeleted,
         previousRevisions,

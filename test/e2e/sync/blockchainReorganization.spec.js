@@ -112,7 +112,7 @@ describe('Blockchain reorganization', function main() {
 
     const contractPackets = [];
     for (let i = 1; i <= 3; i++) {
-      const dpContract = dpp.contract.create(`contract${i}`, {
+      const contract = dpp.contract.create(`contract${i}`, {
         [objectType]: {
           properties: {
             aboutMe: {
@@ -123,10 +123,10 @@ describe('Blockchain reorganization', function main() {
         },
       });
 
-      dpp.setContract(dpContract);
+      dpp.setContract(contract);
 
       contractPackets.push(
-        dpp.packet.create(dpContract),
+        dpp.packet.create(contract),
       );
     }
     [firstContractPacket, secondContractPacket, thirdContractPacket] = contractPackets;
