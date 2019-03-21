@@ -170,9 +170,9 @@ describe('applyStateTransitionFactory', () => {
         {
           userId: stateTransition.extraPayload.regTxId,
           contractId: stPacket.getContractId(),
-          objectId: document.getId(),
+          documentId: document.getId(),
           reference,
-          object: document.toJSON(),
+          document: document.toJSON(),
         },
       );
     }

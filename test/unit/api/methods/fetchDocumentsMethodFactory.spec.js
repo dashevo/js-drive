@@ -97,7 +97,7 @@ describe('fetchDocumentsMethodFactory', () => {
 
   it('should return Documents', async () => {
     const documents = getDocumentsFixture();
-    const rawDocuments = documents.map(o => o.toJSON());
+    const rawDocuments = documents.map(d => d.toJSON());
 
     fetchDocumentsMock.resolves(documents);
 

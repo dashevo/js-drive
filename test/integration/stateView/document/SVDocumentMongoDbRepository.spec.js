@@ -17,7 +17,7 @@ const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocume
 function sortAndJsonizeSVDocuments(svDocuments) {
   return svDocuments.sort((prev, next) => (
     prev.getDocument().getId() > next.getDocument().getId()
-  )).map(o => o.toJSON());
+  )).map(d => d.toJSON());
 }
 
 describe('SVDocumentMongoDbRepository', function main() {
@@ -201,7 +201,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
     describe('orderBy', () => {
       it('should order desc', async () => {
-        svDocuments.forEach((o, i) => o.getDocument().set('age', i + 1));
+        svDocuments.forEach((d, i) => d.getDocument().set('age', i + 1));
 
         await Promise.all(
           svDocuments.map(o => svDocumentRepository.store(o)),
@@ -217,14 +217,14 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawSVDocuments = result.map(o => o.toJSON());
-        const expectedRawSVDocuments = svDocuments.reverse().map(o => o.toJSON());
+        const actualRawSVDocuments = result.map(d => d.toJSON());
+        const expectedRawSVDocuments = svDocuments.reverse().map(d => d.toJSON());
 
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
 
       it('should order asc', async () => {
-        svDocuments.reverse().forEach((o, i) => o.getDocument().set('age', i + 1));
+        svDocuments.reverse().forEach((d, i) => d.getDocument().set('age', i + 1));
 
         await Promise.all(
           svDocuments.map(o => svDocumentRepository.store(o)),
@@ -240,8 +240,8 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawSVDocuments = result.map(o => o.toJSON());
-        const expectedRawSVDocuments = svDocuments.map(o => o.toJSON());
+        const actualRawSVDocuments = result.map(d => d.toJSON());
+        const expectedRawSVDocuments = svDocuments.map(d => d.toJSON());
 
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
@@ -278,8 +278,8 @@ describe('SVDocumentMongoDbRepository', function main() {
     });
 
     describe('start', () => {
-      it('should start at 1 object', async () => {
-        svDocuments.forEach((o, i) => o.getDocument().set('age', i + 1));
+      it('should start at 1 document', async () => {
+        svDocuments.forEach((d, i) => d.getDocument().set('age', i + 1));
 
         await Promise.all(
           svDocuments.map(o => svDocumentRepository.store(o)),
@@ -296,8 +296,8 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawSVDocuments = result.map(o => o.toJSON());
-        const expectedRawSVDocuments = svDocuments.splice(1).map(o => o.toJSON());
+        const actualRawSVDocuments = result.map(d => d.toJSON());
+        const expectedRawSVDocuments = svDocuments.splice(1).map(d => d.toJSON());
 
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
@@ -332,8 +332,8 @@ describe('SVDocumentMongoDbRepository', function main() {
         expect(error).to.be.an.instanceOf(InvalidStartAtError);
       });
 
-      it('should start after 1 object', async () => {
-        svDocuments.forEach((o, i) => o.getDocument().set('age', i + 1));
+      it('should start after 1 document', async () => {
+        svDocuments.forEach((d, i) => d.getDocument().set('age', i + 1));
 
         await Promise.all(
           svDocuments.map(o => svDocumentRepository.store(o)),
@@ -350,8 +350,8 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawSVDocuments = result.map(o => o.toJSON());
-        const expectedRawSVDocuments = svDocuments.splice(1).map(o => o.toJSON());
+        const actualRawSVDocuments = result.map(d => d.toJSON());
+        const expectedRawSVDocuments = svDocuments.splice(1).map(d => d.toJSON());
 
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
@@ -430,9 +430,9 @@ describe('SVDocumentMongoDbRepository', function main() {
     it('should find SVDocument marked as deleted by ID');
 
     it('should return null if SVDocument was not found', async () => {
-      const object = await svDocumentRepository.find('unknown');
+      const document = await svDocumentRepository.find('unknown');
 
-      expect(object).to.be.null();
+      expect(document).to.be.null();
     });
   });
 });

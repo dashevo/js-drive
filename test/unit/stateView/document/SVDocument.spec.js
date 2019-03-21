@@ -44,7 +44,7 @@ describe('SVDocument', () => {
   });
 
   describe('#markAsDeleted', () => {
-    it('should mark object as deleted', () => {
+    it('should mark document as deleted', () => {
       const result = svDocument.markAsDeleted();
 
       expect(result).to.equal(svDocument);
@@ -54,7 +54,7 @@ describe('SVDocument', () => {
   });
 
   describe('#isDeleted', () => {
-    it('should return true if object is deleted', () => {
+    it('should return true if document is deleted', () => {
       const result = svDocument.isDeleted();
 
       expect(result).to.be.false();

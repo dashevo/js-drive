@@ -7,13 +7,13 @@ describe('createSVDocumentMongoDbRepositoryFactory', () => {
   let mongoDb;
   let createSVDocumentMongoDbRepository;
   let contractId;
-  let objectType;
+  let documentType;
   let SVDocumentMongoDbRepositoryMock;
   let sanitizerMock;
 
   beforeEach(function beforeEach() {
     contractId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
-    objectType = 'niceDocument';
+    documentType = 'niceDocument';
 
     mongoDb = {};
     mongoClient = {
@@ -35,7 +35,7 @@ describe('createSVDocumentMongoDbRepositoryFactory', () => {
     const contractIdEncoded = bs58.encode(Buffer.from(contractId, 'hex'));
     const dbName = `${process.env.MONGODB_DB_PREFIX}dpa_${contractIdEncoded}`;
 
-    const result = createSVDocumentMongoDbRepository(contractId, objectType);
+    const result = createSVDocumentMongoDbRepository(contractId, documentType);
 
     expect(result).to.be.an.instanceof(SVDocumentMongoDbRepositoryMock);
 
@@ -44,7 +44,7 @@ describe('createSVDocumentMongoDbRepositoryFactory', () => {
     expect(SVDocumentMongoDbRepositoryMock).to.have.been.calledOnceWith(
       mongoDb,
       sanitizerMock,
-      objectType,
+      documentType,
     );
   });
 });

@@ -76,7 +76,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
   let users;
   let dpp;
   let contract;
-  let objectType;
+  let documentType;
 
   this.timeout(900000);
 
@@ -110,9 +110,9 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     }
 
     // 3. Create Contract
-    objectType = 'user';
+    documentType = 'user';
     contract = dpp.contract.create('TestContract', {
-      [objectType]: {
+      [documentType]: {
         properties: {
           aboutMe: {
             type: 'string',
@@ -159,7 +159,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
       dpp.setUserId(user.userId);
 
-      const userDocument = dpp.object.create(objectType, {
+      const userDocument = dpp.document.create(documentType, {
         aboutMe: user.aboutMe,
       });
 
@@ -196,12 +196,12 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     const { result: fetchedDocuments } = await driveApi.request('fetchDocuments', {
       contractId: contract.getId(),
-      type: objectType,
+      type: documentType,
     });
 
     expect(fetchedDocuments).to.have.lengthOf(users.length);
 
-    const aboutMes = fetchedDocuments.map(o => o.aboutMe);
+    const aboutMes = fetchedDocuments.map(d => d.aboutMe);
 
     for (let i = 0; i < users.length; i++) {
       expect(aboutMes).to.include(users[i].aboutMe);

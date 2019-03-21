@@ -37,7 +37,7 @@ describe('fetchDocumentsFactory', () => {
     contractId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
   });
 
-  it('should fetch Documents for specified contract ID and object type', async () => {
+  it('should fetch Documents for specified contract ID and document type', async () => {
     const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
     await svDocumentRepository.store(svDocument);
 
@@ -51,7 +51,7 @@ describe('fetchDocumentsFactory', () => {
     expect(actualDocument.toJSON()).to.deep.equal(document.toJSON());
   });
 
-  it('should fetch Documents for specified contract id, object type and name', async () => {
+  it('should fetch Documents for specified contract id, document type and name', async () => {
     let result = await fetchDocuments(contractId, type);
 
     expect(result).to.deep.equal([]);
@@ -70,7 +70,7 @@ describe('fetchDocumentsFactory', () => {
     expect(actualDocument.toJSON()).to.deep.equal(document.toJSON());
   });
 
-  it('should return empty array for specified contract ID, object type and name not exist', async () => {
+  it('should return empty array for specified contract ID, document type and name not exist', async () => {
     const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
     await svDocumentRepository.store(svDocument);
 

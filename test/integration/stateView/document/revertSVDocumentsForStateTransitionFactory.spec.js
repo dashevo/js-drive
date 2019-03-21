@@ -155,15 +155,15 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
       ReaderMediator.EVENTS.DOCUMENT_MARKED_DELETED,
       {
         userId,
-        objectId: document.getId(),
+        documentId: document.getId(),
         reference,
-        object: document.toJSON(),
+        document: document.toJSON(),
       },
     );
   });
 
   it('should revert SVDocument to its previous revision if any', async () => {
-    // TODO Revert several objects
+    // TODO Revert several documents
 
     // 1. Store 3 revisions of Document in IPFS
     const documentRevisions = [];
@@ -263,9 +263,9 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
       ReaderMediator.EVENTS.DOCUMENT_REVERTED,
       {
         userId: svDocument.getUserId(),
-        objectId: svDocument.getDocument().getId(),
+        documentId: svDocument.getDocument().getId(),
         reference: svDocument.getReference(),
-        object: svDocument.getDocument().toJSON(),
+        document: svDocument.getDocument().toJSON(),
         previousRevision: previousRevisions[1],
       },
     );
