@@ -103,14 +103,14 @@ Fetch Contract from Drive State View
 
 #### fetchDocuments
 
-Fetch DP Objects from Drive State View
+Fetch Documents from Drive State View
 
 ##### Params
 
 | name    | type   | description          |
 |---------|--------|----------------------|
 | contractId   | string | DP ID               |
-| type    | string | DP Objects type     |
+| type    | string | Documents type     |
 | options | object | Options              |
 
 Fetch method options:
@@ -127,7 +127,7 @@ Fetch method options:
 
 | name    | type   | description  |
 |---------|--------|--------------|
-| result  | array  | DP objects  |
+| result  | array  | Documents  |
 
 #### getSyncInfo
 

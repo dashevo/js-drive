@@ -126,7 +126,7 @@ describe('applyStateTransitionFactory', () => {
     expect(svContract.getPreviousRevisions()).to.deep.equal([]);
   });
 
-  it('should compute DP Objects state view', async () => {
+  it('should compute Documents state view', async () => {
     const svContract = getSVContractFixture();
 
     svContractMongoDbRepository.store(svContract);

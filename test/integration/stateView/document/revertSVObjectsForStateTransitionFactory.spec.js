@@ -165,7 +165,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
   it('should revert SV Object to its previous revision if any', async () => {
     // TODO Revert several objects
 
-    // 1. Store 3 revisions of DP Object in IPFS
+    // 1. Store 3 revisions of Document in IPFS
     const documentRevisions = [];
 
     const blocks = getBlocksFixture();

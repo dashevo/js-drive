@@ -95,7 +95,7 @@ describe('fetchDocumentsMethodFactory', () => {
     expect(fetchDocumentsMock).to.have.been.calledOnceWith(contractId, type, options);
   });
 
-  it('should return DP Objects', async () => {
+  it('should return Documents', async () => {
     const documents = getDocumentsFixture();
     const rawDocuments = documents.map(o => o.toJSON());
 

@@ -143,7 +143,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     expect(rawContract).to.deep.equal(contract.toJSON());
 
-    // 4. Create a bunch of `user` DP Objects (for every blockchain user)
+    // 4. Create a bunch of `user` Documents (for every blockchain user)
     let prevTransitionId;
 
     for (let i = 0; i < users.length; i++) {
