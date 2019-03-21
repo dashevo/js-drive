@@ -88,7 +88,7 @@ describe('applyStateTransitionFactory', () => {
     );
   });
 
-  it('should compute DP Contract state view', async () => {
+  it('should compute Contract state view', async () => {
     const block = getBlocksFixture()[0];
     const stPacket = getSTPacketsFixture()[0];
     const stateTransition = getStateTransitionsFixture()[0];

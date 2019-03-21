@@ -109,7 +109,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
       users.push(user);
     }
 
-    // 3. Create DP Contract
+    // 3. Create Contract
     objectType = 'user';
     contract = dpp.contract.create('TestContract', {
       [objectType]: {
@@ -137,7 +137,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     // 3.1 Await Drive to sync
     await driveSyncToFinish(firstDrive.driveApi);
 
-    // 3.2 Check DP Contract is in Drive and ok
+    // 3.2 Check Contract is in Drive and ok
     const { result: rawContract } = await firstDrive.driveApi.getApi()
       .request('fetchContract', { contractId: contract.getId() });
 

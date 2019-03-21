@@ -92,7 +92,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
   });
 
   it('should remove last version of SV Contract and re-apply previous versions in order', async () => {
-    // 1. Store 3 versions of DP Contracts in IPFS
+    // 1. Store 3 versions of Contracts in IPFS
     const contractVersions = [];
 
     const blocks = getBlocksFixture();

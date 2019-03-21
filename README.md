@@ -87,13 +87,13 @@ Remove State Transition Packet from Drive storage
 
 #### fetchContact
 
-Fetch DP Contract from Drive State View
+Fetch Contract from Drive State View
 
 ##### Params
 
 | name    | type   | description  |
 |---------|--------|--------------|
-| contractId   | string | DP Contract ID       |
+| contractId   | string | Contract ID       |
 
 ##### Response
 

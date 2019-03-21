@@ -50,7 +50,7 @@ describe('SVContract', () => {
   });
 
   describe('#getContract', () => {
-    it('should return DP Contract', () => {
+    it('should return Contract', () => {
       const result = svContract.getContract();
 
       expect(result.toJSON()).to.deep.equal(contract.toJSON());

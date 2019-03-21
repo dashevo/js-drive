@@ -271,5 +271,5 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     );
   });
 
-  it('should not do anything if packet have no DP Contract ID');
+  it('should not do anything if packet have no Contract ID');
 });

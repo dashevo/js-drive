@@ -57,7 +57,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
       stPacket.getContract().setName(`${username}_contract`);
       stPacket.setContractId(stPacket.getContract().hash());
 
-      // 2.2 Register user and create DP Contract ST Packet and State Transition
+      // 2.2 Register user and create Contract ST Packet and State Transition
       const {
         userId,
         privateKeyString,
