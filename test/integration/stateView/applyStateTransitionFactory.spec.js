@@ -143,7 +143,7 @@ describe('applyStateTransitionFactory', () => {
 
     expect(readerMediator.emitSerial).to.have.been.calledTwice();
 
-    for (const dpObject of stPacket.getDPObjects()) {
+    for (const dpObject of stPacket.getDocuments()) {
       const svObjectRepository = createSVObjectMongoDbRepository(
         stPacket.getContractId(),
         dpObject.getType(),
@@ -155,7 +155,7 @@ describe('applyStateTransitionFactory', () => {
 
       const [svObject] = svObjects;
 
-      expect(svObject.getDPObject().toJSON()).to.deep.equal(dpObject.toJSON());
+      expect(svObject.getDocument().toJSON()).to.deep.equal(dpObject.toJSON());
 
       const reference = new Reference({
         blockHash: block.hash,

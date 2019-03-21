@@ -35,9 +35,9 @@ describe('SVObject', () => {
     });
   });
 
-  describe('#getDPObject', () => {
+  describe('#getDocument', () => {
     it('should return DP Object', () => {
-      const result = svObject.getDPObject();
+      const result = svObject.getDocument();
 
       expect(result.toJSON()).to.deep.equal(dpObject.toJSON());
     });

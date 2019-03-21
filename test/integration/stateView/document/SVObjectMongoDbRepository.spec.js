@@ -16,7 +16,7 @@ const getSVObjectsFixture = require('../../../../lib/test/fixtures/getSVObjectsF
 
 function sortAndJsonizeSVObjects(svObjects) {
   return svObjects.sort((prev, next) => (
-    prev.getDPObject().getId() > next.getDPObject().getId()
+    prev.getDocument().getId() > next.getDocument().getId()
   )).map(o => o.toJSON());
 }
 
@@ -39,7 +39,7 @@ describe('SVObjectMongoDbRepository', function main() {
     svObjectRepository = new SVObjectMongoDbRepository(
       mongoDatabase,
       sanitizer,
-      svObject.getDPObject().getType(),
+      svObject.getDocument().getType(),
     );
 
     await Promise.all(
@@ -49,7 +49,7 @@ describe('SVObjectMongoDbRepository', function main() {
 
   describe('#store', () => {
     it('should store SV Object', async () => {
-      const result = await svObjectRepository.find(svObject.getDPObject().getId());
+      const result = await svObjectRepository.find(svObject.getDocument().getId());
 
       expect(result).to.be.an.instanceOf(SVObject);
       expect(result.toJSON()).to.deep.equal(svObject.toJSON());
@@ -73,7 +73,7 @@ describe('SVObjectMongoDbRepository', function main() {
     describe('where', () => {
       it('should fetch SV Objects by where condition', async () => {
         const options = {
-          where: { 'dpObject.name': svObject.getDPObject().get('name') },
+          where: { 'dpObject.name': svObject.getDocument().get('name') },
         };
 
         const result = await svObjectRepository.fetch(options);
@@ -201,7 +201,7 @@ describe('SVObjectMongoDbRepository', function main() {
 
     describe('orderBy', () => {
       it('should order desc', async () => {
-        svObjects.forEach((o, i) => o.getDPObject().set('age', i + 1));
+        svObjects.forEach((o, i) => o.getDocument().set('age', i + 1));
 
         await Promise.all(
           svObjects.map(o => svObjectRepository.store(o)),
@@ -224,7 +224,7 @@ describe('SVObjectMongoDbRepository', function main() {
       });
 
       it('should order asc', async () => {
-        svObjects.reverse().forEach((o, i) => o.getDPObject().set('age', i + 1));
+        svObjects.reverse().forEach((o, i) => o.getDocument().set('age', i + 1));
 
         await Promise.all(
           svObjects.map(o => svObjectRepository.store(o)),
@@ -279,7 +279,7 @@ describe('SVObjectMongoDbRepository', function main() {
 
     describe('start', () => {
       it('should start at 1 object', async () => {
-        svObjects.forEach((o, i) => o.getDPObject().set('age', i + 1));
+        svObjects.forEach((o, i) => o.getDocument().set('age', i + 1));
 
         await Promise.all(
           svObjects.map(o => svObjectRepository.store(o)),
@@ -333,7 +333,7 @@ describe('SVObjectMongoDbRepository', function main() {
       });
 
       it('should start after 1 object', async () => {
-        svObjects.forEach((o, i) => o.getDPObject().set('age', i + 1));
+        svObjects.forEach((o, i) => o.getDocument().set('age', i + 1));
 
         await Promise.all(
           svObjects.map(o => svObjectRepository.store(o)),
@@ -418,7 +418,7 @@ describe('SVObjectMongoDbRepository', function main() {
     it('should delete SV Object', async () => {
       await svObjectRepository.delete(svObject);
 
-      const result = await svObjectRepository.find(svObject.getDPObject().getId());
+      const result = await svObjectRepository.find(svObject.getDocument().getId());
 
       expect(result).to.be.null();
     });

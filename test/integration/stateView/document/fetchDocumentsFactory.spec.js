@@ -32,7 +32,7 @@ describe('fetchDocumentsFactory', () => {
 
     [svObject] = getSVObjectsFixture();
 
-    dpObject = svObject.getDPObject();
+    dpObject = svObject.getDocument();
     type = dpObject.getType();
     contractId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
   });
@@ -46,9 +46,9 @@ describe('fetchDocumentsFactory', () => {
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
 
-    const [actualDPObject] = result;
+    const [actualDocument] = result;
 
-    expect(actualDPObject.toJSON()).to.deep.equal(dpObject.toJSON());
+    expect(actualDocument.toJSON()).to.deep.equal(dpObject.toJSON());
   });
 
   it('should fetch DP objects for specified contract id, object type and name', async () => {
@@ -65,9 +65,9 @@ describe('fetchDocumentsFactory', () => {
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
 
-    const [actualDPObject] = result;
+    const [actualDocument] = result;
 
-    expect(actualDPObject.toJSON()).to.deep.equal(dpObject.toJSON());
+    expect(actualDocument.toJSON()).to.deep.equal(dpObject.toJSON());
   });
 
   it('should return empty array for specified contract ID, object type and name not exist', async () => {

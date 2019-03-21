@@ -211,7 +211,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchDocuments', { contractId: firstContractPacket.getContractId(), type: objectType });
 
     expect(firstDriveFirstContract).to.deep.equal(firstContractPacket.getContract().toJSON());
-    expect(firstDriveFirstObject).to.deep.equal(firstObjectPacket.getDPObjects()[0].toJSON());
+    expect(firstDriveFirstObject).to.deep.equal(firstObjectPacket.getDocuments()[0].toJSON());
 
     // Check data on the second node
     const { result: secondDriveFirstContract } = await secondDrive.driveApi.getApi()
@@ -221,7 +221,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchDocuments', { contractId: firstContractPacket.getContractId(), type: objectType });
 
     expect(secondDriveFirstContract).to.deep.equal(firstContractPacket.getContract().toJSON());
-    expect(secondDriveFirstObject).to.deep.equal(firstObjectPacket.getDPObjects()[0].toJSON());
+    expect(secondDriveFirstObject).to.deep.equal(firstObjectPacket.getDocuments()[0].toJSON());
 
     // Disconnect Core nodes
     await firstDrive.dashCore.disconnect(secondDrive.dashCore);
@@ -270,7 +270,7 @@ describe('Blockchain reorganization', function main() {
     );
 
     expect(firstDriveSecondObject).to.deep.equal(
-      secondObjectPacket.getDPObjects()[0].toJSON(),
+      secondObjectPacket.getDocuments()[0].toJSON(),
     );
 
     // Generate 2 more blocks, 3rd contract and object on the second Drive node
@@ -320,7 +320,7 @@ describe('Blockchain reorganization', function main() {
     );
 
     expect(secondDriveThirdObject).to.deep.equal(
-      thirdObjectPacket.getDPObjects()[0].toJSON(),
+      thirdObjectPacket.getDocuments()[0].toJSON(),
     );
   });
 
@@ -360,7 +360,7 @@ describe('Blockchain reorganization', function main() {
       firstContractPacket.getContract().toJSON(),
     );
     expect(firstDriveFirstObject).to.deep.equal(
-      firstObjectPacket.getDPObjects()[0].toJSON(),
+      firstObjectPacket.getDocuments()[0].toJSON(),
     );
 
     // Check the second node
@@ -374,7 +374,7 @@ describe('Blockchain reorganization', function main() {
       firstContractPacket.getContract().toJSON(),
     );
     expect(secondDriveFirstObject).to.deep.equal(
-      firstObjectPacket.getDPObjects()[0].toJSON(),
+      firstObjectPacket.getDocuments()[0].toJSON(),
     );
 
     //
@@ -391,7 +391,7 @@ describe('Blockchain reorganization', function main() {
       thirdContractPacket.getContract().toJSON(),
     );
     expect(firstDriveThirdObject).to.deep.equal(
-      thirdObjectPacket.getDPObjects()[0].toJSON(),
+      thirdObjectPacket.getDocuments()[0].toJSON(),
     );
 
     // Check the second node
@@ -405,7 +405,7 @@ describe('Blockchain reorganization', function main() {
       thirdContractPacket.getContract().toJSON(),
     );
     expect(secondDriveThirdObject).to.deep.equal(
-      thirdObjectPacket.getDPObjects()[0].toJSON(),
+      thirdObjectPacket.getDocuments()[0].toJSON(),
     );
 
     //
@@ -460,7 +460,7 @@ describe('Blockchain reorganization', function main() {
       secondContractPacket.getContract().toJSON(),
     );
     expect(firstDriveSecondObjectAfter).to.deep.equal(
-      secondObjectPacket.getDPObjects()[0].toJSON(),
+      secondObjectPacket.getDocuments()[0].toJSON(),
     );
 
     // Check the second node
@@ -474,7 +474,7 @@ describe('Blockchain reorganization', function main() {
       secondContractPacket.getContract().toJSON(),
     );
     expect(secondDriveSecondObjectAfter).to.deep.equal(
-      secondObjectPacket.getDPObjects()[0].toJSON(),
+      secondObjectPacket.getDocuments()[0].toJSON(),
     );
 
     //

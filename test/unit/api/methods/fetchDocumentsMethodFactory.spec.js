@@ -97,13 +97,13 @@ describe('fetchDocumentsMethodFactory', () => {
 
   it('should return DP Objects', async () => {
     const dpObjects = getDocumentsFixture();
-    const rawDPObjects = dpObjects.map(o => o.toJSON());
+    const rawDocuments = dpObjects.map(o => o.toJSON());
 
     fetchDocumentsMock.resolves(dpObjects);
 
     const result = await fetchDocumentsMethod({ contractId, type, options });
 
-    expect(result).to.deep.equal(rawDPObjects);
+    expect(result).to.deep.equal(rawDocuments);
 
     expect(fetchDocumentsMock).to.have.been.calledOnceWith(contractId, type, options);
   });

@@ -6,7 +6,7 @@ const {
 } = require('@dashevo/dp-services-ctl');
 
 const DashPlatformProtocol = require('@dashevo/dpp');
-const DPObject = require('@dashevo/dpp/lib/document/Document');
+const Document = require('@dashevo/dpp/lib/document/Document');
 
 const sanitizer = require('../../../../lib/mongoDb/sanitizer');
 
@@ -112,7 +112,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
   it('should mark SV Objects as deleted if there is no previous version', async () => {
     const [block] = getBlocksFixture();
     const [stateTransition] = getStateTransitionsFixture();
-    const [dpObject] = stPacket.getDPObjects();
+    const [dpObject] = stPacket.getDocuments();
 
     stateTransition.extraPayload.regTxId = userId;
     stateTransition.extraPayload.hashSTPacket = stPacket.hash();
@@ -171,21 +171,21 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     const blocks = getBlocksFixture();
     const stateTransitions = getStateTransitionsFixture();
 
-    const [dpObject] = stPacket.getDPObjects();
+    const [dpObject] = stPacket.getDocuments();
 
     for (let i = 0; i < 3; i++) {
       const block = blocks[i];
       const stateTransition = stateTransitions[i];
 
-      const updatedDPObject = new DPObject(dpObject.toJSON());
+      const updatedDocument = new Document(dpObject.toJSON());
 
       if (i > 0) {
-        updatedDPObject.setAction(DPObject.ACTIONS.UPDATE);
+        updatedDocument.setAction(Document.ACTIONS.UPDATE);
       }
 
-      updatedDPObject.setRevision(i);
+      updatedDocument.setRevision(i);
 
-      stPacket.setDPObjects([updatedDPObject]);
+      stPacket.setDocuments([updatedDocument]);
 
       await stPacketRepository.store(stPacket);
 
@@ -197,12 +197,12 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
         blockHeight: block.height,
         stHash: stateTransition.hash,
         stPacketHash: stPacket.hash(),
-        hash: updatedDPObject.hash(),
+        hash: updatedDocument.hash(),
       });
 
       dpObjectRevisions.push({
         revision: i,
-        dpObject: updatedDPObject,
+        dpObject: updatedDocument,
         block,
         stateTransition,
         stPacket,
@@ -222,12 +222,12 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
         new Revision(revision, reference)
       ));
 
-    const thirdDPObjectRevision = dpObjectRevisions[dpObjectRevisions.length - 1];
+    const thirdDocumentRevision = dpObjectRevisions[dpObjectRevisions.length - 1];
 
     const svObject = new SVObject(
       userId,
-      thirdDPObjectRevision.dpObject,
-      thirdDPObjectRevision.reference,
+      thirdDocumentRevision.dpObject,
+      thirdDocumentRevision.reference,
       false,
       previousRevisions,
     );
@@ -241,8 +241,8 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
 
     // 3. Revert 3rd version of contract to 2nd
     await revertSVObjectsForStateTransition({
-      stateTransition: thirdDPObjectRevision.stateTransition,
-      block: thirdDPObjectRevision.block,
+      stateTransition: thirdDocumentRevision.stateTransition,
+      block: thirdDocumentRevision.block,
     });
 
     const revertedSVObjects = await svObjectRepository.fetch(dpObject.getId());
@@ -253,7 +253,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
 
     expect(revertedSVObject).to.be.an.instanceOf(SVObject);
 
-    expect(revertedSVObject.getDPObject().getRevision()).to.equal(1);
+    expect(revertedSVObject.getDocument().getRevision()).to.equal(1);
 
     expect(revertedSVObject.getPreviousRevisions()).to.deep.equal([
       previousRevisions[0],
@@ -263,9 +263,9 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
       ReaderMediator.EVENTS.DP_OBJECT_REVERTED,
       {
         userId: svObject.getUserId(),
-        objectId: svObject.getDPObject().getId(),
+        objectId: svObject.getDocument().getId(),
         reference: svObject.getReference(),
-        object: svObject.getDPObject().toJSON(),
+        object: svObject.getDocument().toJSON(),
         previousRevision: previousRevisions[1],
       },
     );

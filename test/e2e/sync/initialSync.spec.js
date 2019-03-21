@@ -159,11 +159,11 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
       dpp.setUserId(user.userId);
 
-      const userDPObject = dpp.object.create(objectType, {
+      const userDocument = dpp.object.create(objectType, {
         aboutMe: user.aboutMe,
       });
 
-      const stPacket = dpp.packet.create([userDPObject]);
+      const stPacket = dpp.packet.create([userDocument]);
 
       ({ tsId: user.prevTransitionId } = await sendSTPacket(
         user.userId,
@@ -194,14 +194,14 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     expect(fetchedContract).to.deep.equal(contract.toJSON());
 
-    const { result: fetchedDPObjects } = await driveApi.request('fetchDocuments', {
+    const { result: fetchedDocuments } = await driveApi.request('fetchDocuments', {
       contractId: contract.getId(),
       type: objectType,
     });
 
-    expect(fetchedDPObjects).to.have.lengthOf(users.length);
+    expect(fetchedDocuments).to.have.lengthOf(users.length);
 
-    const aboutMes = fetchedDPObjects.map(o => o.aboutMe);
+    const aboutMes = fetchedDocuments.map(o => o.aboutMe);
 
     for (let i = 0; i < users.length; i++) {
       expect(aboutMes).to.include(users[i].aboutMe);

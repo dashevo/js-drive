@@ -1,4 +1,4 @@
-const DPObject = require('@dashevo/dpp/lib/document/Document');
+const Document = require('@dashevo/dpp/lib/document/Document');
 const SVObject = require('../../../../lib/stateView/document/SVObject');
 
 const Revision = require('../../../../lib/stateView/revisions/Revision');
@@ -43,7 +43,7 @@ describe('updateSVObjectFactory', () => {
 
     expect(svObject).to.be.an.instanceOf(SVObject);
     expect(svObject.getUserId()).to.equal(userId);
-    expect(svObject.getDPObject()).to.equal(dpObject);
+    expect(svObject.getDocument()).to.equal(dpObject);
     expect(svObject.getReference()).to.equal(reference);
     expect(svObject.getPreviousRevisions()).to.deep.equal([]);
     expect(svObject.isDeleted()).to.be.false();
@@ -55,7 +55,7 @@ describe('updateSVObjectFactory', () => {
     svObjectRepository.find.returns(previousSVObject);
 
     dpObject.setRevision(1);
-    dpObject.setAction(DPObject.ACTIONS.UPDATE);
+    dpObject.setAction(Document.ACTIONS.UPDATE);
 
     await updateSVObject(contractId, userId, reference, dpObject);
 
@@ -66,7 +66,7 @@ describe('updateSVObjectFactory', () => {
 
     expect(svObject).to.be.an.instanceOf(SVObject);
     expect(svObject.getUserId()).to.equal(userId);
-    expect(svObject.getDPObject()).to.equal(dpObject);
+    expect(svObject.getDocument()).to.equal(dpObject);
     expect(svObject.getReference()).to.equal(reference);
     expect(svObject.getPreviousRevisions()).to.deep.equal([
       previousSVObject.getCurrentRevision(),
@@ -77,7 +77,7 @@ describe('updateSVObjectFactory', () => {
   it('should throw an error if action is "update" and there is no previous version', async () => {
     svObjectRepository.find.returns(null);
 
-    dpObject.setAction(DPObject.ACTIONS.UPDATE);
+    dpObject.setAction(Document.ACTIONS.UPDATE);
 
     let error;
     try {
@@ -112,7 +112,7 @@ describe('updateSVObjectFactory', () => {
 
     svObjectRepository.find.returns(previousSVObject);
 
-    dpObject.setAction(DPObject.ACTIONS.UPDATE);
+    dpObject.setAction(Document.ACTIONS.UPDATE);
     dpObject.setRevision(2);
 
     await updateSVObject(contractId, userId, reference, dpObject, true);
@@ -124,7 +124,7 @@ describe('updateSVObjectFactory', () => {
 
     expect(svObject).to.be.an.instanceOf(SVObject);
     expect(svObject.getUserId()).to.equal(userId);
-    expect(svObject.getDPObject()).to.equal(dpObject);
+    expect(svObject.getDocument()).to.equal(dpObject);
     expect(svObject.getReference()).to.equal(reference);
     expect(svObject.getPreviousRevisions()).to.deep.equal(previousRevisions.slice(0, 2));
     expect(svObject.isDeleted()).to.be.false();
@@ -137,7 +137,7 @@ describe('updateSVObjectFactory', () => {
 
     dpObject.setRevision(1);
     dpObject.setData({});
-    dpObject.setAction(DPObject.ACTIONS.DELETE);
+    dpObject.setAction(Document.ACTIONS.DELETE);
 
     await updateSVObject(contractId, userId, reference, dpObject);
 
@@ -147,7 +147,7 @@ describe('updateSVObjectFactory', () => {
 
     expect(svObject).to.be.an.instanceOf(SVObject);
     expect(svObject.getUserId()).to.equal(userId);
-    expect(svObject.getDPObject()).to.equal(dpObject);
+    expect(svObject.getDocument()).to.equal(dpObject);
     expect(svObject.getReference()).to.equal(reference);
     expect(svObject.getPreviousRevisions()).to.deep.equal([
       previousSVObject.getCurrentRevision(),
