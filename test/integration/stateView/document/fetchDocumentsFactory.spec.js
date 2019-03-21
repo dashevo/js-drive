@@ -12,7 +12,7 @@ describe('fetchDocumentsFactory', () => {
   let createSVDocumentMongoDbRepository;
   let fetchDocuments;
   let mongoClient;
-  let svObject;
+  let svDocument;
   let type;
   let contractId;
   let document;
@@ -30,16 +30,16 @@ describe('fetchDocumentsFactory', () => {
 
     fetchDocuments = fetchDocumentsFactory(createSVDocumentMongoDbRepository);
 
-    [svObject] = getSVDocumentsFixture();
+    [svDocument] = getSVDocumentsFixture();
 
-    document = svObject.getDocument();
+    document = svDocument.getDocument();
     type = document.getType();
     contractId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
   });
 
   it('should fetch Documents for specified contract ID and object type', async () => {
-    const svObjectRepository = createSVDocumentMongoDbRepository(contractId, type);
-    await svObjectRepository.store(svObject);
+    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
+    await svDocumentRepository.store(svDocument);
 
     const result = await fetchDocuments(contractId, type);
 
@@ -56,8 +56,8 @@ describe('fetchDocumentsFactory', () => {
 
     expect(result).to.deep.equal([]);
 
-    const svObjectRepository = createSVDocumentMongoDbRepository(contractId, type);
-    await svObjectRepository.store(svObject);
+    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
+    await svDocumentRepository.store(svDocument);
 
     const options = { where: { 'document.name': document.get('name') } };
     result = await fetchDocuments(contractId, type, options);
@@ -71,8 +71,8 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should return empty array for specified contract ID, object type and name not exist', async () => {
-    const svObjectRepository = createSVDocumentMongoDbRepository(contractId, type);
-    await svObjectRepository.store(svObject);
+    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
+    await svDocumentRepository.store(svDocument);
 
     const options = { where: { 'document.name': 'unknown' } };
 
@@ -82,9 +82,9 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should return empty array if contract ID does not exist', async () => {
-    const svObjectRepository = createSVDocumentMongoDbRepository(contractId, type);
+    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
 
-    await svObjectRepository.store(svObject);
+    await svDocumentRepository.store(svDocument);
 
     contractId = 'Unknown';
 
@@ -94,9 +94,9 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should return empty array if type does not exist', async () => {
-    const svObjectRepository = createSVDocumentMongoDbRepository(contractId, type);
+    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
 
-    await svObjectRepository.store(svObject);
+    await svDocumentRepository.store(svDocument);
 
     type = 'Unknown';
 

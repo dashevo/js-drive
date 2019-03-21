@@ -4,7 +4,7 @@ const getDocumentsFixture = require('../../../../lib/test/fixtures/getDocumentsF
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
 
 describe('SVDocument', () => {
-  let svObject;
+  let svDocument;
   let userId;
   let document;
   let reference;
@@ -18,7 +18,7 @@ describe('SVDocument', () => {
     isDeleted = false;
     previousRevisions = [];
 
-    svObject = new SVDocument(
+    svDocument = new SVDocument(
       userId,
       document,
       reference,
@@ -29,7 +29,7 @@ describe('SVDocument', () => {
 
   describe('#getUserId', () => {
     it('should return user ID', () => {
-      const result = svObject.getUserId();
+      const result = svDocument.getUserId();
 
       expect(result).to.equal(userId);
     });
@@ -37,7 +37,7 @@ describe('SVDocument', () => {
 
   describe('#getDocument', () => {
     it('should return Document', () => {
-      const result = svObject.getDocument();
+      const result = svDocument.getDocument();
 
       expect(result.toJSON()).to.deep.equal(document.toJSON());
     });
@@ -45,17 +45,17 @@ describe('SVDocument', () => {
 
   describe('#markAsDeleted', () => {
     it('should mark object as deleted', () => {
-      const result = svObject.markAsDeleted();
+      const result = svDocument.markAsDeleted();
 
-      expect(result).to.equal(svObject);
+      expect(result).to.equal(svDocument);
 
-      expect(svObject.deleted).to.be.true();
+      expect(svDocument.deleted).to.be.true();
     });
   });
 
   describe('#isDeleted', () => {
     it('should return true if object is deleted', () => {
-      const result = svObject.isDeleted();
+      const result = svDocument.isDeleted();
 
       expect(result).to.be.false();
     });
@@ -63,7 +63,7 @@ describe('SVDocument', () => {
 
   describe('#toJSON', () => {
     it('should return SVDocument as a plain object', () => {
-      const result = svObject.toJSON();
+      const result = svDocument.toJSON();
 
       expect(result).to.deep.equal({
         userId,

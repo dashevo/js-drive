@@ -10,7 +10,7 @@ const getDocumentsFixture = require('../../../../lib/test/fixtures/getDocumentsF
 const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');
 
 describe('updateSVDocumentFactory', () => {
-  let svObjectRepository;
+  let svDocumentRepository;
   let updateSVDocument;
   let reference;
   let document;
@@ -18,7 +18,7 @@ describe('updateSVDocumentFactory', () => {
   let contractId;
 
   beforeEach(function beforeEach() {
-    svObjectRepository = {
+    svDocumentRepository = {
       find: this.sinon.stub(),
       store: this.sinon.stub(),
     };
@@ -27,7 +27,7 @@ describe('updateSVDocumentFactory', () => {
     ({ userId } = getDocumentsFixture);
     [document] = getDocumentsFixture();
 
-    const createSVDocumentRepository = () => svObjectRepository;
+    const createSVDocumentRepository = () => svDocumentRepository;
 
     updateSVDocument = updateSVDocumentFactory(createSVDocumentRepository);
 
@@ -37,45 +37,45 @@ describe('updateSVDocumentFactory', () => {
   it('should store SVDocument if action is "create"', async () => {
     await updateSVDocument(contractId, userId, reference, document);
 
-    expect(svObjectRepository.store).to.have.been.calledOnce();
+    expect(svDocumentRepository.store).to.have.been.calledOnce();
 
-    const svObject = svObjectRepository.store.getCall(0).args[0];
+    const svDocument = svDocumentRepository.store.getCall(0).args[0];
 
-    expect(svObject).to.be.an.instanceOf(SVDocument);
-    expect(svObject.getUserId()).to.equal(userId);
-    expect(svObject.getDocument()).to.equal(document);
-    expect(svObject.getReference()).to.equal(reference);
-    expect(svObject.getPreviousRevisions()).to.deep.equal([]);
-    expect(svObject.isDeleted()).to.be.false();
+    expect(svDocument).to.be.an.instanceOf(SVDocument);
+    expect(svDocument.getUserId()).to.equal(userId);
+    expect(svDocument.getDocument()).to.equal(document);
+    expect(svDocument.getReference()).to.equal(reference);
+    expect(svDocument.getPreviousRevisions()).to.deep.equal([]);
+    expect(svDocument.isDeleted()).to.be.false();
   });
 
   it('should store SVDocument if action is "update" and it has a previous version', async () => {
     const [previousSVDocument] = getSVDocumentsFixture();
 
-    svObjectRepository.find.returns(previousSVDocument);
+    svDocumentRepository.find.returns(previousSVDocument);
 
     document.setRevision(1);
     document.setAction(Document.ACTIONS.UPDATE);
 
     await updateSVDocument(contractId, userId, reference, document);
 
-    expect(svObjectRepository.find).to.have.been.calledOnceWith(document.getId());
-    expect(svObjectRepository.store).to.have.been.calledOnce();
+    expect(svDocumentRepository.find).to.have.been.calledOnceWith(document.getId());
+    expect(svDocumentRepository.store).to.have.been.calledOnce();
 
-    const svObject = svObjectRepository.store.getCall(0).args[0];
+    const svDocument = svDocumentRepository.store.getCall(0).args[0];
 
-    expect(svObject).to.be.an.instanceOf(SVDocument);
-    expect(svObject.getUserId()).to.equal(userId);
-    expect(svObject.getDocument()).to.equal(document);
-    expect(svObject.getReference()).to.equal(reference);
-    expect(svObject.getPreviousRevisions()).to.deep.equal([
+    expect(svDocument).to.be.an.instanceOf(SVDocument);
+    expect(svDocument.getUserId()).to.equal(userId);
+    expect(svDocument.getDocument()).to.equal(document);
+    expect(svDocument.getReference()).to.equal(reference);
+    expect(svDocument.getPreviousRevisions()).to.deep.equal([
       previousSVDocument.getCurrentRevision(),
     ]);
-    expect(svObject.isDeleted()).to.be.false();
+    expect(svDocument.isDeleted()).to.be.false();
   });
 
   it('should throw an error if action is "update" and there is no previous version', async () => {
-    svObjectRepository.find.returns(null);
+    svDocumentRepository.find.returns(null);
 
     document.setAction(Document.ACTIONS.UPDATE);
 
@@ -88,8 +88,8 @@ describe('updateSVDocumentFactory', () => {
 
     expect(error).to.be.an.instanceOf(Error);
 
-    expect(svObjectRepository.find).to.have.been.calledOnceWith(document.getId());
-    expect(svObjectRepository.store).to.have.not.been.called();
+    expect(svDocumentRepository.find).to.have.been.calledOnceWith(document.getId());
+    expect(svDocumentRepository.store).to.have.not.been.called();
   });
 
   it('should store SVDocument and remove ahead versions if action is "update" upon reverting', async () => {
@@ -110,30 +110,30 @@ describe('updateSVDocumentFactory', () => {
       previousRevisions,
     );
 
-    svObjectRepository.find.returns(previousSVDocument);
+    svDocumentRepository.find.returns(previousSVDocument);
 
     document.setAction(Document.ACTIONS.UPDATE);
     document.setRevision(2);
 
     await updateSVDocument(contractId, userId, reference, document, true);
 
-    expect(svObjectRepository.find).to.have.been.calledOnceWith(document.getId());
-    expect(svObjectRepository.store).to.have.been.calledOnce();
+    expect(svDocumentRepository.find).to.have.been.calledOnceWith(document.getId());
+    expect(svDocumentRepository.store).to.have.been.calledOnce();
 
-    const svObject = svObjectRepository.store.getCall(0).args[0];
+    const svDocument = svDocumentRepository.store.getCall(0).args[0];
 
-    expect(svObject).to.be.an.instanceOf(SVDocument);
-    expect(svObject.getUserId()).to.equal(userId);
-    expect(svObject.getDocument()).to.equal(document);
-    expect(svObject.getReference()).to.equal(reference);
-    expect(svObject.getPreviousRevisions()).to.deep.equal(previousRevisions.slice(0, 2));
-    expect(svObject.isDeleted()).to.be.false();
+    expect(svDocument).to.be.an.instanceOf(SVDocument);
+    expect(svDocument.getUserId()).to.equal(userId);
+    expect(svDocument.getDocument()).to.equal(document);
+    expect(svDocument.getReference()).to.equal(reference);
+    expect(svDocument.getPreviousRevisions()).to.deep.equal(previousRevisions.slice(0, 2));
+    expect(svDocument.isDeleted()).to.be.false();
   });
 
   it('should delete SVDocument if action is "delete"', async () => {
     const [previousSVDocument] = getSVDocumentsFixture();
 
-    svObjectRepository.find.returns(previousSVDocument);
+    svDocumentRepository.find.returns(previousSVDocument);
 
     document.setRevision(1);
     document.setData({});
@@ -141,18 +141,18 @@ describe('updateSVDocumentFactory', () => {
 
     await updateSVDocument(contractId, userId, reference, document);
 
-    expect(svObjectRepository.store).to.have.been.calledOnce();
+    expect(svDocumentRepository.store).to.have.been.calledOnce();
 
-    const svObject = svObjectRepository.store.getCall(0).args[0];
+    const svDocument = svDocumentRepository.store.getCall(0).args[0];
 
-    expect(svObject).to.be.an.instanceOf(SVDocument);
-    expect(svObject.getUserId()).to.equal(userId);
-    expect(svObject.getDocument()).to.equal(document);
-    expect(svObject.getReference()).to.equal(reference);
-    expect(svObject.getPreviousRevisions()).to.deep.equal([
+    expect(svDocument).to.be.an.instanceOf(SVDocument);
+    expect(svDocument.getUserId()).to.equal(userId);
+    expect(svDocument.getDocument()).to.equal(document);
+    expect(svDocument.getReference()).to.equal(reference);
+    expect(svDocument.getPreviousRevisions()).to.deep.equal([
       previousSVDocument.getCurrentRevision(),
     ]);
-    expect(svObject.isDeleted()).to.be.true();
+    expect(svDocument.isDeleted()).to.be.true();
   });
 
 
@@ -168,6 +168,6 @@ describe('updateSVDocumentFactory', () => {
 
     expect(error).to.be.an.instanceOf(Error);
 
-    expect(svObjectRepository.store).to.have.not.been.called();
+    expect(svDocumentRepository.store).to.have.not.been.called();
   });
 });

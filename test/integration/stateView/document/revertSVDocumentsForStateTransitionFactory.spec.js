@@ -119,7 +119,7 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
 
     await stPacketRepository.store(stPacket);
 
-    const svObjectRepository = createSVDocumentMongoDbRepository(
+    const svDocumentRepository = createSVDocumentMongoDbRepository(
       stPacket.getContractId(),
       document.getType(),
     );
@@ -139,17 +139,17 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
       document,
     );
 
-    const svObjects = await svObjectRepository.fetch();
+    const svDocuments = await svDocumentRepository.fetch();
 
-    expect(svObjects).to.be.not.empty();
+    expect(svDocuments).to.be.not.empty();
 
     await revertSVDocumentsForStateTransition({
       stateTransition,
     });
 
-    const svObjectsAfterReverting = await svObjectRepository.fetch();
+    const svDocumentsAfterReverting = await svDocumentRepository.fetch();
 
-    expect(svObjectsAfterReverting).to.be.empty();
+    expect(svDocumentsAfterReverting).to.be.empty();
 
     expect(readerMediatorMock.emitSerial).to.have.been.calledWith(
       ReaderMediator.EVENTS.DOCUMENT_MARKED_DELETED,
@@ -224,7 +224,7 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
 
     const thirdDocumentRevision = documentRevisions[documentRevisions.length - 1];
 
-    const svObject = new SVDocument(
+    const svDocument = new SVDocument(
       userId,
       thirdDocumentRevision.document,
       thirdDocumentRevision.reference,
@@ -232,12 +232,12 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
       previousRevisions,
     );
 
-    const svObjectRepository = createSVDocumentMongoDbRepository(
+    const svDocumentRepository = createSVDocumentMongoDbRepository(
       stPacket.getContractId(),
       document.getType(),
     );
 
-    await svObjectRepository.store(svObject);
+    await svDocumentRepository.store(svDocument);
 
     // 3. Revert 3rd version of contract to 2nd
     await revertSVDocumentsForStateTransition({
@@ -245,7 +245,7 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
       block: thirdDocumentRevision.block,
     });
 
-    const revertedSVDocuments = await svObjectRepository.fetch(document.getId());
+    const revertedSVDocuments = await svDocumentRepository.fetch(document.getId());
 
     expect(revertedSVDocuments).to.be.an('array');
 
@@ -262,10 +262,10 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
     expect(readerMediatorMock.emitSerial.getCall(1)).to.have.been.calledWith(
       ReaderMediator.EVENTS.DOCUMENT_REVERTED,
       {
-        userId: svObject.getUserId(),
-        objectId: svObject.getDocument().getId(),
-        reference: svObject.getReference(),
-        object: svObject.getDocument().toJSON(),
+        userId: svDocument.getUserId(),
+        objectId: svDocument.getDocument().getId(),
+        reference: svDocument.getReference(),
+        object: svDocument.getDocument().toJSON(),
         previousRevision: previousRevisions[1],
       },
     );

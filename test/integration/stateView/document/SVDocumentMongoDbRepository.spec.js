@@ -14,8 +14,8 @@ const AmbiguousStartError = require('../../../../lib/stateView/document/errors/A
 
 const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');
 
-function sortAndJsonizeSVDocuments(svObjects) {
-  return svObjects.sort((prev, next) => (
+function sortAndJsonizeSVDocuments(svDocuments) {
+  return svDocuments.sort((prev, next) => (
     prev.getDocument().getId() > next.getDocument().getId()
   )).map(o => o.toJSON());
 }
@@ -23,9 +23,9 @@ function sortAndJsonizeSVDocuments(svObjects) {
 describe('SVDocumentMongoDbRepository', function main() {
   this.timeout(10000);
 
-  let svObjectRepository;
-  let svObject;
-  let svObjects;
+  let svDocumentRepository;
+  let svDocument;
+  let svDocuments;
   let mongoDatabase;
 
   startMongoDb().then((mongoDb) => {
@@ -33,37 +33,37 @@ describe('SVDocumentMongoDbRepository', function main() {
   });
 
   beforeEach(async () => {
-    svObjects = getSVDocumentsFixture();
-    [svObject] = svObjects;
+    svDocuments = getSVDocumentsFixture();
+    [svDocument] = svDocuments;
 
-    svObjectRepository = new SVDocumentMongoDbRepository(
+    svDocumentRepository = new SVDocumentMongoDbRepository(
       mongoDatabase,
       sanitizer,
-      svObject.getDocument().getType(),
+      svDocument.getDocument().getType(),
     );
 
     await Promise.all(
-      svObjects.map(o => svObjectRepository.store(o)),
+      svDocuments.map(o => svDocumentRepository.store(o)),
     );
   });
 
   describe('#store', () => {
     it('should store SV Object', async () => {
-      const result = await svObjectRepository.find(svObject.getDocument().getId());
+      const result = await svDocumentRepository.find(svDocument.getDocument().getId());
 
       expect(result).to.be.an.instanceOf(SVDocument);
-      expect(result.toJSON()).to.deep.equal(svObject.toJSON());
+      expect(result.toJSON()).to.deep.equal(svDocument.toJSON());
     });
   });
 
   describe('#fetch', () => {
     it('should fetch SV Objects', async () => {
-      const result = await svObjectRepository.fetch();
+      const result = await svDocumentRepository.fetch();
 
       expect(result).to.be.an('array');
 
       const actualRawSVDocuments = sortAndJsonizeSVDocuments(result);
-      const expectedRawSVDocuments = sortAndJsonizeSVDocuments(svObjects);
+      const expectedRawSVDocuments = sortAndJsonizeSVDocuments(svDocuments);
 
       expect(actualRawSVDocuments).to.have.deep.members(expectedRawSVDocuments);
     });
@@ -73,16 +73,16 @@ describe('SVDocumentMongoDbRepository', function main() {
     describe('where', () => {
       it('should fetch SV Objects by where condition', async () => {
         const options = {
-          where: { 'document.name': svObject.getDocument().get('name') },
+          where: { 'document.name': svDocument.getDocument().get('name') },
         };
 
-        const result = await svObjectRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(options);
 
         expect(result).to.be.an('array');
 
         const [expectedSVDocument] = result;
 
-        expect(expectedSVDocument.toJSON()).to.deep.equal(svObject.toJSON());
+        expect(expectedSVDocument.toJSON()).to.deep.equal(svDocument.toJSON());
       });
 
       it('should throw InvalidWhereError if where clause is not an object', async () => {
@@ -92,7 +92,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -107,7 +107,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -120,7 +120,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           where: { 'document.name': 'Dash enthusiast' },
         };
 
-        const result = await svObjectRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(options);
 
         expect(result).to.deep.equal([]);
       });
@@ -132,7 +132,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -147,7 +147,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -162,7 +162,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           limit: 1,
         };
 
-        const result = await svObjectRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(options);
 
         expect(result).to.be.an('array');
         expect(result).to.have.lengthOf(1);
@@ -175,7 +175,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -190,7 +190,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -201,10 +201,10 @@ describe('SVDocumentMongoDbRepository', function main() {
 
     describe('orderBy', () => {
       it('should order desc', async () => {
-        svObjects.forEach((o, i) => o.getDocument().set('age', i + 1));
+        svDocuments.forEach((o, i) => o.getDocument().set('age', i + 1));
 
         await Promise.all(
-          svObjects.map(o => svObjectRepository.store(o)),
+          svDocuments.map(o => svDocumentRepository.store(o)),
         );
 
         const options = {
@@ -213,21 +213,21 @@ describe('SVDocumentMongoDbRepository', function main() {
           },
         };
 
-        const result = await svObjectRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(options);
 
         expect(result).to.be.an('array');
 
         const actualRawSVDocuments = result.map(o => o.toJSON());
-        const expectedRawSVDocuments = svObjects.reverse().map(o => o.toJSON());
+        const expectedRawSVDocuments = svDocuments.reverse().map(o => o.toJSON());
 
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
 
       it('should order asc', async () => {
-        svObjects.reverse().forEach((o, i) => o.getDocument().set('age', i + 1));
+        svDocuments.reverse().forEach((o, i) => o.getDocument().set('age', i + 1));
 
         await Promise.all(
-          svObjects.map(o => svObjectRepository.store(o)),
+          svDocuments.map(o => svDocumentRepository.store(o)),
         );
 
         const options = {
@@ -236,12 +236,12 @@ describe('SVDocumentMongoDbRepository', function main() {
           },
         };
 
-        const result = await svObjectRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(options);
 
         expect(result).to.be.an('array');
 
         const actualRawSVDocuments = result.map(o => o.toJSON());
-        const expectedRawSVDocuments = svObjects.map(o => o.toJSON());
+        const expectedRawSVDocuments = svDocuments.map(o => o.toJSON());
 
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
@@ -253,7 +253,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -268,7 +268,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -279,10 +279,10 @@ describe('SVDocumentMongoDbRepository', function main() {
 
     describe('start', () => {
       it('should start at 1 object', async () => {
-        svObjects.forEach((o, i) => o.getDocument().set('age', i + 1));
+        svDocuments.forEach((o, i) => o.getDocument().set('age', i + 1));
 
         await Promise.all(
-          svObjects.map(o => svObjectRepository.store(o)),
+          svDocuments.map(o => svDocumentRepository.store(o)),
         );
 
         const options = {
@@ -292,12 +292,12 @@ describe('SVDocumentMongoDbRepository', function main() {
           startAt: 2,
         };
 
-        const result = await svObjectRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(options);
 
         expect(result).to.be.an('array');
 
         const actualRawSVDocuments = result.map(o => o.toJSON());
-        const expectedRawSVDocuments = svObjects.splice(1).map(o => o.toJSON());
+        const expectedRawSVDocuments = svDocuments.splice(1).map(o => o.toJSON());
 
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
@@ -309,7 +309,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -324,7 +324,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -333,10 +333,10 @@ describe('SVDocumentMongoDbRepository', function main() {
       });
 
       it('should start after 1 object', async () => {
-        svObjects.forEach((o, i) => o.getDocument().set('age', i + 1));
+        svDocuments.forEach((o, i) => o.getDocument().set('age', i + 1));
 
         await Promise.all(
-          svObjects.map(o => svObjectRepository.store(o)),
+          svDocuments.map(o => svDocumentRepository.store(o)),
         );
 
         const options = {
@@ -346,12 +346,12 @@ describe('SVDocumentMongoDbRepository', function main() {
           startAfter: 1,
         };
 
-        const result = await svObjectRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(options);
 
         expect(result).to.be.an('array');
 
         const actualRawSVDocuments = result.map(o => o.toJSON());
-        const expectedRawSVDocuments = svObjects.splice(1).map(o => o.toJSON());
+        const expectedRawSVDocuments = svDocuments.splice(1).map(o => o.toJSON());
 
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
@@ -363,7 +363,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -378,7 +378,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         let error;
         try {
-          await svObjectRepository.fetch(options);
+          await svDocumentRepository.fetch(options);
         } catch (e) {
           error = e;
         }
@@ -390,7 +390,7 @@ describe('SVDocumentMongoDbRepository', function main() {
         let error;
 
         try {
-          await svObjectRepository.fetch({ startAt: 1, startAfter: 2 });
+          await svDocumentRepository.fetch({ startAt: 1, startAfter: 2 });
         } catch (e) {
           error = e;
         }
@@ -402,23 +402,23 @@ describe('SVDocumentMongoDbRepository', function main() {
 
   describe('#findAllBySTHash', () => {
     it('should find all SV Objects by stHash', async () => {
-      const stHash = svObject.getReference().getSTHash();
+      const stHash = svDocument.getReference().getSTHash();
 
-      const result = await svObjectRepository.findAllBySTHash(stHash);
+      const result = await svDocumentRepository.findAllBySTHash(stHash);
 
       expect(result).to.be.an('array');
 
       const [expectedSVDocument] = result;
 
-      expect(expectedSVDocument.toJSON()).to.deep.equal(svObject.toJSON());
+      expect(expectedSVDocument.toJSON()).to.deep.equal(svDocument.toJSON());
     });
   });
 
   describe('#delete', () => {
     it('should delete SV Object', async () => {
-      await svObjectRepository.delete(svObject);
+      await svDocumentRepository.delete(svDocument);
 
-      const result = await svObjectRepository.find(svObject.getDocument().getId());
+      const result = await svDocumentRepository.find(svDocument.getDocument().getId());
 
       expect(result).to.be.null();
     });
@@ -430,7 +430,7 @@ describe('SVDocumentMongoDbRepository', function main() {
     it('should find SV Object marked as deleted by ID');
 
     it('should return null if SV object was not found', async () => {
-      const object = await svObjectRepository.find('unknown');
+      const object = await svDocumentRepository.find('unknown');
 
       expect(object).to.be.null();
     });
