@@ -208,7 +208,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: firstContractPacket.getContractId() });
 
     const { result: [firstDriveFirstObject] } = await firstDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: firstContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: firstContractPacket.getContractId(), type: objectType });
 
     expect(firstDriveFirstContract).to.deep.equal(firstContractPacket.getContract().toJSON());
     expect(firstDriveFirstObject).to.deep.equal(firstObjectPacket.getDPObjects()[0].toJSON());
@@ -218,7 +218,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: firstContractPacket.getContractId() });
 
     const { result: [secondDriveFirstObject] } = await secondDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: firstContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: firstContractPacket.getContractId(), type: objectType });
 
     expect(secondDriveFirstContract).to.deep.equal(firstContractPacket.getContract().toJSON());
     expect(secondDriveFirstObject).to.deep.equal(firstObjectPacket.getDPObjects()[0].toJSON());
@@ -263,7 +263,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: secondContractPacket.getContractId() });
 
     const { result: [firstDriveSecondObject] } = await firstDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: secondContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: secondContractPacket.getContractId(), type: objectType });
 
     expect(firstDriveSecondContract).to.deep.equal(
       secondContractPacket.getContract().toJSON(),
@@ -313,7 +313,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: thirdContractPacket.getContractId() });
 
     const { result: [secondDriveThirdObject] } = await secondDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: thirdContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: thirdContractPacket.getContractId(), type: objectType });
 
     expect(secondDriveThirdContract).to.deep.equal(
       thirdContractPacket.getContract().toJSON(),
@@ -354,7 +354,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: firstContractPacket.getContractId() });
 
     const { result: [firstDriveFirstObject] } = await firstDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: firstContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: firstContractPacket.getContractId(), type: objectType });
 
     expect(firstDriveFirstContract).to.deep.equal(
       firstContractPacket.getContract().toJSON(),
@@ -368,7 +368,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: firstContractPacket.getContractId() });
 
     const { result: [secondDriveFirstObject] } = await secondDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: firstContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: firstContractPacket.getContractId(), type: objectType });
 
     expect(secondDriveFirstContract).to.deep.equal(
       firstContractPacket.getContract().toJSON(),
@@ -385,7 +385,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: thirdContractPacket.getContractId() });
 
     const { result: [firstDriveThirdObject] } = await firstDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: thirdContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: thirdContractPacket.getContractId(), type: objectType });
 
     expect(firstDriveThirdContract).to.deep.equal(
       thirdContractPacket.getContract().toJSON(),
@@ -399,7 +399,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: thirdContractPacket.getContractId() });
 
     const { result: [secondDriveThirdObject] } = await secondDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: thirdContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: thirdContractPacket.getContractId(), type: objectType });
 
     expect(secondDriveThirdContract).to.deep.equal(
       thirdContractPacket.getContract().toJSON(),
@@ -417,7 +417,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: secondContractPacket.getContractId() });
 
     const { result: [firstDriveSecondObject] } = await firstDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: secondContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: secondContractPacket.getContractId(), type: objectType });
 
     expect(firstDriveSecondContract).to.be.undefined();
     expect(firstDriveSecondObject).to.be.undefined();
@@ -427,7 +427,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: secondContractPacket.getContractId() });
 
     const { result: [secondDriveSecondObject] } = await secondDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: secondContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: secondContractPacket.getContractId(), type: objectType });
 
     expect(secondDriveSecondContract).to.be.undefined();
     expect(secondDriveSecondObject).to.be.undefined();
@@ -454,7 +454,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: secondContractPacket.getContractId() });
 
     const { result: [firstDriveSecondObjectAfter] } = await firstDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: secondContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: secondContractPacket.getContractId(), type: objectType });
 
     expect(firstDriveSecondContractAfter).to.deep.equal(
       secondContractPacket.getContract().toJSON(),
@@ -468,7 +468,7 @@ describe('Blockchain reorganization', function main() {
       .request('fetchContract', { contractId: secondContractPacket.getContractId() });
 
     const { result: [secondDriveSecondObjectAfter] } = await secondDrive.driveApi.getApi()
-      .request('fetchDPObjects', { contractId: secondContractPacket.getContractId(), type: objectType });
+      .request('fetchDocuments', { contractId: secondContractPacket.getContractId(), type: objectType });
 
     expect(secondDriveSecondContractAfter).to.deep.equal(
       secondContractPacket.getContract().toJSON(),

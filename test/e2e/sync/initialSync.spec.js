@@ -194,7 +194,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     expect(fetchedContract).to.deep.equal(contract.toJSON());
 
-    const { result: fetchedDPObjects } = await driveApi.request('fetchDPObjects', {
+    const { result: fetchedDPObjects } = await driveApi.request('fetchDocuments', {
       contractId: contract.getId(),
       type: objectType,
     });

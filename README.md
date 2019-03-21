@@ -101,7 +101,7 @@ Fetch Contract from Drive State View
 |---------|--------|---------------------|
 | result  | object | DP Contact object  |
 
-#### fetchDPObjects
+#### fetchDocuments
 
 Fetch DP Objects from Drive State View
 

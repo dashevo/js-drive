@@ -4,13 +4,13 @@ const SVObjectMongoDbRepository = require('../../../../lib/stateView/document/SV
 
 const sanitizer = require('../../../../lib/mongoDb/sanitizer');
 const createSVObjectMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVObjectMongoDbRepositoryFactory');
-const fetchDPObjectsFactory = require('../../../../lib/stateView/document/fetchDPObjectsFactory');
+const fetchDocumentsFactory = require('../../../../lib/stateView/document/fetchDocumentsFactory');
 
 const getSVObjectsFixture = require('../../../../lib/test/fixtures/getSVObjectsFixture');
 
-describe('fetchDPObjectsFactory', () => {
+describe('fetchDocumentsFactory', () => {
   let createSVObjectMongoDbRepository;
-  let fetchDPObjects;
+  let fetchDocuments;
   let mongoClient;
   let svObject;
   let type;
@@ -28,7 +28,7 @@ describe('fetchDPObjectsFactory', () => {
       sanitizer,
     );
 
-    fetchDPObjects = fetchDPObjectsFactory(createSVObjectMongoDbRepository);
+    fetchDocuments = fetchDocumentsFactory(createSVObjectMongoDbRepository);
 
     [svObject] = getSVObjectsFixture();
 
@@ -41,7 +41,7 @@ describe('fetchDPObjectsFactory', () => {
     const svObjectRepository = createSVObjectMongoDbRepository(contractId, type);
     await svObjectRepository.store(svObject);
 
-    const result = await fetchDPObjects(contractId, type);
+    const result = await fetchDocuments(contractId, type);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
@@ -52,7 +52,7 @@ describe('fetchDPObjectsFactory', () => {
   });
 
   it('should fetch DP objects for specified contract id, object type and name', async () => {
-    let result = await fetchDPObjects(contractId, type);
+    let result = await fetchDocuments(contractId, type);
 
     expect(result).to.deep.equal([]);
 
@@ -60,7 +60,7 @@ describe('fetchDPObjectsFactory', () => {
     await svObjectRepository.store(svObject);
 
     const options = { where: { 'dpObject.name': dpObject.get('name') } };
-    result = await fetchDPObjects(contractId, type, options);
+    result = await fetchDocuments(contractId, type, options);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
@@ -76,7 +76,7 @@ describe('fetchDPObjectsFactory', () => {
 
     const options = { where: { 'dpObject.name': 'unknown' } };
 
-    const result = await fetchDPObjects(contractId, type, options);
+    const result = await fetchDocuments(contractId, type, options);
 
     expect(result).to.deep.equal([]);
   });
@@ -88,7 +88,7 @@ describe('fetchDPObjectsFactory', () => {
 
     contractId = 'Unknown';
 
-    const result = await fetchDPObjects(contractId, type);
+    const result = await fetchDocuments(contractId, type);
 
     expect(result).to.deep.equal([]);
   });
@@ -100,7 +100,7 @@ describe('fetchDPObjectsFactory', () => {
 
     type = 'Unknown';
 
-    const result = await fetchDPObjects(contractId, type);
+    const result = await fetchDocuments(contractId, type);
 
     expect(result).to.deep.equal([]);
   });

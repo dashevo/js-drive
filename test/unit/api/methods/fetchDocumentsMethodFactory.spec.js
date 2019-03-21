@@ -1,4 +1,4 @@
-const fetchDPObjectsMethodFactory = require('../../../../lib/api/methods/fetchDPObjectsMethodFactory');
+const fetchDocumentsMethodFactory = require('../../../../lib/api/methods/fetchDocumentsMethodFactory');
 
 const getDPObjectsFixture = require('../../../../lib/test/fixtures/getDPObjectsFixture');
 
@@ -10,26 +10,26 @@ const InvalidStartAtError = require('../../../../lib/stateView/document/errors/I
 const InvalidStartAfterError = require('../../../../lib/stateView/document/errors/InvalidStartAfterError');
 const AmbiguousStartError = require('../../../../lib/stateView/document/errors/AmbiguousStartError');
 
-describe('fetchDPObjectsMethodFactory', () => {
+describe('fetchDocumentsMethodFactory', () => {
   let contractId;
   let type;
   let options;
-  let fetchDPObjectsMock;
-  let fetchDPObjectsMethod;
+  let fetchDocumentsMock;
+  let fetchDocumentsMethod;
 
   async function throwErrorAndExpectInvalidParamError(error) {
-    fetchDPObjectsMock.throws(error);
+    fetchDocumentsMock.throws(error);
 
     let actualError;
     try {
-      await fetchDPObjectsMethod({ contractId, type, options });
+      await fetchDocumentsMethod({ contractId, type, options });
     } catch (e) {
       actualError = e;
     }
 
     expect(actualError).to.be.an.instanceOf(InvalidParamsError);
 
-    expect(fetchDPObjectsMock).to.have.been.calledOnceWith(contractId, type, options);
+    expect(fetchDocumentsMock).to.have.been.calledOnceWith(contractId, type, options);
   }
 
   beforeEach(function beforeEach() {
@@ -37,21 +37,21 @@ describe('fetchDPObjectsMethodFactory', () => {
     type = 'niceObject';
     options = {};
 
-    fetchDPObjectsMock = this.sinon.stub();
-    fetchDPObjectsMethod = fetchDPObjectsMethodFactory(fetchDPObjectsMock);
+    fetchDocumentsMock = this.sinon.stub();
+    fetchDocumentsMethod = fetchDocumentsMethodFactory(fetchDocumentsMock);
   });
 
   it('should throw InvalidParamsError if Contract ID is not provided', async () => {
     let error;
     try {
-      await fetchDPObjectsMethod({});
+      await fetchDocumentsMethod({});
     } catch (e) {
       error = e;
     }
 
     expect(error).to.be.an.instanceOf(InvalidParamsError);
 
-    expect(fetchDPObjectsMock).to.have.not.been.called();
+    expect(fetchDocumentsMock).to.have.not.been.called();
   });
 
   it('should throw InvalidParamsError if InvalidWhereError is thrown', async () => {
@@ -81,30 +81,30 @@ describe('fetchDPObjectsMethodFactory', () => {
   it('should escalate an error if error type is unknown', async () => {
     const fetchError = new Error();
 
-    fetchDPObjectsMock.throws(fetchError);
+    fetchDocumentsMock.throws(fetchError);
 
     let error;
     try {
-      await fetchDPObjectsMethod({ contractId, type, options });
+      await fetchDocumentsMethod({ contractId, type, options });
     } catch (e) {
       error = e;
     }
 
     expect(error).to.equal(fetchError);
 
-    expect(fetchDPObjectsMock).to.have.been.calledOnceWith(contractId, type, options);
+    expect(fetchDocumentsMock).to.have.been.calledOnceWith(contractId, type, options);
   });
 
   it('should return DP Objects', async () => {
     const dpObjects = getDPObjectsFixture();
     const rawDPObjects = dpObjects.map(o => o.toJSON());
 
-    fetchDPObjectsMock.resolves(dpObjects);
+    fetchDocumentsMock.resolves(dpObjects);
 
-    const result = await fetchDPObjectsMethod({ contractId, type, options });
+    const result = await fetchDocumentsMethod({ contractId, type, options });
 
     expect(result).to.deep.equal(rawDPObjects);
 
-    expect(fetchDPObjectsMock).to.have.been.calledOnceWith(contractId, type, options);
+    expect(fetchDocumentsMock).to.have.been.calledOnceWith(contractId, type, options);
   });
 });
