@@ -20,7 +20,7 @@ const updateSVContractFactory = require('../../../lib/stateView/contract/updateS
 const updateSVObjectFactory = require('../../../lib/stateView/object/updateSVObjectFactory');
 const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
 
-const fetchDPContractFactory = require('../../../lib/stateView/contract/fetchDPContractFactory');
+const fetchContractFactory = require('../../../lib/stateView/contract/fetchContractFactory');
 const STPacketIpfsRepository = require('../../../lib/storage/stPacket/STPacketIpfsRepository');
 
 const ReaderMediator = require('../../../lib/blockchain/reader/BlockchainReaderMediator');
@@ -55,7 +55,7 @@ describe('applyStateTransitionFactory', () => {
 
     svContractMongoDbRepository = new SVContractMongoDbRepository(mongoDatabase, dpp);
 
-    const createFetchDPContract = () => fetchDPContractFactory(svContractMongoDbRepository);
+    const createFetchDPContract = () => fetchContractFactory(svContractMongoDbRepository);
 
     const dataProvider = new DriveDataProvider(
       null,

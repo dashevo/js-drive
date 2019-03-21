@@ -139,7 +139,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
 
     // 3.2 Check DP Contract is in Drive and ok
     const { result: rawDPContract } = await firstDrive.driveApi.getApi()
-      .request('fetchDPContract', { contractId: dpContract.getId() });
+      .request('fetchContract', { contractId: dpContract.getId() });
 
     expect(rawDPContract).to.deep.equal(dpContract.toJSON());
 
@@ -188,7 +188,7 @@ describe('Initial sync of Dash Drive and Dash Core', function main() {
     // 5. Ensure second Dash Drive have a proper data
     const driveApi = secondDrive.driveApi.getApi();
 
-    const { result: fetchedDPContract } = await driveApi.request('fetchDPContract', {
+    const { result: fetchedDPContract } = await driveApi.request('fetchContract', {
       contractId: dpContract.getId(),
     });
 

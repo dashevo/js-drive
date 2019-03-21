@@ -85,7 +85,7 @@ Remove State Transition Packet from Drive storage
 |------------|--------|----------------------------------------------|
 | packetHash | string | ST Packet hash previously submitted to Drive |
 
-#### fetchDPContact
+#### fetchContact
 
 Fetch DP Contract from Drive State View
 

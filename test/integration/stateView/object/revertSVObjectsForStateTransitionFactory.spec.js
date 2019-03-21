@@ -62,7 +62,7 @@ describe('revertSVObjectsForStateTransitionFactory', () => {
     const dpContract = getDPContractFixture();
 
     const dataProviderMock = {
-      fetchDPContract: this.sinon.stub().returns(dpContract),
+      fetchContract: this.sinon.stub().returns(dpContract),
     };
 
     const dpp = new DashPlatformProtocol({
