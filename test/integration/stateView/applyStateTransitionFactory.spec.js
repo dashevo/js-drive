@@ -109,7 +109,7 @@ describe('applyStateTransitionFactory', () => {
     await applyStateTransition(stateTransition, block);
 
     expect(readerMediator.emitSerial).to.have.been.calledWith(
-      ReaderMediator.EVENTS.DP_CONTRACT_APPLIED,
+      ReaderMediator.EVENTS.CONTRACT_APPLIED,
       {
         userId: stateTransition.extraPayload.regTxId,
         contractId,

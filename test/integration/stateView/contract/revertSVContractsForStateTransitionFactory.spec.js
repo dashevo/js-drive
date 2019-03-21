@@ -169,7 +169,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
     ]);
 
     expect(readerMediator.emitSerial.getCall(1)).to.have.been.calledWith(
-      ReaderMediator.EVENTS.DP_CONTRACT_REVERTED,
+      ReaderMediator.EVENTS.CONTRACT_REVERTED,
       {
         userId: thirdContractVersion.stateTransition.extraPayload.regTxId,
         contractId,
@@ -200,7 +200,7 @@ describe('revertSVContractsForStateTransitionFactory', () => {
     expect(revertedSVContract).to.not.exist();
 
     expect(readerMediator.emitSerial).to.have.been.calledWith(
-      ReaderMediator.EVENTS.DP_CONTRACT_MARKED_DELETED,
+      ReaderMediator.EVENTS.CONTRACT_MARKED_DELETED,
       {
         userId: stateTransition.extraPayload.regTxId,
         contractId,
