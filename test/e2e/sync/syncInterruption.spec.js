@@ -55,7 +55,7 @@ describe('Sync interruption and resume between Dash Drive and Dash Core', functi
     async function createAndSubmitST(username) {
       // 2.1 Set ST Packet name
       stPacket.getContract().setName(`${username}_contract`);
-      stPacket.setContractId(stPacket.getContract().hash());
+      stPacket.setContractId(stPacket.getContract().getId());
 
       // 2.2 Register user and create Contract ST Packet and State Transition
       const {
