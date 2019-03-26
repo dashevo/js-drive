@@ -34,7 +34,7 @@ describe('fetchDocumentsFactory', () => {
 
     document = svDocument.getDocument();
     type = document.getType();
-    contractId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
+    contractId = 'HgKXrLhm7sMjPrRGS1UsETmmQ7nZHbaKN729zw55PUVk';
   });
 
   it('should fetch Documents for specified contract ID and document type', async () => {

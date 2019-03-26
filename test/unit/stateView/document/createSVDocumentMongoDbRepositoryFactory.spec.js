@@ -1,5 +1,3 @@
-const bs58 = require('bs58');
-
 const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
 
 describe('createSVDocumentMongoDbRepositoryFactory', () => {
@@ -12,7 +10,7 @@ describe('createSVDocumentMongoDbRepositoryFactory', () => {
   let sanitizerMock;
 
   beforeEach(function beforeEach() {
-    contractId = 'b8ae412cdeeb4bb39ec496dec34495ecccaf74f9fa9eaa712c77a03eb1994e75';
+    contractId = 'HgKXrLhm7sMjPrRGS1UsETmmQ7nZHbaKN729zw55PUVk';
     documentType = 'niceDocument';
 
     mongoDb = {};
@@ -32,8 +30,7 @@ describe('createSVDocumentMongoDbRepositoryFactory', () => {
   });
 
   it('should create a MongoDb database with a prefix + contractId', async () => {
-    const contractIdEncoded = bs58.encode(Buffer.from(contractId, 'hex'));
-    const dbName = `${process.env.MONGODB_DB_PREFIX}dpa_${contractIdEncoded}`;
+    const dbName = `${process.env.MONGODB_DB_PREFIX}dpa_${contractId}`;
 
     const result = createSVDocumentMongoDbRepository(contractId, documentType);
 
