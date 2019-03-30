@@ -21,6 +21,8 @@ FROM node:10-alpine
 LABEL maintainer="Dash Developers <dev@dash.org>"
 LABEL description="Drive Node.JS"
 
+RUN apk update && apk add --no-cache zeromq-dev
+
 # Copy NPM modules
 COPY package.json package-lock.json /
 COPY --from=0 /node_modules/ /node_modules
