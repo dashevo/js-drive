@@ -8,7 +8,7 @@ if [ "x$REPO_URL" = "x" ]; then
   exit 1
 fi
 
-IMAGE_NAME="dashevo/drive"
+IMAGE_NAME="dashevo/dashdrive"
 DRIVE_VERSION=$(node -p "require('./package.json').version")
 
 docker build --build-arg NODE_ENV=development \
