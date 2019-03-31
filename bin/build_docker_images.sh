@@ -1,14 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
+# Show script in output, and error if anything fails
+set -xe
 
-# ensure REPO_URL is set externally (e.g. via CI/CD)
-if [ "x$REPO_URL" = "x" ]; then
-  echo "error: REPO_URL is required to be set"
-  exit 1
-fi
-
-IMAGE_NAME="dashevo/drive"
+IMAGE_NAME="dashpay/drive"
 DRIVE_VERSION=$(node -p "require('./package.json').version")
 
 docker build --build-arg NODE_ENV=development \
@@ -17,5 +12,9 @@ docker build --build-arg NODE_ENV=development \
              -t "${REPO_URL}/${IMAGE_NAME}:${DRIVE_VERSION}" \
              .
 
-docker push "${REPO_URL}/${IMAGE_NAME}:latest"
-docker push "${REPO_URL}/${IMAGE_NAME}:${DRIVE_VERSION}"
+# Login to Docker Hub
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+# Push images to the registry
+docker push "${IMAGE_NAME}:latest"
+docker push "${IMAGE_NAME}:${VERSION}"
