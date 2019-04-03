@@ -7,7 +7,6 @@ IMAGE_NAME="dashpay/drive"
 VERSION=$(node -p "require('./package.json').version")
 
 docker build --build-arg NODE_ENV=development \
-             --build-arg npm_token=$NPM_TOKEN \
              -t "${IMAGE_NAME}:latest" \
              -t "${IMAGE_NAME}:${VERSION}" \
              .
