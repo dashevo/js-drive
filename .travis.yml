@@ -1,13 +1,14 @@
 sudo: required
 dist: trusty
 language: node_js
+
 node_js:
  - '10'
 
 branches:
   only:
     - master
-    - /v\d+\.\d+[a-z]/
+    - /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
 
 services:
   - docker
@@ -21,28 +22,18 @@ before_install:
   # Add token for @dashevo private npm registry
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
-  # Add credential helper
-  - git clone https://github.com/awslabs/amazon-ecr-credential-helper.git
-  - cd amazon-ecr-credential-helper
-  - make docker
-  - sudo mv ./bin/local/docker-credential-ecr-login /usr/local/bin
-  - cd ..
-  - sudo rm -rf amazon-ecr-credential-helper
-  - mkdir -p ~/.docker
-  - "echo '{ \"credsStore\": \"ecr-login\" }' > ~/.docker/config.json"
-  # Fix awslabs/amazon-ecr-credential-helper#9
-  - echo '103738324493.dkr.ecr.us-west-2.amazonaws.com' | docker-credential-ecr-login get
-
 install:
   - npm ci
   - cp .env.example .env
 
 script:
+  - npm run check-package
   - npm run lint
   - npm run test
 
 deploy:
   provider: script
-  script: bash bin/build_docker_images.sh
+  script: bash bin/deploy.sh
   on:
-    branch: master
+    tags: true
+    repo: dashevo/drive
