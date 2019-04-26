@@ -6,6 +6,8 @@ const sanitizer = require('../../../../lib/mongoDb/sanitizer');
 const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
 const fetchDocumentsFactory = require('../../../../lib/stateView/document/fetchDocumentsFactory');
 
+const hydrateSVDocumentForApiResponse = require('../../../../lib/stateView/document/hydrateSVDocumentForApiResponse');
+
 const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');
 
 describe('fetchDocumentsFactory', () => {
@@ -28,7 +30,10 @@ describe('fetchDocumentsFactory', () => {
       sanitizer,
     );
 
-    fetchDocuments = fetchDocumentsFactory(createSVDocumentMongoDbRepository);
+    fetchDocuments = fetchDocumentsFactory(
+      createSVDocumentMongoDbRepository,
+      hydrateSVDocumentForApiResponse,
+    );
 
     [svDocument] = getSVDocumentsFixture();
 
