@@ -46,7 +46,7 @@
     "sinon-chai": "^3.3.0"
   },
   "dependencies": {
-    "@dashevo/dashcore-lib": "0.17.1",
+    "@dashevo/dashcore-lib": "github:dashevo/dashcore-lib#fix-script",
     "@dashevo/dashd-rpc": "^1.3.0",
     "@dashevo/dpp": "^0.7.1",
     "bs58": "^4.0.1",
