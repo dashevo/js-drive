@@ -28,9 +28,7 @@ describe('fetchDocumentsFactory', () => {
       sanitizer,
     );
 
-    fetchDocuments = fetchDocumentsFactory(
-      createSVDocumentMongoDbRepository,
-    );
+    fetchDocuments = fetchDocumentsFactory(createSVDocumentMongoDbRepository);
 
     [svDocument] = getSVDocumentsFixture();
 
