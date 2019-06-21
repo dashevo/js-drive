@@ -1,9 +1,9 @@
 const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
 
-const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/SVDocumentMongoDbRepository');
+const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/mongoDbRepository/SVDocumentMongoDbRepository');
 
 const sanitizer = require('../../../../lib/mongoDb/sanitizer');
-const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
+const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/mongoDbRepository/createSVDocumentMongoDbRepositoryFactory');
 const fetchDocumentsFactory = require('../../../../lib/stateView/document/fetchDocumentsFactory');
 
 const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');

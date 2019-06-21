@@ -1,4 +1,4 @@
-const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
+const createSVDocumentMongoDbRepositoryFactory = require('../../../../../lib/stateView/document/mongoDbRepository/createSVDocumentMongoDbRepositoryFactory');
 
 describe('createSVDocumentMongoDbRepositoryFactory', () => {
   let mongoClient;

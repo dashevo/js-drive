@@ -1,18 +1,13 @@
 const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
 
-const SVDocument = require('../../../../lib/stateView/document/SVDocument');
-const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/SVDocumentMongoDbRepository');
+const SVDocument = require('../../../../../lib/stateView/document/SVDocument');
+const SVDocumentMongoDbRepository = require('../../../../../lib/stateView/document/mongoDbRepository/SVDocumentMongoDbRepository');
 
-const sanitizer = require('../../../../lib/mongoDb/sanitizer');
+const sanitizer = require('../../../../../lib/mongoDb/sanitizer');
 
-const InvalidWhereError = require('../../../../lib/stateView/document/errors/InvalidWhereError');
-const InvalidOrderBy = require('../../../../lib/stateView/document/errors/InvalidOrderByError');
-const InvalidLimitError = require('../../../../lib/stateView/document/errors/InvalidLimitError');
-const InvalidStartAtError = require('../../../../lib/stateView/document/errors/InvalidStartAtError');
-const InvalidStartAfterError = require('../../../../lib/stateView/document/errors/InvalidStartAfterError');
-const AmbiguousStartError = require('../../../../lib/stateView/document/errors/AmbiguousStartError');
+const InvalidQueryError = require('../../../../../lib/stateView/document/errors/InvalidQueryError');
 
-const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');
+const getSVDocumentsFixture = require('../../../../../lib/test/fixtures/getSVDocumentsFixture');
 
 function sortAndJsonizeSVDocuments(svDocuments) {
   return svDocuments.sort((prev, next) => (

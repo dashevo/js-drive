@@ -14,11 +14,11 @@ const ReaderMediator = require('../../../../lib/blockchain/reader/BlockchainRead
 
 const Revision = require('../../../../lib/stateView/revisions/Revision');
 const Reference = require('../../../../lib/stateView/revisions/Reference');
-const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/SVDocumentMongoDbRepository');
+const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/mongoDbRepository/SVDocumentMongoDbRepository');
 const SVDocument = require('../../../../lib/stateView/document/SVDocument');
 
 const revertSVDocumentsForStateTransitionFactory = require('../../../../lib/stateView/document/revertSVDocumentsForStateTransitionFactory');
-const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
+const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/mongoDbRepository/createSVDocumentMongoDbRepositoryFactory');
 const updateSVDocumentFactory = require('../../../../lib/stateView/document/updateSVDocumentFactory');
 const applyStateTransitionFactory = require('../../../../lib/stateView/applyStateTransitionFactory');
 const applyStateTransitionFromReferenceFactory = require('../../../../lib/stateView/applyStateTransitionFromReferenceFactory');

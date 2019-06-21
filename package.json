@@ -1,6 +1,6 @@
 {
   "name": "@dashevo/drive",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "description": "Decentralized application storage on the Dash network",
   "engines": {
     "node": ">=8"
@@ -49,6 +49,7 @@
     "@dashevo/dashcore-lib": "github:dashevo/dashcore-lib#fix-script",
     "@dashevo/dashd-rpc": "^1.3.0",
     "@dashevo/dpp": "^0.7.1",
+    "ajv": "^6.10.0",
     "bs58": "^4.0.1",
     "cids": "^0.5.8",
     "connect": "^3.6.6",
@@ -57,6 +58,7 @@
     "emittery": "^0.4.1",
     "ipfs-http-client": "^28.1.0",
     "jayson": "^2.1.2",
+    "lodash.escaperegexp": "^4.1.2",
     "mongodb": "^3.2.2",
     "multihashes": "^0.4.13",
     "recursive-iterator": "^3.3.0",
