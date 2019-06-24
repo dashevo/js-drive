@@ -37,56 +37,56 @@ describe('validateQueryFactory', () => {
       it('should return invalid result if condition array has more than 3 elements (field, operator, value)');
 
       describe('comparisons', () => {
-        it('should return valid result if "<" operator is used with a numeric value');
-        it('should return valid result if "<" operator is used with a string value');
-        it('should return invalid result if "<" operator is used with a string value longer than 512 chars');
-        it('should return valid result if "<" operator is used with a boolean value');
-        it('should return invalid result if "<" operator is used with a not scalar value');
-        it('should return valid result if "<=" operator is used with scalar value');
-        it('should return valid result if "==" operator is used with scalar value');
-        it('should return valid result if ">=" operator is used with scalar value');
-        it('should return valid result if ">" operator is used with scalar value');
+        it('should return valid result if "<" operator used with a numeric value');
+        it('should return valid result if "<" operator used with a string value');
+        it('should return invalid result if "<" operator used with a string value longer than 512 chars');
+        it('should return valid result if "<" operator used with a boolean value');
+        it('should return invalid result if "<" operator used with a not scalar value');
+        it('should return valid result if "<=" operator used with scalar value');
+        it('should return valid result if "==" operator used with scalar value');
+        it('should return valid result if ">=" operator used with scalar value');
+        it('should return valid result if ">" operator used with scalar value');
       });
 
       describe('in', () => {
-        it('should return valid result if "in" operator is used with an array value');
-        it('should return invalid result if "in" operator is used with not an array value');
-        it('should return invalid result if "in" operator is used with an empty array value');
-        it('should return invalid result if "in" operator is used with an array value which contains more than 100'
+        it('should return valid result if "in" operator used with an array value');
+        it('should return invalid result if "in" operator used with not an array value');
+        it('should return invalid result if "in" operator used with an empty array value');
+        it('should return invalid result if "in" operator used with an array value which contains more than 100'
           + ' elements');
-        it('should return invalid result if "in" operator is used with an array which contains not unique elements');
+        it('should return invalid result if "in" operator used with an array which contains not unique elements');
       });
 
       describe('startsWith', () => {
-        it('should return valid result if "startsWith" operator is used with a string value');
-        it('should return invalid result if "startsWith" operator is used with an empty string value');
-        it('should return invalid result if "startsWith" operator is used with a string value which is more than 255'
+        it('should return valid result if "startsWith" operator used with a string value');
+        it('should return invalid result if "startsWith" operator used with an empty string value');
+        it('should return invalid result if "startsWith" operator used with a string value which is more than 255'
           + ' chars long');
-        it('should return invalid result if "startWith" operator is used with a not string value');
+        it('should return invalid result if "startWith" operator used with a not string value');
       });
 
       describe('elementMatch', () => {
-        it('should return valid result if "elementMatch" operator is used with "where" conditions');
-        it('should return invalid result if "elementMatch" operator is used with invalid "where" conditions');
-        it('should return invalid result if "elementMatch" operator is used with less than 2 "where" conditions');
+        it('should return valid result if "elementMatch" operator used with "where" conditions');
+        it('should return invalid result if "elementMatch" operator used with invalid "where" conditions');
+        it('should return invalid result if "elementMatch" operator used with less than 2 "where" conditions');
         it('should return invalid result if value contains conflicting conditions');
         it('should return invalid result if value contains nested "elementMatch" operator');
       });
 
       describe('length', () => {
-        it('should return valid result if "length" operator is used with a numeric value');
-        it('should return invalid result if "length" operator is used with a float numeric value');
-        it('should return invalid result if "length" operator is used with a numeric value which is less than 0');
-        it('should return invalid result if "length" operator is used with a not numeric value');
+        it('should return valid result if "length" operator used with a numeric value');
+        it('should return invalid result if "length" operator used with a float numeric value');
+        it('should return invalid result if "length" operator used with a numeric value which is less than 0');
+        it('should return invalid result if "length" operator used with a not numeric value');
       });
 
       describe('contains', () => {
-        it('should return valid result if "contains" operator is used with a scalar value');
-        it('should return valid result if "contains" operator is used with an array of scalar values');
-        it('should return invalid result if "contains" operator is used with an array which has '
+        it('should return valid result if "contains" operator used with a scalar value');
+        it('should return valid result if "contains" operator used with an array of scalar values');
+        it('should return invalid result if "contains" operator used with an array which has '
           + ' more than 100 elements');
-        it('should return invalid result if "contains" operator is used with an empty array');
-        it('should return invalid result if "contains" operator is used with an array which contains not unique'
+        it('should return invalid result if "contains" operator used with an empty array');
+        it('should return invalid result if "contains" operator used with an array which contains not unique'
           + ' elements');
       });
     });
@@ -100,9 +100,10 @@ describe('validateQueryFactory', () => {
   });
 
   describe('orderBy', () => {
-    it('should return valid result if ');
+    it('should return valid result if "orderBy" contains 1 sorting field');
+    it('should return valid result if "orderBy" contains 2 sorting fields');
     it('should return invalid result if "orderBy" is an empty array');
-    it('should return invalid result if "orderBy" has more than two sorting fields');
+    it('should return invalid result if "orderBy" has more than 2 sorting fields');
     it('should return invalid result if "orderBy" has wrong field format');
     it('should return invalid result if "orderBy" has wrong direction');
     it('should return invalid result if "orderBy" field array has less than 2 elements (field, direction)');
