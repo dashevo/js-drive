@@ -4,6 +4,9 @@ const SVDocument = require('../../../../../lib/stateView/document/SVDocument');
 const SVDocumentMongoDbRepository = require('../../../../../lib/stateView/document/mongoDbRepository/SVDocumentMongoDbRepository');
 
 const sanitizer = require('../../../../../lib/mongoDb/sanitizer');
+const convertWhereToMongoDbQuery = require('../../../../../lib/stateView/document/mongoDbRepository/convertWhereToMongoDbQuery');
+const validateQueryFactory = require('../../../../../lib/stateView/document/query/validateQueryFactory');
+const findConflictingConditions = require('../../../../../lib/stateView/document/query/findConflictingConditions');
 
 const InvalidQueryError = require('../../../../../lib/stateView/document/errors/InvalidQueryError');
 
@@ -31,9 +34,13 @@ describe('SVDocumentMongoDbRepository', function main() {
     svDocuments = getSVDocumentsFixture();
     [svDocument] = svDocuments;
 
+    const validateQuery = validateQueryFactory(findConflictingConditions);
+
     svDocumentRepository = new SVDocumentMongoDbRepository(
       mongoDatabase,
       sanitizer,
+      convertWhereToMongoDbQuery,
+      validateQuery,
       svDocument.getDocument().getType(),
     );
 
@@ -68,7 +75,7 @@ describe('SVDocumentMongoDbRepository', function main() {
     describe('where', () => {
       it('should fetch SVDocuments by where condition', async () => {
         const options = {
-          where: { 'document.name': svDocument.getDocument().get('name') },
+          where: [['name', '==', svDocument.getDocument().get('name')]],
         };
 
         const result = await svDocumentRepository.fetch(options);
@@ -92,7 +99,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(InvalidWhereError);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
 
       it('should throw InvalidWhereError if where clause is boolean', async () => {
@@ -107,47 +114,17 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(InvalidWhereError);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
 
       it('should return empty array if where clause conditions do not match', async () => {
         const options = {
-          where: { 'document.name': 'Dash enthusiast' },
+          where: [['name', '==', 'Dash enthusiast']],
         };
 
         const result = await svDocumentRepository.fetch(options);
 
         expect(result).to.deep.equal([]);
-      });
-
-      it('should throw an unknown operator error if where clause conditions are invalid', async () => {
-        const options = {
-          where: { 'document.name': { $dirty: true } },
-        };
-
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error.message).to.equal('unknown operator: $dirty');
-      });
-
-      it('should throw an unknown operator error if where clause conditions are invalid', async () => {
-        const options = {
-          where: { 'document.name': { $dirty: true } },
-        };
-
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error.message).to.equal('unknown operator: $dirty');
       });
     });
 
@@ -175,7 +152,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(InvalidLimitError);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
 
       it('should throw InvalidLimitError if limit is a boolean', async () => {
@@ -190,7 +167,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(InvalidLimitError);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
     });
 
@@ -253,7 +230,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(InvalidOrderBy);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
 
       it('should throw InvalidOrderBy if orderBy is a boolean', async () => {
@@ -268,7 +245,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(InvalidOrderBy);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
     });
 
@@ -309,7 +286,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(InvalidStartAtError);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
 
       it('should throw InvalidStartAtError if startAt is a boolean', async () => {
@@ -324,7 +301,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(InvalidStartAtError);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
 
       it('should start after 1 document', async () => {
@@ -363,7 +340,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(InvalidStartAfterError);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
 
       it('should throw InvalidStartAfterError if startAfter is a boolean', async () => {
@@ -378,7 +355,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(InvalidStartAfterError);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
 
       it('should throw AmbiguousStartError if both startAt and startAfter are present', async () => {
@@ -390,7 +367,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           error = e;
         }
 
-        expect(error).to.be.an.instanceOf(AmbiguousStartError);
+        expect(error).to.be.an.instanceOf(InvalidQueryError);
       });
     });
   });
