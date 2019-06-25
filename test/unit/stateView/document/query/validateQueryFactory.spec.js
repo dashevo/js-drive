@@ -70,6 +70,8 @@ describe('validateQueryFactory', () => {
         it('should return invalid result if "elementMatch" operator used with invalid "where" conditions');
         it('should return invalid result if "elementMatch" operator used with less than 2 "where" conditions');
         it('should return invalid result if value contains conflicting conditions');
+        it('should return invalid result if $id field is specified');
+        it('should return invalid result if $userId field is specified');
         it('should return invalid result if value contains nested "elementMatch" operator');
       });
 
