@@ -8,8 +8,6 @@ const convertWhereToMongoDbQuery = require('../../../../../lib/stateView/documen
 const validateQueryFactory = require('../../../../../lib/stateView/document/query/validateQueryFactory');
 const findConflictingConditions = require('../../../../../lib/stateView/document/query/findConflictingConditions');
 
-const InvalidQueryError = require('../../../../../lib/stateView/document/errors/InvalidQueryError');
-
 const getSVDocumentsFixture = require('../../../../../lib/test/fixtures/getSVDocumentsFixture');
 
 function sortAndJsonizeSVDocuments(svDocuments) {
@@ -70,62 +68,51 @@ describe('SVDocumentMongoDbRepository', function main() {
       expect(actualRawSVDocuments).to.have.deep.members(expectedRawSVDocuments);
     });
 
+    it('should throw InvalidQueryError if query is not valid');
+
     it('should not fetch SVDocument that is marked as deleted');
 
     describe('where', () => {
-      it('should fetch SVDocuments by where condition', async () => {
-        const options = {
+      it('should find SVDocuments using "<" operator');
+      it('should find SVDocuments using "<=" operator');
+
+      it('should find SVDocuments using "==" operator', async () => {
+        const query = {
           where: [['name', '==', svDocument.getDocument().get('name')]],
         };
 
-        const result = await svDocumentRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(query);
 
         expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(1);
 
         const [expectedSVDocument] = result;
 
         expect(expectedSVDocument.toJSON()).to.deep.equal(svDocument.toJSON());
       });
 
-      it('should throw InvalidWhereError if where clause is not an object', async () => {
-        const options = {
-          where: 'something',
-        };
-
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
-      });
-
-      it('should throw InvalidWhereError if where clause is boolean', async () => {
-        const options = {
-          where: false,
-        };
-
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
-      });
+      it('should find SVDocuments using ">" operator');
+      it('should find SVDocuments using ">=" operator');
+      it('should find SVDocuments using "in" operator');
+      it('should find SVDocuments using "length" operator');
+      it('should find SVDocuments using "startsWith" operator');
+      it('should find SVDocuments using "elementMatch" operator');
+      it('should find SVDocuments using "contains" operator and array value');
+      it('should find SVDocuments using "contains" operator and scalar value');
 
       it('should return empty array if where clause conditions do not match', async () => {
-        const options = {
+        const query = {
           where: [['name', '==', 'Dash enthusiast']],
         };
 
-        const result = await svDocumentRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(query);
 
         expect(result).to.deep.equal([]);
       });
+
+      it('should find SVDocuments by nested object fields');
+
+      it('should return SVDocuments by several conditions');
     });
 
     describe('limit', () => {
@@ -140,131 +127,26 @@ describe('SVDocumentMongoDbRepository', function main() {
         expect(result).to.have.lengthOf(1);
       });
 
-      it('should throw InvalidLimitError if limit is not a number', async () => {
-        const options = {
-          limit: 'something',
-        };
 
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
-      });
-
-      it('should throw InvalidLimitError if limit is a boolean', async () => {
-        const options = {
-          limit: false,
-        };
-
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
-      });
+      it('should limit return to 100 SVDocuments if limit is not set');
     });
 
-    describe('orderBy', () => {
-      it('should order desc', async () => {
+    describe('startAt', () => {
+      it('should return SVDocuments from 2 document', async () => {
         svDocuments.forEach((d, i) => d.getDocument().set('age', i + 1));
 
         await Promise.all(
           svDocuments.map(o => svDocumentRepository.store(o)),
         );
 
-        const options = {
-          orderBy: {
-            'document.age': -1,
-          },
-        };
-
-        const result = await svDocumentRepository.fetch(options);
-
-        expect(result).to.be.an('array');
-
-        const actualRawSVDocuments = result.map(d => d.toJSON());
-        const expectedRawSVDocuments = svDocuments.reverse().map(d => d.toJSON());
-
-        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
-      });
-
-      it('should order asc', async () => {
-        svDocuments.reverse().forEach((d, i) => d.getDocument().set('age', i + 1));
-
-        await Promise.all(
-          svDocuments.map(o => svDocumentRepository.store(o)),
-        );
-
-        const options = {
-          orderBy: {
-            'document.age': 1,
-          },
-        };
-
-        const result = await svDocumentRepository.fetch(options);
-
-        expect(result).to.be.an('array');
-
-        const actualRawSVDocuments = result.map(d => d.toJSON());
-        const expectedRawSVDocuments = svDocuments.map(d => d.toJSON());
-
-        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
-      });
-
-      it('should throw InvalidOrderBy if orderBy is not an object', async () => {
-        const options = {
-          orderBy: 'something',
-        };
-
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
-      });
-
-      it('should throw InvalidOrderBy if orderBy is a boolean', async () => {
-        const options = {
-          orderBy: false,
-        };
-
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
-      });
-    });
-
-    describe('start', () => {
-      it('should start at 1 document', async () => {
-        svDocuments.forEach((d, i) => d.getDocument().set('age', i + 1));
-
-        await Promise.all(
-          svDocuments.map(o => svDocumentRepository.store(o)),
-        );
-
-        const options = {
-          orderBy: {
-            'document.age': 1,
-          },
+        const query = {
+          orderBy: [
+            ['age', 'asc'],
+          ],
           startAt: 2,
         };
 
-        const result = await svDocumentRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(query);
 
         expect(result).to.be.an('array');
 
@@ -273,38 +155,10 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
+    });
 
-      it('should throw InvalidStartAtError if startAt is not a number', async () => {
-        const options = {
-          startAt: 'something',
-        };
-
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
-      });
-
-      it('should throw InvalidStartAtError if startAt is a boolean', async () => {
-        const options = {
-          startAt: 'something',
-        };
-
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
-
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
-      });
-
-      it('should start after 1 document', async () => {
+    describe('startAfter', () => {
+      it('should return SVDocuments after 1 document', async () => {
         svDocuments.forEach((d, i) => d.getDocument().set('age', i + 1));
 
         await Promise.all(
@@ -312,9 +166,9 @@ describe('SVDocumentMongoDbRepository', function main() {
         );
 
         const options = {
-          orderBy: {
-            'document.age': 1,
-          },
+          orderBy: [
+            ['age', 'asc'],
+          ],
           startAfter: 1,
         };
 
@@ -327,48 +181,60 @@ describe('SVDocumentMongoDbRepository', function main() {
 
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
+    });
 
-      it('should throw InvalidStartAfterError if startAfter is not a number', async () => {
-        const options = {
-          startAfter: 'something',
+    describe('orderBy', () => {
+      it('should sort SVDocuments in descending order', async () => {
+        svDocuments.forEach((d, i) => d.getDocument().set('age', i + 1));
+
+        await Promise.all(
+          svDocuments.map(o => svDocumentRepository.store(o)),
+        );
+
+        const query = {
+          orderBy: [
+            ['age', 'desc'],
+          ],
         };
 
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
+        const result = await svDocumentRepository.fetch(query);
 
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
+        expect(result).to.be.an('array');
+
+        const actualRawSVDocuments = result.map(d => d.toJSON());
+        const expectedRawSVDocuments = svDocuments.reverse().map(d => d.toJSON());
+
+        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
 
-      it('should throw InvalidStartAfterError if startAfter is a boolean', async () => {
-        const options = {
-          startAfter: false,
+      it('should sort SVDocuments in ascending order', async () => {
+        svDocuments.reverse().forEach((d, i) => d.getDocument().set('age', i + 1));
+
+        await Promise.all(
+          svDocuments.map(o => svDocumentRepository.store(o)),
+        );
+
+        const query = {
+          orderBy: [
+            ['age', 'asc'],
+          ],
         };
 
-        let error;
-        try {
-          await svDocumentRepository.fetch(options);
-        } catch (e) {
-          error = e;
-        }
+        const result = await svDocumentRepository.fetch(query);
 
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
+        expect(result).to.be.an('array');
+
+        const actualRawSVDocuments = result.map(d => d.toJSON());
+        const expectedRawSVDocuments = svDocuments.map(d => d.toJSON());
+
+        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
 
-      it('should throw AmbiguousStartError if both startAt and startAfter are present', async () => {
-        let error;
+      it('should sort SVDocuments using two fields');
 
-        try {
-          await svDocumentRepository.fetch({ startAt: 1, startAfter: 2 });
-        } catch (e) {
-          error = e;
-        }
+      it('should sort SVDocuments by $id');
 
-        expect(error).to.be.an.instanceOf(InvalidQueryError);
-      });
+      it('should sort SVDocuments by $userId');
     });
   });
 
