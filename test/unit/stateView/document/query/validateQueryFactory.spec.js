@@ -1,6 +1,55 @@
 const validateQueryFactory = require('../../../../../lib/stateView/document/query/validateQueryFactory');
 const ValidationResult = require('../../../../../lib/stateView/document/query/ValidationResult');
 
+const typesTestCases = {
+  number: {
+    type: 'number',
+    value: 1,
+  },
+  boolean: {
+    type: 'boolean',
+    value: true,
+  },
+  string: {
+    type: 'string',
+    value: 'test',
+  },
+  null: {
+    type: 'null',
+    value: null,
+  },
+  undefined: {
+    type: 'undefined',
+    value: undefined,
+  },
+  function: {
+    type: 'function',
+    value: () => {},
+  },
+  object: {
+    type: 'object',
+    value: {},
+  },
+};
+
+const notObjectTestCases = [
+  typesTestCases.number,
+  typesTestCases.boolean,
+  typesTestCases.string,
+  typesTestCases.null,
+  typesTestCases.undefined,
+  typesTestCases.function,
+];
+
+const notArrayTestCases = [
+  typesTestCases.number,
+  typesTestCases.boolean,
+  typesTestCases.string,
+  typesTestCases.null,
+  typesTestCases.object,
+  typesTestCases.function,
+];
+
 describe('validateQueryFactory', () => {
   let findConflictingConditionsStub;
   let validateQuery;
@@ -18,25 +67,6 @@ describe('validateQueryFactory', () => {
     expect(result.isValid()).to.be.true();
   });
 
-  const notObjectTestCases = [{
-    type: 'number',
-    value: 1,
-  }, {
-    type: 'boolean',
-    value: true,
-  }, {
-    type: 'string',
-    value: 'test',
-  }, {
-    type: 'null',
-    value: null,
-  }, {
-    type: 'undefined',
-    value: undefined,
-  }, {
-    type: 'function',
-    value: () => {},
-  }];
   notObjectTestCases.forEach((testCase) => {
     const { type, value } = testCase;
     it(`should return invalid result if query is a ${type}`, () => {
@@ -47,11 +77,23 @@ describe('validateQueryFactory', () => {
     });
   });
   it('should return valid result when some valid sample query is passed', () => {
+    const result = validateQuery({ where: [['a', '>', 1]] });
 
+    expect(result).to.be.instanceOf(ValidationResult);
+    expect(result.isValid()).to.be.true();
   });
 
   describe('where', () => {
-    it('should return invalid result if "where" is not an array');
+    notArrayTestCases.forEach((testCase) => {
+      const { type, value } = testCase;
+      it(`should return invalid result if "where" is not an array, but ${type}`, () => {
+        const result = validateQuery({ where: value });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.false();
+      });
+    });
+
     it('should return invalid result if "where" is an empty array');
     it('should return invalid result if "where" contains more than 10 conditions');
     it('should return invalid result if "where" contains conflicting conditions');
