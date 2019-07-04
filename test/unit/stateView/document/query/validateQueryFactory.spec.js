@@ -1,5 +1,6 @@
 const validateQueryFactory = require('../../../../../lib/stateView/document/query/validateQueryFactory');
 const ValidationResult = require('../../../../../lib/stateView/document/query/ValidationResult');
+const ConflictingConditionsError = require('../../../../../lib/stateView/document/query/errors/ConflictingConditionsError');
 
 const typesTestCases = {
   number: {
@@ -77,6 +78,8 @@ describe('validateQueryFactory', () => {
     });
   });
   it('should return valid result when some valid sample query is passed', () => {
+    findConflictingConditionsStub.returns([]);
+
     const result = validateQuery({ where: [['a', '>', 1]] });
 
     expect(result).to.be.instanceOf(ValidationResult);
@@ -94,9 +97,49 @@ describe('validateQueryFactory', () => {
       });
     });
 
-    it('should return invalid result if "where" is an empty array');
-    it('should return invalid result if "where" contains more than 10 conditions');
-    it('should return invalid result if "where" contains conflicting conditions');
+    it('should return invalid result if "where" is an empty array', () => {
+      const result = validateQuery({ where: [] });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "where" contains more than 10 conditions', () => {
+      findConflictingConditionsStub.returns([]);
+
+      const result = validateQuery({
+        where: [
+          ['a', '<', 1],
+          ['a', '<', 1],
+          ['a', '<', 1],
+          ['a', '<', 1],
+          ['a', '<', 1],
+          ['a', '<', 1],
+          ['a', '<', 1],
+          ['a', '<', 1],
+          ['a', '<', 1],
+          ['a', '<', 1],
+          ['a', '<', 1],
+        ],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "where" contains conflicting conditions', () => {
+      findConflictingConditionsStub.returns([['a', ['<', '>']]]);
+
+      const result = validateQuery({
+        where: [
+          ['a', '<', 1],
+          ['a', '>', 1],
+        ],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+      expect(result.errors[0]).to.be.an.instanceOf(ConflictingConditionsError);
+      expect(result.errors[0].message).to.be.equal('Using multiple conditions (<, >) with a single field ("a") is not allowed');
+    });
 
     describe('condition', () => {
       it('should return valid result if condition contains "$id" field');
