@@ -142,13 +142,71 @@ describe('validateQueryFactory', () => {
     });
 
     describe('condition', () => {
-      it('should return valid result if condition contains "$id" field');
-      it('should return valid result if condition contains "$userId" field');
-      it('should return valid result if condition contains top-level field');
-      it('should return valid result if condition contains nested path field');
-      it('should return invalid result if condition contains wrong field format');
-      it('should return invalid result if condition array has less than 3 elements (field, operator, value)');
-      it('should return invalid result if condition array has more than 3 elements (field, operator, value)');
+      it('should return valid result if condition contains "$id" field', () => {
+        findConflictingConditionsStub.returns([]);
+
+        const result = validateQuery({ where: [['$id', '==', 'idvalue']] });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.true();
+      });
+      it('should return valid result if condition contains "$userId" field', () => {
+        findConflictingConditionsStub.returns([]);
+
+        const result = validateQuery({ where: [['$userId', '==', 'userid']] });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.true();
+      });
+      it('should return valid result if condition contains top-level field', () => {
+        findConflictingConditionsStub.returns([]);
+
+        const result = validateQuery({ where: [['a', '==', '1']] });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.true();
+      });
+      it('should return valid result if condition contains nested path field', () => {
+        findConflictingConditionsStub.returns([]);
+
+        const result = validateQuery({ where: [['a.b', '==', '1']] });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.true();
+      });
+      it('should return invalid result if condition contains wrong field format', () => {
+        findConflictingConditionsStub.returns([]);
+
+        const result = validateQuery({ where: [['$a', '==', '1']] });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.false();
+      });
+      it('should return invalid result if condition contains wrong field format', () => {
+        findConflictingConditionsStub.returns([]);
+
+        const result = validateQuery({ where: [['...', '==', '1']] });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        // TODO: is that a valid name?
+        expect(result.isValid()).to.be.false();
+      });
+      it('should return invalid result if condition array has less than 3 elements (field, operator, value)', () => {
+        findConflictingConditionsStub.returns([]);
+
+        const result = validateQuery({ where: [['a', '==']] });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.false();
+      });
+      it('should return invalid result if condition array has more than 3 elements (field, operator, value)', () => {
+        findConflictingConditionsStub.returns([]);
+
+        const result = validateQuery({ where: [['a', '==', '1', '2']] });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.false();
+      });
 
       describe('comparisons', () => {
         it('should return valid result if "<" operator used with a numeric value');
