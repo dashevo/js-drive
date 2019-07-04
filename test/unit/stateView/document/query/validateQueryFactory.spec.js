@@ -18,8 +18,37 @@ describe('validateQueryFactory', () => {
     expect(result.isValid()).to.be.true();
   });
 
-  it('should return invalid result if query is not an object');
-  it('should return valid result when some valid sample query is passed');
+  const notObjectTestCases = [{
+    type: 'number',
+    value: 1,
+  }, {
+    type: 'boolean',
+    value: true,
+  }, {
+    type: 'string',
+    value: 'test',
+  }, {
+    type: 'null',
+    value: null,
+  }, {
+    type: 'undefined',
+    value: undefined,
+  }, {
+    type: 'function',
+    value: () => {},
+  }];
+  notObjectTestCases.forEach((testCase) => {
+    const { type, value } = testCase;
+    it(`should return invalid result if query is a ${type}`, () => {
+      const result = validateQuery(value);
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+  });
+  it('should return valid result when some valid sample query is passed', () => {
+
+  });
 
   describe('where', () => {
     it('should return invalid result if "where" is not an array');
