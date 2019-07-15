@@ -608,7 +608,7 @@ describe('validateQueryFactory', () => {
           findConflictingConditionsStub.returns([]);
           const result = validateQuery({
             where: [
-              ['arr', 'length', 1.2],
+              ['arr', 'length', -1],
             ],
           });
 
@@ -739,10 +739,74 @@ describe('validateQueryFactory', () => {
   });
 
   describe('limit', () => {
-    it('should return valid result if "limit" is a number');
-    it('should return invalid result if "limit" is less than 1');
-    it('should return invalid result if "limit" is bigger than 100');
-    it('should return invalid result if "limit" is a float number');
+    it('should return valid result if "limit" is a number', () => {
+      findConflictingConditionsStub.returns([]);
+      const result = validateQuery({
+        where: [
+          ['a', '>', 1],
+        ],
+        limit: 1,
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.true();
+    });
+
+    it('should return invalid result if "limit" is less than 1', () => {
+      findConflictingConditionsStub.returns([]);
+      const where = [
+        ['a', '>', 1],
+      ];
+      let result = validateQuery({ where, limit: 0 });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+
+      result = validateQuery({ where, limit: -1 });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "limit" is bigger than 100', () => {
+      findConflictingConditionsStub.returns([]);
+      const where = [
+        ['a', '>', 1],
+      ];
+      let result = validateQuery({ where, limit: 100 });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.true();
+
+      result = validateQuery({ where, limit: 101 });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "limit" is a float number', () => {
+      findConflictingConditionsStub.returns([]);
+      const where = [
+        ['a', '>', 1],
+      ];
+      const result = validateQuery({ where, limit: 1.5 });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+
+    nonNumberTestCases.forEach(({ type, value }) => {
+      it(`should return invalid result if "limit" is not a number, but ${type}`, () => {
+        findConflictingConditionsStub.returns([]);
+        const result = validateQuery({
+          where: [
+            ['a', '>', 1],
+          ],
+          limit: value,
+        });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.false();
+      });
+    });
   });
 
   describe('orderBy', () => {
