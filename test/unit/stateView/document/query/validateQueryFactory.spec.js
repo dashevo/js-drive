@@ -959,9 +959,39 @@ describe('validateQueryFactory', () => {
       expect(result.isValid()).to.be.true();
     });
 
-    it('should return invalid result if "startAt" is not a number');
-    it('should return invalid result if "startAt" less than 1');
-    it('should return invalid result if "startAt" more than 20000');
+    nonNumberAndUndefinedTestCases.forEach(({ type, value }) => {
+      it(`should return invalid result if "startAt" is not a number, but ${type}`, () => {
+        const result = validateQuery({
+          startAfter: value,
+        });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.false();
+      });
+    });
+    it('should return invalid result if "startAt" less than 1', () => {
+      const result = validateQuery({
+        startAfter: 0,
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "startAt" more than 20000', () => {
+      let result = validateQuery({
+        startAfter: 20000,
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.true();
+
+      result = validateQuery({
+        startAfter: 20001,
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
   });
 
   describe('startAfter', () => {
