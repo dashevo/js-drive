@@ -82,6 +82,14 @@ const nonNumberTestCases = [
   typesTestCases.function,
 ];
 
+const nonNumberAndUndefinedTestCases = [
+  typesTestCases.string,
+  typesTestCases.boolean,
+  typesTestCases.null,
+  typesTestCases.object,
+  typesTestCases.function,
+];
+
 describe('validateQueryFactory', () => {
   let findConflictingConditionsStub;
   let validateQuery;
@@ -793,7 +801,7 @@ describe('validateQueryFactory', () => {
       expect(result.isValid()).to.be.false();
     });
 
-    nonNumberTestCases.forEach(({ type, value }) => {
+    nonNumberAndUndefinedTestCases.forEach(({ type, value }) => {
       it(`should return invalid result if "limit" is not a number, but ${type}`, () => {
         findConflictingConditionsStub.returns([]);
         const result = validateQuery({
