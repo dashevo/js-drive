@@ -64,6 +64,15 @@ const scalarTestCases = [
   typesTestCases.boolean,
 ];
 
+const nonStringTestCases = [
+  typesTestCases.number,
+  typesTestCases.boolean,
+  typesTestCases.null,
+  typesTestCases.undefined,
+  typesTestCases.object,
+  typesTestCases.function,
+];
+
 describe('validateQueryFactory', () => {
   let findConflictingConditionsStub;
   let validateQuery;
@@ -411,11 +420,38 @@ describe('validateQueryFactory', () => {
       });
 
       describe('startsWith', () => {
-        it('should return valid result if "startsWith" operator used with a string value');
-        it('should return invalid result if "startsWith" operator used with an empty string value');
+        it('should return valid result if "startsWith" operator used with a string value', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({ where: [['a', 'startsWith', 'b']] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+        });
+        it('should return invalid result if "startsWith" operator used with an empty string value', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({ where: [['a', 'startsWith', '']] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
         it('should return invalid result if "startsWith" operator used with a string value which is more than 255'
-          + ' chars long');
-        it('should return invalid result if "startWith" operator used with a not string value');
+          + ' chars long', () => {
+          findConflictingConditionsStub.returns([]);
+          const value = 'b'.repeat(256);
+          const result = validateQuery({ where: [['a', 'startsWith', value]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        nonStringTestCases.forEach(({ type, value }) => {
+          it(`should return invalid result if "startWith" operator used with a not string value, but ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+            const result = validateQuery({ where: [['a', 'startsWith', value]] });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.false();
+          });
+        });
       });
 
       describe('elementMatch', () => {
