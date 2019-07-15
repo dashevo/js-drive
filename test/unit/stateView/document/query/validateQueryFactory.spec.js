@@ -400,17 +400,17 @@ describe('validateQueryFactory', () => {
         it('should return invalid result if "in" operator used with an array value which contains more than 100'
           + ' elements', () => {
           findConflictingConditionsStub.returns([]);
-          const value = [];
+          const arr = [];
           for (let i = 0; i < 100; i++) {
-            value.push(i);
+            arr.push(i);
           }
-          let result = validateQuery({ where: [['a', 'in', value]] });
+          let result = validateQuery({ where: [['a', 'in', arr]] });
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
 
-          value.push(101);
-          result = validateQuery({ where: [['a', 'in', value]] });
+          arr.push(101);
+          result = validateQuery({ where: [['a', 'in', arr]] });
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
@@ -631,13 +631,109 @@ describe('validateQueryFactory', () => {
       });
 
       describe('contains', () => {
-        it('should return valid result if "contains" operator used with a scalar value');
-        it('should return valid result if "contains" operator used with an array of scalar values');
+        scalarTestCases.forEach(({ type, value }) => {
+          it(`should return valid result if "contains" operator used with a scalar value ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+            const result = validateQuery({
+              where: [
+                ['arr', 'contains', value],
+              ],
+            });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.true();
+          });
+        });
+
+        scalarTestCases.forEach(({ type, value }) => {
+          it(`should return valid result if "contains" operator used with an array of scalar values ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+            const result = validateQuery({
+              where: [
+                ['arr', 'contains', [value]],
+              ],
+            });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.true();
+          });
+        });
         it('should return invalid result if "contains" operator used with an array which has '
-          + ' more than 100 elements');
-        it('should return invalid result if "contains" operator used with an empty array');
+          + ' more than 100 elements', () => {
+          findConflictingConditionsStub.returns([]);
+          const arr = [];
+          for (let i = 0; i < 100; i++) {
+            arr.push(i);
+          }
+          let result = validateQuery({
+            where: [
+              ['arr', 'contains', arr],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+
+          arr.push(101);
+
+          result = validateQuery({
+            where: [
+              ['arr', 'contains', arr],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('should return invalid result if "contains" operator used with an empty array', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'contains', []],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
         it('should return invalid result if "contains" operator used with an array which contains not unique'
-          + ' elements');
+          + ' elements', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'contains', [1, 1]],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        nonScalarTestCases.forEach(({ type, value }) => {
+          it(`should return invalid result if used with non-scalar value ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+            const result = validateQuery({
+              where: [
+                ['arr', 'contains', value],
+              ],
+            });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.false();
+          });
+        });
+        nonScalarTestCases.forEach(({ type, value }) => {
+          it(`should return invalid result if used with an array of non-scalar values ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+            const result = validateQuery({
+              where: [
+                ['arr', 'contains', [value]],
+              ],
+            });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.false();
+          });
+        });
       });
     });
   });
