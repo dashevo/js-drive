@@ -818,15 +818,135 @@ describe('validateQueryFactory', () => {
   });
 
   describe('orderBy', () => {
-    it('should return valid result if "orderBy" contains 1 sorting field');
-    it('should return valid result if "orderBy" contains 2 sorting fields');
-    it('should return invalid result if "orderBy" is an empty array');
-    it('should return invalid result if "orderBy" has more than 2 sorting fields');
-    it('should return invalid result if "orderBy" has wrong field format');
-    it('should return invalid result if "orderBy" has wrong direction');
-    it('should return invalid result if "orderBy" field array has less than 2 elements (field, direction)');
-    it('should return invalid result if "orderBy" field array has more than 2 elements (field, direction)');
-    it('should return invalid result if "orderBy" contains duplicate sorting fields');
+    it('should return valid result if "orderBy" contains 1 sorting field', () => {
+      findConflictingConditionsStub.returns([]);
+      const result = validateQuery({
+        where: [
+          ['a', '>', 1],
+        ],
+        orderBy: [['a', 'asc']],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.true();
+    });
+    it('should return valid result if "orderBy" contains 2 sorting fields', () => {
+      findConflictingConditionsStub.returns([]);
+      const result = validateQuery({
+        where: [
+          ['a', '>', 1],
+        ],
+        orderBy: [['a', 'asc'], ['b', 'desc']],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.true();
+    });
+    it('should return invalid result if "orderBy" is an empty array', () => {
+      findConflictingConditionsStub.returns([]);
+      const result = validateQuery({
+        where: [
+          ['a', '>', 1],
+        ],
+        orderBy: [],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if the field inside an "orderBy" is an empty array', () => {
+      findConflictingConditionsStub.returns([]);
+      const result = validateQuery({
+        where: [
+          ['a', '>', 1],
+        ],
+        orderBy: [[]],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "orderBy" has more than 2 sorting fields', () => {
+      findConflictingConditionsStub.returns([]);
+      const result = validateQuery({
+        where: [
+          ['a', '>', 1],
+        ],
+        orderBy: [['a', 'asc'], ['b', 'desc'], ['c', 'asc']],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "orderBy" has wrong field format', () => {
+      findConflictingConditionsStub.returns([]);
+      const result = validateQuery({
+        where: [
+          ['a', '>', 1],
+        ],
+        orderBy: [['$a', 'asc']],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "orderBy" has wrong direction', () => {
+      findConflictingConditionsStub.returns([]);
+      const result = validateQuery({
+        where: [
+          ['a', '>', 1],
+        ],
+        orderBy: [['a', 'a']],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "orderBy" field array has less than 2 elements (field, direction)', () => {
+      findConflictingConditionsStub.returns([]);
+      const result = validateQuery({
+        where: [
+          ['a', '>', 1],
+        ],
+        orderBy: [['a']],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "orderBy" field array has more than 2 elements (field, direction)', () => {
+      findConflictingConditionsStub.returns([]);
+      const result = validateQuery({
+        where: [
+          ['a', '>', 1],
+        ],
+        orderBy: [['a', 'asc', 'desc']],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "orderBy" contains duplicate sorting fields', () => {
+      findConflictingConditionsStub.returns([]);
+      const where = [
+        ['a', '>', 1],
+      ];
+      let result = validateQuery({
+        where,
+        orderBy: [['a', 'asc'], ['a', 'asc']],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+
+      result = validateQuery({
+        where,
+        orderBy: [['a', 'asc'], ['a', 'desc']],
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
   });
 
   describe('startAt', () => {
