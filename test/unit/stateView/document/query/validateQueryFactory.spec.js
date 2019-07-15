@@ -425,14 +425,19 @@ describe('validateQueryFactory', () => {
         });
         it('should return invalid result if "in" operator used with an array which contains not unique elements', () => {
           findConflictingConditionsStub.returns([]);
-          const value = [1, 1];
-          const result = validateQuery({ where: [['a', 'in', value]] });
+          const arr = [1, 1];
+          const result = validateQuery({ where: [['a', 'in', arr]] });
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
         });
-        it('What are allowed value in the array? can it be other array?', () => {
-          throw new Error('Not implemented');
+        it('should return invalid results if condition contains empty arrays', () => {
+          findConflictingConditionsStub.returns([]);
+          const arr = [[], []];
+          const result = validateQuery({ where: [['a', 'in', arr]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
         });
       });
 
@@ -952,7 +957,7 @@ describe('validateQueryFactory', () => {
   describe('startAt', () => {
     it('should return valid result if "startAt" is a number', () => {
       const result = validateQuery({
-        startAfter: 1,
+        startAt: 1,
       });
 
       expect(result).to.be.instanceOf(ValidationResult);
@@ -962,7 +967,7 @@ describe('validateQueryFactory', () => {
     nonNumberAndUndefinedTestCases.forEach(({ type, value }) => {
       it(`should return invalid result if "startAt" is not a number, but ${type}`, () => {
         const result = validateQuery({
-          startAfter: value,
+          startAt: value,
         });
 
         expect(result).to.be.instanceOf(ValidationResult);
@@ -971,7 +976,7 @@ describe('validateQueryFactory', () => {
     });
     it('should return invalid result if "startAt" less than 1', () => {
       const result = validateQuery({
-        startAfter: 0,
+        startAt: 0,
       });
 
       expect(result).to.be.instanceOf(ValidationResult);
@@ -979,14 +984,14 @@ describe('validateQueryFactory', () => {
     });
     it('should return invalid result if "startAt" more than 20000', () => {
       let result = validateQuery({
-        startAfter: 20000,
+        startAt: 20000,
       });
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
 
       result = validateQuery({
-        startAfter: 20001,
+        startAt: 20001,
       });
 
       expect(result).to.be.instanceOf(ValidationResult);
@@ -994,7 +999,7 @@ describe('validateQueryFactory', () => {
     });
     it('should return invalid result if "startAt" is not an integer', () => {
       const result = validateQuery({
-        startAfter: 1.1,
+        startAt: 1.1,
       });
 
       expect(result).to.be.instanceOf(ValidationResult);
@@ -1030,8 +1035,46 @@ describe('validateQueryFactory', () => {
       expect(result.isValid()).to.be.true();
     });
 
-    it('should return invalid result if "startAfter" is not a number');
-    it('should return invalid result if "startAfter" less than 1');
-    it('should return invalid result if "startAfter" more than 20000');
+    nonNumberAndUndefinedTestCases.forEach(({ type, value }) => {
+      it(`should return invalid result if "startAftert" is not a number, but ${type}`, () => {
+        const result = validateQuery({
+          startAfter: value,
+        });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.false();
+      });
+    });
+    it('should return invalid result if "startAfter" less than 1', () => {
+      const result = validateQuery({
+        startAfter: 0,
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "startAfter" more than 20000', () => {
+      let result = validateQuery({
+        startAfter: 20000,
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.true();
+
+      result = validateQuery({
+        startAfter: 20001,
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
+    it('should return invalid result if "startAfter" is not an integer', () => {
+      const result = validateQuery({
+        startAfter: 1.1,
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
   });
 });
