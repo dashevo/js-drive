@@ -187,7 +187,7 @@ describe('validateQueryFactory', () => {
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.true();
       });
-      it('should return invalid result if condition contains wrong field format', () => {
+      it('should return invalid result if field name contains restricted symbols', () => {
         findConflictingConditionsStub.returns([]);
 
         const result = validateQuery({ where: [['$a', '==', '1']] });
@@ -195,13 +195,37 @@ describe('validateQueryFactory', () => {
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
       });
-      it('should return invalid result if condition contains wrong field format', () => {
+      it('should return invalid result if condition contains invalid condition operator', () => {
         findConflictingConditionsStub.returns([]);
+        const operators = ['<', '<=', '==', '>', '>='];
 
-        const result = validateQuery({ where: [['...', '==', '1']] });
+        operators.forEach((opertaor) => {
+          const result = validateQuery({ where: [['a', opertaor, '1']] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          // TODO: is that a valid name?
+          expect(result.isValid()).to.be.true();
+        });
+        const result = validateQuery({ where: [['a', '===', '1']] });
 
         expect(result).to.be.instanceOf(ValidationResult);
         // TODO: is that a valid name?
+        expect(result.isValid()).to.be.false();
+      });
+      it('should return invalid result if field name is more than 255 characters long', () => {
+        findConflictingConditionsStub.returns([]);
+        const fieldName = 'a'.repeat(255);
+
+        let result = validateQuery({ where: [[fieldName, '==', '1']] });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.true();
+
+        const longFieldName = 'a'.repeat(256);
+
+        result = validateQuery({ where: [[longFieldName, '==', '1']] });
+
+        expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
       });
       it('should return invalid result if condition array has less than 3 elements (field, operator, value)', () => {
@@ -243,7 +267,14 @@ describe('validateQueryFactory', () => {
 
           const longString = 't'.repeat(512);
 
-          const result = validateQuery({ where: [['a', '<', longString]] });
+          let result = validateQuery({ where: [['a', '<', longString]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+
+          const veryLongString = 't'.repeat(513);
+
+          result = validateQuery({ where: [['a', '<', veryLongString]] });
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
@@ -325,12 +356,58 @@ describe('validateQueryFactory', () => {
       });
 
       describe('in', () => {
-        it('should return valid result if "in" operator used with an array value');
-        it('should return invalid result if "in" operator used with not an array value');
-        it('should return invalid result if "in" operator used with an empty array value');
+        it('should return valid result if "in" operator used with an array value', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({ where: [['a', 'in', [1, 2]]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+        });
+        notArrayTestCases.forEach(({ type, value }) => {
+          it(`should return invalid result if "in" operator used with not an array value, but ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+            const result = validateQuery({ where: [['a', 'in', value]] });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.false();
+          });
+        });
+        it('should return invalid result if "in" operator used with an empty array value', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({ where: [['a', 'in', []]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
         it('should return invalid result if "in" operator used with an array value which contains more than 100'
-          + ' elements');
-        it('should return invalid result if "in" operator used with an array which contains not unique elements');
+          + ' elements', () => {
+          findConflictingConditionsStub.returns([]);
+          const value = [];
+          for (let i = 0; i < 100; i++) {
+            value.push(i);
+          }
+          let result = validateQuery({ where: [['a', 'in', value]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+
+          value.push(101);
+          result = validateQuery({ where: [['a', 'in', value]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('should return invalid result if "in" operator used with an array which contains not unique elements', () => {
+          findConflictingConditionsStub.returns([]);
+          const value = [1, 1];
+          const result = validateQuery({ where: [['a', 'in', value]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('What are allowed value in the array? can it be other array?', () => {
+          throw new Error('Not implemented');
+        });
       });
 
       describe('startsWith', () => {
