@@ -992,6 +992,14 @@ describe('validateQueryFactory', () => {
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
     });
+    it('should return invalid result if "startAt" is not an integer', () => {
+      const result = validateQuery({
+        startAfter: 1.1,
+      });
+
+      expect(result).to.be.instanceOf(ValidationResult);
+      expect(result.isValid()).to.be.false();
+    });
   });
 
   describe('startAfter', () => {
