@@ -51,6 +51,19 @@ const notArrayTestCases = [
   typesTestCases.function,
 ];
 
+const nonScalarTestCases = [
+  typesTestCases.null,
+  typesTestCases.undefined,
+  typesTestCases.function,
+  typesTestCases.object,
+];
+
+const scalarTestCases = [
+  typesTestCases.number,
+  typesTestCases.string,
+  typesTestCases.boolean,
+];
+
 describe('validateQueryFactory', () => {
   let findConflictingConditionsStub;
   let validateQuery;
@@ -209,15 +222,106 @@ describe('validateQueryFactory', () => {
       });
 
       describe('comparisons', () => {
-        it('should return valid result if "<" operator used with a numeric value');
-        it('should return valid result if "<" operator used with a string value');
-        it('should return invalid result if "<" operator used with a string value longer than 512 chars');
-        it('should return valid result if "<" operator used with a boolean value');
-        it('should return invalid result if "<" operator used with a not scalar value');
-        it('should return valid result if "<=" operator used with scalar value');
-        it('should return valid result if "==" operator used with scalar value');
-        it('should return valid result if ">=" operator used with scalar value');
-        it('should return valid result if ">" operator used with scalar value');
+        it('should return valid result if "<" operator used with a numeric value', () => {
+          findConflictingConditionsStub.returns([]);
+
+          const result = validateQuery({ where: [['a', '<', 1]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+        });
+        it('should return valid result if "<" operator used with a string value', () => {
+          findConflictingConditionsStub.returns([]);
+
+          const result = validateQuery({ where: [['a', '<', 'test']] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+        });
+        it('should return invalid result if "<" operator used with a string value longer than 512 chars', () => {
+          findConflictingConditionsStub.returns([]);
+
+          const longString = 't'.repeat(512);
+
+          const result = validateQuery({ where: [['a', '<', longString]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('should return valid result if "<" operator used with a boolean value', () => {
+          findConflictingConditionsStub.returns([]);
+
+          const result = validateQuery({ where: [['a', '<', true]] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+        });
+        nonScalarTestCases.forEach((testCase) => {
+          const { type, value } = testCase;
+          it(`should return invalid result if "<" operator used with a not scalar value, but ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+
+            const result = validateQuery({ where: [['a', '<', value]] });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.false();
+          });
+        });
+        scalarTestCases.forEach((testCase) => {
+          const { type, value } = testCase;
+          it(`should return valid result if "<" operator used with a scalar value ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+
+            const result = validateQuery({ where: [['a', '<', value]] });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.true();
+          });
+        });
+        scalarTestCases.forEach((testCase) => {
+          const { type, value } = testCase;
+          it(`should return valid result if "<=" operator used with a scalar value ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+
+            const result = validateQuery({ where: [['a', '<=', value]] });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.true();
+          });
+        });
+        scalarTestCases.forEach((testCase) => {
+          const { type, value } = testCase;
+          it(`should return valid result if "==" operator used with a scalar value ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+
+            const result = validateQuery({ where: [['a', '==', value]] });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.true();
+          });
+        });
+        scalarTestCases.forEach((testCase) => {
+          const { type, value } = testCase;
+          it(`should return valid result if ">=" operator used with a scalar value ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+
+            const result = validateQuery({ where: [['a', '<=', value]] });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.true();
+          });
+        });
+        scalarTestCases.forEach((testCase) => {
+          const { type, value } = testCase;
+          it(`should return valid result if ">=" operator used with a scalar value ${type}`, () => {
+            findConflictingConditionsStub.returns([]);
+
+            const result = validateQuery({ where: [['a', '>', value]] });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.true();
+          });
+        });
       });
 
       describe('in', () => {
