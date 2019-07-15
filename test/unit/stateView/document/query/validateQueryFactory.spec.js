@@ -73,6 +73,15 @@ const nonStringTestCases = [
   typesTestCases.function,
 ];
 
+const nonNumberTestCases = [
+  typesTestCases.string,
+  typesTestCases.boolean,
+  typesTestCases.null,
+  typesTestCases.undefined,
+  typesTestCases.object,
+  typesTestCases.function,
+];
+
 describe('validateQueryFactory', () => {
   let findConflictingConditionsStub;
   let validateQuery;
@@ -455,20 +464,170 @@ describe('validateQueryFactory', () => {
       });
 
       describe('elementMatch', () => {
-        it('should return valid result if "elementMatch" operator used with "where" conditions');
-        it('should return invalid result if "elementMatch" operator used with invalid "where" conditions');
-        it('should return invalid result if "elementMatch" operator used with less than 2 "where" conditions');
-        it('should return invalid result if value contains conflicting conditions');
-        it('should return invalid result if $id field is specified');
-        it('should return invalid result if $userId field is specified');
-        it('should return invalid result if value contains nested "elementMatch" operator');
+        it('should return valid result if "elementMatch" operator used with "where" conditions', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'elementMatch',
+                [['elem', '>', 1], ['elem', '<', 3]],
+              ],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+        });
+        it('should return invalid result if "elementMatch" operator used with invalid "where" conditions', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'elementMatch',
+                [['elem', 'startsWith', 1], ['elem', '<', 3]],
+              ],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('should return invalid result if "elementMatch" operator used with less than 2 "where" conditions', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'elementMatch',
+                [['elem', '>', 1]],
+              ],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('should return invalid result if value contains conflicting conditions', () => {
+          findConflictingConditionsStub.returns([['elem', ['>', '>']]]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'elementMatch',
+                [['elem', '>', 1], ['elem', '>', 1]],
+              ],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('should return invalid result if $id field is specified', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'elementMatch',
+                [['$id', '>', 1], ['$id', '<', 3]],
+              ],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('should return invalid result if $userId field is specified', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'elementMatch',
+                [['$userId', '>', 1], ['$userId', '<', 3]],
+              ],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('should return invalid result if value contains nested "elementMatch" operator', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'elementMatch',
+                [['subArr', 'elementMatch', [
+                  ['subArrElem', '>', 1], ['subArrElem', '<', 3],
+                ]], ['subArr', '<', 3]],
+              ],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
       });
 
       describe('length', () => {
-        it('should return valid result if "length" operator used with a numeric value');
-        it('should return invalid result if "length" operator used with a float numeric value');
-        it('should return invalid result if "length" operator used with a numeric value which is less than 0');
-        it('should return invalid result if "length" operator used with a not numeric value');
+        it('should return valid result if "length" operator used with a positive numeric value', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'length', 2],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+        });
+        it('should return valid result if "length" operator used with zero', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'length', 0],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.true();
+        });
+        it('should return invalid result if "length" operator used with a float numeric value', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'length', 1.2],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('should return invalid result if "length" operator used with a NaN', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'length', NaN],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        it('should return invalid result if "length" operator used with a numeric value which is less than 0', () => {
+          findConflictingConditionsStub.returns([]);
+          const result = validateQuery({
+            where: [
+              ['arr', 'length', 1.2],
+            ],
+          });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+        });
+        nonNumberTestCases.forEach(({ type, value }) => {
+          it(`should return invalid result if "length" operator used with a ${type} instead of numeric value`, () => {
+            findConflictingConditionsStub.returns([]);
+            const result = validateQuery({
+              where: [
+                ['arr', 'length', value],
+              ],
+            });
+
+            expect(result).to.be.instanceOf(ValidationResult);
+            expect(result.isValid()).to.be.false();
+          });
+        });
       });
 
       describe('contains', () => {
