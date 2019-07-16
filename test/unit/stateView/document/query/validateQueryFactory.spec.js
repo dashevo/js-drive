@@ -513,6 +513,9 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[2].dataPath).to.be.equal('.where[0][2]');
+          expect(result.errors[2].keyword).to.be.equal('maxLength');
+          expect(result.errors[2].message).to.be.equal('should NOT be longer than 255 characters');
         });
         nonStringTestCases.forEach(({ type, value }) => {
           it(`should return invalid result if "startWith" operator used with a not string value, but ${type}`, () => {
@@ -521,6 +524,9 @@ describe('validateQueryFactory', () => {
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
+            expect(result.errors[2].dataPath).to.be.equal('.where[0][2]');
+            expect(result.errors[2].keyword).to.be.equal('type');
+            expect(result.errors[2].message).to.be.equal('should be string');
           });
         });
       });
@@ -551,6 +557,9 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[9].dataPath).to.be.equal('.where[0][2][0]');
+          expect(result.errors[9].keyword).to.be.equal('oneOf');
+          expect(result.errors[9].message).to.be.equal('should match exactly one schema in oneOf');
         });
         it('should return invalid result if "elementMatch" operator used with less than 2 "where" conditions', () => {
           findConflictingConditionsStub.returns([]);
@@ -564,6 +573,9 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[3].dataPath).to.be.equal('.where[0][2]');
+          expect(result.errors[3].keyword).to.be.equal('minItems');
+          expect(result.errors[3].message).to.be.equal('should NOT have fewer than 2 items');
         });
         it('should return invalid result if value contains conflicting conditions', () => {
           findConflictingConditionsStub.returns([['elem', ['>', '>']]]);
@@ -577,6 +589,8 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[0].dataPath).to.be.equal('elem');
+          expect(result.errors[0].message).to.be.equal('Using multiple conditions (>,>) with a single field ("elem") is not allowed');
         });
         it('should return invalid result if $id field is specified', () => {
           findConflictingConditionsStub.returns([]);
@@ -590,6 +604,8 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[0].dataPath).to.be.equal('$id');
+          expect(result.errors[0].message).to.be.equal('Field $id is not supported in nested objects');
         });
         it('should return invalid result if $userId field is specified', () => {
           findConflictingConditionsStub.returns([]);
@@ -618,6 +634,8 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[0].dataPath).to.be.equal('subArr');
+          expect(result.errors[0].message).to.be.equal('Nested "elementMatch" operator is not supported');
         });
       });
 
@@ -654,6 +672,8 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[4].dataPath).to.be.equal('.where[0][2]');
+          expect(result.errors[4].message).to.be.equal('should be multiple of 1');
         });
         it('should return invalid result if "length" operator used with a NaN', () => {
           findConflictingConditionsStub.returns([]);
@@ -665,6 +685,9 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[4].dataPath).to.be.equal('.where[0][2]');
+          expect(result.errors[4].keyword).to.be.equal('minimum');
+          expect(result.errors[4].message).to.be.equal('should be >= 0');
         });
         it('should return invalid result if "length" operator used with a numeric value which is less than 0', () => {
           findConflictingConditionsStub.returns([]);
@@ -676,6 +699,9 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[4].dataPath).to.be.equal('.where[0][2]');
+          expect(result.errors[4].keyword).to.be.equal('minimum');
+          expect(result.errors[4].message).to.be.equal('should be >= 0');
         });
         nonNumberTestCases.forEach(({ type, value }) => {
           it(`should return invalid result if "length" operator used with a ${type} instead of numeric value`, () => {
@@ -688,6 +714,9 @@ describe('validateQueryFactory', () => {
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
+            expect(result.errors[4].dataPath).to.be.equal('.where[0][2]');
+            expect(result.errors[4].keyword).to.be.equal('type');
+            expect(result.errors[4].message).to.be.equal('should be number');
           });
         });
       });
@@ -746,6 +775,9 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[9].dataPath).to.be.equal('.where[0][2]');
+          expect(result.errors[9].keyword).to.be.equal('maxItems');
+          expect(result.errors[9].message).to.be.equal('should not have more than 100 items');
         });
         it('should return invalid result if "contains" operator used with an empty array', () => {
           findConflictingConditionsStub.returns([]);
@@ -757,6 +789,9 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[9].dataPath).to.be.equal('.where[0][2]');
+          expect(result.errors[9].keyword).to.be.equal('minItems');
+          expect(result.errors[9].message).to.be.equal('should NOT have fewer than 1 items');
         });
         it('should return invalid result if "contains" operator used with an array which contains not unique'
           + ' elements', () => {
@@ -769,6 +804,9 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
+          expect(result.errors[4].dataPath).to.be.equal('.where[0][2]');
+          expect(result.errors[4].keyword).to.be.equal('uniqueItems');
+          expect(result.errors[4].message).to.be.equal('shoud NOT have duplicate items (items ## 0 and 1 are identical)');
         });
         nonScalarTestCases.forEach(({ type, value }) => {
           it(`should return invalid result if used with non-scalar value ${type}`, () => {
@@ -781,6 +819,15 @@ describe('validateQueryFactory', () => {
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
+            expect(result.errors[5].dataPath).to.be.equal('.where[0][2]');
+            expect(result.errors[5].keyword).to.be.equal('type');
+            expect(result.errors[5].message).to.be.equal('should be string');
+            expect(result.errors[6].dataPath).to.be.equal('.where[0][2]');
+            expect(result.errors[6].keyword).to.be.equal('type');
+            expect(result.errors[6].message).to.be.equal('should be number');
+            expect(result.errors[7].dataPath).to.be.equal('.where[0][2]');
+            expect(result.errors[7].keyword).to.be.equal('type');
+            expect(result.errors[7].message).to.be.equal('should be boolean');
           });
         });
         nonScalarTestCases.forEach(({ type, value }) => {
@@ -794,6 +841,15 @@ describe('validateQueryFactory', () => {
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
+            expect(result.errors[9].dataPath).to.be.equal('.where[0][2][0]');
+            expect(result.errors[9].keyword).to.be.equal('type');
+            expect(result.errors[9].message).to.be.equal('should be string');
+            expect(result.errors[10].dataPath).to.be.equal('.where[0][2][0]');
+            expect(result.errors[10].keyword).to.be.equal('type');
+            expect(result.errors[10].message).to.be.equal('should be number');
+            expect(result.errors[11].dataPath).to.be.equal('.where[0][2][0]');
+            expect(result.errors[11].keyword).to.be.equal('type');
+            expect(result.errors[11].message).to.be.equal('should be boolean');
           });
         });
       });
@@ -823,11 +879,17 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.limit');
+      expect(result.errors[0].keyword).to.be.equal('minimum');
+      expect(result.errors[0].message).to.be.equal('should be >= 1');
 
       result = validateQuery({ where, limit: -1 });
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.limit');
+      expect(result.errors[0].keyword).to.be.equal('minimum');
+      expect(result.errors[0].message).to.be.equal('should be >= 1');
     });
     it('should return invalid result if "limit" is bigger than 100', () => {
       findConflictingConditionsStub.returns([]);
@@ -843,6 +905,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.limit');
+      expect(result.errors[0].keyword).to.be.equal('minimum');
+      expect(result.errors[0].message).to.be.equal('should be <= 100');
     });
     it('should return invalid result if "limit" is a float number', () => {
       findConflictingConditionsStub.returns([]);
@@ -853,6 +918,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.limit');
+      expect(result.errors[0].keyword).to.be.equal('multipleOf');
+      expect(result.errors[0].message).to.be.equal('should be multiple of 1');
     });
 
     nonNumberAndUndefinedTestCases.forEach(({ type, value }) => {
@@ -867,6 +935,10 @@ describe('validateQueryFactory', () => {
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
+
+        expect(result.errors[0].dataPath).to.be.equal('.limit');
+        expect(result.errors[0].keyword).to.be.equal('type');
+        expect(result.errors[0].message).to.be.equal('should be number');
       });
     });
   });
@@ -907,6 +979,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.orderBy');
+      expect(result.errors[0].keyword).to.be.equal('minItems');
+      expect(result.errors[0].message).to.be.equal('should NOT have fewer than 1 items');
     });
     it('should return invalid result if the field inside an "orderBy" is an empty array', () => {
       findConflictingConditionsStub.returns([]);
@@ -919,6 +994,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.orderBy[0]');
+      expect(result.errors[0].keyword).to.be.equal('minItems');
+      expect(result.errors[0].message).to.be.equal('should NOT have fewer than 2 items');
     });
     it('should return invalid result if "orderBy" has more than 2 sorting fields', () => {
       findConflictingConditionsStub.returns([]);
@@ -931,6 +1009,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.orderBy[0]');
+      expect(result.errors[0].keyword).to.be.equal('minItems');
+      expect(result.errors[0].message).to.be.equal('should NOT have more than 2 items');
     });
     it('should return invalid result if "orderBy" has wrong field format', () => {
       findConflictingConditionsStub.returns([]);
@@ -943,6 +1024,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.orderBy[0][0]');
+      expect(result.errors[0].keyword).to.be.equal('pattern');
+      expect(result.errors[0].message).to.be.equal('should match pshould NOT have fewer than 2 itemsattern "^(\\$id|\\$userId|[a-zA-Z0-9-_.]+)$"');
     });
     it('should return invalid result if "orderBy" has wrong direction', () => {
       findConflictingConditionsStub.returns([]);
@@ -955,6 +1039,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.orderBy[0][1]');
+      expect(result.errors[0].keyword).to.be.equal('enum');
+      expect(result.errors[0].message).to.be.equal('should be equal to one of the allowed values');
     });
     it('should return invalid result if "orderBy" field array has less than 2 elements (field, direction)', () => {
       findConflictingConditionsStub.returns([]);
@@ -967,6 +1054,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.orderBy[0]');
+      expect(result.errors[0].keyword).to.be.equal('minItems');
+      expect(result.errors[0].message).to.be.equal('should NOT have fewer than 2 items');
     });
     it('should return invalid result if "orderBy" field array has more than 2 elements (field, direction)', () => {
       findConflictingConditionsStub.returns([]);
@@ -979,6 +1069,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.orderBy[0]');
+      expect(result.errors[0].keyword).to.be.equal('maxItems');
+      expect(result.errors[0].message).to.be.equal('should NOT have more than 2 items');
     });
     it('should return invalid result if "orderBy" contains duplicate sorting fields', () => {
       findConflictingConditionsStub.returns([]);
@@ -992,6 +1085,8 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].field).to.be.equal('a');
+      expect(result.errors[0].message).to.be.equal('Duplicate sorting field a');
 
       result = validateQuery({
         where,
@@ -1000,6 +1095,8 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].field).to.be.equal('a');
+      expect(result.errors[0].message).to.be.equal('Duplicate sorting field a');
     });
   });
 
@@ -1021,6 +1118,9 @@ describe('validateQueryFactory', () => {
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
+        expect(result.errors[0].dataPath).to.be.equal('.startAt');
+        expect(result.errors[0].keyword).to.be.equal('type');
+        expect(result.errors[0].message).to.be.equal('should be number');
       });
     });
     it('should return invalid result if "startAt" less than 1', () => {
@@ -1030,6 +1130,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.startAt');
+      expect(result.errors[0].keyword).to.be.equal('minimum');
+      expect(result.errors[0].message).to.be.equal('should be >= 1');
     });
     it('should return invalid result if "startAt" more than 20000', () => {
       let result = validateQuery({
@@ -1045,6 +1148,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.startAt');
+      expect(result.errors[0].keyword).to.be.equal('minimum');
+      expect(result.errors[0].message).to.be.equal('should be <= 20000');
     });
     it('should return invalid result if "startAt" is not an integer', () => {
       const result = validateQuery({
@@ -1053,6 +1159,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.startAt');
+      expect(result.errors[0].keyword).to.be.equal('multipleOf');
+      expect(result.errors[0].message).to.be.equal('should be multiple of 1');
     });
   });
 
@@ -1092,6 +1201,9 @@ describe('validateQueryFactory', () => {
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
+        expect(result.errors[0].dataPath).to.be.equal('.startAfter');
+        expect(result.errors[0].keyword).to.be.equal('type');
+        expect(result.errors[0].message).to.be.equal('should be number');
       });
     });
     it('should return invalid result if "startAfter" less than 1', () => {
@@ -1101,6 +1213,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.startAfter');
+      expect(result.errors[0].keyword).to.be.equal('minimum');
+      expect(result.errors[0].message).to.be.equal('should be >= 1');
     });
     it('should return invalid result if "startAfter" more than 20000', () => {
       let result = validateQuery({
@@ -1116,6 +1231,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.startAfter');
+      expect(result.errors[0].keyword).to.be.equal('maximum');
+      expect(result.errors[0].message).to.be.equal('should be <= 20000');
     });
     it('should return invalid result if "startAfter" is not an integer', () => {
       const result = validateQuery({
@@ -1124,6 +1242,9 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
+      expect(result.errors[0].dataPath).to.be.equal('.startAfter');
+      expect(result.errors[0].keyword).to.be.equal('multipleOf');
+      expect(result.errors[0].message).to.be.equal('should be multiple of 1');
     });
   });
 });
