@@ -10,6 +10,8 @@ const findConflictingConditions = require('../../../../../lib/stateView/document
 
 const getSVDocumentsFixture = require('../../../../../lib/test/fixtures/getSVDocumentsFixture');
 
+const InvalidQueryError = require('../../../../../lib/stateView/document/errors/InvalidQueryError');
+
 function sortAndJsonizeSVDocuments(svDocuments) {
   return svDocuments.sort((prev, next) => (
     prev.getDocument().getId() > next.getDocument().getId()
@@ -30,6 +32,21 @@ describe('SVDocumentMongoDbRepository', function main() {
 
   beforeEach(async () => {
     svDocuments = getSVDocumentsFixture();
+
+    // Modify documents for the test cases
+    svDocuments.forEach((svDoc, i) => {
+      const document = svDoc.getDocument();
+
+      document.set('order', i);
+
+      document.set('arrayWithScalar', Array(i + 1)
+        .fill(1)
+        .map((item, index) => i + index));
+
+      const arrayItem = { item: i + 1, flag: true };
+      document.set('arrayWithObjects', Array(i + 1).fill(arrayItem));
+    });
+
     [svDocument] = svDocuments;
 
     const validateQuery = validateQueryFactory(findConflictingConditions);
@@ -68,13 +85,55 @@ describe('SVDocumentMongoDbRepository', function main() {
       expect(actualRawSVDocuments).to.have.deep.members(expectedRawSVDocuments);
     });
 
-    it('should throw InvalidQueryError if query is not valid');
+    it('should throw InvalidQueryError if query is not valid', async () => {
+      const invalidQuery = { invalid: 'query' };
+
+      let error;
+      try {
+        await svDocumentRepository.fetch(invalidQuery);
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).to.be.instanceOf(InvalidQueryError);
+      expect(error.getErrors()).has.lengthOf(1);
+    });
 
     it('should not fetch SVDocument that is marked as deleted');
 
     describe('where', () => {
-      it('should find SVDocuments using "<" operator');
-      it('should find SVDocuments using "<=" operator');
+      it('should find SVDocuments using "<" operator', async () => {
+        const query = {
+          where: [['order', '<', svDocuments[1].getDocument().get('order')]],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(1);
+
+        const [expectedSVDocument] = result;
+
+        expect(expectedSVDocument.toJSON()).to.deep.equal(svDocuments[0].toJSON());
+      });
+
+      it('should find SVDocuments using "<=" operator', async () => {
+        const query = {
+          where: [['order', '<=', svDocuments[1].getDocument().get('order')]],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(2);
+
+        const actualRawSVDocuments = sortAndJsonizeSVDocuments(result);
+
+        svDocuments.pop();
+        const expectedRawSVDocuments = sortAndJsonizeSVDocuments(svDocuments);
+
+        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
+      });
 
       it('should find SVDocuments using "==" operator', async () => {
         const query = {
@@ -91,14 +150,143 @@ describe('SVDocumentMongoDbRepository', function main() {
         expect(expectedSVDocument.toJSON()).to.deep.equal(svDocument.toJSON());
       });
 
-      it('should find SVDocuments using ">" operator');
-      it('should find SVDocuments using ">=" operator');
-      it('should find SVDocuments using "in" operator');
-      it('should find SVDocuments using "length" operator');
-      it('should find SVDocuments using "startsWith" operator');
-      it('should find SVDocuments using "elementMatch" operator');
-      it('should find SVDocuments using "contains" operator and array value');
-      it('should find SVDocuments using "contains" operator and scalar value');
+      it('should find SVDocuments using ">" operator', async () => {
+        const query = {
+          where: [['order', '>', svDocuments[1].getDocument().get('order')]],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(1);
+
+        const [expectedSVDocument] = result;
+
+        expect(expectedSVDocument.toJSON()).to.deep.equal(svDocuments[2].toJSON());
+      });
+
+      it('should find SVDocuments using ">=" operator', async () => {
+        const query = {
+          where: [['order', '>=', svDocuments[1].getDocument().get('order')]],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(2);
+
+        const actualRawSVDocuments = sortAndJsonizeSVDocuments(result);
+
+        svDocuments.shift();
+        const expectedRawSVDocuments = sortAndJsonizeSVDocuments(svDocuments);
+
+        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
+      });
+
+      it('should find SVDocuments using "in" operator', async () => {
+        const query = {
+          where: [
+            ['$id', 'in', [
+              svDocuments[0].getDocument().getId(),
+              svDocuments[1].getDocument().getId(),
+            ]],
+          ],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(2);
+
+        const actualRawSVDocuments = sortAndJsonizeSVDocuments(result);
+
+        svDocuments.pop();
+        const expectedRawSVDocuments = sortAndJsonizeSVDocuments(svDocuments);
+
+        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
+      });
+
+      it('should find SVDocuments using "length" operator', async () => {
+        const query = {
+          where: [['arrayWithObjects', 'length', 2]],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(1);
+
+        const [expectedSVDocument] = result;
+
+        expect(expectedSVDocument.toJSON()).to.deep.equal(svDocuments[1].toJSON());
+      });
+
+      it('should find SVDocuments using "startsWith" operator', async () => {
+        const query = {
+          where: [['lastName', 'startsWith', 'Swe']],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(1);
+
+        const [expectedSVDocument] = result;
+
+        expect(expectedSVDocument.toJSON()).to.deep.equal(svDocuments[2].toJSON());
+      });
+
+      it('should find SVDocuments using "elementMatch" operator', async () => {
+        const query = {
+          where: [
+            ['arrayWithObjects', 'elementMatch', [
+              ['item', '==', 2], ['flag', '==', true],
+            ]],
+          ],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(1);
+
+        const [expectedSVDocument] = result;
+
+        expect(expectedSVDocument.toJSON()).to.deep.equal(svDocuments[1].toJSON());
+      });
+
+      it('should find SVDocuments using "contains" operator and array value', async () => {
+        const query = {
+          where: [
+            ['arrayWithScalar', 'contains', [2, 3]],
+          ],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(1);
+
+        const [expectedSVDocument] = result;
+
+        expect(expectedSVDocument.toJSON()).to.deep.equal(svDocuments[2].toJSON());
+      });
+
+      it('should find SVDocuments using "contains" operator and scalar value', async () => {
+        const query = {
+          where: [
+            ['arrayWithScalar', 'contains', 2],
+          ],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(2);
+
+        expect(result[0].toJSON()).to.deep.equal(svDocuments[1].toJSON());
+        expect(result[1].toJSON()).to.deep.equal(svDocuments[2].toJSON());
+      });
 
       it('should return empty array if where clause conditions do not match', async () => {
         const query = {
@@ -110,9 +298,43 @@ describe('SVDocumentMongoDbRepository', function main() {
         expect(result).to.deep.equal([]);
       });
 
-      it('should find SVDocuments by nested object fields');
+      it('should find SVDocuments by nested object fields', async () => {
+        const query = {
+          where: [
+            ['arrayWithObjects.item', '==', 2],
+          ],
+        };
 
-      it('should return SVDocuments by several conditions');
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(1);
+
+        const [expectedSVDocument] = result;
+
+        expect(expectedSVDocument.toJSON()).to.deep.equal(svDocuments[1].toJSON());
+      });
+
+      it('should return SVDocuments by several conditions', async () => {
+        const query = {
+          where: [
+            ['name', '==', 'Cutie'],
+            ['arrayWithObjects', 'elementMatch', [
+              ['item', '==', 1],
+              ['flag', '==', true],
+            ]],
+          ],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(1);
+
+        const [expectedSVDocument] = result;
+
+        expect(expectedSVDocument.toJSON()).to.deep.equal(svDocuments[0].toJSON());
+      });
     });
 
     describe('limit', () => {
@@ -127,21 +349,31 @@ describe('SVDocumentMongoDbRepository', function main() {
         expect(result).to.have.lengthOf(1);
       });
 
+      it('should limit result to 100 SVDocuments if limit is not set', async () => {
+        // Store 101 document
+        await Promise.all(
+          Array(101).fill(svDocument).map((svDoc, i) => {
+            // Ensure unique ID
 
-      it('should limit return to 100 SVDocuments if limit is not set');
+            // eslint-disable-next-line no-param-reassign
+            svDoc.getDocument().id = i + 1;
+
+            return svDocumentRepository.store(svDoc);
+          }),
+        );
+
+        const result = await svDocumentRepository.fetch();
+
+        expect(result).to.be.an('array');
+        expect(result).to.have.lengthOf(100);
+      });
     });
 
     describe('startAt', () => {
       it('should return SVDocuments from 2 document', async () => {
-        svDocuments.forEach((d, i) => d.getDocument().set('age', i + 1));
-
-        await Promise.all(
-          svDocuments.map(o => svDocumentRepository.store(o)),
-        );
-
         const query = {
           orderBy: [
-            ['age', 'asc'],
+            ['order', 'asc'],
           ],
           startAt: 2,
         };
@@ -159,15 +391,9 @@ describe('SVDocumentMongoDbRepository', function main() {
 
     describe('startAfter', () => {
       it('should return SVDocuments after 1 document', async () => {
-        svDocuments.forEach((d, i) => d.getDocument().set('age', i + 1));
-
-        await Promise.all(
-          svDocuments.map(o => svDocumentRepository.store(o)),
-        );
-
         const options = {
           orderBy: [
-            ['age', 'asc'],
+            ['order', 'asc'],
           ],
           startAfter: 1,
         };
@@ -185,15 +411,9 @@ describe('SVDocumentMongoDbRepository', function main() {
 
     describe('orderBy', () => {
       it('should sort SVDocuments in descending order', async () => {
-        svDocuments.forEach((d, i) => d.getDocument().set('age', i + 1));
-
-        await Promise.all(
-          svDocuments.map(o => svDocumentRepository.store(o)),
-        );
-
         const query = {
           orderBy: [
-            ['age', 'desc'],
+            ['order', 'desc'],
           ],
         };
 
@@ -208,15 +428,9 @@ describe('SVDocumentMongoDbRepository', function main() {
       });
 
       it('should sort SVDocuments in ascending order', async () => {
-        svDocuments.reverse().forEach((d, i) => d.getDocument().set('age', i + 1));
-
-        await Promise.all(
-          svDocuments.map(o => svDocumentRepository.store(o)),
-        );
-
         const query = {
           orderBy: [
-            ['age', 'asc'],
+            ['order', 'asc'],
           ],
         };
 
@@ -230,11 +444,88 @@ describe('SVDocumentMongoDbRepository', function main() {
         expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
 
-      it('should sort SVDocuments using two fields');
+      it('should sort SVDocuments using two fields', async () => {
+        svDocuments[0].getDocument().set('primaryOrder', 1);
+        svDocuments[1].getDocument().set('primaryOrder', 2);
+        svDocuments[2].getDocument().set('primaryOrder', 2);
 
-      it('should sort SVDocuments by $id');
+        await Promise.all(
+          svDocuments.map(o => svDocumentRepository.store(o)),
+        );
 
-      it('should sort SVDocuments by $userId');
+        const query = {
+          orderBy: [
+            ['primaryOrder', 'asc'],
+            ['order', 'desc'],
+          ],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(3);
+
+        expect(result[0].toJSON()).to.deep.equal(svDocuments[0].toJSON());
+        expect(result[1].toJSON()).to.deep.equal(svDocuments[2].toJSON());
+        expect(result[2].toJSON()).to.deep.equal(svDocuments[1].toJSON());
+      });
+
+      it('should sort SVDocuments by $id', async () => {
+        await Promise.all(
+          svDocuments.map(d => svDocumentRepository.delete(d)),
+        );
+
+        await Promise.all(
+          svDocuments.map((svDoc, i) => {
+            // eslint-disable-next-line no-param-reassign
+            svDoc.getDocument().id = i + 1;
+
+            return svDocumentRepository.store(svDoc);
+          }),
+        );
+
+        const query = {
+          orderBy: [
+            ['$id', 'desc'],
+          ],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(3);
+
+        expect(result[0].toJSON()).to.deep.equal(svDocuments[2].toJSON());
+        expect(result[1].toJSON()).to.deep.equal(svDocuments[1].toJSON());
+        expect(result[2].toJSON()).to.deep.equal(svDocuments[0].toJSON());
+      });
+
+      it('should sort SVDocuments by $userId', async () => {
+        await Promise.all(
+          svDocuments.map((svDoc, i) => {
+            svDoc.setUserId(i + 1);
+            // eslint-disable-next-line no-param-reassign
+            svDoc.getDocument().getMetadata().userId = i + 1;
+
+            return svDocumentRepository.store(svDoc);
+          }),
+        );
+
+        const query = {
+          orderBy: [
+            ['$userId', 'desc'],
+          ],
+        };
+
+        const result = await svDocumentRepository.fetch(query);
+
+        expect(result).to.be.an('array');
+        expect(result).to.be.lengthOf(3);
+
+        expect(result[0].toJSON()).to.deep.equal(svDocuments[2].toJSON());
+        expect(result[1].toJSON()).to.deep.equal(svDocuments[1].toJSON());
+        expect(result[2].toJSON()).to.deep.equal(svDocuments[0].toJSON());
+      });
     });
   });
 
