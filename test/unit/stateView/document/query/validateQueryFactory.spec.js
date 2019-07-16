@@ -107,8 +107,7 @@ describe('validateQueryFactory', () => {
     expect(result.isValid()).to.be.true();
   });
 
-  notObjectTestCases.forEach((testCase) => {
-    const { type, value } = testCase;
+  notObjectTestCases.forEach(({ type, value }) => {
     it(`should return invalid result if query is a ${type}`, () => {
       const result = validateQuery(value);
 
