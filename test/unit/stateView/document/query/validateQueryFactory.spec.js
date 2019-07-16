@@ -594,7 +594,7 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
-          expect(result.errors[0].field).to.be.equal('elem');
+          expect(result.errors[0].getField()).to.be.equal('elem');
           expect(result.errors[0].message).to.be.equal('Using multiple conditions (>, >) with a single field ("elem") is not allowed');
         });
         it('should return invalid result if $id field is specified', () => {
@@ -609,7 +609,7 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
-          expect(result.errors[0].field).to.be.equal('$id');
+          expect(result.errors[0].getField()).to.be.equal('$id');
           expect(result.errors[0].message).to.be.equal('Field $id is not supported in nested objects');
         });
         it('should return invalid result if $userId field is specified', () => {
@@ -639,7 +639,7 @@ describe('validateQueryFactory', () => {
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
-          expect(result.errors[0].field).to.be.equal('subArr');
+          expect(result.errors[0].getField()).to.be.equal('subArr');
           expect(result.errors[0].message).to.be.equal('Nested "elementMatch" operator is not supported');
         });
       });
@@ -1090,7 +1090,7 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
-      expect(result.errors[0].field).to.be.equal('a');
+      expect(result.errors[0].getField()).to.be.equal('a');
       expect(result.errors[0].message).to.be.equal('Duplicate sorting field a');
 
       result = validateQuery({
@@ -1100,7 +1100,7 @@ describe('validateQueryFactory', () => {
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
-      expect(result.errors[0].field).to.be.equal('a');
+      expect(result.errors[0].getField()).to.be.equal('a');
       expect(result.errors[0].message).to.be.equal('Duplicate sorting field a');
     });
   });
