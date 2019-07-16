@@ -238,8 +238,8 @@ describe('validateQueryFactory', () => {
         findConflictingConditionsStub.returns([]);
         const operators = ['<', '<=', '==', '>', '>='];
 
-        operators.forEach((opertaor) => {
-          const result = validateQuery({ where: [['a', opertaor, '1']] });
+        operators.forEach((operator) => {
+          const result = validateQuery({ where: [['a', operator, '1']] });
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
