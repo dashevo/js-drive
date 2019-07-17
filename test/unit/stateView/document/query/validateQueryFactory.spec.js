@@ -90,6 +90,25 @@ const nonNumberAndUndefinedTestCases = [
   typesTestCases.function,
 ];
 
+const validFieldNameTestCases = [
+  'a',
+  'a.b',
+  'a.b.c',
+  'array.element',
+  'a.0',
+  'a.0.b',
+  'a_._b',
+  'a-b.c_',
+];
+
+const invalidFieldNameTestCases = [
+  '$a',
+  '$#1321',
+  'a...',
+  '.a',
+  'a.b.c.',
+];
+
 describe('validateQueryFactory', () => {
   let findConflictingConditionsStub;
   let validateQuery;
@@ -1018,20 +1037,38 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('maxItems');
       expect(result.errors[0].message).to.be.equal('should NOT have more than 2 items');
     });
-    it('should return invalid result if "orderBy" has wrong field format', () => {
-      findConflictingConditionsStub.returns([]);
-      const result = validateQuery({
-        where: [
-          ['a', '>', 1],
-        ],
-        orderBy: [['$a', 'asc']],
-      });
 
-      expect(result).to.be.instanceOf(ValidationResult);
-      expect(result.isValid()).to.be.false();
-      expect(result.errors[0].dataPath).to.be.equal('.orderBy[0][0]');
-      expect(result.errors[0].keyword).to.be.equal('pattern');
-      expect(result.errors[0].message).to.be.equal('should match pattern "^(\\$id|\\$userId|[a-zA-Z0-9-_.]+)$"');
+    validFieldNameTestCases.forEach((fieldName) => {
+      it(`should return true if "orderBy" has valid field format, ${fieldName}`, () => {
+        findConflictingConditionsStub.returns([]);
+        const result = validateQuery({
+          where: [
+            [fieldName, '>', 1],
+          ],
+          orderBy: [[fieldName, 'asc']],
+        });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.true();
+      });
+    });
+
+    invalidFieldNameTestCases.forEach((fieldName) => {
+      it(`should return invalid result if "orderBy" has invalid field format, ${fieldName}`, () => {
+        findConflictingConditionsStub.returns([]);
+        const result = validateQuery({
+          where: [
+            ['a', '>', 1],
+          ],
+          orderBy: [['$a', 'asc']],
+        });
+
+        expect(result).to.be.instanceOf(ValidationResult);
+        expect(result.isValid()).to.be.false();
+        expect(result.errors[0].dataPath).to.be.equal('.orderBy[0][0]');
+        expect(result.errors[0].keyword).to.be.equal('pattern');
+        expect(result.errors[0].message).to.be.equal('should match pattern "^(\\$id|\\$userId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$"');
+      });
     });
     it('should return invalid result if "orderBy" has wrong direction', () => {
       findConflictingConditionsStub.returns([]);
