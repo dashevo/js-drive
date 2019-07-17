@@ -171,21 +171,9 @@ describe('validateQueryFactory', () => {
     it('should return invalid result if "where" contains more than 10 conditions', () => {
       findConflictingConditionsStub.returns([]);
 
-      const result = validateQuery({
-        where: [
-          ['a', '<', 1],
-          ['a', '<', 1],
-          ['a', '<', 1],
-          ['a', '<', 1],
-          ['a', '<', 1],
-          ['a', '<', 1],
-          ['a', '<', 1],
-          ['a', '<', 1],
-          ['a', '<', 1],
-          ['a', '<', 1],
-          ['a', '<', 1],
-        ],
-      });
+      const where = Array(11).fill(['a', '<', 1]);
+
+      const result = validateQuery({ where });
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
