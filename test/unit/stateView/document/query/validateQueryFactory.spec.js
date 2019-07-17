@@ -194,6 +194,8 @@ describe('validateQueryFactory', () => {
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
       expect(result.errors[0]).to.be.an.instanceOf(ConflictingConditionsError);
+      expect(result.errors[0].getField()).to.be.equal('a');
+      expect(result.errors[0].getOperators()).to.be.deep.equal(['<', '>']);
       expect(result.errors[0].message).to.be.equal('Using multiple conditions (<, >) with a single field ("a") is not allowed');
     });
 
