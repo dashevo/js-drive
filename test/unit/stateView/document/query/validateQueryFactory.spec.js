@@ -242,17 +242,23 @@ describe('validateQueryFactory', () => {
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.true();
       });
-      it('should return invalid result if field name contains restricted symbols', () => {
-        findConflictingConditionsStub.returns([]);
 
-        const result = validateQuery({ where: [['$a', '==', '1']] });
+      invalidFieldNameTestCases.forEach((fieldName) => {
+        it(`should return invalid result if field name contains restricted symbols: ${fieldName}`, () => {
+          findConflictingConditionsStub.returns([]);
 
-        expect(result).to.be.instanceOf(ValidationResult);
-        expect(result.isValid()).to.be.false();
-        expect(result.errors[6].dataPath).to.be.equal('.where[0]');
-        expect(result.errors[6].keyword).to.be.equal('oneOf');
-        expect(result.errors[6].message).to.be.equal('should match exactly one schema in oneOf');
+          const result = validateQuery({ where: [['$a', '==', '1']] });
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+          expect(result.errors[0].dataPath).to.be.equal('.where[0][0]');
+          expect(result.errors[0].keyword).to.be.equal('pattern');
+          expect(result.errors[0].message).to.be.equal(
+            'should match pattern "^(\\$id|\\$userId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$"',
+          );
+        });
       });
+
       it('should return invalid result if condition contains invalid condition operator', () => {
         findConflictingConditionsStub.returns([]);
         const operators = ['<', '<=', '==', '>', '>='];
