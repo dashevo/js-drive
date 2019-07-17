@@ -284,8 +284,12 @@ describe('SVDocumentMongoDbRepository', function main() {
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(2);
 
-        expect(result[0].toJSON()).to.deep.equal(svDocuments[1].toJSON());
-        expect(result[1].toJSON()).to.deep.equal(svDocuments[2].toJSON());
+        const actualRawSVDocuments = sortAndJsonizeSVDocuments(result);
+
+        svDocuments.shift();
+        const expectedRawSVDocuments = sortAndJsonizeSVDocuments(svDocuments);
+
+        expect(actualRawSVDocuments).to.deep.equal(expectedRawSVDocuments);
       });
 
       it('should return empty array if where clause conditions do not match', async () => {
