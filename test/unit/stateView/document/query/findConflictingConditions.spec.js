@@ -37,6 +37,7 @@ describe('findConflictingConditions', () => {
 
       expect(result).to.be.an('array');
       expect(result).to.have.lengthOf(1);
+      expect(result[0]).to.be.deep.equal(['a', [operator1, operator2]]);
     });
   });
 
@@ -45,5 +46,6 @@ describe('findConflictingConditions', () => {
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.be.deep.equal(['a', ['>', '<', '=>']]);
   });
 });
