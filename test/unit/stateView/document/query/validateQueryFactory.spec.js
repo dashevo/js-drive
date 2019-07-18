@@ -136,6 +136,7 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].message).to.be.equal('should be object');
     });
   });
+
   it('should return valid result when some valid sample query is passed', () => {
     findConflictingConditionsStub.returns([]);
 
@@ -146,8 +147,7 @@ describe('validateQueryFactory', () => {
   });
 
   describe('where', () => {
-    notArrayTestCases.forEach((testCase) => {
-      const { type, value } = testCase;
+    notArrayTestCases.forEach(({ type, value }) => {
       it(`should return invalid result if "where" is not an array, but ${type}`, () => {
         const result = validateQuery({ where: value });
 
@@ -168,6 +168,7 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('minItems');
       expect(result.errors[0].message).to.be.equal('should NOT have fewer than 1 items');
     });
+
     it('should return invalid result if "where" contains more than 10 conditions', () => {
       findConflictingConditionsStub.returns([]);
 
@@ -181,6 +182,7 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('maxItems');
       expect(result.errors[0].message).to.be.equal('should NOT have more than 10 items');
     });
+
     it('should return invalid result if "where" contains conflicting conditions', () => {
       findConflictingConditionsStub.returns([['a', ['<', '>']]]);
 
@@ -208,6 +210,7 @@ describe('validateQueryFactory', () => {
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.true();
       });
+
       it('should return valid result if condition contains "$userId" field', () => {
         findConflictingConditionsStub.returns([]);
 
@@ -216,6 +219,7 @@ describe('validateQueryFactory', () => {
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.true();
       });
+
       it('should return valid result if condition contains top-level field', () => {
         findConflictingConditionsStub.returns([]);
 
@@ -224,6 +228,7 @@ describe('validateQueryFactory', () => {
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.true();
       });
+
       it('should return valid result if condition contains nested path field', () => {
         findConflictingConditionsStub.returns([]);
 
@@ -262,13 +267,13 @@ describe('validateQueryFactory', () => {
         const result = validateQuery({ where: [['a', '===', '1']] });
 
         expect(result).to.be.instanceOf(ValidationResult);
-        // TODO: is that a valid name?
         expect(result.isValid()).to.be.false();
 
         expect(result.errors[6].dataPath).to.be.equal('.where[0]');
         expect(result.errors[6].keyword).to.be.equal('oneOf');
         expect(result.errors[6].message).to.be.equal('should match exactly one schema in oneOf');
       });
+
       it('should return invalid result if field name is more than 255 characters long', () => {
         findConflictingConditionsStub.returns([]);
         const fieldName = 'a'.repeat(255);
@@ -289,6 +294,7 @@ describe('validateQueryFactory', () => {
         expect(result.errors[0].keyword).to.be.equal('maxLength');
         expect(result.errors[0].message).to.be.equal('should NOT be longer than 255 characters');
       });
+
       it('should return invalid result if condition array has less than 3 elements (field, operator, value)', () => {
         findConflictingConditionsStub.returns([]);
 
@@ -301,6 +307,7 @@ describe('validateQueryFactory', () => {
         expect(result.errors[0].keyword).to.be.equal('minItems');
         expect(result.errors[0].message).to.be.equal('should NOT have fewer than 3 items');
       });
+
       it('should return invalid result if condition array has more than 3 elements (field, operator, value)', () => {
         findConflictingConditionsStub.returns([]);
 
@@ -322,6 +329,7 @@ describe('validateQueryFactory', () => {
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
+
         it('should return valid result if "<" operator used with a string value', () => {
           findConflictingConditionsStub.returns([]);
 
@@ -330,6 +338,7 @@ describe('validateQueryFactory', () => {
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
+
         it('should return invalid result if "<" operator used with a string value longer than 512 chars', () => {
           findConflictingConditionsStub.returns([]);
 
@@ -350,6 +359,7 @@ describe('validateQueryFactory', () => {
           expect(result.errors[0].keyword).to.be.equal('maxLength');
           expect(result.errors[0].message).to.be.equal('should NOT be longer than 512 characters');
         });
+
         it('should return valid result if "<" operator used with a boolean value', () => {
           findConflictingConditionsStub.returns([]);
 
@@ -358,8 +368,8 @@ describe('validateQueryFactory', () => {
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
-        nonScalarTestCases.forEach((testCase) => {
-          const { type, value } = testCase;
+
+        nonScalarTestCases.forEach(({ type, value }) => {
           it(`should return invalid result if "<" operator used with a not scalar value, but ${type}`, () => {
             findConflictingConditionsStub.returns([]);
 
@@ -378,8 +388,8 @@ describe('validateQueryFactory', () => {
             expect(result.errors[2].message).to.be.equal('should be boolean');
           });
         });
-        scalarTestCases.forEach((testCase) => {
-          const { type, value } = testCase;
+
+        scalarTestCases.forEach(({ type, value }) => {
           it(`should return valid result if "<" operator used with a scalar value ${type}`, () => {
             findConflictingConditionsStub.returns([]);
 
@@ -389,8 +399,8 @@ describe('validateQueryFactory', () => {
             expect(result.isValid()).to.be.true();
           });
         });
-        scalarTestCases.forEach((testCase) => {
-          const { type, value } = testCase;
+
+        scalarTestCases.forEach(({ type, value }) => {
           it(`should return valid result if "<=" operator used with a scalar value ${type}`, () => {
             findConflictingConditionsStub.returns([]);
 
@@ -400,8 +410,8 @@ describe('validateQueryFactory', () => {
             expect(result.isValid()).to.be.true();
           });
         });
-        scalarTestCases.forEach((testCase) => {
-          const { type, value } = testCase;
+
+        scalarTestCases.forEach(({ type, value }) => {
           it(`should return valid result if "==" operator used with a scalar value ${type}`, () => {
             findConflictingConditionsStub.returns([]);
 
@@ -411,8 +421,8 @@ describe('validateQueryFactory', () => {
             expect(result.isValid()).to.be.true();
           });
         });
-        scalarTestCases.forEach((testCase) => {
-          const { type, value } = testCase;
+
+        scalarTestCases.forEach(({ type, value }) => {
           it(`should return valid result if ">=" operator used with a scalar value ${type}`, () => {
             findConflictingConditionsStub.returns([]);
 
@@ -422,8 +432,8 @@ describe('validateQueryFactory', () => {
             expect(result.isValid()).to.be.true();
           });
         });
-        scalarTestCases.forEach((testCase) => {
-          const { type, value } = testCase;
+
+        scalarTestCases.forEach(({ type, value }) => {
           it(`should return valid result if ">=" operator used with a scalar value ${type}`, () => {
             findConflictingConditionsStub.returns([]);
 
@@ -443,6 +453,7 @@ describe('validateQueryFactory', () => {
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
+
         notArrayTestCases.forEach(({ type, value }) => {
           it(`should return invalid result if "in" operator used with not an array value, but ${type}`, () => {
             findConflictingConditionsStub.returns([]);
@@ -455,6 +466,7 @@ describe('validateQueryFactory', () => {
             expect(result.errors[1].message).to.be.equal('should be array');
           });
         });
+
         it('should return invalid result if "in" operator used with an empty array value', () => {
           findConflictingConditionsStub.returns([]);
           const result = validateQuery({ where: [['a', 'in', []]] });
@@ -465,19 +477,24 @@ describe('validateQueryFactory', () => {
           expect(result.errors[1].keyword).to.be.equal('minItems');
           expect(result.errors[1].message).to.be.equal('should NOT have fewer than 1 items');
         });
+
         it('should return invalid result if "in" operator used with an array value which contains more than 100'
           + ' elements', () => {
           findConflictingConditionsStub.returns([]);
+
           const arr = [];
+
           for (let i = 0; i < 100; i++) {
             arr.push(i);
           }
+
           let result = validateQuery({ where: [['a', 'in', arr]] });
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
 
           arr.push(101);
+
           result = validateQuery({ where: [['a', 'in', arr]] });
 
           expect(result).to.be.instanceOf(ValidationResult);
@@ -486,6 +503,7 @@ describe('validateQueryFactory', () => {
           expect(result.errors[1].keyword).to.be.equal('maxItems');
           expect(result.errors[1].message).to.be.equal('should NOT have more than 100 items');
         });
+
         it('should return invalid result if "in" operator used with an array which contains not unique elements', () => {
           findConflictingConditionsStub.returns([]);
           const arr = [1, 1];
@@ -497,6 +515,7 @@ describe('validateQueryFactory', () => {
           expect(result.errors[1].keyword).to.be.equal('uniqueItems');
           expect(result.errors[1].message).to.be.equal('should NOT have duplicate items (items ## 0 and 1 are identical)');
         });
+
         it('should return invalid results if condition contains empty arrays', () => {
           findConflictingConditionsStub.returns([]);
           const arr = [[], []];
@@ -515,6 +534,7 @@ describe('validateQueryFactory', () => {
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
+
         it('should return invalid result if "startsWith" operator used with an empty string value', () => {
           findConflictingConditionsStub.returns([]);
           const result = validateQuery({ where: [['a', 'startsWith', '']] });
@@ -525,9 +545,11 @@ describe('validateQueryFactory', () => {
           expect(result.errors[2].keyword).to.be.equal('minLength');
           expect(result.errors[2].message).to.be.equal('should NOT be shorter than 1 characters');
         });
+
         it('should return invalid result if "startsWith" operator used with a string value which is more than 255'
           + ' chars long', () => {
           findConflictingConditionsStub.returns([]);
+
           const value = 'b'.repeat(256);
           const result = validateQuery({ where: [['a', 'startsWith', value]] });
 
@@ -537,9 +559,11 @@ describe('validateQueryFactory', () => {
           expect(result.errors[2].keyword).to.be.equal('maxLength');
           expect(result.errors[2].message).to.be.equal('should NOT be longer than 255 characters');
         });
+
         nonStringTestCases.forEach(({ type, value }) => {
           it(`should return invalid result if "startWith" operator used with a not string value, but ${type}`, () => {
             findConflictingConditionsStub.returns([]);
+
             const result = validateQuery({ where: [['a', 'startsWith', value]] });
 
             expect(result).to.be.instanceOf(ValidationResult);
@@ -554,6 +578,7 @@ describe('validateQueryFactory', () => {
       describe('elementMatch', () => {
         it('should return valid result if "elementMatch" operator used with "where" conditions', () => {
           findConflictingConditionsStub.returns([]);
+
           const result = validateQuery({
             where: [
               ['arr', 'elementMatch',
@@ -565,8 +590,10 @@ describe('validateQueryFactory', () => {
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
+
         it('should return invalid result if "elementMatch" operator used with invalid "where" conditions', () => {
           findConflictingConditionsStub.returns([]);
+
           const result = validateQuery({
             where: [
               ['arr', 'elementMatch',
@@ -581,8 +608,10 @@ describe('validateQueryFactory', () => {
           expect(result.errors[9].keyword).to.be.equal('oneOf');
           expect(result.errors[9].message).to.be.equal('should match exactly one schema in oneOf');
         });
+
         it('should return invalid result if "elementMatch" operator used with less than 2 "where" conditions', () => {
           findConflictingConditionsStub.returns([]);
+
           const result = validateQuery({
             where: [
               ['arr', 'elementMatch',
@@ -597,8 +626,10 @@ describe('validateQueryFactory', () => {
           expect(result.errors[3].keyword).to.be.equal('minItems');
           expect(result.errors[3].message).to.be.equal('should NOT have fewer than 2 items');
         });
+
         it('should return invalid result if value contains conflicting conditions', () => {
           findConflictingConditionsStub.returns([['elem', ['>', '>']]]);
+
           const result = validateQuery({
             where: [
               ['arr', 'elementMatch',
@@ -612,8 +643,10 @@ describe('validateQueryFactory', () => {
           expect(result.errors[0].getField()).to.be.equal('elem');
           expect(result.errors[0].message).to.be.equal('Using multiple conditions (>, >) with a single field ("elem") is not allowed');
         });
+
         it('should return invalid result if $id field is specified', () => {
           findConflictingConditionsStub.returns([]);
+
           const result = validateQuery({
             where: [
               ['arr', 'elementMatch',
@@ -627,8 +660,10 @@ describe('validateQueryFactory', () => {
           expect(result.errors[0].getField()).to.be.equal('$id');
           expect(result.errors[0].message).to.be.equal('Field $id is not supported in nested objects');
         });
+
         it('should return invalid result if $userId field is specified', () => {
           findConflictingConditionsStub.returns([]);
+
           const result = validateQuery({
             where: [
               ['arr', 'elementMatch',
@@ -640,8 +675,10 @@ describe('validateQueryFactory', () => {
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
         });
+
         it('should return invalid result if value contains nested "elementMatch" operator', () => {
           findConflictingConditionsStub.returns([]);
+
           const result = validateQuery({
             where: [
               ['arr', 'elementMatch',
@@ -671,8 +708,10 @@ describe('validateQueryFactory', () => {
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
+
         it('should return valid result if "length" operator used with zero', () => {
           findConflictingConditionsStub.returns([]);
+
           const result = validateQuery({
             where: [
               ['arr', 'length', 0],
@@ -682,8 +721,10 @@ describe('validateQueryFactory', () => {
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
+
         it('should return invalid result if "length" operator used with a float numeric value', () => {
           findConflictingConditionsStub.returns([]);
+
           const result = validateQuery({
             where: [
               ['arr', 'length', 1.2],
@@ -695,8 +736,10 @@ describe('validateQueryFactory', () => {
           expect(result.errors[4].dataPath).to.be.equal('.where[0][2]');
           expect(result.errors[4].message).to.be.equal('should be multiple of 1');
         });
+
         it('should return invalid result if "length" operator used with a NaN', () => {
           findConflictingConditionsStub.returns([]);
+
           const result = validateQuery({
             where: [
               ['arr', 'length', NaN],
@@ -709,6 +752,7 @@ describe('validateQueryFactory', () => {
           expect(result.errors[4].keyword).to.be.equal('minimum');
           expect(result.errors[4].message).to.be.equal('should be >= 0');
         });
+
         it('should return invalid result if "length" operator used with a numeric value which is less than 0', () => {
           findConflictingConditionsStub.returns([]);
           const result = validateQuery({
@@ -769,6 +813,7 @@ describe('validateQueryFactory', () => {
             expect(result.isValid()).to.be.true();
           });
         });
+
         it('should return invalid result if "contains" operator used with an array which has '
           + ' more than 100 elements', () => {
           findConflictingConditionsStub.returns([]);
@@ -799,6 +844,7 @@ describe('validateQueryFactory', () => {
           expect(result.errors[9].keyword).to.be.equal('maxItems');
           expect(result.errors[9].message).to.be.equal('should NOT have more than 100 items');
         });
+
         it('should return invalid result if "contains" operator used with an empty array', () => {
           findConflictingConditionsStub.returns([]);
           const result = validateQuery({
@@ -813,6 +859,7 @@ describe('validateQueryFactory', () => {
           expect(result.errors[9].keyword).to.be.equal('minItems');
           expect(result.errors[9].message).to.be.equal('should NOT have fewer than 1 items');
         });
+
         it('should return invalid result if "contains" operator used with an array which contains not unique'
           + ' elements', () => {
           findConflictingConditionsStub.returns([]);
@@ -828,6 +875,7 @@ describe('validateQueryFactory', () => {
           expect(result.errors[9].keyword).to.be.equal('uniqueItems');
           expect(result.errors[9].message).to.be.equal('should NOT have duplicate items (items ## 0 and 1 are identical)');
         });
+
         nonScalarTestCases.forEach(({ type, value }) => {
           it(`should return invalid result if used with non-scalar value ${type}`, () => {
             findConflictingConditionsStub.returns([]);
@@ -850,6 +898,7 @@ describe('validateQueryFactory', () => {
             expect(result.errors[7].message).to.be.equal('should be boolean');
           });
         });
+
         nonScalarTestCases.forEach(({ type, value }) => {
           it(`should return invalid result if used with an array of non-scalar values ${type}`, () => {
             findConflictingConditionsStub.returns([]);
@@ -911,6 +960,7 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('minimum');
       expect(result.errors[0].message).to.be.equal('should be >= 1');
     });
+
     it('should return invalid result if "limit" is bigger than 100', () => {
       findConflictingConditionsStub.returns([]);
       const where = [
@@ -929,11 +979,14 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('maximum');
       expect(result.errors[0].message).to.be.equal('should be <= 100');
     });
+
     it('should return invalid result if "limit" is a float number', () => {
       findConflictingConditionsStub.returns([]);
+
       const where = [
         ['a', '>', 1],
       ];
+
       const result = validateQuery({ where, limit: 1.5 });
 
       expect(result).to.be.instanceOf(ValidationResult);
@@ -946,6 +999,7 @@ describe('validateQueryFactory', () => {
     nonNumberAndUndefinedTestCases.forEach(({ type, value }) => {
       it(`should return invalid result if "limit" is not a number, but ${type}`, () => {
         findConflictingConditionsStub.returns([]);
+
         const result = validateQuery({
           where: [
             ['a', '>', 1],
@@ -966,6 +1020,7 @@ describe('validateQueryFactory', () => {
   describe('orderBy', () => {
     it('should return valid result if "orderBy" contains 1 sorting field', () => {
       findConflictingConditionsStub.returns([]);
+
       const result = validateQuery({
         where: [
           ['a', '>', 1],
@@ -976,8 +1031,10 @@ describe('validateQueryFactory', () => {
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
     });
+
     it('should return valid result if "orderBy" contains 2 sorting fields', () => {
       findConflictingConditionsStub.returns([]);
+
       const result = validateQuery({
         where: [
           ['a', '>', 1],
@@ -988,8 +1045,10 @@ describe('validateQueryFactory', () => {
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
     });
+
     it('should return invalid result if "orderBy" is an empty array', () => {
       findConflictingConditionsStub.returns([]);
+
       const result = validateQuery({
         where: [
           ['a', '>', 1],
@@ -1003,8 +1062,10 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('minItems');
       expect(result.errors[0].message).to.be.equal('should NOT have fewer than 1 items');
     });
+
     it('should return invalid result if the field inside an "orderBy" is an empty array', () => {
       findConflictingConditionsStub.returns([]);
+
       const result = validateQuery({
         where: [
           ['a', '>', 1],
@@ -1018,8 +1079,10 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('minItems');
       expect(result.errors[0].message).to.be.equal('should NOT have fewer than 2 items');
     });
+
     it('should return invalid result if "orderBy" has more than 2 sorting fields', () => {
       findConflictingConditionsStub.returns([]);
+
       const result = validateQuery({
         where: [
           ['a', '>', 1],
@@ -1037,6 +1100,7 @@ describe('validateQueryFactory', () => {
     validFieldNameTestCases.forEach((fieldName) => {
       it(`should return true if "orderBy" has valid field format, ${fieldName}`, () => {
         findConflictingConditionsStub.returns([]);
+
         const result = validateQuery({
           where: [
             [fieldName, '>', 1],
@@ -1052,6 +1116,7 @@ describe('validateQueryFactory', () => {
     invalidFieldNameTestCases.forEach((fieldName) => {
       it(`should return invalid result if "orderBy" has invalid field format, ${fieldName}`, () => {
         findConflictingConditionsStub.returns([]);
+
         const result = validateQuery({
           where: [
             ['a', '>', 1],
@@ -1066,8 +1131,10 @@ describe('validateQueryFactory', () => {
         expect(result.errors[0].message).to.be.equal('should match pattern "^(\\$id|\\$userId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$"');
       });
     });
+
     it('should return invalid result if "orderBy" has wrong direction', () => {
       findConflictingConditionsStub.returns([]);
+
       const result = validateQuery({
         where: [
           ['a', '>', 1],
@@ -1081,8 +1148,10 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('enum');
       expect(result.errors[0].message).to.be.equal('should be equal to one of the allowed values');
     });
+
     it('should return invalid result if "orderBy" field array has less than 2 elements (field, direction)', () => {
       findConflictingConditionsStub.returns([]);
+
       const result = validateQuery({
         where: [
           ['a', '>', 1],
@@ -1096,8 +1165,10 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('minItems');
       expect(result.errors[0].message).to.be.equal('should NOT have fewer than 2 items');
     });
+
     it('should return invalid result if "orderBy" field array has more than 2 elements (field, direction)', () => {
       findConflictingConditionsStub.returns([]);
+
       const result = validateQuery({
         where: [
           ['a', '>', 1],
@@ -1111,11 +1182,14 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('maxItems');
       expect(result.errors[0].message).to.be.equal('should NOT have more than 2 items');
     });
+
     it('should return invalid result if "orderBy" contains duplicate sorting fields', () => {
       findConflictingConditionsStub.returns([]);
+
       const where = [
         ['a', '>', 1],
       ];
+
       let result = validateQuery({
         where,
         orderBy: [['a', 'asc'], ['a', 'asc']],
@@ -1161,6 +1235,7 @@ describe('validateQueryFactory', () => {
         expect(result.errors[0].message).to.be.equal('should be number');
       });
     });
+
     it('should return invalid result if "startAt" less than 1', () => {
       const result = validateQuery({
         startAt: 0,
@@ -1172,6 +1247,7 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('minimum');
       expect(result.errors[0].message).to.be.equal('should be >= 1');
     });
+
     it('should return invalid result if "startAt" more than 20000', () => {
       let result = validateQuery({
         startAt: 20000,
@@ -1190,6 +1266,7 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('maximum');
       expect(result.errors[0].message).to.be.equal('should be <= 20000');
     });
+
     it('should return invalid result if "startAt" is not an integer', () => {
       const result = validateQuery({
         startAt: 1.1,
@@ -1244,6 +1321,7 @@ describe('validateQueryFactory', () => {
         expect(result.errors[0].message).to.be.equal('should be number');
       });
     });
+
     it('should return invalid result if "startAfter" less than 1', () => {
       const result = validateQuery({
         startAfter: 0,
@@ -1255,6 +1333,7 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('minimum');
       expect(result.errors[0].message).to.be.equal('should be >= 1');
     });
+
     it('should return invalid result if "startAfter" more than 20000', () => {
       let result = validateQuery({
         startAfter: 20000,
@@ -1273,6 +1352,7 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('maximum');
       expect(result.errors[0].message).to.be.equal('should be <= 20000');
     });
+
     it('should return invalid result if "startAfter" is not an integer', () => {
       const result = validateQuery({
         startAfter: 1.1,
