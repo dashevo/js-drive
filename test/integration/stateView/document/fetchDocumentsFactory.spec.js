@@ -1,8 +1,11 @@
 const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
 
-const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/SVDocumentMongoDbRepository');
+const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/mongoDbRepository/SVDocumentMongoDbRepository');
+const convertWhereToMongoDbQuery = require('../../../../lib/stateView/document/mongoDbRepository/convertWhereToMongoDbQuery');
+const validateQueryFactory = require('../../../../lib/stateView/document/query/validateQueryFactory');
+const findConflictingConditions = require('../../../../lib/stateView/document/query/findConflictingConditions');
 
-const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
+const createSVDocumentMongoDbRepositoryFactory = require('../../../../lib/stateView/document/mongoDbRepository/createSVDocumentMongoDbRepositoryFactory');
 const fetchDocumentsFactory = require('../../../../lib/stateView/document/fetchDocumentsFactory');
 
 const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');
@@ -21,9 +24,13 @@ describe('fetchDocumentsFactory', () => {
   });
 
   beforeEach(() => {
+    const validateQuery = validateQueryFactory(findConflictingConditions);
+
     createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
       mongoClient,
       SVDocumentMongoDbRepository,
+      convertWhereToMongoDbQuery,
+      validateQuery,
     );
 
     fetchDocuments = fetchDocumentsFactory(createSVDocumentMongoDbRepository);
@@ -57,8 +64,8 @@ describe('fetchDocumentsFactory', () => {
     const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
     await svDocumentRepository.store(svDocument);
 
-    const options = { where: { 'document.name': document.get('name') } };
-    result = await fetchDocuments(contractId, type, options);
+    const query = { where: [['name', '==', document.get('name')]] };
+    result = await fetchDocuments(contractId, type, query);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
@@ -72,9 +79,9 @@ describe('fetchDocumentsFactory', () => {
     const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
     await svDocumentRepository.store(svDocument);
 
-    const options = { where: { 'document.name': 'unknown' } };
+    const query = { where: [['name', '==', 'unknown']] };
 
-    const result = await fetchDocuments(contractId, type, options);
+    const result = await fetchDocuments(contractId, type, query);
 
     expect(result).to.deep.equal([]);
   });
