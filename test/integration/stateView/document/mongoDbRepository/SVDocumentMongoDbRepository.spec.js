@@ -562,6 +562,26 @@ describe('SVDocumentMongoDbRepository', function main() {
 
     it('should find SVDocument marked as deleted by ID');
 
+    it('should return SVDocument with Document having proper $meta', async () => {
+      await svDocumentRepository.store(svDocument);
+
+      const foundSVDocument = await svDocumentRepository
+        .find(svDocument.getDocument().getId());
+
+      const metadataJSON = foundSVDocument.getDocument().getMetadata()
+        .toJSON();
+
+      const currentReference = svDocument.getCurrentRevision()
+        .getReference();
+
+      expect(metadataJSON.stReference).to.deep.equal({
+        blockHash: currentReference.getBlockHash(),
+        blockHeight: currentReference.getBlockHeight(),
+        stHeaderHash: currentReference.getSTHash(),
+        stPacketHash: currentReference.getSTPacketHash(),
+      });
+    });
+
     it('should return null if SVDocument was not found', async () => {
       const document = await svDocumentRepository.find('unknown');
 
