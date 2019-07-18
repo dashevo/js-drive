@@ -11,8 +11,6 @@ const DriveDataProvider = require('../../../lib/dpp/DriveDataProvider');
 
 const Reference = require('../../../lib/stateView/revisions/Reference');
 
-const sanitizer = require('../../../lib/mongoDb/sanitizer');
-
 const createSVDocumentMongoDbRepositoryFactory = require('../../../lib/stateView/document/createSVDocumentMongoDbRepositoryFactory');
 const SVDocumentMongoDbRepository = require('../../../lib/stateView/document/SVDocumentMongoDbRepository');
 const SVContractMongoDbRepository = require('../../../lib/stateView/contract/SVContractMongoDbRepository');
@@ -74,7 +72,6 @@ describe('applyStateTransitionFactory', () => {
     createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
       mongoClient,
       SVDocumentMongoDbRepository,
-      sanitizer,
     );
 
     const updateSVContract = updateSVContractFactory(svContractMongoDbRepository);

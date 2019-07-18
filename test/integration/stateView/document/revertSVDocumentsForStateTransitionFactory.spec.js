@@ -8,8 +8,6 @@ const {
 const DashPlatformProtocol = require('@dashevo/dpp');
 const Document = require('@dashevo/dpp/lib/document/Document');
 
-const sanitizer = require('../../../../lib/mongoDb/sanitizer');
-
 const ReaderMediator = require('../../../../lib/blockchain/reader/BlockchainReaderMediator');
 
 const Revision = require('../../../../lib/stateView/revisions/Revision');
@@ -78,7 +76,6 @@ describe('revertSVDocumentsForStateTransitionFactory', () => {
     createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
       mongoClient,
       SVDocumentMongoDbRepository,
-      sanitizer,
     );
 
     updateSVDocument = updateSVDocumentFactory(createSVDocumentMongoDbRepository);

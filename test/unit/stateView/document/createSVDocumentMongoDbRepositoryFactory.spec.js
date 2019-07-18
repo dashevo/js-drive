@@ -7,7 +7,6 @@ describe('createSVDocumentMongoDbRepositoryFactory', () => {
   let contractId;
   let documentType;
   let SVDocumentMongoDbRepositoryMock;
-  let sanitizerMock;
 
   beforeEach(function beforeEach() {
     contractId = 'HgKXrLhm7sMjPrRGS1UsETmmQ7nZHbaKN729zw55PUVk';
@@ -18,14 +17,11 @@ describe('createSVDocumentMongoDbRepositoryFactory', () => {
       db: this.sinon.stub().returns(mongoDb),
     };
 
-    sanitizerMock = {};
-
     SVDocumentMongoDbRepositoryMock = this.sinon.stub();
 
     createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
       mongoClient,
       SVDocumentMongoDbRepositoryMock,
-      sanitizerMock,
     );
   });
 
@@ -40,7 +36,6 @@ describe('createSVDocumentMongoDbRepositoryFactory', () => {
 
     expect(SVDocumentMongoDbRepositoryMock).to.have.been.calledOnceWith(
       mongoDb,
-      sanitizerMock,
       documentType,
     );
   });

@@ -3,8 +3,6 @@ const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
 const SVDocument = require('../../../../lib/stateView/document/SVDocument');
 const SVDocumentMongoDbRepository = require('../../../../lib/stateView/document/SVDocumentMongoDbRepository');
 
-const sanitizer = require('../../../../lib/mongoDb/sanitizer');
-
 const InvalidWhereError = require('../../../../lib/stateView/document/errors/InvalidWhereError');
 const InvalidOrderBy = require('../../../../lib/stateView/document/errors/InvalidOrderByError');
 const InvalidLimitError = require('../../../../lib/stateView/document/errors/InvalidLimitError');
@@ -38,7 +36,6 @@ describe('SVDocumentMongoDbRepository', function main() {
 
     svDocumentRepository = new SVDocumentMongoDbRepository(
       mongoDatabase,
-      sanitizer,
       svDocument.getDocument().getType(),
     );
 
