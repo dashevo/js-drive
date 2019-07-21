@@ -572,11 +572,14 @@ describe('SVDocumentMongoDbRepository', function main() {
       const currentReference = svDocument.getCurrentRevision()
         .getReference();
 
-      expect(metadataJSON.stReference).to.deep.equal({
-        blockHash: currentReference.getBlockHash(),
-        blockHeight: currentReference.getBlockHeight(),
-        stHeaderHash: currentReference.getSTHash(),
-        stPacketHash: currentReference.getSTPacketHash(),
+      expect(metadataJSON).to.deep.equal({
+        userId: svDocument.getUserId(),
+        stReference: {
+          blockHash: currentReference.getBlockHash(),
+          blockHeight: currentReference.getBlockHeight(),
+          stHeaderHash: currentReference.getSTHash(),
+          stPacketHash: currentReference.getSTPacketHash(),
+        },
       });
     });
 
