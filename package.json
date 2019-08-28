@@ -64,7 +64,6 @@
     "lodash.escaperegexp": "^4.1.2",
     "mongodb": "^3.2.2",
     "multihashes": "^0.4.13",
-    "recursive-iterator": "^3.3.0",
-    "zeromq": "^5.1.0"
+    "recursive-iterator": "^3.3.0"
   }
 }
