@@ -20,9 +20,6 @@
     "type": "git",
     "url": "git+https://github.com/dashevo/drive.git"
   },
-  "authors": [
-    "Nathan Marley"
-  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dashevo/drive/issues"
