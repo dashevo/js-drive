@@ -24,7 +24,7 @@ const getSTPacketsFixture = require('../../../lib/test/fixtures/getSTPacketsFixt
 const getStateTransitionsFixture = require('../../../lib/test/fixtures/getStateTransitionsFixture');
 const getSVContractFixture = require('../../../lib/test/fixtures/getSVContractFixture');
 
-describe('applyStateTransitionFactory', () => {
+describe.skip('applyStateTransitionFactory', () => {
   let mongoClient;
   let mongoDatabase;
   let svContractMongoDbRepository;
