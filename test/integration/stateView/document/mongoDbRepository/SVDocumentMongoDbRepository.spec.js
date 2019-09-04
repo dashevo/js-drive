@@ -22,13 +22,12 @@ describe('SVDocumentMongoDbRepository', function main() {
   let svDocument;
   let svDocuments;
   let mongoDatabase;
-  let stateViewTransactionMock;
 
   startMongoDb().then((mongoDb) => {
     mongoDatabase = mongoDb.getDb();
   });
 
-  beforeEach(async function beforeEach() {
+  beforeEach(async () => {
     svDocuments = getSVDocumentsFixture();
 
     // Modify documents for the test cases
@@ -59,11 +58,6 @@ describe('SVDocumentMongoDbRepository', function main() {
     await Promise.all(
       svDocuments.map(o => svDocumentRepository.store(o)),
     );
-
-    stateViewTransactionMock = {
-      getSession: this.sinon.stub(),
-      runWithTransaction: this.sinon.stub(),
-    };
   });
 
   describe('#store', () => {
@@ -72,13 +66,6 @@ describe('SVDocumentMongoDbRepository', function main() {
 
       expect(result).to.be.an.instanceOf(SVDocument);
       expect(result.toJSON()).to.deep.equal(svDocument.toJSON());
-    });
-
-    it('should store SVDocument in transaction', async () => {
-      await svDocumentRepository.store(svDocument, stateViewTransactionMock);
-
-      expect(stateViewTransactionMock.getSession).to.be.calledOnce();
-      expect(stateViewTransactionMock.runWithTransaction).to.be.calledOnce();
     });
   });
 
@@ -93,15 +80,6 @@ describe('SVDocumentMongoDbRepository', function main() {
       const expectedRawSVDocuments = jsonizeSVDocuments(svDocuments);
 
       expect(actualRawSVDocuments).to.have.deep.members(expectedRawSVDocuments);
-    });
-
-    it('should fetch SVDocuments in transaction', async () => {
-      stateViewTransactionMock.runWithTransaction.resolves([]);
-
-      await svDocumentRepository.fetch({}, stateViewTransactionMock);
-
-      expect(stateViewTransactionMock.getSession).to.be.calledOnce();
-      expect(stateViewTransactionMock.runWithTransaction).to.be.calledOnce();
     });
 
     it('should throw InvalidQueryError if query is not valid', async () => {
@@ -564,16 +542,6 @@ describe('SVDocumentMongoDbRepository', function main() {
 
       expect(expectedSVDocument.toJSON()).to.deep.equal(svDocument.toJSON());
     });
-
-    it('should find all SVDocuments by stHash transaction', async () => {
-      stateViewTransactionMock.runWithTransaction.resolves([]);
-      const stHash = svDocument.getReference().getSTHash();
-
-      await svDocumentRepository.findAllBySTHash(stHash, stateViewTransactionMock);
-
-      expect(stateViewTransactionMock.getSession).to.be.calledOnce();
-      expect(stateViewTransactionMock.runWithTransaction).to.be.calledOnce();
-    });
   });
 
   describe('#delete', () => {
@@ -583,13 +551,6 @@ describe('SVDocumentMongoDbRepository', function main() {
       const result = await svDocumentRepository.find(svDocument.getDocument().getId());
 
       expect(result).to.be.null();
-    });
-
-    it('should delete SVDocument in transaction', async () => {
-      await svDocumentRepository.delete(svDocument, stateViewTransactionMock);
-
-      expect(stateViewTransactionMock.getSession).to.be.calledOnce();
-      expect(stateViewTransactionMock.runWithTransaction).to.be.calledOnce();
     });
   });
 
@@ -625,13 +586,6 @@ describe('SVDocumentMongoDbRepository', function main() {
       const document = await svDocumentRepository.find('unknown');
 
       expect(document).to.be.null();
-    });
-
-    it('should find SVDocument by ID in transaction', async () => {
-      await svDocumentRepository.find('unknown', stateViewTransactionMock);
-
-      expect(stateViewTransactionMock.getSession).to.be.calledOnce();
-      expect(stateViewTransactionMock.runWithTransaction).to.be.calledOnce();
     });
   });
 });
