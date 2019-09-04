@@ -15,7 +15,7 @@ const convertWhereToMongoDbQuery = require('../../../lib/stateView/document/mong
 const validateQueryFactory = require('../../../lib/stateView/document/query/validateQueryFactory');
 const findConflictingConditions = require('../../../lib/stateView/document/query/findConflictingConditions');
 const SVDocumentMongoDbRepository = require('../../../lib/stateView/document/mongoDbRepository/SVDocumentMongoDbRepository');
-const SVContractMongoDbRepository = require('../../../lib/stateView/contract/mongoDbDatabase/SVContractMongoDbRepository');
+const SVContractMongoDbRepository = require('../../../lib/stateView/contract/SVContractMongoDbRepository');
 
 const fetchContractFactory = require('../../../lib/stateView/contract/fetchContractFactory');
 

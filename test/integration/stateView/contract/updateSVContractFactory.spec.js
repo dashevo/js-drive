@@ -5,7 +5,7 @@ const DashPlatformProtocol = require('@dashevo/dpp');
 const Revision = require('../../../../lib/stateView/revisions/Revision');
 const SVContract = require('../../../../lib/stateView/contract/SVContract');
 
-const SVContractMongoDbRepository = require('../../../../lib/stateView/contract/mongoDbDatabase/SVContractMongoDbRepository');
+const SVContractMongoDbRepository = require('../../../../lib/stateView/contract/SVContractMongoDbRepository');
 
 const updateSVContractFactory = require('../../../../lib/stateView/contract/updateSVContractFactory');
 
