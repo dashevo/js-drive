@@ -19,12 +19,13 @@ describe('fetchDocumentsFactory', () => {
   let contractId;
   let document;
   let stReference;
+  let stateViewTransactionMock;
 
   startMongoDb().then((mongoDb) => {
     mongoClient = mongoDb.getClient();
   });
 
-  beforeEach(() => {
+  beforeEach(function beforeEach() {
     const validateQuery = validateQueryFactory(findConflictingConditions);
 
     createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
@@ -50,6 +51,11 @@ describe('fetchDocumentsFactory', () => {
     };
     type = document.getType();
     contractId = 'HgKXrLhm7sMjPrRGS1UsETmmQ7nZHbaKN729zw55PUVk';
+
+    stateViewTransactionMock = {
+      getSession: this.sinon.stub(),
+      runWithTransaction: this.sinon.stub().resolves([]),
+    };
   });
 
   it('should fetch Documents for specified contract ID and document type', async () => {
@@ -126,5 +132,15 @@ describe('fetchDocumentsFactory', () => {
     const result = await fetchDocuments(contractId, type);
 
     expect(result).to.deep.equal([]);
+  });
+
+  it('should fetch Documents with stateViewTransaction', async () => {
+    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
+    await svDocumentRepository.store(svDocument);
+
+    await fetchDocuments(contractId, type, {}, stateViewTransactionMock);
+
+    expect(stateViewTransactionMock.getSession).to.be.calledOnce();
+    expect(stateViewTransactionMock.runWithTransaction).to.be.calledOnce();
   });
 });
