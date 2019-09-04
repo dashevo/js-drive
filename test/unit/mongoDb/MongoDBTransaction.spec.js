@@ -1,10 +1,11 @@
 const MongoDBTransaction = require('../../../lib/mongoDb/MongoDBTransaction');
+const InvalidSessionError = require('../../../lib/mongoDb/errors/InvalidSessionError');
 
 describe('MongoDBTransaction', () => {
   let mongoClientMock;
   let mongoDBTransaction;
   let sessionMock;
-  let txFuncMock;
+  let transactionFunctionMock;
 
   beforeEach(function beforeEach() {
     sessionMock = {
@@ -18,10 +19,10 @@ describe('MongoDBTransaction', () => {
     };
 
     mongoDBTransaction = new MongoDBTransaction(mongoClientMock);
-    txFuncMock = this.sinon.stub().resolves(this.sinon.stub());
+    transactionFunctionMock = this.sinon.stub().resolves(this.sinon.stub());
   });
 
-  describe('start', () => {
+  describe('#start', () => {
     it('should start session', async () => {
       await mongoDBTransaction.start();
 
@@ -37,13 +38,14 @@ describe('MongoDBTransaction', () => {
 
         expect.fail('should throw "Session is already started error"');
       } catch (error) {
+        expect(error).to.be.an.instanceOf(InvalidSessionError);
         expect(mongoClientMock.startSession).to.be.calledOnce();
         expect(sessionMock.startTransaction).to.be.calledOnce();
       }
     });
   });
 
-  describe('commit', () => {
+  describe('#commit', () => {
     it('should commit transaction', async () => {
       await mongoDBTransaction.start();
       await mongoDBTransaction.commit();
@@ -57,12 +59,12 @@ describe('MongoDBTransaction', () => {
 
         expect.fail('should throw "Session is not started" error');
       } catch (error) {
+        expect(error).to.be.an.instanceOf(InvalidSessionError);
         expect(sessionMock.commitTransaction).to.have.not.been.called();
       }
     });
 
-
-    it('should catch UnknownTransactionCommitResult error', async () => {
+    it('should catch UNKNOWN_TRANSACTION_COMMIT_RSEULT error', async () => {
       sessionMock.commitTransaction.onFirstCall().throws({ errorLabels: ['UnknownTransactionCommitResult'] });
 
       await mongoDBTransaction.start();
@@ -70,7 +72,6 @@ describe('MongoDBTransaction', () => {
 
       expect(sessionMock.commitTransaction).to.be.calledTwice();
     });
-
 
     it('should throw an error', async () => {
       sessionMock.commitTransaction.throws('UnknownError');
@@ -87,7 +88,7 @@ describe('MongoDBTransaction', () => {
     });
   });
 
-  describe('abort', () => {
+  describe('#abort', () => {
     it('should abort session', async () => {
       await mongoDBTransaction.start();
       await mongoDBTransaction.abort();
@@ -101,39 +102,27 @@ describe('MongoDBTransaction', () => {
 
         expect.fail('should throw "Session is not started" error');
       } catch (error) {
+        expect(error).to.be.an.instanceOf(InvalidSessionError);
         expect(sessionMock.commitTransaction).to.have.not.been.called();
       }
     });
   });
 
-  describe('getSession', () => {
-    it('should return session', async () => {
-      let session = mongoDBTransaction.getSession();
-
-      expect(session).to.be.a('null');
-
-      await mongoDBTransaction.start();
-      session = mongoDBTransaction.getSession();
-
-      expect(session).to.be.deep.equal(sessionMock);
-    });
-  });
-
-  describe('runWithTransaction', async () => {
+  describe('#runWithTransaction', async () => {
     it('should run function with transaction', async () => {
       await mongoDBTransaction.start();
-      await mongoDBTransaction.runWithTransaction(txFuncMock);
+      await mongoDBTransaction.runWithTransaction(transactionFunctionMock);
 
-      expect(txFuncMock).to.be.calledOnce();
+      expect(transactionFunctionMock).to.be.calledOnce();
     });
 
-    it('should catch TransientTransactionError', async () => {
-      txFuncMock.onFirstCall().throws({ errorLabels: ['TransientTransactionError'] });
+    it('should catch TRANSIENT_TRANSACTION_ERROR', async () => {
+      transactionFunctionMock.onFirstCall().throws({ errorLabels: ['TransientTransactionError'] });
 
       await mongoDBTransaction.start();
-      await mongoDBTransaction.runWithTransaction(txFuncMock);
+      await mongoDBTransaction.runWithTransaction(transactionFunctionMock);
 
-      expect(txFuncMock).to.be.calledTwice();
+      expect(transactionFunctionMock).to.be.calledTwice();
     });
 
     it('should throw an error', async () => {
@@ -142,21 +131,22 @@ describe('MongoDBTransaction', () => {
       await mongoDBTransaction.start();
 
       try {
-        await mongoDBTransaction.runWithTransaction(txFuncMock);
+        await mongoDBTransaction.runWithTransaction(transactionFunctionMock);
 
         expect.fail('should throw "UnknownError"');
       } catch (error) {
-        expect(txFuncMock).to.be.calledOnce();
+        expect(transactionFunctionMock).to.be.calledOnce();
       }
     });
 
     it('should throw an error if session is not started', async () => {
       try {
-        await mongoDBTransaction.runWithTransaction(txFuncMock);
+        await mongoDBTransaction.runWithTransaction(transactionFunctionMock);
 
         expect.fail('should throw "Session is not started" error');
       } catch (error) {
-        expect(txFuncMock).to.have.not.been.called();
+        expect(error).to.be.an.instanceOf(InvalidSessionError);
+        expect(transactionFunctionMock).to.have.not.been.called();
       }
     });
   });
