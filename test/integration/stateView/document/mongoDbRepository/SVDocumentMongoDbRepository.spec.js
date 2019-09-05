@@ -6,6 +6,7 @@ const SVDocumentMongoDbRepository = require('../../../../../lib/stateView/docume
 const convertWhereToMongoDbQuery = require('../../../../../lib/stateView/document/mongoDbRepository/convertWhereToMongoDbQuery');
 const validateQueryFactory = require('../../../../../lib/stateView/document/query/validateQueryFactory');
 const findConflictingConditions = require('../../../../../lib/stateView/document/query/findConflictingConditions');
+const MongoDBTransaction = require('../../../../../lib/mongoDb/MongoDBTransaction');
 
 const getSVDocumentsFixture = require('../../../../../lib/test/fixtures/getSVDocumentsFixture');
 
@@ -22,9 +23,12 @@ describe('SVDocumentMongoDbRepository', function main() {
   let svDocument;
   let svDocuments;
   let mongoDatabase;
+  let mongoClient;
+  let stateViewTransaction;
 
   startMongoDb().then((mongoDb) => {
     mongoDatabase = mongoDb.getDb();
+    mongoClient = mongoDb.getClient();
   });
 
   beforeEach(async () => {
@@ -58,6 +62,8 @@ describe('SVDocumentMongoDbRepository', function main() {
     await Promise.all(
       svDocuments.map(o => svDocumentRepository.store(o)),
     );
+
+    stateViewTransaction = new MongoDBTransaction(mongoClient);
   });
 
   describe('#store', () => {
@@ -66,6 +72,28 @@ describe('SVDocumentMongoDbRepository', function main() {
 
       expect(result).to.be.an.instanceOf(SVDocument);
       expect(result.toJSON()).to.deep.equal(svDocument.toJSON());
+    });
+
+    it('should store SVDocument in transaction', async () => {
+      await svDocumentRepository.delete(svDocument);
+
+      stateViewTransaction.start();
+
+      await svDocumentRepository.store(svDocument, stateViewTransaction);
+
+      const transactionDocument = await svDocumentRepository
+        .find(svDocument.getDocument().getId(), stateViewTransaction);
+      const notFoundDocument = await svDocumentRepository.find(svDocument.getDocument().getId());
+
+      await stateViewTransaction.commit();
+
+      const createdDocument = await svDocumentRepository.find(svDocument.getDocument().getId());
+
+      expect(notFoundDocument).to.be.a('null');
+      expect(transactionDocument).to.be.an.instanceOf(SVDocument);
+      expect(transactionDocument.toJSON()).to.deep.equal(svDocument.toJSON());
+      expect(createdDocument).to.be.an.instanceOf(SVDocument);
+      expect(createdDocument.toJSON()).to.deep.equal(svDocument.toJSON());
     });
   });
 
@@ -530,20 +558,6 @@ describe('SVDocumentMongoDbRepository', function main() {
     });
   });
 
-  describe('#findAllBySTHash', () => {
-    it('should find all SVDocuments by stHash', async () => {
-      const stHash = svDocument.getReference().getSTHash();
-
-      const result = await svDocumentRepository.findAllBySTHash(stHash);
-
-      expect(result).to.be.an('array');
-
-      const [expectedSVDocument] = result;
-
-      expect(expectedSVDocument.toJSON()).to.deep.equal(svDocument.toJSON());
-    });
-  });
-
   describe('#delete', () => {
     it('should delete SVDocument', async () => {
       await svDocumentRepository.delete(svDocument);
@@ -551,6 +565,51 @@ describe('SVDocumentMongoDbRepository', function main() {
       const result = await svDocumentRepository.find(svDocument.getDocument().getId());
 
       expect(result).to.be.null();
+    });
+
+    it('should delete SVDocument in transaction', async () => {
+      stateViewTransaction.start();
+
+      await svDocumentRepository.delete(svDocument, stateViewTransaction);
+
+      const removedDocument = await svDocumentRepository
+        .find(svDocument.getDocument().getId(), stateViewTransaction);
+
+      const notRemovedDocument = await svDocumentRepository
+        .find(svDocument.getDocument().getId());
+
+      await stateViewTransaction.commit();
+
+      const completelyRemovedDocument = await svDocumentRepository
+        .find(svDocument.getDocument().getId());
+
+      expect(removedDocument).to.be.a('null');
+      expect(notRemovedDocument).to.be.an.instanceOf(SVDocument);
+      expect(notRemovedDocument.toJSON()).to.deep.equal(svDocument.toJSON());
+      expect(completelyRemovedDocument).to.be.a('null');
+    });
+
+    it('should restore document if transaction aborted', async () => {
+      stateViewTransaction.start();
+
+      await svDocumentRepository.delete(svDocument, stateViewTransaction);
+
+      const removedDocument = await svDocumentRepository
+        .find(svDocument.getDocument().getId(), stateViewTransaction);
+
+      const notRemovedDocument = await svDocumentRepository
+        .find(svDocument.getDocument().getId());
+
+      await stateViewTransaction.abort();
+
+      const restoredDocument = await svDocumentRepository
+        .find(svDocument.getDocument().getId());
+
+      expect(removedDocument).to.be.a('null');
+      expect(notRemovedDocument).to.be.an.instanceOf(SVDocument);
+      expect(notRemovedDocument.toJSON()).to.deep.equal(svDocument.toJSON());
+      expect(restoredDocument).to.be.an.instanceOf(SVDocument);
+      expect(restoredDocument.toJSON()).to.deep.equal(svDocument.toJSON());
     });
   });
 
