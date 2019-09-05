@@ -1,5 +1,6 @@
 const MongoDBTransaction = require('../../../lib/mongoDb/MongoDBTransaction');
-const InvalidSessionStateError = require('../../../lib/mongoDb/errors/InvalidSessionStateError');
+const SessionIsNotStartedError = require('../../../lib/mongoDb/errors/SessionIsNotStartedError');
+const SessionIsAlreadyStartedError = require('../../../lib/mongoDb/errors/SessionIsAlreadyStartedError');
 
 describe('MongoDBTransaction', () => {
   let mongoClientMock;
@@ -38,7 +39,7 @@ describe('MongoDBTransaction', () => {
 
         expect.fail('should throw "Session is already started" error');
       } catch (error) {
-        expect(error).to.be.an.instanceOf(InvalidSessionStateError);
+        expect(error).to.be.an.instanceOf(SessionIsAlreadyStartedError);
         expect(error.message).to.be.equal('Session is already started');
         expect(mongoClientMock.startSession).to.be.calledOnce();
         expect(sessionMock.startTransaction).to.be.calledOnce();
@@ -60,7 +61,7 @@ describe('MongoDBTransaction', () => {
 
         expect.fail('should throw "Session is not started" error');
       } catch (error) {
-        expect(error).to.be.an.instanceOf(InvalidSessionStateError);
+        expect(error).to.be.an.instanceOf(SessionIsNotStartedError);
         expect(error.message).to.be.equal('Session is not started');
         expect(sessionMock.commitTransaction).to.have.not.been.called();
       }
@@ -108,7 +109,7 @@ describe('MongoDBTransaction', () => {
 
         expect.fail('should throw "Session is not started" error');
       } catch (error) {
-        expect(error).to.be.an.instanceOf(InvalidSessionStateError);
+        expect(error).to.be.an.instanceOf(SessionIsNotStartedError);
         expect(error.message).to.be.equal('Session is not started');
         expect(sessionMock.commitTransaction).to.have.not.been.called();
       }
@@ -156,7 +157,7 @@ describe('MongoDBTransaction', () => {
 
         expect.fail('should throw "Session is not started" error');
       } catch (error) {
-        expect(error).to.be.an.instanceOf(InvalidSessionStateError);
+        expect(error).to.be.an.instanceOf(SessionIsNotStartedError);
         expect(error.message).to.be.equal('Session is not started');
         expect(transactionFunctionMock).to.have.not.been.called();
       }
