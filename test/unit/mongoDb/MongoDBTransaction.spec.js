@@ -1,6 +1,6 @@
 const MongoDBTransaction = require('../../../lib/mongoDb/MongoDBTransaction');
-const SessionIsNotStartedError = require('../../../lib/mongoDb/errors/SessionIsNotStartedError');
-const SessionIsAlreadyStartedError = require('../../../lib/mongoDb/errors/SessionIsAlreadyStartedError');
+const TransactionIsNotStartedError = require('../../../lib/mongoDb/errors/TransactionIsNotStartedError');
+const TransactionIsAlreadyStartedError = require('../../../lib/mongoDb/errors/TransactionIsAlreadyStartedError');
 
 describe('MongoDBTransaction', () => {
   let mongoClientMock;
@@ -24,23 +24,23 @@ describe('MongoDBTransaction', () => {
   });
 
   describe('#start', () => {
-    it('should start session', () => {
+    it('should start transaction', () => {
       mongoDBTransaction.start();
 
       expect(mongoClientMock.startSession).to.be.calledOnce();
       expect(sessionMock.startTransaction).to.be.calledOnce();
     });
 
-    it('should throw an error, if session is already started', () => {
+    it('should throw an error, if transaction is already started', () => {
       mongoDBTransaction.start();
 
       try {
         mongoDBTransaction.start();
 
-        expect.fail('should throw "Session is already started" error');
+        expect.fail('should throw "Transaction is already started" error');
       } catch (error) {
-        expect(error).to.be.an.instanceOf(SessionIsAlreadyStartedError);
-        expect(error.message).to.be.equal('Session is already started');
+        expect(error).to.be.an.instanceOf(TransactionIsAlreadyStartedError);
+        expect(error.message).to.be.equal('Transaction is already started');
         expect(mongoClientMock.startSession).to.be.calledOnce();
         expect(sessionMock.startTransaction).to.be.calledOnce();
       }
@@ -53,16 +53,28 @@ describe('MongoDBTransaction', () => {
       await mongoDBTransaction.commit();
 
       expect(sessionMock.commitTransaction).to.be.calledOnce();
+      expect(mongoDBTransaction.transactionIsStarted).to.be.false();
     });
 
-    it('should throw an error if session is not started', async () => {
+    it('should commit two transactions one after another', async () => {
+      mongoDBTransaction.start();
+      await mongoDBTransaction.commit();
+
+      mongoDBTransaction.start();
+      await mongoDBTransaction.commit();
+
+      expect(sessionMock.commitTransaction).to.be.calledTwice();
+      expect(mongoDBTransaction.transactionIsStarted).to.be.false();
+    });
+
+    it('should throw an error if transaction is not started', async () => {
       try {
         await mongoDBTransaction.commit();
 
-        expect.fail('should throw "Session is not started" error');
+        expect.fail('should throw "Transaction is not started" error');
       } catch (error) {
-        expect(error).to.be.an.instanceOf(SessionIsNotStartedError);
-        expect(error.message).to.be.equal('Session is not started');
+        expect(error).to.be.an.instanceOf(TransactionIsNotStartedError);
+        expect(error.message).to.be.equal('Transaction is not started');
         expect(sessionMock.commitTransaction).to.have.not.been.called();
       }
     });
@@ -101,16 +113,28 @@ describe('MongoDBTransaction', () => {
       await mongoDBTransaction.abort();
 
       expect(sessionMock.abortTransaction).to.be.calledOnce();
+      expect(mongoDBTransaction.transactionIsStarted).to.be.false();
     });
 
-    it('should throw an error if session is not started', async () => {
+    it('should commit new transaction after aborted transaction', async() => {
+      mongoDBTransaction.start();
+      await mongoDBTransaction.abort();
+
+      mongoDBTransaction.start();
+      await mongoDBTransaction.commit();
+
+      expect(sessionMock.abortTransaction).to.be.calledOnce();
+      expect(sessionMock.commitTransaction).to.be.calledOnce();
+    });
+
+    it('should throw an error if transaction is not started', async () => {
       try {
         await mongoDBTransaction.abort();
 
-        expect.fail('should throw "Session is not started" error');
+        expect.fail('should throw "Transaction is not started" error');
       } catch (error) {
-        expect(error).to.be.an.instanceOf(SessionIsNotStartedError);
-        expect(error.message).to.be.equal('Session is not started');
+        expect(error).to.be.an.instanceOf(TransactionIsNotStartedError);
+        expect(error.message).to.be.equal('Transaction is not started');
         expect(sessionMock.commitTransaction).to.have.not.been.called();
       }
     });
@@ -151,14 +175,14 @@ describe('MongoDBTransaction', () => {
       }
     });
 
-    it('should throw an error if session is not started', async () => {
+    it('should throw an error if transaction is not started', async () => {
       try {
         await mongoDBTransaction.runWithTransaction(transactionFunctionMock);
 
-        expect.fail('should throw "Session is not started" error');
+        expect.fail('should throw "Transaction is not started" error');
       } catch (error) {
-        expect(error).to.be.an.instanceOf(SessionIsNotStartedError);
-        expect(error.message).to.be.equal('Session is not started');
+        expect(error).to.be.an.instanceOf(TransactionIsNotStartedError);
+        expect(error.message).to.be.equal('Transaction is not started');
         expect(transactionFunctionMock).to.have.not.been.called();
       }
     });
