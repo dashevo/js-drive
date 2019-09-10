@@ -116,7 +116,7 @@ describe('MongoDBTransaction', () => {
       expect(mongoDBTransaction.transactionIsStarted).to.be.false();
     });
 
-    it('should commit new transaction after aborted transaction', async() => {
+    it('should commit new transaction after aborted transaction', async () => {
       mongoDBTransaction.start();
       await mongoDBTransaction.abort();
 
