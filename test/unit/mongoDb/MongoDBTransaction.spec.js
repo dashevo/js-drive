@@ -53,7 +53,7 @@ describe('MongoDBTransaction', () => {
       await mongoDBTransaction.commit();
 
       expect(sessionMock.commitTransaction).to.be.calledOnce();
-      expect(mongoDBTransaction.transactionIsStarted).to.be.false();
+      expect(mongoDBTransaction.isTransactionStarted).to.be.false();
     });
 
     it('should commit two transactions one after another', async () => {
@@ -64,7 +64,7 @@ describe('MongoDBTransaction', () => {
       await mongoDBTransaction.commit();
 
       expect(sessionMock.commitTransaction).to.be.calledTwice();
-      expect(mongoDBTransaction.transactionIsStarted).to.be.false();
+      expect(mongoDBTransaction.isTransactionStarted).to.be.false();
     });
 
     it('should throw an error if transaction is not started', async () => {
@@ -113,7 +113,7 @@ describe('MongoDBTransaction', () => {
       await mongoDBTransaction.abort();
 
       expect(sessionMock.abortTransaction).to.be.calledOnce();
-      expect(mongoDBTransaction.transactionIsStarted).to.be.false();
+      expect(mongoDBTransaction.isTransactionStarted).to.be.false();
     });
 
     it('should commit new transaction after aborted transaction', async () => {
