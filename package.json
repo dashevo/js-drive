@@ -46,10 +46,13 @@
   "dependencies": {
     "@dashevo/dashcore-lib": "0.17.8",
     "@dashevo/dpp": "dev",
+    "@dashevo/drive-grpc": "git://github.com/dashevo/drive-grpc.git#initial-implementation",
     "ajv": "^6.10.0",
     "connect": "^3.6.6",
     "dotenv-expand": "^4.2.0",
     "dotenv-safe": "^6.1.0",
+    "grpc": "^1.23.3",
+    "grpc-health-check": "^1.7.0",
     "jayson": "^2.1.2",
     "lodash.escaperegexp": "^4.1.2",
     "mongodb": "^3.2.2"

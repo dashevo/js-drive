@@ -25,6 +25,7 @@ describe('SVDocumentMongoDbRepository', function main() {
   let mongoDatabase;
   let mongoClient;
   let stateViewTransaction;
+  let validateQuery;
 
   startMongoDb().then((mongoDb) => {
     mongoDatabase = mongoDb.getDb();
@@ -50,7 +51,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
     [svDocument] = svDocuments;
 
-    const validateQuery = validateQueryFactory(findConflictingConditions);
+    validateQuery = validateQueryFactory(findConflictingConditions);
 
     svDocumentRepository = new SVDocumentMongoDbRepository(
       mongoDatabase,
@@ -645,6 +646,38 @@ describe('SVDocumentMongoDbRepository', function main() {
       const document = await svDocumentRepository.find('unknown');
 
       expect(document).to.be.null();
+    });
+  });
+
+  describe('#createCollection', () => {
+    it('should create collection for SVDocument', async () => {
+      await svDocumentRepository.removeCollection();
+      svDocumentRepository = new SVDocumentMongoDbRepository(
+        mongoDatabase,
+        convertWhereToMongoDbQuery,
+        validateQuery,
+        'myDocumentType',
+      );
+
+      const collectionsBefore = await mongoDatabase.collections();
+      await svDocumentRepository.createCollection();
+      const collectionsAfter = await mongoDatabase.collections();
+
+      expect(collectionsBefore).to.have.lengthOf(0);
+      expect(collectionsAfter).to.have.lengthOf(1);
+      expect(collectionsAfter[0].collectionName).to.equal(svDocumentRepository.getCollectionName());
+    });
+  });
+
+  describe('#removeCollection', () => {
+    it('should remove collection for SVDocument', async () => {
+      const collectionsBefore = await mongoDatabase.collections();
+      const result = await svDocumentRepository.removeCollection();
+      const collectionsAfter = await mongoDatabase.collections();
+
+      expect(result).to.be.true();
+      expect(collectionsBefore).to.have.lengthOf(1);
+      expect(collectionsAfter).to.have.lengthOf(0);
     });
   });
 });
