@@ -3,7 +3,7 @@ const startTransactionHandlerFactory = require('../../../../lib/grpcApi/handlers
 const InternalGrpcError = require('../../../../lib/grpcApi/error/InternalGrpcError');
 const MongoDBTransaction = require('../../../../lib/mongoDb/MongoDBTransaction');
 const GrpcCallMock = require('../../../../lib/test/mock/GrpcCallMock');
-const mongoClientMock = require('../../../../lib/test/mock/mongoClientMock');
+const getMongoClientMock = require('../../../../lib/test/mock/getMongoClientMock');
 
 describe('startTransactionHandlerFactory', () => {
   let startTransactionHandler;
@@ -11,6 +11,7 @@ describe('startTransactionHandlerFactory', () => {
   let mongoDBTransaction;
 
   beforeEach(function beforeEach() {
+    const mongoClientMock = getMongoClientMock(this.sinon);
     mongoDBTransaction = new MongoDBTransaction(mongoClientMock);
     startTransactionHandler = startTransactionHandlerFactory(mongoDBTransaction);
     call = new GrpcCallMock(this.sinon, {});

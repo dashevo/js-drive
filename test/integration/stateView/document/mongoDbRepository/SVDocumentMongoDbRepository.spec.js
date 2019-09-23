@@ -31,7 +31,6 @@ describe('SVDocumentMongoDbRepository', function main() {
   let mongoDatabase;
   let mongoClient;
   let stateViewTransaction;
-  let validateQuery;
 
   startMongoDb().then((mongoDb) => {
     mongoDatabase = mongoDb.getDb();
@@ -57,7 +56,7 @@ describe('SVDocumentMongoDbRepository', function main() {
 
     [svDocument] = svDocuments;
 
-    validateQuery = validateQueryFactory(findConflictingConditions);
+    const validateQuery = validateQueryFactory(findConflictingConditions);
 
     svDocumentRepository = new SVDocumentMongoDbRepository(
       mongoDatabase,
@@ -696,6 +695,10 @@ describe('SVDocumentMongoDbRepository', function main() {
   });
 
   describe('#removeCollection', () => {
+    beforeEach(async () => {
+      await createSVDocuments(svDocumentRepository, svDocuments);
+    });
+
     it('should remove collection for SVDocument', async () => {
       const collectionsBefore = await mongoDatabase.collections();
       const result = await svDocumentRepository.removeCollection();
