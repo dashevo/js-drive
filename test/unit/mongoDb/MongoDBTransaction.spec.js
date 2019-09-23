@@ -162,7 +162,7 @@ describe('MongoDBTransaction', () => {
     });
 
     it('should throw an error', async () => {
-      sessionMock.commitTransaction.throws('UnknownError');
+      transactionFunctionMock.throws('UnknownError');
 
       mongoDBTransaction.start();
 

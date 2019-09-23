@@ -16,6 +16,12 @@ function jsonizeSVDocuments(svDocuments) {
   return svDocuments.map(d => d.toJSON());
 }
 
+async function createSVDocuments(svDocumentRepository, svDocuments) {
+  return Promise.all(
+    svDocuments.map(o => svDocumentRepository.store(o)),
+  );
+}
+
 describe('SVDocumentMongoDbRepository', function main() {
   this.timeout(10000);
 
@@ -60,14 +66,14 @@ describe('SVDocumentMongoDbRepository', function main() {
       svDocument.getDocument().getType(),
     );
 
-    await Promise.all(
-      svDocuments.map(o => svDocumentRepository.store(o)),
-    );
-
     stateViewTransaction = new MongoDBTransaction(mongoClient);
   });
 
   describe('#store', () => {
+    beforeEach(async () => {
+      await createSVDocuments(svDocumentRepository, svDocuments);
+    });
+
     it('should store SVDocument', async () => {
       const result = await svDocumentRepository.find(svDocument.getDocument().getId());
 
@@ -99,8 +105,28 @@ describe('SVDocumentMongoDbRepository', function main() {
   });
 
   describe('#fetch', () => {
+    beforeEach(async () => {
+      await createSVDocuments(svDocumentRepository, svDocuments);
+    });
+
     it('should fetch SVDocuments', async () => {
       const result = await svDocumentRepository.fetch();
+
+      expect(result).to.be.an('array');
+      expect(result).to.have.lengthOf(3);
+
+      const actualRawSVDocuments = jsonizeSVDocuments(result);
+      const expectedRawSVDocuments = jsonizeSVDocuments(svDocuments);
+
+      expect(actualRawSVDocuments).to.have.deep.members(expectedRawSVDocuments);
+    });
+
+    it('should fetch SVDocuments in transaction', async () => {
+      stateViewTransaction.start();
+
+      const result = await svDocumentRepository.fetch({}, stateViewTransaction);
+
+      await stateViewTransaction.commit();
 
       expect(result).to.be.an('array');
       expect(result).to.have.lengthOf(3);
@@ -560,6 +586,10 @@ describe('SVDocumentMongoDbRepository', function main() {
   });
 
   describe('#delete', () => {
+    beforeEach(async () => {
+      await createSVDocuments(svDocumentRepository, svDocuments);
+    });
+
     it('should delete SVDocument', async () => {
       await svDocumentRepository.delete(svDocument);
 
@@ -615,6 +645,10 @@ describe('SVDocumentMongoDbRepository', function main() {
   });
 
   describe('#find', () => {
+    beforeEach(async () => {
+      await createSVDocuments(svDocumentRepository, svDocuments);
+    });
+
     it('should find SVDocument by ID');
 
     it('should find SVDocument marked as deleted by ID');
@@ -651,14 +685,6 @@ describe('SVDocumentMongoDbRepository', function main() {
 
   describe('#createCollection', () => {
     it('should create collection for SVDocument', async () => {
-      await svDocumentRepository.removeCollection();
-      svDocumentRepository = new SVDocumentMongoDbRepository(
-        mongoDatabase,
-        convertWhereToMongoDbQuery,
-        validateQuery,
-        'myDocumentType',
-      );
-
       const collectionsBefore = await mongoDatabase.collections();
       await svDocumentRepository.createCollection();
       const collectionsAfter = await mongoDatabase.collections();
