@@ -1,8 +1,6 @@
 const Document = require('@dashevo/dpp/lib/document/Document');
 const SVDocument = require('../../../../lib/stateView/document/SVDocument');
 
-const Revision = require('../../../../lib/stateView/revisions/Revision');
-
 const updateSVDocumentFactory = require('../../../../lib/stateView/document/updateSVDocumentFactory');
 
 const getReferenceFixture = require('../../../../lib/test/fixtures/getReferenceFixture');
