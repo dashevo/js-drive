@@ -14,7 +14,7 @@ const errorHandler = require('../lib/util/errorHandler');
 
   await updateStateApiApp.init();
 
-  const grpcServer = createServer('UpdateState', updateStateApiApp.createHandlers());
+  const grpcServer = createServer('UpdateState', updateStateApiApp.createWrappedHandlers());
   grpcServer.bind(
     `${updateStateApiAppOptions.getGrpcHost()}:${updateStateApiAppOptions.getGrpcPort()}`,
     grpc.ServerCredentials.createInsecure(),
