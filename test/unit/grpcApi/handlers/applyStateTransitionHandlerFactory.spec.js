@@ -40,8 +40,8 @@ describe('applyStateTransitionHandlerFactory', () => {
     );
 
     const [stPacket] = getSTPacketsFixture();
-    const [transition] = getStateTransitionsFixture(1);
-    const transitionHex = transition.serialize();
+    const [stateTransition] = getStateTransitionsFixture(1);
+    const transitionHex = stateTransition.serialize();
 
     request = new ApplyStateTransitionRequest();
     request.getBlockHeight = this.sinon.stub().returns(1);
@@ -140,7 +140,7 @@ describe('applyStateTransitionHandlerFactory', () => {
 
   describe('throw InternalGrpcError error', () => {
     it('should fail with "Transaction is not started" error', async () => {
-      applyStateTransition.throws(new Error('Transaction is already started'));
+      applyStateTransition.throws(new Error('Transaction is not started'));
 
       try {
         await applyStateTransitionHandler(call);
@@ -148,7 +148,7 @@ describe('applyStateTransitionHandlerFactory', () => {
       } catch (error) {
         expect(error).to.be.an.instanceOf(InternalGrpcError);
         expect(error.getMessage()).to.equal('Internal error');
-        expect(error.getError().message).to.equal('Transaction is already started');
+        expect(error.getError().message).to.equal('Transaction is not started');
       }
     });
   });
