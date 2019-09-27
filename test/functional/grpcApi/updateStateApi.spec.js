@@ -7,16 +7,14 @@ const {
   CommitTransactionResponse,
 } = require('@dashevo/drive-grpc');
 const {
-  mocha: {
-    startDrive,
-  },
+  startDrive,
 } = require('@dashevo/dp-services-ctl');
 
 const getSTPacketsFixture = require('../../../lib/test/fixtures/getSTPacketsFixture');
 const getStateTransitionsFixture = require('../../../lib/test/fixtures/getStateTransitionsFixture');
 const InternalGrpcError = require('../../../lib/grpcApi/error/InternalGrpcError');
 
-describe('applyStateTransitionHandlerFactory', () => {
+describe('applyStateTransitionHandlerFactory', function main () {
   let grpcClient;
   let driveApiClient;
   let stPacket;
@@ -24,20 +22,23 @@ describe('applyStateTransitionHandlerFactory', () => {
   let startTransactionRequest;
   let applyStateTransitionRequest;
   let commitTransactionRequest;
+  let driveInstance;
 
   const height = 1;
   const hash = 'b4749f017444b051c44dfd2720e88f314ff94f3dd6d56d40ef65854fcd7fff6b';
 
-  startDrive().then((services) => {
-    grpcClient = services.driveUpdateStateApi.getClient();
-    driveApiClient = services.driveApi.getClient();
-  });
+  this.timeout(90000);
 
   beforeEach(async () => {
+    driveInstance = await startDrive();
+    grpcClient = driveInstance.driveUpdateStateApi.getApi();
+    driveApiClient = driveInstance.driveApi.getApi();
+
     [stPacket] = getSTPacketsFixture();
     [stateTransition] = getStateTransitionsFixture(1);
 
     startTransactionRequest = new StartTransactionRequest();
+    startTransactionRequest.setBlockHeight(height);
 
     applyStateTransitionRequest = new ApplyStateTransitionRequest();
     applyStateTransitionRequest.setStateTransitionHeader(Buffer.from(stateTransition.serialize(), 'hex'));
@@ -47,6 +48,12 @@ describe('applyStateTransitionHandlerFactory', () => {
 
     commitTransactionRequest = new CommitTransactionRequest();
     commitTransactionRequest.setBlockHeight();
+  });
+
+  after(async () => {
+    await Promise.all([
+      driveInstance.remove(),
+    ]);
   });
 
   it('should successfully apply state transition and commit data', async () => {
