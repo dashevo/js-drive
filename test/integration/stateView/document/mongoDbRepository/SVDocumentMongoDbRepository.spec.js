@@ -136,6 +136,22 @@ describe('SVDocumentMongoDbRepository', function main() {
       expect(actualRawSVDocuments).to.have.deep.members(expectedRawSVDocuments);
     });
 
+    it('should fetch SVDocuments in transaction', async () => {
+      stateViewTransaction.start();
+
+      const result = await svDocumentRepository.fetch({}, stateViewTransaction);
+
+      await stateViewTransaction.commit();
+
+      expect(result).to.be.an('array');
+      expect(result).to.have.lengthOf(3);
+
+      const actualRawSVDocuments = jsonizeSVDocuments(result);
+      const expectedRawSVDocuments = jsonizeSVDocuments(svDocuments);
+
+      expect(actualRawSVDocuments).to.have.deep.members(expectedRawSVDocuments);
+    });
+
     it('should throw InvalidQueryError if query is not valid', async () => {
       const invalidQuery = { invalid: 'query' };
 
