@@ -109,7 +109,7 @@ describe('applyStateTransitionHandlerFactory', () => {
         expect.fail('should throw an InvalidArgumentGrpcError error');
       } catch (error) {
         expect(error).to.be.an.instanceOf(InvalidArgumentGrpcError);
-        expect(error.message).to.be.equal('Invalid argument: Invalid "stateTransitionPacket" param: Invalid ST Packet');
+        expect(error.message).to.be.equal('Invalid argument: Invalid ST Packet');
       }
     });
 
