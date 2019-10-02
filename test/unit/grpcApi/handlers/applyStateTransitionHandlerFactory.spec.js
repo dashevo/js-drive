@@ -5,11 +5,12 @@ const InvalidSTPacketError = require('@dashevo/dpp/lib/stPacket/errors/InvalidST
 const MongoDBTransaction = require('../../../../lib/mongoDb/MongoDBTransaction');
 const applyStateTransitionHandlerFactory = require('../../../../lib/grpcApi/handlers/applyStateTransitionHandlerFactory');
 const GrpcCallMock = require('../../../../lib/test/mock/GrpcCallMock');
-const mongoClientMock = require('../../../../lib/test/mock/getMongoClientMock');
+const getMongoClientMock = require('../../../../lib/test/mock/getMongoClientMock');
 const InvalidArgumentGrpcError = require('../../../../lib/grpcApi/error/InvalidArgumentGrpcError');
-const InternalGrpcError = require('../../../../lib/grpcApi/error/InternalGrpcError');
+const FailedPreconditionGrpcError = require('../../../../lib/grpcApi/error/FailedPreconditionGrpcError');
 const getSTPacketsFixture = require('../../../../lib/test/fixtures/getSTPacketsFixture');
 const getStateTransitionsFixture = require('../../../../lib/test/fixtures/getStateTransitionsFixture');
+const BlockExecutionState = require('../../../../lib/grpcApi/BlockExecutionState');
 
 describe('applyStateTransitionHandlerFactory', () => {
   let applyStateTransitionHandler;
@@ -18,14 +19,17 @@ describe('applyStateTransitionHandlerFactory', () => {
   let request;
   let dppMock;
   let applyStateTransition;
+  let blockExecutionState;
 
   beforeEach(function beforeEach() {
+    const mongoClientMock = getMongoClientMock(this.sinon);
+    blockExecutionState = new BlockExecutionState();
     mongoDBTransaction = new MongoDBTransaction(mongoClientMock);
     applyStateTransition = this.sinon.stub();
     dppMock = createDPPMock(this.sinon);
 
     dppMock.packet.createFromSerialized.returns({
-      isValid: this.sinon.stub().returns(true),
+      getContract: this.sinon.stub(),
     });
 
     dppMock.packet.verify.returns({
@@ -37,6 +41,7 @@ describe('applyStateTransitionHandlerFactory', () => {
       mongoDBTransaction,
       dppMock,
       applyStateTransition,
+      blockExecutionState,
     );
 
     const [stPacket] = getSTPacketsFixture();
@@ -53,6 +58,10 @@ describe('applyStateTransitionHandlerFactory', () => {
   });
 
   describe('throw InvalidArgumentGrpcError error', () => {
+    beforeEach(() => {
+      mongoDBTransaction.start();
+    });
+
     it('should fail with missed stateTransitionPacket param', async () => {
       request.getStateTransitionPacket.returns(null);
 
@@ -121,7 +130,7 @@ describe('applyStateTransitionHandlerFactory', () => {
         expect.fail('should throw an InvalidArgumentGrpcError error');
       } catch (error) {
         expect(error).to.be.an.instanceOf(InvalidArgumentGrpcError);
-        expect(error.message).to.equal('Invalid argument: Invalid "stateTransitionHeader" param: The value of "offset" is out of range. It must be >= 0 and <= 23. Received 37');
+        expect(error.message).to.equal('Invalid argument: Invalid "stateTransitionHeader"');
       }
     });
 
@@ -133,31 +142,35 @@ describe('applyStateTransitionHandlerFactory', () => {
         expect.fail('should throw an InvalidArgumentGrpcError error');
       } catch (error) {
         expect(error).to.be.an.instanceOf(InvalidArgumentGrpcError);
-        expect(error.message).to.be.equal('Invalid argument: Invalid "stPacket" and "stateTransition" params: ');
+        expect(error.message).to.be.equal('Invalid argument: Invalid "stPacket" and "stateTransition"');
       }
     });
   });
 
-  describe('throw InternalGrpcError error', () => {
+  describe('throw FailedPreconditionGrpcError error', () => {
     it('should fail with "Transaction is not started" error', async () => {
       applyStateTransition.throws(new Error('Transaction is not started'));
 
       try {
         await applyStateTransitionHandler(call);
-        expect.fail('should throw an InvalidArgumentGrpcError error');
+        expect.fail('should throw an FailedPreconditionGrpcError error');
       } catch (error) {
-        expect(error).to.be.an.instanceOf(InternalGrpcError);
-        expect(error.getMessage()).to.equal('Internal error');
-        expect(error.getError().message).to.equal('Transaction is not started');
+        expect(error).to.be.an.instanceOf(FailedPreconditionGrpcError);
+        expect(error.getMessage()).to.equal('Failed precondition: Transaction is not started');
       }
     });
   });
 
   describe('valid result', () => {
+    beforeEach(() => {
+      mongoDBTransaction.start();
+    });
+
     it('should return valid result', async () => {
       const response = await applyStateTransitionHandler(call);
 
       expect(response).to.be.an.instanceOf(ApplyStateTransitionResponse);
+      expect(blockExecutionState.getContracts()).to.have.lengthOf(1);
     });
   });
 });

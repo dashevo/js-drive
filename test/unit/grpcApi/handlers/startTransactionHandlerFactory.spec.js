@@ -19,6 +19,7 @@ describe('startTransactionHandlerFactory', () => {
 
   it('should throw an error if transaction is not started', async () => {
     mongoDBTransaction.start();
+
     try {
       await startTransactionHandler(call);
       expect.fail('should throw an error');

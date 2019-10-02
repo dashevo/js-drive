@@ -14,7 +14,7 @@ const getSTPacketsFixture = require('../../../lib/test/fixtures/getSTPacketsFixt
 const getStateTransitionsFixture = require('../../../lib/test/fixtures/getStateTransitionsFixture');
 const InternalGrpcError = require('../../../lib/grpcApi/error/InternalGrpcError');
 
-describe('applyStateTransitionHandlerFactory', function main () {
+describe('applyStateTransitionHandlerFactory', function main() {
   let grpcClient;
   let driveApiClient;
   let stPacket;
