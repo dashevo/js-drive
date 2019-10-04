@@ -1,4 +1,4 @@
-const BlockExecutionState = require('../../../lib/grpcApi/BlockExecutionState');
+const BlockExecutionState = require('../../../lib/updateState/BlockExecutionState');
 const getSVContractFixture = require('../../../lib/test/fixtures/getSVContractFixture');
 
 describe('BlockExecutionState', () => {

@@ -5,7 +5,7 @@ const grpc = require('grpc');
 const UpdateStateApp = require('../lib/app/UpdateStateApp');
 const UpdateStateAppOptions = require('../lib/app/UpdateStateAppOptions');
 
-const createServer = require('../lib/grpcApi/createServer');
+const createServer = require('../lib/grpcServer/createServer');
 const errorHandler = require('../lib/util/errorHandler');
 
 (async function main() {
