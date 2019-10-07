@@ -10,9 +10,9 @@ const {
   startDrive,
 } = require('@dashevo/dp-services-ctl');
 
-const getSTPacketsFixture = require('../../../lib/test/fixtures/getSTPacketsFixture');
-const getStateTransitionsFixture = require('../../../lib/test/fixtures/getStateTransitionsFixture');
-const InternalGrpcError = require('../../../lib/grpcServer/error/InternalGrpcError');
+const getSTPacketsFixture = require('../../lib/test/fixtures/getSTPacketsFixture');
+const getStateTransitionsFixture = require('../../lib/test/fixtures/getStateTransitionsFixture');
+const InternalGrpcError = require('../../lib/grpcServer/error/InternalGrpcError');
 
 describe('updateState', function main() {
   let grpcClient;
