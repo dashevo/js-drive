@@ -9,7 +9,7 @@
     "api": "node scripts/api",
     "updateState": "node scripts/updateState",
     "lint": "eslint .",
-    "test": "npm run test:coverage",
+    "test": "(EXIT_CODE=0; npm run test:coverage || EXIT_CODE=$?; npm run test:functional || EXIT_CODE=$?; exit $EXIT_CODE)",
     "test:coverage": "nyc --check-coverage --stmts=95 --branch=86 --funcs=93 --lines=95 mocha './test/unit/**/*.spec.js' './test/integration/**/*.spec.js'",
     "test:unit": "mocha './test/unit/**/*.spec.js'",
     "test:integration": "mocha './test/integration/**/*.spec.js'",
