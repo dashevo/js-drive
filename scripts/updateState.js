@@ -26,7 +26,15 @@ const errorHandler = require('../lib/util/errorHandler');
     'update_state.proto',
   ];
 
-  let protoPathRoot = protoPathStart === 'root' ? '/' : process.cwd();
+  let protoPathRoot;
+
+  if (protoPathStart === 'root') {
+    protoPathRoot = '/';
+  }
+
+  if (protoPathStart === 'cwd') {
+    protoPathRoot = process.cwd();
+  }
 
   const protoPath = path.join(
     protoPathRoot,
