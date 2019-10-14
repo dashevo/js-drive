@@ -55,7 +55,7 @@
     "connect": "^3.6.6",
     "dotenv-expand": "^4.2.0",
     "dotenv-safe": "^6.1.0",
-    "grpc": "^1.23.3",
+    "grpc": "^1.24.0",
     "grpc-health-check": "^1.7.0",
     "jayson": "^2.1.2",
     "lodash.escaperegexp": "^4.1.2",
