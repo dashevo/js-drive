@@ -1,7 +1,5 @@
 require('dotenv-expand')(require('dotenv-safe').config());
 
-const path = require('path');
-
 const grpc = require('grpc');
 
 const { server: { createServer } } = require('@dashevo/grpc-common');
