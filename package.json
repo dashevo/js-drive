@@ -1,19 +1,19 @@
 {
   "name": "@dashevo/drive",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "description": "Decentralized application storage on the Dash network",
   "engines": {
     "node": ">=8"
   },
   "scripts": {
     "api": "node scripts/api",
-    "sync": "node scripts/sync",
+    "updateState": "node scripts/updateState",
     "lint": "eslint .",
-    "test": "(EXIT_CODE=0; npm run test:coverage || EXIT_CODE=$?; npm run test:e2e || EXIT_CODE=$?; exit $EXIT_CODE)",
+    "test": "(EXIT_CODE=0; npm run test:coverage || EXIT_CODE=$?; npm run test:functional || EXIT_CODE=$?; exit $EXIT_CODE)",
     "test:coverage": "nyc --check-coverage --stmts=95 --branch=86 --funcs=93 --lines=95 mocha './test/unit/**/*.spec.js' './test/integration/**/*.spec.js'",
     "test:unit": "mocha './test/unit/**/*.spec.js'",
     "test:integration": "mocha './test/integration/**/*.spec.js'",
-    "test:e2e": "mocha './test/e2e/**/*.spec.js'",
+    "test:functional": "mocha './test/functional/**/*.spec.js'",
     "check-package": "npm run check-package:name && npm run check-package:version",
     "check-package:name": "test $(jq -r .name package.json) = $(jq -r .name package-lock.json)",
     "check-package:version": "test $(jq -r .version package.json) = $(jq -r .version package-lock.json)"
@@ -22,16 +22,13 @@
     "type": "git",
     "url": "git+https://github.com/dashevo/drive.git"
   },
-  "authors": [
-    "Nathan Marley"
-  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dashevo/drive/issues"
   },
   "homepage": "https://github.com/dashevo/drive",
   "devDependencies": {
-    "@dashevo/dp-services-ctl": "^0.7.1",
+    "@dashevo/dp-services-ctl": "^0.8.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dirty-chai": "^2.0.1",
@@ -46,20 +43,19 @@
     "sinon-chai": "^3.3.0"
   },
   "dependencies": {
-    "@dashevo/dashcore-lib": "github:dashevo/dashcore-lib#fix-script",
-    "@dashevo/dashd-rpc": "^1.3.0",
-    "@dashevo/dpp": "^0.7.1",
-    "bs58": "^4.0.1",
-    "cids": "^0.5.8",
+    "@dashevo/dashcore-lib": "0.17.8",
+    "@dashevo/dashd-rpc": "^1.3.1",
+    "@dashevo/dpp": "^0.8.1",
+    "@dashevo/drive-grpc": "^0.2.2",
+    "@dashevo/grpc-common": "^0.2.0",
+    "ajv": "^6.10.0",
     "connect": "^3.6.6",
     "dotenv-expand": "^4.2.0",
     "dotenv-safe": "^6.1.0",
-    "emittery": "^0.4.1",
-    "ipfs-http-client": "^28.1.0",
+    "grpc": "^1.24.0",
+    "grpc-health-check": "^1.7.0",
     "jayson": "^2.1.2",
-    "mongodb": "^3.2.2",
-    "multihashes": "^0.4.13",
-    "recursive-iterator": "^3.3.0",
-    "zeromq": "^5.1.0"
+    "lodash.escaperegexp": "^4.1.2",
+    "mongodb": "^3.2.2"
   }
 }
