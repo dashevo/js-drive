@@ -27,9 +27,6 @@
     "url": "https://github.com/dashevo/drive/issues"
   },
   "homepage": "https://github.com/dashevo/drive",
-  "publishConfig": {
-    "tag": "dev"
-  },
   "devDependencies": {
     "@dashevo/dp-services-ctl": "^0.8.0-dev.7",
     "chai": "^4.2.0",
