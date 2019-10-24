@@ -19,7 +19,6 @@ describe('SVDocument', () => {
     previousRevisions = [];
 
     svDocument = new SVDocument(
-      userId,
       document,
       reference,
       isDeleted,
