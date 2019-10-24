@@ -49,6 +49,7 @@
     "@dashevo/drive-grpc": "^0.2.2",
     "@dashevo/grpc-common": "^0.2.0",
     "ajv": "^6.10.0",
+    "bs58": "^4.0.1",
     "connect": "^3.6.6",
     "dotenv-expand": "^4.2.0",
     "dotenv-safe": "^6.1.0",
