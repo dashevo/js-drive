@@ -10,15 +10,14 @@ const {
   startDrive,
 } = require('@dashevo/dp-services-ctl');
 
-const getSTPacketsFixture = require('../../lib/test/fixtures/getSTPacketsFixture');
-const createStateTransition = require('../../lib/test/createStateTransition');
+const getStateTransitionsFixture = require('../../lib/test/fixtures/getStateTransitionsFixture');
 const registerUser = require('../../lib/test/registerUser');
 
 describe('updateState', function main() {
   let grpcClient;
   let driveApiClient;
-  let stPacket;
   let stateTransition;
+  let documentsStateTransition;
   let startTransactionRequest;
   let applyStateTransitionRequest;
   let commitTransactionRequest;
@@ -26,6 +25,7 @@ describe('updateState', function main() {
 
   const height = 1;
   const hash = 'b4749f017444b051c44dfd2720e88f314ff94f3dd6d56d40ef65854fcd7fff6b';
+  const nextHash = 'b4749f017444b051c44dfd2720e88f314ff94f3dd6d56d40ef65854fcd7fff7b';
 
   this.timeout(90000);
 
@@ -41,20 +41,18 @@ describe('updateState', function main() {
 
     const { userId, privateKeyString: userPrivateKeyString } = await registerUser('testUser', coreApi);
 
-    [stPacket] = getSTPacketsFixture();
-    stateTransition = createStateTransition(userId, userPrivateKeyString, stPacket);
+    [stateTransition, documentsStateTransition] = getStateTransitionsFixture();
 
     startTransactionRequest = new StartTransactionRequest();
     startTransactionRequest.setBlockHeight(height);
 
     applyStateTransitionRequest = new ApplyStateTransitionRequest();
-    applyStateTransitionRequest.setStateTransitionHeader(Buffer.from(stateTransition.serialize(), 'hex'));
-    applyStateTransitionRequest.setStateTransitionPacket(stPacket.serialize());
+    applyStateTransitionRequest.setStateTransition(Buffer.from(stateTransition.serialize(), 'hex'));
     applyStateTransitionRequest.setBlockHeight(height);
     applyStateTransitionRequest.setBlockHash(hash);
 
     commitTransactionRequest = new CommitTransactionRequest();
-    commitTransactionRequest.setBlockHeight();
+    commitTransactionRequest.setBlockHeight(height);
   });
 
   after(async () => {
@@ -74,18 +72,47 @@ describe('updateState', function main() {
     expect(commitTransactionResponse).to.be.an.instanceOf(CommitTransactionResponse);
 
     // check we have our data in database
-    const contract = await driveApiClient.request('fetchContract', { contractId: stPacket.getContractId() });
-    const documents = await Promise.all(
-      stPacket.getDocuments().map(
-        document => driveApiClient.fetchDocuments(stPacket.getContractId(), document.getType()),
-      ),
+    const { result: contract } = await driveApiClient.request('fetchContract', {
+      contractId: stateTransition.getDataContract().getId(),
+    });
+
+    expect(contract).to.deep.equal(stateTransition.getDataContract().toJSON());
+
+    startTransactionRequest = new StartTransactionRequest();
+    startTransactionRequest.setBlockHeight(height + 1);
+
+    applyStateTransitionRequest = new ApplyStateTransitionRequest();
+    applyStateTransitionRequest.setStateTransition(
+      Buffer.from(documentsStateTransition.serialize(), 'hex'),
+    );
+    applyStateTransitionRequest.setBlockHeight(height + 1);
+    applyStateTransitionRequest.setBlockHash(nextHash);
+
+    commitTransactionRequest = new CommitTransactionRequest();
+    commitTransactionRequest.setBlockHeight(height + 1);
+
+    await grpcClient.startTransaction(startTransactionRequest);
+    await grpcClient.applyStateTransition(applyStateTransitionRequest);
+    await grpcClient.commitTransaction(commitTransactionRequest);
+
+    const { result: niceDocuments } = await driveApiClient.request('fetchDocuments', {
+      contractId: stateTransition.getDataContract().getId(),
+      type: 'niceDocument',
+    });
+
+    const { result: prettyDocuments } = await driveApiClient.reques('fetchDocuments', {
+      contractId: stateTransition.getDataContract().getId(),
+      type: 'prettyDocument',
+    });
+
+    const storedDocumentsJson = stateTransition.getDocuments().map(
+      document => document.toJSON(),
     );
 
-    expect(contract.result).to.deep.equal(stPacket.getContract().toJSON());
+    const receivedDocumentsJson = niceDocuments
+      .append(prettyDocuments)
+      .map(document => document.toJSON());
 
-    const storedDocumentsJson = documents.map(document => document.toJSON());
-    const stPacketDocumentsJson = stPacket.getDocuments().map(document => document.toJSON());
-
-    expect(storedDocumentsJson).to.deep.equal(stPacketDocumentsJson);
+    expect(storedDocumentsJson).to.have.deep.members(receivedDocumentsJson);
   });
 });
