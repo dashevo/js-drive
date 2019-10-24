@@ -13,7 +13,8 @@ const {
 const getStateTransitionsFixture = require('../../lib/test/fixtures/getStateTransitionsFixture');
 const registerUser = require('../../lib/test/registerUser');
 
-describe('updateState', function main() {
+// TODO: enable once `services-ctl` is merged
+describe.skip('updateState', function main() {
   let grpcClient;
   let driveApiClient;
   let stateTransition;
@@ -39,6 +40,7 @@ describe('updateState', function main() {
     // activate sporks
     await coreApi.generate(1000);
 
+    // eslint-disable-next-line no-unused-vars
     const { userId, privateKeyString: userPrivateKeyString } = await registerUser('testUser', coreApi);
 
     [stateTransition, documentsStateTransition] = getStateTransitionsFixture();
