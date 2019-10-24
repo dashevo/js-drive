@@ -18,7 +18,6 @@ describe('updateSVContractFactory', () => {
   let svContract;
   let dpp;
   let contractId;
-  let userId;
   let contract;
 
   startMongoDb().then((mongoDb) => {
@@ -31,8 +30,7 @@ describe('updateSVContractFactory', () => {
     svContract = getSVContractFixture();
     contract = svContract.getContract();
 
-    contractId = svContract.getContractId();
-    userId = svContract.getUserId();
+    contractId = svContract.getContract().getId();
 
     svContractRepository = new SVContractMongoDbRepository(mongoDatabase, dpp);
     updateSVContract = updateSVContractFactory(svContractRepository);
@@ -40,25 +38,21 @@ describe('updateSVContractFactory', () => {
 
   it('should store SVContract', async () => {
     await updateSVContract(
-      svContract.getContractId(),
-      svContract.getUserId(),
-      svContract.getReference(),
       svContract.getContract(),
+      svContract.getReference(),
     );
 
-    const fetchedSVContract = await svContractRepository.find(svContract.getContractId());
+    const fetchedSVContract = await svContractRepository.find(svContract.getContract().getId());
 
     expect(fetchedSVContract).to.deep.equal(svContract);
   });
 
   it('should maintain SVContract previous revisions and add new one', async () => {
     // Create and store the second contract version
-    const secondDPOContract = dpp.contract.createFromObject(contract.toJSON());
+    const secondDPOContract = dpp.dataContract.createFromObject(contract.toJSON());
     secondDPOContract.setVersion(2);
 
     const secondSVContract = new SVContract(
-      contractId,
-      userId,
       contract,
       getReferenceFixture(2),
       false,
@@ -68,14 +62,12 @@ describe('updateSVContractFactory', () => {
     await svContractRepository.store(secondSVContract);
 
     // Update to the third contract version
-    const thirdContract = dpp.contract.createFromObject(contract.toJSON());
+    const thirdContract = dpp.dataContract.createFromObject(contract.toJSON());
     thirdContract.setVersion(3);
 
     await updateSVContract(
-      contractId,
-      userId,
-      getReferenceFixture(3),
       thirdContract,
+      getReferenceFixture(3),
     );
 
     const thirdSVContract = await svContractRepository.find(contractId);

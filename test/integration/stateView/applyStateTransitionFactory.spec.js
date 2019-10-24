@@ -20,16 +20,19 @@ const SVContractMongoDbRepository = require('../../../lib/stateView/contract/SVC
 const fetchContractFactory = require('../../../lib/stateView/contract/fetchContractFactory');
 
 const getBlocksFixture = require('../../../lib/test/fixtures/getBlocksFixture');
-const getSTPacketsFixture = require('../../../lib/test/fixtures/getSTPacketsFixture');
 const getStateTransitionsFixture = require('../../../lib/test/fixtures/getStateTransitionsFixture');
 const getSVContractFixture = require('../../../lib/test/fixtures/getSVContractFixture');
 
-describe.skip('applyStateTransitionFactory', () => {
+const updateSVContractFactory = require('../../../lib/stateView/contract/updateSVContractFactory');
+const updateSVDocumentFactory = require('../../../lib/stateView/document/updateSVDocumentFactory');
+
+const applyStateTransitionFactory = require('../../../lib/stateView/applyStateTransitionFactory');
+
+describe('applyStateTransitionFactory', () => {
   let mongoClient;
   let mongoDatabase;
   let svContractMongoDbRepository;
   let createSVDocumentMongoDbRepository;
-  let readerMediator;
   let applyStateTransition;
 
   startMongoDb().then((mongoDb) => {
@@ -51,7 +54,7 @@ describe.skip('applyStateTransitionFactory', () => {
       null,
     );
 
-    dpp.setDataProvider(dataProvider);
+    dpp.dataProvider = dataProvider;
 
     const validateQuery = validateQueryFactory(findConflictingConditions);
 
@@ -61,30 +64,34 @@ describe.skip('applyStateTransitionFactory', () => {
       convertWhereToMongoDbQuery,
       validateQuery,
     );
+
+    const updateSVContract = updateSVContractFactory(svContractMongoDbRepository);
+    const updateSVDocument = updateSVDocumentFactory(createSVDocumentMongoDbRepository);
+
+    applyStateTransition = applyStateTransitionFactory(
+      updateSVContract,
+      updateSVDocument,
+    );
   });
 
   it('should compute Contract state view', async () => {
     const block = getBlocksFixture()[0];
-    const stPacket = getSTPacketsFixture()[0];
     const stateTransition = getStateTransitionsFixture()[0];
-    const contractId = stPacket.getContractId();
-
-    stateTransition.extraPayload.hashSTPacket = stPacket.hash();
+    const contract = stateTransition.getDataContract();
 
     const reference = new Reference({
       blockHash: block.hash,
       blockHeight: block.height,
-      stHash: stateTransition.hash,
-      stPacketHash: stPacket.hash(),
-      hash: stPacket.getContract().hash(),
+      stHash: stateTransition.hash(),
+      hash: contract.hash(),
     });
 
-    await applyStateTransition(stateTransition, block);
+    await applyStateTransition(stateTransition, block.hash, block.height);
 
-    const svContract = await svContractMongoDbRepository.find(contractId);
+    const svContract = await svContractMongoDbRepository.find(contract.getId());
 
-    expect(svContract.getContractId()).to.equal(contractId);
-    expect(svContract.getContract().toJSON()).to.deep.equal(stPacket.getContract().toJSON());
+    expect(svContract.getContract().getId()).to.equal(contract.getId());
+    expect(svContract.getContract().toJSON()).to.deep.equal(contract.toJSON());
     expect(svContract.getReference()).to.deep.equal(reference);
     expect(svContract.getPreviousRevisions()).to.deep.equal([]);
   });
@@ -95,29 +102,39 @@ describe.skip('applyStateTransitionFactory', () => {
     svContractMongoDbRepository.store(svContract);
 
     const block = getBlocksFixture()[1];
-    const stPacket = getSTPacketsFixture()[1];
     const stateTransition = getStateTransitionsFixture()[1];
 
-    stateTransition.extraPayload.hashSTPacket = stPacket.hash();
+    await applyStateTransition(stateTransition, block.hash, block.height);
 
-    await applyStateTransition(stateTransition, block);
+    const [
+      documentA,
+      documentB,
+      documentC,
+    ] = stateTransition.getDocuments();
 
-    expect(readerMediator.emitSerial).to.have.been.calledTwice();
+    const documentTypes = ['niceDocument', 'prettyDocument'];
+    const documentByTypes = {
+      niceDocument: [documentA],
+      prettyDocument: [documentB, documentC],
+    };
 
-    for (const document of stPacket.getDocuments()) {
+    for (const documentType of documentTypes) {
       const svDocumentRepository = createSVDocumentMongoDbRepository(
-        stPacket.getContractId(),
-        document.getType(),
+        documentA.getDataContractId(),
+        documentType,
       );
       const svDocuments = await svDocumentRepository.fetch();
 
       expect(svDocuments).to.be.an('array');
-      expect(svDocuments).to.have.lengthOf(1);
+      expect(svDocuments).to.have.a.lengthOf(
+        documentByTypes[documentType].length,
+      );
 
-      const [svDocument] = svDocuments;
-      const actualDocument = svDocument.getDocument();
+      const actualDocuments = svDocuments.map(svD => svD.getDocument());
 
-      expect(actualDocument.removeMetadata().toJSON()).to.deep.equal(document.toJSON());
+      expect(actualDocuments.map(d => d.toJSON())).to.have.deep.members(
+        documentByTypes[documentType].map(d => d.toJSON()),
+      );
     }
   });
 });

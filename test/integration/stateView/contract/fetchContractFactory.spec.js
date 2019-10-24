@@ -26,7 +26,7 @@ describe('fetchContractFactory', () => {
 
     await svContractMongoDbRepository.store(svContract);
 
-    const contractData = await fetchContract(svContract.getContractId());
+    const contractData = await fetchContract(svContract.getContract().getId());
 
     expect(contractData.toJSON()).to.deep.equal(svContract.getContract().toJSON());
   });
