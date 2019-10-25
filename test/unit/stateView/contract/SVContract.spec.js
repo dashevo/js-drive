@@ -27,17 +27,17 @@ describe('SVContract', () => {
     );
   });
 
-  describe('#getContractId', () => {
+  describe('#getId', () => {
     it('should return contract ID', () => {
-      const result = svContract.getContractId();
+      const result = svContract.getId();
 
       expect(result).to.equal(contractId);
     });
   });
 
-  describe('#getContract', () => {
-    it('should return Contract', () => {
-      const result = svContract.getContract();
+  describe('#getDataContract', () => {
+    it('should return Data Contract', () => {
+      const result = svContract.getDataContract();
 
       expect(result.toJSON()).to.deep.equal(contract.toJSON());
     });

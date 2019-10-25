@@ -82,7 +82,7 @@ describe('applyStateTransitionHandlerFactory', () => {
       expect.fail('should throw an InvalidArgumentGrpcError error');
     } catch (error) {
       expect(error).to.be.an.instanceOf(InvalidArgumentGrpcError);
-      expect(error.message).to.be.equal('Invalid argument: blockHeight is not specified');
+      expect(error.message).to.be.equal('Invalid argument: Block height is not specified');
       expect(applyStateTransitionMock).to.not.be.called();
     }
   });
@@ -95,7 +95,7 @@ describe('applyStateTransitionHandlerFactory', () => {
       expect.fail('should throw an InvalidArgumentGrpcError error');
     } catch (error) {
       expect(error).to.be.an.instanceOf(InvalidArgumentGrpcError);
-      expect(error.message).to.be.equal('Invalid argument: blockHash is not specified');
+      expect(error.message).to.be.equal('Invalid argument: Block hash is not specified');
       expect(applyStateTransitionMock).to.not.be.called();
     }
   });
