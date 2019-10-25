@@ -667,8 +667,6 @@ describe('SVDocumentMongoDbRepository', function main() {
 
     it('should find SVDocument marked as deleted by ID');
 
-    it('should return SVDocument with Document having proper $meta');
-
     it('should return null if SVDocument was not found', async () => {
       const document = await svDocumentRepository.find('unknown');
 

@@ -90,8 +90,8 @@ describe('applyStateTransitionFactory', () => {
 
     const svContract = await svContractMongoDbRepository.find(contract.getId());
 
-    expect(svContract.getContract().getId()).to.equal(contract.getId());
-    expect(svContract.getContract().toJSON()).to.deep.equal(contract.toJSON());
+    expect(svContract.getId()).to.equal(contract.getId());
+    expect(svContract.getDataContract().toJSON()).to.deep.equal(contract.toJSON());
     expect(svContract.getReference()).to.deep.equal(reference);
     expect(svContract.getPreviousRevisions()).to.deep.equal([]);
   });

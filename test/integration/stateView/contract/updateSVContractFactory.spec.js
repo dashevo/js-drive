@@ -28,9 +28,9 @@ describe('updateSVContractFactory', () => {
     dpp = new DashPlatformProtocol();
 
     svContract = getSVContractFixture();
-    contract = svContract.getContract();
+    contract = svContract.getDataContract();
 
-    contractId = svContract.getContract().getId();
+    contractId = svContract.getId();
 
     svContractRepository = new SVContractMongoDbRepository(mongoDatabase, dpp);
     updateSVContract = updateSVContractFactory(svContractRepository);
@@ -38,11 +38,11 @@ describe('updateSVContractFactory', () => {
 
   it('should store SVContract', async () => {
     await updateSVContract(
-      svContract.getContract(),
+      svContract.getDataContract(),
       svContract.getReference(),
     );
 
-    const fetchedSVContract = await svContractRepository.find(svContract.getContract().getId());
+    const fetchedSVContract = await svContractRepository.find(svContract.getId());
 
     expect(fetchedSVContract).to.deep.equal(svContract);
   });
@@ -73,7 +73,7 @@ describe('updateSVContractFactory', () => {
     const thirdSVContract = await svContractRepository.find(contractId);
 
     expect(thirdSVContract).to.be.an.instanceOf(SVContract);
-    expect(thirdSVContract.getContract()).to.deep.equal(thirdContract);
+    expect(thirdSVContract.getDataContract()).to.deep.equal(thirdContract);
     expect(thirdSVContract.getPreviousRevisions()).to.deep.equal([
       svContract.getCurrentRevision(),
       secondSVContract.getCurrentRevision(),
