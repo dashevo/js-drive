@@ -6,8 +6,6 @@ const {
 
 const DashPlatformProtocol = require('@dashevo/dpp');
 
-const DriveDataProvider = require('../../../lib/dpp/DriveDataProvider');
-
 const Reference = require('../../../lib/stateView/revisions/Reference');
 
 const createSVDocumentMongoDbRepositoryFactory = require('../../../lib/stateView/document/mongoDbRepository/createSVDocumentMongoDbRepositoryFactory');
@@ -16,8 +14,6 @@ const validateQueryFactory = require('../../../lib/stateView/document/query/vali
 const findConflictingConditions = require('../../../lib/stateView/document/query/findConflictingConditions');
 const SVDocumentMongoDbRepository = require('../../../lib/stateView/document/mongoDbRepository/SVDocumentMongoDbRepository');
 const SVContractMongoDbRepository = require('../../../lib/stateView/contract/SVContractMongoDbRepository');
-
-const fetchContractFactory = require('../../../lib/stateView/contract/fetchContractFactory');
 
 const getBlocksFixture = require('../../../lib/test/fixtures/getBlocksFixture');
 const getStateTransitionsFixture = require('../../../lib/test/fixtures/getStateTransitionsFixture');
@@ -44,17 +40,6 @@ describe('applyStateTransitionFactory', () => {
     const dpp = new DashPlatformProtocol();
 
     svContractMongoDbRepository = new SVContractMongoDbRepository(mongoDatabase, dpp);
-
-    const fetchContract = fetchContractFactory(svContractMongoDbRepository);
-
-    const dataProvider = new DriveDataProvider(
-      null,
-      fetchContract,
-      null,
-      null,
-    );
-
-    dpp.dataProvider = dataProvider;
 
     const validateQuery = validateQueryFactory(findConflictingConditions);
 
