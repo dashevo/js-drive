@@ -49,7 +49,7 @@ describe.skip('updateState', function main() {
     startTransactionRequest.setBlockHeight(height);
 
     applyStateTransitionRequest = new ApplyStateTransitionRequest();
-    applyStateTransitionRequest.setStateTransition(Buffer.from(stateTransition.serialize(), 'hex'));
+    applyStateTransitionRequest.setStateTransition(stateTransition.serialize());
     applyStateTransitionRequest.setBlockHeight(height);
     applyStateTransitionRequest.setBlockHash(hash);
 
@@ -85,7 +85,7 @@ describe.skip('updateState', function main() {
 
     applyStateTransitionRequest = new ApplyStateTransitionRequest();
     applyStateTransitionRequest.setStateTransition(
-      Buffer.from(documentsStateTransition.serialize(), 'hex'),
+      documentsStateTransition.serialize(),
     );
     applyStateTransitionRequest.setBlockHeight(height + 1);
     applyStateTransitionRequest.setBlockHash(nextHash);
@@ -102,19 +102,14 @@ describe.skip('updateState', function main() {
       type: 'niceDocument',
     });
 
-    const { result: prettyDocuments } = await driveApiClient.reques('fetchDocuments', {
+    const { result: prettyDocuments } = await driveApiClient.request('fetchDocuments', {
       contractId: stateTransition.getDataContract().getId(),
       type: 'prettyDocument',
     });
 
-    const storedDocumentsJson = stateTransition.getDocuments().map(
-      document => document.toJSON(),
-    );
+    const { documents } = documentsStateTransition.toJSON();
+    const storedDocuments = niceDocuments.concat(prettyDocuments);
 
-    const receivedDocumentsJson = niceDocuments
-      .append(prettyDocuments)
-      .map(document => document.toJSON());
-
-    expect(storedDocumentsJson).to.have.deep.members(receivedDocumentsJson);
+    expect(documents).to.have.deep.members(storedDocuments);
   });
 });
