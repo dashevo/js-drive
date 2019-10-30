@@ -13,8 +13,7 @@ const {
 const getStateTransitionsFixture = require('../../lib/test/fixtures/getStateTransitionsFixture');
 const registerUser = require('../../lib/test/registerUser');
 
-// TODO: enable once `services-ctl` is merged
-describe.skip('updateState', function main() {
+describe('updateState', function main() {
   let grpcClient;
   let driveApiClient;
   let stateTransition;
