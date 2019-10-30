@@ -30,7 +30,7 @@ describe('fetchDocumentsFactory', () => {
     mongoClient = mongoDb.getClient();
   });
 
-  beforeEach(async () => {
+  beforeEach(async function beforeEach() {
     const validateQuery = validateQueryFactory(findConflictingConditions);
 
     createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
@@ -47,9 +47,25 @@ describe('fetchDocumentsFactory', () => {
       new DashPlatformProtocol(),
     );
 
+    const indexedFields = ['$userId', 'firstName', 'lastName', '$id'];
+
+    const validateIndexedFields = this.sinon.stub()
+      .returns({
+        isValid: this.sinon.stub().returns(true),
+      });
+
+    validateIndexedFields.withArgs(indexedFields, { where: [['lastName', '==', 'unknown']] }).returns({
+      isValid: this.sinon.stub().returns(false),
+      getErrors: this.sinon.stub().returns([{ message: 'Search fields can only contain one of these fields: name, $id' }]),
+    });
+
+    const getIndexedFieldsFromDocumentSchema = this.sinon.stub().returns(indexedFields);
+
     fetchDocuments = fetchDocumentsFactory(
       createSVDocumentMongoDbRepository,
       svContractMongoDbRepository,
+      validateIndexedFields,
+      getIndexedFieldsFromDocumentSchema,
     );
 
     svContract = getSVContractFixture();
@@ -124,16 +140,23 @@ describe('fetchDocumentsFactory', () => {
     expect(result).to.deep.equal([]);
   });
 
-  it('should return empty array if type does not exist', async () => {
+  it('should throw InvalidQueryError if type does not exist', async () => {
     const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
 
     await svDocumentRepository.store(svDocument);
 
     type = 'Unknown';
 
-    const result = await fetchDocuments(contractId, type);
+    try {
+      await fetchDocuments(contractId, type);
 
-    expect(result).to.deep.equal([]);
+      expect.fail('should throw InvalidQueryError');
+    } catch (e) {
+      expect(e).to.be.instanceOf(InvalidQueryError);
+      expect(e.getErrors()).to.be.an('array');
+      expect(e.getErrors()).to.have.lengthOf(1);
+      expect(e.getErrors()[0].message).to.be.equal('Invalid document type: Unknown');
+    }
   });
 
   it('should throw InvalidQueryError if searching by non indexed fields', async () => {
