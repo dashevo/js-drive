@@ -128,16 +128,23 @@ describe('fetchDocumentsFactory', () => {
     expect(result).to.deep.equal([]);
   });
 
-  it('should return empty array if contract ID does not exist', async () => {
+  it('should throw InvalidQueryError if contract ID does not exist', async () => {
     const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, type);
 
     await svDocumentRepository.store(svDocument);
 
     contractId = 'Unknown';
 
-    const result = await fetchDocuments(contractId, type);
+    try {
+      await fetchDocuments(contractId, type);
 
-    expect(result).to.deep.equal([]);
+      expect.fail('should throw InvalidQueryError');
+    } catch (e) {
+      expect(e).to.be.instanceOf(InvalidQueryError);
+      expect(e.getErrors()).to.be.an('array');
+      expect(e.getErrors()).to.have.lengthOf(1);
+      expect(e.getErrors()[0].message).to.be.equal('Invalid contract ID: Unknown');
+    }
   });
 
   it('should throw InvalidQueryError if type does not exist', async () => {

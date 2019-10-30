@@ -1,6 +1,6 @@
 const validateIndexedFields = require('../../../../../lib/stateView/document/query/validateIndexedFields.js');
 const ValidationResult = require('../../../../../lib/stateView/document/query/ValidationResult');
-const ValidationError = require('../../../../../lib/stateView/document/query/errors/ValidationError');
+const NotIndexedFieldError = require('../../../../../lib/stateView/document/query/errors/NotIndexedFieldError');
 
 describe('validateIndexedFields', () => {
   let indexedFields;
@@ -37,7 +37,7 @@ describe('validateIndexedFields', () => {
     expect(result.isValid()).to.be.false();
     expect(result.getErrors()).to.be.an('array');
     expect(result.getErrors()).to.have.lengthOf(1);
-    expect(result.getErrors()[0]).to.be.an.instanceOf(ValidationError);
+    expect(result.getErrors()[0]).to.be.an.instanceOf(NotIndexedFieldError);
     expect(result.getErrors()[0].message).to.be.equal('Search fields can only contain one of these fields: $userId, firstName, lastName, $id');
   });
 
@@ -61,7 +61,7 @@ describe('validateIndexedFields', () => {
     expect(result.isValid()).to.be.false();
     expect(result.getErrors()).to.be.an('array');
     expect(result.getErrors()).to.have.lengthOf(1);
-    expect(result.getErrors()[0]).to.be.an.instanceOf(ValidationError);
+    expect(result.getErrors()[0]).to.be.an.instanceOf(NotIndexedFieldError);
     expect(result.getErrors()[0].message).to.be.equal('Search fields can only contain one of these fields: $userId, firstName, lastName, $id');
   });
 });
