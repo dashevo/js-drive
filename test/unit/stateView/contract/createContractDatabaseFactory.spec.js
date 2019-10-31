@@ -9,7 +9,7 @@ describe('createContractDatabaseFactory', () => {
   let svContract;
   let createCollection;
   let convertToMongoDbIndices;
-  let indices;
+  let convertedIndices;
   let createSVDocumentRepository;
 
   beforeEach(function beforeEach() {
@@ -34,7 +34,7 @@ describe('createContractDatabaseFactory', () => {
 
     createSVDocumentRepository = this.sinon.stub().returns(svDocumentRepository);
 
-    indices = [{
+    convertedIndices = [{
       key: {
         $userId: 1,
         firstName: -1,
@@ -50,7 +50,7 @@ describe('createContractDatabaseFactory', () => {
       name: '$userId_lastName',
     }];
 
-    convertToMongoDbIndices = this.sinon.stub().returns(indices);
+    convertToMongoDbIndices = this.sinon.stub().returns(convertedIndices);
 
     createContractDatabase = createContractDatabaseFactory(
       createSVDocumentRepository,
@@ -65,10 +65,10 @@ describe('createContractDatabaseFactory', () => {
     const { indices: documentIndices } = documents.niceDocument;
 
     expect(createCollection).to.be.callCount(Object.keys(documents).length);
-    expect(createCollection).to.be.calledWith(indices);
-    expect(createCollection).to.be.calledWith(undefined);
+
     expect(convertToMongoDbIndices).to.be.calledOnceWith(documentIndices);
-    Object.keys(documents).forEach((documentType) => {
+    Object.entries(documents).forEach(([documentType, document]) => {
+      expect(createCollection).to.be.calledWith(document.indices ? convertedIndices : undefined);
       expect(createSVDocumentRepository).to.be.calledWith(svContract.getId(), documentType);
     });
   });
