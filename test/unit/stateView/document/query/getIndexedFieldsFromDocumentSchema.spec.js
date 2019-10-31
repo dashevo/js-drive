@@ -1,4 +1,4 @@
-const getIndexedFieldsFromDocumentSchema = require('../../../../lib/stateView/document/getIndexedFieldsFromDocumentSchema');
+const getIndexedFieldsFromDocumentSchema = require('../../../../../lib/stateView/document/query/getIndexedFieldsFromDocumentSchema');
 
 describe('getIndexedFieldsFromDocumentSchema', () => {
   let documentSchema;

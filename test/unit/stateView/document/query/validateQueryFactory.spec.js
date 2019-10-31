@@ -634,11 +634,9 @@ describe('validateQueryFactory', () => {
             const result = validateQuery({
               where: [
                 ['arr', 'elementMatch',
-                  [
-                    ['subArr', 'elementMatch',
-                      [['subArrElem', '>', 1], ['subArrElem', '<', 3],]],
-                    ['subArr', '<', 3]
-                  ],
+                  [['subArr', 'elementMatch', [
+                    ['subArrElem', '>', 1], ['subArrElem', '<', 3],
+                  ]], ['subArr', '<', 3]],
                 ],
               ],
             });

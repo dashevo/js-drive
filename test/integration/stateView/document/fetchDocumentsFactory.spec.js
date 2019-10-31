@@ -15,6 +15,9 @@ const SVContractMongoDbRepository = require('../../../../lib/stateView/contract/
 const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');
 const getSVContractFixture = require('../../../../lib/test/fixtures/getSVContractFixture');
 
+const validateIndexedFields = require('../../../../lib/stateView/document/query/validateIndexedFields');
+const getIndexedFieldsFromDocumentSchema = require('../../../../lib/stateView/document/query/getIndexedFieldsFromDocumentSchema');
+
 describe('fetchDocumentsFactory', () => {
   let createSVDocumentMongoDbRepository;
   let fetchDocuments;
@@ -30,8 +33,12 @@ describe('fetchDocumentsFactory', () => {
     mongoClient = mongoDb.getClient();
   });
 
-  beforeEach(async function beforeEach() {
-    const validateQuery = validateQueryFactory(findConflictingConditions);
+  beforeEach(async () => {
+    const validateQuery = validateQueryFactory(
+      findConflictingConditions,
+      getIndexedFieldsFromDocumentSchema,
+      validateIndexedFields,
+    );
 
     createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
       mongoClient,
@@ -47,25 +54,9 @@ describe('fetchDocumentsFactory', () => {
       new DashPlatformProtocol(),
     );
 
-    const indexedFields = ['$userId', 'firstName', 'lastName', '$id'];
-
-    const validateIndexedFields = this.sinon.stub()
-      .returns({
-        isValid: this.sinon.stub().returns(true),
-      });
-
-    validateIndexedFields.withArgs(indexedFields, { where: [['lastName', '==', 'unknown']] }).returns({
-      isValid: this.sinon.stub().returns(false),
-      getErrors: this.sinon.stub().returns([{ message: 'Search fields can only contain one of these fields: name, $id' }]),
-    });
-
-    const getIndexedFieldsFromDocumentSchema = this.sinon.stub().returns(indexedFields);
-
     fetchDocuments = fetchDocumentsFactory(
       createSVDocumentMongoDbRepository,
       svContractMongoDbRepository,
-      validateIndexedFields,
-      getIndexedFieldsFromDocumentSchema,
     );
 
     svContract = getSVContractFixture();
@@ -180,7 +171,7 @@ describe('fetchDocumentsFactory', () => {
       expect(e).to.be.instanceOf(InvalidQueryError);
       expect(e.getErrors()).to.be.an('array');
       expect(e.getErrors()).to.have.lengthOf(1);
-      expect(e.getErrors()[0].message).to.be.equal('Search fields can only contain one of these fields: name, $id');
+      expect(e.getErrors()[0].message).to.be.equal('Search by not indexed field "lastName" is not allowed');
     }
   });
 });

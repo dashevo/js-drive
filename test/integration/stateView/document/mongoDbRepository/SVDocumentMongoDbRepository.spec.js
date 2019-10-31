@@ -9,8 +9,12 @@ const findConflictingConditions = require('../../../../../lib/stateView/document
 const MongoDBTransaction = require('../../../../../lib/mongoDb/MongoDBTransaction');
 
 const getSVDocumentsFixture = require('../../../../../lib/test/fixtures/getSVDocumentsFixture');
+const getSVContractFixture = require('../../../../../lib/test/fixtures/getSVContractFixture');
 
 const InvalidQueryError = require('../../../../../lib/stateView/document/errors/InvalidQueryError');
+
+const validateIndexedFields = require('../../../../../lib/stateView/document/query/validateIndexedFields');
+const getIndexedFieldsFromDocumentSchema = require('../../../../../lib/stateView/document/query/getIndexedFieldsFromDocumentSchema');
 
 function jsonizeSVDocuments(svDocuments) {
   return svDocuments.map(d => d.toJSON());
@@ -31,6 +35,7 @@ describe('SVDocumentMongoDbRepository', function main() {
   let mongoDatabase;
   let mongoClient;
   let stateViewTransaction;
+  let documentSchema;
 
   startMongoDb().then((mongoDb) => {
     mongoDatabase = mongoDb.getDb();
@@ -39,6 +44,9 @@ describe('SVDocumentMongoDbRepository', function main() {
 
   beforeEach(async () => {
     svDocuments = getSVDocumentsFixture();
+
+    const svContract = getSVContractFixture();
+    const { documents: documentsSchema } = svContract.dataContract.toJSON();
 
     // Modify documents for the test cases
     svDocuments.forEach((svDoc, i) => {
@@ -55,8 +63,36 @@ describe('SVDocumentMongoDbRepository', function main() {
     });
 
     [svDocument] = svDocuments;
+    documentSchema = documentsSchema[svDocument.getDocument().getType()];
 
-    const validateQuery = validateQueryFactory(findConflictingConditions);
+    // redeclare indices
+    const indices = documentSchema.indices || [];
+    documentSchema.indices = indices.concat([
+      {
+        properties: [{ order: 'asc' }],
+      },
+      {
+        properties: [{ lastName: 'asc' }],
+      },
+      {
+        properties: [{ arrayWithScalar: 'asc' }],
+      },
+      {
+        properties: [{ arrayWithObjects: 'asc' }],
+      },
+      {
+        properties: [{ 'arrayWithObjects.item': 'asc' }],
+      },
+      {
+        properties: [{ 'arrayWithObjects.flag': 'asc' }],
+      },
+    ]);
+
+    const validateQuery = validateQueryFactory(
+      findConflictingConditions,
+      getIndexedFieldsFromDocumentSchema,
+      validateIndexedFields,
+    );
 
     svDocumentRepository = new SVDocumentMongoDbRepository(
       mongoDatabase,
@@ -123,7 +159,7 @@ describe('SVDocumentMongoDbRepository', function main() {
     it('should fetch SVDocuments in transaction', async () => {
       stateViewTransaction.start();
 
-      const result = await svDocumentRepository.fetch({}, stateViewTransaction);
+      const result = await svDocumentRepository.fetch({}, {}, stateViewTransaction);
 
       await stateViewTransaction.commit();
 
@@ -139,7 +175,7 @@ describe('SVDocumentMongoDbRepository', function main() {
     it('should fetch SVDocuments in transaction', async () => {
       stateViewTransaction.start();
 
-      const result = await svDocumentRepository.fetch({}, stateViewTransaction);
+      const result = await svDocumentRepository.fetch({}, {}, stateViewTransaction);
 
       await stateViewTransaction.commit();
 
@@ -174,7 +210,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           where: [['order', '<', svDocuments[1].getDocument().get('order')]],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -189,7 +225,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           where: [['order', '<=', svDocuments[1].getDocument().get('order')]],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(2);
@@ -207,7 +243,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           where: [['name', '==', svDocument.getDocument().get('name')]],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -222,7 +258,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           where: [['order', '>', svDocuments[1].getDocument().get('order')]],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -237,7 +273,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           where: [['order', '>=', svDocuments[1].getDocument().get('order')]],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(2);
@@ -260,7 +296,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(2);
@@ -278,7 +314,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           where: [['arrayWithObjects', 'length', 2]],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -293,7 +329,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           where: [['lastName', 'startsWith', 'Swe']],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -312,7 +348,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -329,7 +365,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -346,7 +382,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(2);
@@ -364,7 +400,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           where: [['name', '==', 'Dash enthusiast']],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.deep.equal([]);
       });
@@ -376,7 +412,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -397,7 +433,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -414,7 +450,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           limit: 1,
         };
 
-        const result = await svDocumentRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(options, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.have.lengthOf(1);
@@ -449,7 +485,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           startAt: 2,
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
 
@@ -469,7 +505,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           startAfter: 1,
         };
 
-        const result = await svDocumentRepository.fetch(options);
+        const result = await svDocumentRepository.fetch(options, documentSchema);
 
         expect(result).to.be.an('array');
 
@@ -488,7 +524,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
 
@@ -505,7 +541,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
 
@@ -531,7 +567,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(3);
@@ -561,7 +597,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(3);
@@ -587,7 +623,7 @@ describe('SVDocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await svDocumentRepository.fetch(query);
+        const result = await svDocumentRepository.fetch(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(3);

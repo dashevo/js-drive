@@ -4,7 +4,7 @@ describe('validateIndexedFields', () => {
   let indexedFields;
 
   beforeEach(() => {
-    indexedFields = ['$userId', 'firstName', 'lastName', '$id'];
+    indexedFields = ['$userId', 'firstName', 'lastName', '$id', 'arrayWithObjects.item', 'arrayWithObjects.flag'];
   });
 
   it('should pass system $id field', () => {
@@ -58,5 +58,36 @@ describe('validateIndexedFields', () => {
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
     expect(result[0]).to.equal('secondName');
+  });
+
+  it('should check fields by nested conditions', () => {
+    const condition = [
+      ['firstName', '==', 'Cutie'],
+      ['arrayWithObjects', 'elementMatch', [
+        ['item', '==', 1],
+        ['flag', '==', true],
+      ]],
+    ];
+
+    const result = validateIndexedFields(indexedFields, condition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.be.empty();
+  });
+
+  it('should fail with nested conditions', () => {
+    const condition = [
+      ['firstName', '==', 'Cutie'],
+      ['arrayWithObjects', 'elementMatch', [
+        ['item', '==', 1],
+        ['anotherFlag', '==', true],
+      ]],
+    ];
+
+    const result = validateIndexedFields(indexedFields, condition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal('arrayWithObjects.anotherFlag');
   });
 });
