@@ -116,11 +116,22 @@ const invalidFieldNameTestCases = [
 describe('validateQueryFactory', () => {
   let findConflictingConditionsStub;
   let validateQuery;
+  let getIndexedFieldsFromDocumentSchemaStub;
+  let validateIndexedFieldsStub;
 
   beforeEach(function beforeEach() {
     findConflictingConditionsStub = this.sinon.stub().returns([]);
+    getIndexedFieldsFromDocumentSchemaStub = this.sinon.stub().returns([]);
+    validateIndexedFieldsStub = this.sinon.stub().returns({
+      isValid: this.sinon.stub().returns(true),
+      getErrors: this.sinon.stub().returns([]),
+    });
 
-    validateQuery = validateQueryFactory(findConflictingConditionsStub);
+    validateQuery = validateQueryFactory(
+      findConflictingConditionsStub,
+      getIndexedFieldsFromDocumentSchemaStub,
+      validateIndexedFieldsStub,
+    );
   });
 
   it('should return valid result if empty query is specified', () => {
