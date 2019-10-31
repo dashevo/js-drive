@@ -10,6 +10,7 @@ describe('createContractDatabaseFactory', () => {
   let createCollection;
   let convertToMongoDbIndices;
   let indices;
+  let createSVDocumentRepository;
 
   beforeEach(function beforeEach() {
     const contract = getDataContractFixture();
@@ -31,7 +32,7 @@ describe('createContractDatabaseFactory', () => {
       createCollection,
     };
 
-    const createSVDocumentRepository = () => svDocumentRepository;
+    createSVDocumentRepository = this.sinon.stub().returns(svDocumentRepository);
 
     indices = [{
       key: {
@@ -67,5 +68,8 @@ describe('createContractDatabaseFactory', () => {
     expect(createCollection).to.be.calledWith(indices);
     expect(createCollection).to.be.calledWith(undefined);
     expect(convertToMongoDbIndices).to.be.calledOnceWith(documentIndices);
+    Object.keys(documents).forEach((documentType) => {
+      expect(createSVDocumentRepository).to.be.calledWith(svContract.getId(), documentType);
+    });
   });
 });
