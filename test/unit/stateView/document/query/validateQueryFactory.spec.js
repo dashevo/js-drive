@@ -122,10 +122,7 @@ describe('validateQueryFactory', () => {
   beforeEach(function beforeEach() {
     findConflictingConditionsStub = this.sinon.stub().returns([]);
     getIndexedFieldsFromDocumentSchemaStub = this.sinon.stub().returns([]);
-    validateIndexedFieldsStub = this.sinon.stub().returns({
-      isValid: this.sinon.stub().returns(true),
-      getErrors: this.sinon.stub().returns([]),
-    });
+    validateIndexedFieldsStub = this.sinon.stub().returns([]);
 
     validateQuery = validateQueryFactory(
       findConflictingConditionsStub,
@@ -637,9 +634,11 @@ describe('validateQueryFactory', () => {
             const result = validateQuery({
               where: [
                 ['arr', 'elementMatch',
-                  [['subArr', 'elementMatch', [
-                    ['subArrElem', '>', 1], ['subArrElem', '<', 3],
-                  ]], ['subArr', '<', 3]],
+                  [
+                    ['subArr', 'elementMatch',
+                      [['subArrElem', '>', 1], ['subArrElem', '<', 3],]],
+                    ['subArr', '<', 3]
+                  ],
                 ],
               ],
             });

@@ -1,6 +1,4 @@
 const validateIndexedFields = require('../../../../../lib/stateView/document/query/validateIndexedFields.js');
-const ValidationResult = require('../../../../../lib/stateView/document/query/ValidationResult');
-const NotIndexedFieldError = require('../../../../../lib/stateView/document/query/errors/NotIndexedFieldError');
 
 describe('validateIndexedFields', () => {
   let indexedFields;
@@ -10,58 +8,55 @@ describe('validateIndexedFields', () => {
   });
 
   it('should pass system $id field', () => {
-    const query = { where: [['$id', '==', 123]] };
-    const result = validateIndexedFields(indexedFields, query);
+    const condition = [['$id', '==', 123]];
+    const result = validateIndexedFields(indexedFields, condition);
 
-    expect(result).to.be.an.instanceOf(ValidationResult);
-    expect(result.isValid()).to.be.true();
-    expect(result.getErrors()).to.be.an('array');
-    expect(result.getErrors()).to.have.lengthOf(0);
+    expect(result).to.be.an('array');
+    expect(result).to.be.empty();
   });
 
   it('should pass', () => {
-    const query = { where: [['firstName', '==', 'name']] };
-    const result = validateIndexedFields(indexedFields, query);
+    const condition = [['firstName', '==', 'name']];
+    const result = validateIndexedFields(indexedFields, condition);
 
-    expect(result).to.be.an.instanceOf(ValidationResult);
-    expect(result.isValid()).to.be.true();
-    expect(result.getErrors()).to.be.an('array');
-    expect(result.getErrors()).to.have.lengthOf(0);
+    expect(result).to.be.an('array');
+    expect(result).to.be.empty();
   });
 
-  it('should return an error', () => {
-    const query = { where: [['secondName', '==', 'name']] };
-    const result = validateIndexedFields(indexedFields, query);
+  it('should return an error for one field', () => {
+    const condition = [['secondName', '==', 'name']];
+    const result = validateIndexedFields(indexedFields, condition);
 
-    expect(result).to.be.an.instanceOf(ValidationResult);
-    expect(result.isValid()).to.be.false();
-    expect(result.getErrors()).to.be.an('array');
-    expect(result.getErrors()).to.have.lengthOf(1);
-    expect(result.getErrors()[0]).to.be.an.instanceOf(NotIndexedFieldError);
-    expect(result.getErrors()[0].message).to.be.equal('Search fields can only contain one of these fields: $userId, firstName, lastName, $id');
+    expect(result).to.be.an('array');
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal('secondName');
   });
 
-  it('should check empty query', () => {
-    const query = {};
-    const result = validateIndexedFields(indexedFields, query);
+  it('should return an error for three fields', () => {
+    const condition = [['secondName', '==', 'name'], ['city', '==', 'NY'], ['country', '==', 'USA']];
+    const result = validateIndexedFields(indexedFields, condition);
 
-    expect(result).to.be.an.instanceOf(ValidationResult);
-    expect(result.isValid()).to.be.true();
-    expect(result.getErrors()).to.be.an('array');
-    expect(result.getErrors()).to.have.lengthOf(0);
+    expect(result).to.be.an('array');
+    expect(result).to.have.lengthOf(3);
+    expect(result).to.have.deep.members(['secondName', 'city', 'country']);
+  });
+
+  it('should check empty condition', () => {
+    const condition = [];
+    const result = validateIndexedFields(indexedFields, condition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.be.empty();
   });
 
   it('should check empty document indices', () => {
     delete indexedFields.indices;
-    const query = { where: [['secondName', '==', 'name']] };
+    const condition = [['secondName', '==', 'name']];
 
-    const result = validateIndexedFields(indexedFields, query);
+    const result = validateIndexedFields(indexedFields, condition);
 
-    expect(result).to.be.an.instanceOf(ValidationResult);
-    expect(result.isValid()).to.be.false();
-    expect(result.getErrors()).to.be.an('array');
-    expect(result.getErrors()).to.have.lengthOf(1);
-    expect(result.getErrors()[0]).to.be.an.instanceOf(NotIndexedFieldError);
-    expect(result.getErrors()[0].message).to.be.equal('Search fields can only contain one of these fields: $userId, firstName, lastName, $id');
+    expect(result).to.be.an('array');
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal('secondName');
   });
 });
