@@ -4,7 +4,14 @@ describe('validateIndexedFields', () => {
   let indexedFields;
 
   beforeEach(() => {
-    indexedFields = ['$userId', 'firstName', 'lastName', '$id', 'arrayWithObjects.item', 'arrayWithObjects.flag'];
+    indexedFields = [
+      [{ $userId: 'asc' }, { firstName: 'desc' }],
+      [{ $userId: 'asc' }, { lastName: 'desc' }, { secondName: 'asc' }],
+      [{ $id: 'asc' }],
+      [{ $id: 'desc' }],
+      [{ 'arrayWithObjects.item': 'desc' }],
+      [{ 'arrayWithObjects.flag': 'desc' }],
+    ];
   });
 
   it('should pass system $id field', () => {
@@ -15,12 +22,13 @@ describe('validateIndexedFields', () => {
     expect(result).to.be.empty();
   });
 
-  it('should pass', () => {
+  it('should fail with condition by second field of compound index', () => {
     const condition = [['firstName', '==', 'name']];
     const result = validateIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
-    expect(result).to.be.empty();
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal('firstName');
   });
 
   it('should return an error for one field', () => {
@@ -62,7 +70,7 @@ describe('validateIndexedFields', () => {
 
   it('should check fields by nested conditions', () => {
     const condition = [
-      ['firstName', '==', 'Cutie'],
+      ['$userId', '==', 'Cutie'],
       ['arrayWithObjects', 'elementMatch', [
         ['item', '==', 1],
         ['flag', '==', true],
@@ -77,7 +85,7 @@ describe('validateIndexedFields', () => {
 
   it('should fail with nested conditions', () => {
     const condition = [
-      ['firstName', '==', 'Cutie'],
+      ['$userId', '==', 123],
       ['arrayWithObjects', 'elementMatch', [
         ['item', '==', 1],
         ['anotherFlag', '==', true],
@@ -89,5 +97,21 @@ describe('validateIndexedFields', () => {
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
     expect(result[0]).to.equal('arrayWithObjects.anotherFlag');
+  });
+
+  it('should pass query by compound index', () => {
+    const condition = [['firstName', '==', 'name'], ['$userId', '==', 123]];
+    const result = validateIndexedFields(indexedFields, condition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.be.empty();
+  });
+
+  it('should fail with query by third field of compound index', () => {
+    const condition = [['lastName', '==', 'name'], ['secondName', '==', 'myName']];
+    const result = validateIndexedFields(indexedFields, condition);
+
+    expect(result).to.have.lengthOf(2);
+    expect(result).to.have.members(['lastName', 'secondName']);
   });
 });

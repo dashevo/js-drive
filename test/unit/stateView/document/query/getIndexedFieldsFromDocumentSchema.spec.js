@@ -8,6 +8,11 @@ describe('getIndexedFieldsFromDocumentSchema', () => {
       indices: [
         {
           properties: [
+            { middleName: 'asc' },
+          ],
+        },
+        {
+          properties: [
             { $userId: 'asc' },
             { firstName: 'desc' },
           ],
@@ -38,7 +43,13 @@ describe('getIndexedFieldsFromDocumentSchema', () => {
     const result = getIndexedFieldsFromDocumentSchema(documentSchema);
 
     expect(result).to.be.an('array');
-    expect(result).to.deep.equal(['$userId', 'firstName', 'lastName', '$id']);
+    expect(result).to.deep.equal([
+      [{ middleName: 'asc' }],
+      [{ $userId: 'asc' }, { firstName: 'desc' }],
+      [{ $userId: 'asc' }, { lastName: 'desc' }],
+      [{ $id: 'asc' }],
+      [{ $id: 'desc' }],
+    ]);
   });
 
   it('should return an array with system field if schema does not contain indices', async () => {
@@ -47,6 +58,9 @@ describe('getIndexedFieldsFromDocumentSchema', () => {
     const result = getIndexedFieldsFromDocumentSchema(documentSchema);
 
     expect(result).to.be.an('array');
-    expect(result).to.deep.equal(['$id']);
+    expect(result).to.deep.equal([
+      [{ $id: 'asc' }],
+      [{ $id: 'desc' }],
+    ]);
   });
 });

@@ -171,7 +171,7 @@ describe('fetchDocumentsFactory', () => {
       expect(e).to.be.instanceOf(InvalidQueryError);
       expect(e.getErrors()).to.be.an('array');
       expect(e.getErrors()).to.have.lengthOf(1);
-      expect(e.getErrors()[0].message).to.be.equal('Search by not indexed field "lastName" is not allowed');
+      expect(e.getErrors()[0].message).to.be.equal('Query by not indexed field "lastName" is not allowed');
     }
   });
 });
