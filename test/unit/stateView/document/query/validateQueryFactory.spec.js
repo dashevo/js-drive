@@ -118,11 +118,13 @@ describe('validateQueryFactory', () => {
   let validateQuery;
   let getIndexedFieldsFromDocumentSchemaStub;
   let validateIndexedFieldsStub;
+  let documentSchema;
 
   beforeEach(function beforeEach() {
     findConflictingConditionsStub = this.sinon.stub().returns([]);
     getIndexedFieldsFromDocumentSchemaStub = this.sinon.stub().returns([]);
     validateIndexedFieldsStub = this.sinon.stub().returns([]);
+    documentSchema = {};
 
     validateQuery = validateQueryFactory(
       findConflictingConditionsStub,
@@ -132,7 +134,7 @@ describe('validateQueryFactory', () => {
   });
 
   it('should return valid result if empty query is specified', () => {
-    const result = validateQuery({});
+    const result = validateQuery({}, {});
 
     expect(result).to.be.instanceOf(ValidationResult);
     expect(result.isValid()).to.be.true();
@@ -140,7 +142,7 @@ describe('validateQueryFactory', () => {
 
   notObjectTestCases.forEach(({ type, value }) => {
     it(`should return invalid result if query is a ${type}`, () => {
-      const result = validateQuery(value);
+      const result = validateQuery(value, documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -150,7 +152,7 @@ describe('validateQueryFactory', () => {
   });
 
   it('should return valid result when some valid sample query is passed', () => {
-    const result = validateQuery({ where: [['a', '>', 1]] });
+    const result = validateQuery({ where: [['a', '>', 1]] }, documentSchema);
 
     expect(result).to.be.instanceOf(ValidationResult);
     expect(result.isValid()).to.be.true();
@@ -159,7 +161,7 @@ describe('validateQueryFactory', () => {
   describe('where', () => {
     notArrayTestCases.forEach(({ type, value }) => {
       it(`should return invalid result if "where" is not an array, but ${type}`, () => {
-        const result = validateQuery({ where: value });
+        const result = validateQuery({ where: value }, documentSchema);
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
@@ -170,7 +172,7 @@ describe('validateQueryFactory', () => {
     });
 
     it('should return invalid result if "where" is an empty array', () => {
-      const result = validateQuery({ where: [] });
+      const result = validateQuery({ where: [] }, documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -182,7 +184,7 @@ describe('validateQueryFactory', () => {
     it('should return invalid result if "where" contains more than 10 conditions', () => {
       const where = Array(11).fill(['a', '<', 1]);
 
-      const result = validateQuery({ where });
+      const result = validateQuery({ where }, documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -199,7 +201,8 @@ describe('validateQueryFactory', () => {
           ['a', '<', 1],
           ['a', '>', 1],
         ],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -211,28 +214,28 @@ describe('validateQueryFactory', () => {
     describe('condition', () => {
       describe('field', () => {
         it('should return valid result if condition contains "$id" field', () => {
-          const result = validateQuery({ where: [['$id', '==', 'idvalue']] });
+          const result = validateQuery({ where: [['$id', '==', 'idvalue']] }, documentSchema);
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
 
         it('should return valid result if condition contains "$userId" field', () => {
-          const result = validateQuery({ where: [['$userId', '==', 'userid']] });
+          const result = validateQuery({ where: [['$userId', '==', 'userid']] }, documentSchema);
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
 
         it('should return valid result if condition contains top-level field', () => {
-          const result = validateQuery({ where: [['a', '==', '1']] });
+          const result = validateQuery({ where: [['a', '==', '1']] }, documentSchema);
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
         });
 
         it('should return valid result if condition contains nested path field', () => {
-          const result = validateQuery({ where: [['a.b', '==', '1']] });
+          const result = validateQuery({ where: [['a.b', '==', '1']] }, documentSchema);
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
@@ -241,14 +244,14 @@ describe('validateQueryFactory', () => {
         it('should return invalid result if field name is more than 255 characters long', () => {
           const fieldName = 'a'.repeat(255);
 
-          let result = validateQuery({ where: [[fieldName, '==', '1']] });
+          let result = validateQuery({ where: [[fieldName, '==', '1']] }, documentSchema);
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
 
           const longFieldName = 'a'.repeat(256);
 
-          result = validateQuery({ where: [[longFieldName, '==', '1']] });
+          result = validateQuery({ where: [[longFieldName, '==', '1']] }, documentSchema);
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.false();
@@ -260,7 +263,7 @@ describe('validateQueryFactory', () => {
 
         invalidFieldNameTestCases.forEach((fieldName) => {
           it(`should return invalid result if field name contains restricted symbols: ${fieldName}`, () => {
-            const result = validateQuery({ where: [[fieldName, '==', '1']] });
+            const result = validateQuery({ where: [[fieldName, '==', '1']] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -274,7 +277,7 @@ describe('validateQueryFactory', () => {
       });
 
       it('should return invalid result if condition array has less than 3 elements (field, operator, value)', () => {
-        const result = validateQuery({ where: [['a', '==']] });
+        const result = validateQuery({ where: [['a', '==']] }, documentSchema);
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
@@ -285,7 +288,7 @@ describe('validateQueryFactory', () => {
       });
 
       it('should return invalid result if condition array has more than 3 elements (field, operator, value)', () => {
-        const result = validateQuery({ where: [['a', '==', '1', '2']] });
+        const result = validateQuery({ where: [['a', '==', '1', '2']] }, documentSchema);
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
@@ -300,12 +303,12 @@ describe('validateQueryFactory', () => {
             const operators = ['<', '<=', '==', '>', '>='];
 
             operators.forEach((operator) => {
-              const result = validateQuery({ where: [['a', operator, '1']] });
+              const result = validateQuery({ where: [['a', operator, '1']] }, documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.true();
             });
-            const result = validateQuery({ where: [['a', '===', '1']] });
+            const result = validateQuery({ where: [['a', '===', '1']] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -315,14 +318,14 @@ describe('validateQueryFactory', () => {
           });
 
           it('should return valid result if "<" operator used with a numeric value', () => {
-            const result = validateQuery({ where: [['a', '<', 1]] });
+            const result = validateQuery({ where: [['a', '<', 1]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
           });
 
           it('should return valid result if "<" operator used with a string value', () => {
-            const result = validateQuery({ where: [['a', '<', 'test']] });
+            const result = validateQuery({ where: [['a', '<', 'test']] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
@@ -331,14 +334,14 @@ describe('validateQueryFactory', () => {
           it('should return invalid result if "<" operator used with a string value longer than 512 chars', () => {
             const longString = 't'.repeat(512);
 
-            let result = validateQuery({ where: [['a', '<', longString]] });
+            let result = validateQuery({ where: [['a', '<', longString]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
 
             const veryLongString = 't'.repeat(513);
 
-            result = validateQuery({ where: [['a', '<', veryLongString]] });
+            result = validateQuery({ where: [['a', '<', veryLongString]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -348,7 +351,7 @@ describe('validateQueryFactory', () => {
           });
 
           it('should return valid result if "<" operator used with a boolean value', () => {
-            const result = validateQuery({ where: [['a', '<', true]] });
+            const result = validateQuery({ where: [['a', '<', true]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
@@ -356,7 +359,7 @@ describe('validateQueryFactory', () => {
 
           nonScalarTestCases.forEach(({ type, value }) => {
             it(`should return invalid result if "<" operator used with a not scalar value, but ${type}`, () => {
-              const result = validateQuery({ where: [['a', '<', value]] });
+              const result = validateQuery({ where: [['a', '<', value]] }, documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.false();
@@ -374,7 +377,7 @@ describe('validateQueryFactory', () => {
 
           scalarTestCases.forEach(({ type, value }) => {
             it(`should return valid result if "<" operator used with a scalar value ${type}`, () => {
-              const result = validateQuery({ where: [['a', '<', value]] });
+              const result = validateQuery({ where: [['a', '<', value]] }, documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.true();
@@ -383,7 +386,7 @@ describe('validateQueryFactory', () => {
 
           scalarTestCases.forEach(({ type, value }) => {
             it(`should return valid result if "<=" operator used with a scalar value ${type}`, () => {
-              const result = validateQuery({ where: [['a', '<=', value]] });
+              const result = validateQuery({ where: [['a', '<=', value]] }, documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.true();
@@ -392,7 +395,7 @@ describe('validateQueryFactory', () => {
 
           scalarTestCases.forEach(({ type, value }) => {
             it(`should return valid result if "==" operator used with a scalar value ${type}`, () => {
-              const result = validateQuery({ where: [['a', '==', value]] });
+              const result = validateQuery({ where: [['a', '==', value]] }, documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.true();
@@ -401,7 +404,7 @@ describe('validateQueryFactory', () => {
 
           scalarTestCases.forEach(({ type, value }) => {
             it(`should return valid result if ">=" operator used with a scalar value ${type}`, () => {
-              const result = validateQuery({ where: [['a', '<=', value]] });
+              const result = validateQuery({ where: [['a', '<=', value]] }, documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.true();
@@ -410,7 +413,7 @@ describe('validateQueryFactory', () => {
 
           scalarTestCases.forEach(({ type, value }) => {
             it(`should return valid result if ">=" operator used with a scalar value ${type}`, () => {
-              const result = validateQuery({ where: [['a', '>', value]] });
+              const result = validateQuery({ where: [['a', '>', value]] }, documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.true();
@@ -420,7 +423,7 @@ describe('validateQueryFactory', () => {
 
         describe('in', () => {
           it('should return valid result if "in" operator used with an array value', () => {
-            const result = validateQuery({ where: [['a', 'in', [1, 2]]] });
+            const result = validateQuery({ where: [['a', 'in', [1, 2]]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
@@ -428,7 +431,7 @@ describe('validateQueryFactory', () => {
 
           notArrayTestCases.forEach(({ type, value }) => {
             it(`should return invalid result if "in" operator used with not an array value, but ${type}`, () => {
-              const result = validateQuery({ where: [['a', 'in', value]] });
+              const result = validateQuery({ where: [['a', 'in', value]] }, documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.false();
@@ -439,7 +442,7 @@ describe('validateQueryFactory', () => {
           });
 
           it('should return invalid result if "in" operator used with an empty array value', () => {
-            const result = validateQuery({ where: [['a', 'in', []]] });
+            const result = validateQuery({ where: [['a', 'in', []]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -456,14 +459,14 @@ describe('validateQueryFactory', () => {
               arr.push(i);
             }
 
-            let result = validateQuery({ where: [['a', 'in', arr]] });
+            let result = validateQuery({ where: [['a', 'in', arr]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
 
             arr.push(101);
 
-            result = validateQuery({ where: [['a', 'in', arr]] });
+            result = validateQuery({ where: [['a', 'in', arr]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -474,7 +477,7 @@ describe('validateQueryFactory', () => {
 
           it('should return invalid result if "in" operator used with an array which contains not unique elements', () => {
             const arr = [1, 1];
-            const result = validateQuery({ where: [['a', 'in', arr]] });
+            const result = validateQuery({ where: [['a', 'in', arr]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -485,7 +488,7 @@ describe('validateQueryFactory', () => {
 
           it('should return invalid results if condition contains empty arrays', () => {
             const arr = [[], []];
-            const result = validateQuery({ where: [['a', 'in', arr]] });
+            const result = validateQuery({ where: [['a', 'in', arr]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -494,14 +497,14 @@ describe('validateQueryFactory', () => {
 
         describe('startsWith', () => {
           it('should return valid result if "startsWith" operator used with a string value', () => {
-            const result = validateQuery({ where: [['a', 'startsWith', 'b']] });
+            const result = validateQuery({ where: [['a', 'startsWith', 'b']] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
           });
 
           it('should return invalid result if "startsWith" operator used with an empty string value', () => {
-            const result = validateQuery({ where: [['a', 'startsWith', '']] });
+            const result = validateQuery({ where: [['a', 'startsWith', '']] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -513,7 +516,7 @@ describe('validateQueryFactory', () => {
           it('should return invalid result if "startsWith" operator used with a string value which is more than 255'
             + ' chars long', () => {
             const value = 'b'.repeat(256);
-            const result = validateQuery({ where: [['a', 'startsWith', value]] });
+            const result = validateQuery({ where: [['a', 'startsWith', value]] }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -524,7 +527,7 @@ describe('validateQueryFactory', () => {
 
           nonStringTestCases.forEach(({ type, value }) => {
             it(`should return invalid result if "startWith" operator used with a not string value, but ${type}`, () => {
-              const result = validateQuery({ where: [['a', 'startsWith', value]] });
+              const result = validateQuery({ where: [['a', 'startsWith', value]] }, documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.false();
@@ -543,7 +546,8 @@ describe('validateQueryFactory', () => {
                   [['elem', '>', 1], ['elem', '<', 3]],
                 ],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
@@ -556,7 +560,8 @@ describe('validateQueryFactory', () => {
                   [['elem', 'startsWith', 1], ['elem', '<', 3]],
                 ],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -571,7 +576,8 @@ describe('validateQueryFactory', () => {
                   [['elem', '>', 1]],
                 ],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -589,7 +595,8 @@ describe('validateQueryFactory', () => {
                   [['elem', '>', 1], ['elem', '>', 1]],
                 ],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -605,7 +612,8 @@ describe('validateQueryFactory', () => {
                   [['$id', '>', 1], ['$id', '<', 3]],
                 ],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -620,7 +628,8 @@ describe('validateQueryFactory', () => {
                   [['$userId', '>', 1], ['$userId', '<', 3]],
                 ],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -639,7 +648,8 @@ describe('validateQueryFactory', () => {
                   ]], ['subArr', '<', 3]],
                 ],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -658,7 +668,8 @@ describe('validateQueryFactory', () => {
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
-          });
+          },
+          documentSchema);
 
           it('should return valid result if "length" operator used with zero', () => {
             const result = validateQuery({
@@ -669,14 +680,16 @@ describe('validateQueryFactory', () => {
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
-          });
+          },
+          documentSchema);
 
           it('should return invalid result if "length" operator used with a float numeric value', () => {
             const result = validateQuery({
               where: [
                 ['arr', 'length', 1.2],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -690,7 +703,8 @@ describe('validateQueryFactory', () => {
               where: [
                 ['arr', 'length', NaN],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -705,7 +719,8 @@ describe('validateQueryFactory', () => {
               where: [
                 ['arr', 'length', -1],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -721,7 +736,8 @@ describe('validateQueryFactory', () => {
                 where: [
                   ['arr', 'length', value],
                 ],
-              });
+              },
+              documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.false();
@@ -739,7 +755,8 @@ describe('validateQueryFactory', () => {
                 where: [
                   ['arr', 'contains', value],
                 ],
-              });
+              },
+              documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.true();
@@ -752,7 +769,8 @@ describe('validateQueryFactory', () => {
                 where: [
                   ['arr', 'contains', [value]],
                 ],
-              });
+              },
+              documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.true();
@@ -770,7 +788,8 @@ describe('validateQueryFactory', () => {
               where: [
                 ['arr', 'contains', arr],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
@@ -781,7 +800,8 @@ describe('validateQueryFactory', () => {
               where: [
                 ['arr', 'contains', arr],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -795,7 +815,8 @@ describe('validateQueryFactory', () => {
               where: [
                 ['arr', 'contains', []],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -810,7 +831,8 @@ describe('validateQueryFactory', () => {
               where: [
                 ['arr', 'contains', [1, 1]],
               ],
-            });
+            },
+            documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
@@ -825,7 +847,8 @@ describe('validateQueryFactory', () => {
                 where: [
                   ['arr', 'contains', value],
                 ],
-              });
+              },
+              documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.false();
@@ -847,7 +870,8 @@ describe('validateQueryFactory', () => {
                 where: [
                   ['arr', 'contains', [value]],
                 ],
-              });
+              },
+              documentSchema);
 
               expect(result).to.be.instanceOf(ValidationResult);
               expect(result.isValid()).to.be.false();
@@ -874,7 +898,8 @@ describe('validateQueryFactory', () => {
           ['a', '>', 1],
         ],
         limit: 1,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
@@ -885,7 +910,7 @@ describe('validateQueryFactory', () => {
         ['a', '>', 1],
       ];
 
-      let result = validateQuery({ where, limit: 0 });
+      let result = validateQuery({ where, limit: 0 }, documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -893,7 +918,7 @@ describe('validateQueryFactory', () => {
       expect(result.errors[0].keyword).to.be.equal('minimum');
       expect(result.errors[0].params.limit).to.be.equal(1);
 
-      result = validateQuery({ where, limit: -1 });
+      result = validateQuery({ where, limit: -1 }, documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -908,12 +933,12 @@ describe('validateQueryFactory', () => {
         ['a', '>', 1],
       ];
 
-      let result = validateQuery({ where, limit: 100 });
+      let result = validateQuery({ where, limit: 100 }, documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
 
-      result = validateQuery({ where, limit: 101 });
+      result = validateQuery({ where, limit: 101 }, documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -928,7 +953,7 @@ describe('validateQueryFactory', () => {
         ['a', '>', 1],
       ];
 
-      const result = validateQuery({ where, limit: 1.5 });
+      const result = validateQuery({ where, limit: 1.5 }, documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -944,7 +969,8 @@ describe('validateQueryFactory', () => {
             ['a', '>', 1],
           ],
           limit: value,
-        });
+        },
+        documentSchema);
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
@@ -963,7 +989,8 @@ describe('validateQueryFactory', () => {
           ['a', '>', 1],
         ],
         orderBy: [['a', 'asc']],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
@@ -975,7 +1002,8 @@ describe('validateQueryFactory', () => {
           ['a', '>', 1],
         ],
         orderBy: [['a', 'asc'], ['b', 'desc']],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
@@ -987,7 +1015,8 @@ describe('validateQueryFactory', () => {
           ['a', '>', 1],
         ],
         orderBy: [],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1002,7 +1031,8 @@ describe('validateQueryFactory', () => {
           ['a', '>', 1],
         ],
         orderBy: [[]],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1017,7 +1047,8 @@ describe('validateQueryFactory', () => {
           ['a', '>', 1],
         ],
         orderBy: [['a', 'asc'], ['b', 'desc'], ['c', 'asc']],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1033,7 +1064,8 @@ describe('validateQueryFactory', () => {
             [fieldName, '>', 1],
           ],
           orderBy: [[fieldName, 'asc']],
-        });
+        },
+        documentSchema);
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.true();
@@ -1047,7 +1079,8 @@ describe('validateQueryFactory', () => {
             ['a', '>', 1],
           ],
           orderBy: [['$a', 'asc']],
-        });
+        },
+        documentSchema);
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
@@ -1065,7 +1098,8 @@ describe('validateQueryFactory', () => {
           ['a', '>', 1],
         ],
         orderBy: [['a', 'a']],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1079,7 +1113,8 @@ describe('validateQueryFactory', () => {
           ['a', '>', 1],
         ],
         orderBy: [['a']],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1094,7 +1129,8 @@ describe('validateQueryFactory', () => {
           ['a', '>', 1],
         ],
         orderBy: [['a', 'asc', 'desc']],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1108,7 +1144,8 @@ describe('validateQueryFactory', () => {
       const result = validateQuery({
         where: [['a', '>', 1]],
         orderBy: [['a', 'asc'], ['a', 'asc']],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1121,7 +1158,8 @@ describe('validateQueryFactory', () => {
       const result = validateQuery({
         where: [['a', '>', 1]],
         orderBy: [['a', 'asc'], ['a', 'desc']],
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1134,7 +1172,8 @@ describe('validateQueryFactory', () => {
     it('should return valid result if "startAt" is a number', () => {
       const result = validateQuery({
         startAt: 1,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
@@ -1144,7 +1183,8 @@ describe('validateQueryFactory', () => {
       it(`should return invalid result if "startAt" is not a number, but ${type}`, () => {
         const result = validateQuery({
           startAt: value,
-        });
+        },
+        documentSchema);
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
@@ -1157,7 +1197,8 @@ describe('validateQueryFactory', () => {
     it('should return valid result if "startAt" is up to 20000', () => {
       const result = validateQuery({
         startAt: 20000,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
@@ -1166,7 +1207,8 @@ describe('validateQueryFactory', () => {
     it('should return invalid result if "startAt" less than 1', () => {
       const result = validateQuery({
         startAt: 0,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1179,7 +1221,8 @@ describe('validateQueryFactory', () => {
     it('should return invalid result if "startAt" more than 20000', () => {
       const result = validateQuery({
         startAt: 20001,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1192,7 +1235,8 @@ describe('validateQueryFactory', () => {
     it('should return invalid result if "startAt" is not an integer', () => {
       const result = validateQuery({
         startAt: 1.1,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1207,7 +1251,8 @@ describe('validateQueryFactory', () => {
       const result = validateQuery({
         startAfter: 1,
         startAt: 1,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1224,7 +1269,8 @@ describe('validateQueryFactory', () => {
     it('should return valid result if "startAfter" is a number', () => {
       const result = validateQuery({
         startAfter: 1,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
@@ -1234,7 +1280,8 @@ describe('validateQueryFactory', () => {
       it(`should return invalid result if "startAfter" is not a number, but ${type}`, () => {
         const result = validateQuery({
           startAfter: value,
-        });
+        },
+        documentSchema);
 
         expect(result).to.be.instanceOf(ValidationResult);
         expect(result.isValid()).to.be.false();
@@ -1247,7 +1294,8 @@ describe('validateQueryFactory', () => {
     it('should return valid result if "startAfter" is up to 20000', () => {
       const result = validateQuery({
         startAfter: 20000,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.true();
@@ -1269,7 +1317,8 @@ describe('validateQueryFactory', () => {
     it('should return invalid result if "startAfter" more than 20000', () => {
       const result = validateQuery({
         startAfter: 20001,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
@@ -1282,7 +1331,8 @@ describe('validateQueryFactory', () => {
     it('should return invalid result if "startAfter" is not an integer', () => {
       const result = validateQuery({
         startAfter: 1.1,
-      });
+      },
+      documentSchema);
 
       expect(result).to.be.instanceOf(ValidationResult);
       expect(result.isValid()).to.be.false();
