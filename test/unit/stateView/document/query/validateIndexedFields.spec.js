@@ -11,6 +11,9 @@ describe('validateIndexedFields', () => {
       [{ $id: 'desc' }],
       [{ 'arrayWithObjects.item': 'desc' }],
       [{ 'arrayWithObjects.flag': 'desc' }],
+      [{ address: 'asc' }, { 'arrayWithObjects.flag': 'desc' }],
+      [{ 'arrayWithObjects.flag': 'desc' }, { street: 'asc' }],
+      [{ 'arrayWithObjects.country': 'desc' }, { 'arrayWithObjects.language': 'asc' }],
     ];
   });
 
@@ -113,5 +116,64 @@ describe('validateIndexedFields', () => {
 
     expect(result).to.have.lengthOf(2);
     expect(result).to.have.members(['lastName', 'secondName']);
+  });
+
+  it('should check fields by nested conditions in compound index when nested condition is second index', () => {
+    const condition = [
+      ['address', '==', 'myAddress'],
+      ['arrayWithObjects', 'elementMatch', [
+        ['item', '==', 1],
+        ['flag', '==', true],
+      ]],
+    ];
+
+    const result = validateIndexedFields(indexedFields, condition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.be.empty();
+  });
+
+  it('should check fields by nested conditions in compound index when nested condition is first index', () => {
+    const condition = [
+      ['street', '==', 'myStreet'],
+      ['arrayWithObjects', 'elementMatch', [
+        ['item', '==', 1],
+        ['flag', '==', true],
+      ]],
+    ];
+
+    const result = validateIndexedFields(indexedFields, condition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.be.empty();
+  });
+
+  it('should check fields by nested conditions in compound index when all indexes are nested', () => {
+    const condition = [
+      ['arrayWithObjects', 'elementMatch', [
+        ['country', '==', 'USA'],
+        ['language', '==', 'US'],
+      ]],
+    ];
+
+    const result = validateIndexedFields(indexedFields, condition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.be.empty();
+  });
+
+  it('should fail when we miss first part of nested field of nested compound index', () => {
+    const condition = [
+      ['arrayWithObjects', 'elementMatch', [
+        ['language', '==', 'US'],
+        ['flag', '==', true],
+      ]],
+    ];
+
+    const result = validateIndexedFields(indexedFields, condition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.have.lengthOf(1);
+    expect(result).to.have.members(['arrayWithObjects.language']);
   });
 });
