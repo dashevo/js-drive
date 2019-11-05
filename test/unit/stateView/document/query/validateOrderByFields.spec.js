@@ -9,8 +9,6 @@ describe('validateOrderByFields', () => {
       [{ $userId: 'asc' }, { lastName: 'desc' }, { secondName: 'asc' }],
       [{ $id: 'asc' }],
       [{ $id: 'desc' }],
-      [{ $userId: 'asc' }],
-      [{ $userId: 'desc' }],
       [{ address: 'desc' }],
       [{ street: 'desc' }],
       [{ 'arrayWithObjects.item': 'desc' }],
@@ -23,16 +21,6 @@ describe('validateOrderByFields', () => {
 
   it('should pass system $id field', () => {
     const orderByCondition = [['$id', 'desc']];
-    const whereCondition = [];
-
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
-
-    expect(result).to.be.an('array');
-    expect(result).to.be.empty();
-  });
-
-  it('should pass system $userId field', () => {
-    const orderByCondition = [['$userId', 'asc']];
     const whereCondition = [];
 
     const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
