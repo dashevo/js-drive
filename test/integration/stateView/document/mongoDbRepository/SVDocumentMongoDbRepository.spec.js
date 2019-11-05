@@ -87,6 +87,12 @@ describe('SVDocumentMongoDbRepository', function main() {
       {
         properties: [{ 'arrayWithObjects.flag': 'asc' }],
       },
+      {
+        properties: [{ primaryOrder: 'asc' }, { order: 'desc' }],
+      },
+      {
+        properties: [{ $userId: 'desc' }],
+      },
     ]);
 
     const validateQuery = validateQueryFactory(
