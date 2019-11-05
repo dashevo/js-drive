@@ -148,4 +148,20 @@ describe('validateOrderByFields', () => {
     expect(result).to.have.lengthOf(2);
     expect(result).to.deep.members(['firstName', '$userId']);
   });
+
+  it('should order by second index key with elementMatch where condition ', () => {
+    const orderByCondition = [
+      ['street', 'asc'],
+    ];
+    const whereCondition = [
+      ['arrayWithObjects', 'elementMatch', [
+        ['flag', '==', true],
+      ],
+      ]];
+
+    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.be.empty();
+  });
 });
