@@ -29,17 +29,6 @@ describe('validateOrderByFields', () => {
     expect(result).to.be.empty();
   });
 
-  it('should fail with multikey field', () => {
-    const orderByCondition = [['arrayWithObjects.flag', 'desc']];
-    const whereCondition = [];
-
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
-
-    expect(result).to.be.an('array');
-    expect(result).to.have.lengthOf(1);
-    expect(result[0]).to.equal('arrayWithObjects.flag');
-  });
-
   it('should pass with first field on index and empty where', () => {
     const orderByCondition = [
       ['address', 'asc'],
