@@ -152,7 +152,7 @@ describe('validateIndexedFields', () => {
     const condition = [
       ['arrayWithObjects', 'elementMatch', [
         ['country', '==', 'USA'],
-        ['language', '==', 'US'],
+        ['language', '==', 'english'],
       ]],
     ];
 
@@ -165,7 +165,7 @@ describe('validateIndexedFields', () => {
   it('should fail when we miss first part of nested field of nested compound index', () => {
     const condition = [
       ['arrayWithObjects', 'elementMatch', [
-        ['language', '==', 'US'],
+        ['language', '==', 'english'],
         ['flag', '==', true],
       ]],
     ];
