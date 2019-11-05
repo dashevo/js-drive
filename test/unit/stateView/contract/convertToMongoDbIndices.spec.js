@@ -21,7 +21,7 @@ describe('convertToMongoDbIndices', () => {
     ];
   });
 
-  it('should return converted data', async () => {
+  it('should return converted data', () => {
     const convertedIndices = convertToMongoDbIndices(indicesFixture);
 
     expect(convertedIndices).to.deep.equal([{

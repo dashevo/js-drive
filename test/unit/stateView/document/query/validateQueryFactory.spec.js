@@ -118,18 +118,21 @@ describe('validateQueryFactory', () => {
   let validateQuery;
   let getIndexedFieldsFromDocumentSchemaStub;
   let validateIndexedFieldsStub;
+  let validateOrderByFieldsStub;
   let documentSchema;
 
   beforeEach(function beforeEach() {
     findConflictingConditionsStub = this.sinon.stub().returns([]);
     getIndexedFieldsFromDocumentSchemaStub = this.sinon.stub().returns([]);
     validateIndexedFieldsStub = this.sinon.stub().returns([]);
+    validateOrderByFieldsStub = this.sinon.stub().returns([]);
     documentSchema = {};
 
     validateQuery = validateQueryFactory(
       findConflictingConditionsStub,
       getIndexedFieldsFromDocumentSchemaStub,
       validateIndexedFieldsStub,
+      validateOrderByFieldsStub,
     );
   });
 

@@ -1,4 +1,4 @@
-const validateIndexedFields = require('../../../../../lib/stateView/document/query/validateIndexedFields.js');
+const validateIndexedFields = require('../../../../../lib/stateView/document/query/validateIndexedFields');
 
 describe('validateIndexedFields', () => {
   let indexedFields;
