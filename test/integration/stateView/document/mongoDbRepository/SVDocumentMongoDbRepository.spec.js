@@ -13,8 +13,8 @@ const getSVContractFixture = require('../../../../../lib/test/fixtures/getSVCont
 
 const InvalidQueryError = require('../../../../../lib/stateView/document/errors/InvalidQueryError');
 
-const validateIndexedFields = require('../../../../../lib/stateView/document/query/validateIndexedFields');
-const validateOrderByFields = require('../../../../../lib/stateView/document/query/validateOrderByFields');
+const findNotIndexedFields = require('../../../../../lib/stateView/document/query/findNotIndexedFields');
+const findNotIndexedOrderByFields = require('../../../../../lib/stateView/document/query/findNotIndexedOrderByFields');
 const getIndexedFieldsFromDocumentSchema = require('../../../../../lib/stateView/document/query/getIndexedFieldsFromDocumentSchema');
 
 function jsonizeSVDocuments(svDocuments) {
@@ -98,8 +98,8 @@ describe('SVDocumentMongoDbRepository', function main() {
     const validateQuery = validateQueryFactory(
       findConflictingConditions,
       getIndexedFieldsFromDocumentSchema,
-      validateIndexedFields,
-      validateOrderByFields,
+      findNotIndexedFields,
+      findNotIndexedOrderByFields,
     );
 
     svDocumentRepository = new SVDocumentMongoDbRepository(

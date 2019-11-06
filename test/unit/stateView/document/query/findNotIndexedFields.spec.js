@@ -1,6 +1,6 @@
-const validateIndexedFields = require('../../../../../lib/stateView/document/query/validateIndexedFields');
+const findNotIndexedFields = require('../../../../../lib/stateView/document/query/findNotIndexedFields');
 
-describe('validateIndexedFields', () => {
+describe('findNotIndexedFields', () => {
   let indexedFields;
 
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('validateIndexedFields', () => {
 
   it('should pass system $id field', () => {
     const condition = [['$id', '==', 123]];
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
@@ -27,7 +27,7 @@ describe('validateIndexedFields', () => {
 
   it('should fail with condition by second field of compound index', () => {
     const condition = [['firstName', '==', 'name']];
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
@@ -36,7 +36,7 @@ describe('validateIndexedFields', () => {
 
   it('should return an error for one field', () => {
     const condition = [['secondName', '==', 'name']];
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
@@ -45,7 +45,7 @@ describe('validateIndexedFields', () => {
 
   it('should return an error for three fields', () => {
     const condition = [['secondName', '==', 'name'], ['city', '==', 'NY'], ['country', '==', 'USA']];
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(3);
@@ -54,7 +54,7 @@ describe('validateIndexedFields', () => {
 
   it('should check empty condition', () => {
     const condition = [];
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
@@ -64,7 +64,7 @@ describe('validateIndexedFields', () => {
     delete indexedFields.indices;
     const condition = [['secondName', '==', 'name']];
 
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
@@ -80,7 +80,7 @@ describe('validateIndexedFields', () => {
       ]],
     ];
 
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
@@ -95,7 +95,7 @@ describe('validateIndexedFields', () => {
       ]],
     ];
 
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
@@ -104,7 +104,7 @@ describe('validateIndexedFields', () => {
 
   it('should pass query by compound index', () => {
     const condition = [['firstName', '==', 'name'], ['$userId', '==', 123]];
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
@@ -112,7 +112,7 @@ describe('validateIndexedFields', () => {
 
   it('should fail with query by third field of compound index', () => {
     const condition = [['lastName', '==', 'name'], ['secondName', '==', 'myName']];
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.have.lengthOf(2);
     expect(result).to.have.members(['lastName', 'secondName']);
@@ -127,7 +127,7 @@ describe('validateIndexedFields', () => {
       ]],
     ];
 
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
@@ -142,7 +142,7 @@ describe('validateIndexedFields', () => {
       ]],
     ];
 
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
@@ -156,7 +156,7 @@ describe('validateIndexedFields', () => {
       ]],
     ];
 
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
@@ -170,7 +170,7 @@ describe('validateIndexedFields', () => {
       ]],
     ];
 
-    const result = validateIndexedFields(indexedFields, condition);
+    const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);

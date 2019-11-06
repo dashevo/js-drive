@@ -15,8 +15,8 @@ const SVContractMongoDbRepository = require('../../../../lib/stateView/contract/
 const getSVDocumentsFixture = require('../../../../lib/test/fixtures/getSVDocumentsFixture');
 const getSVContractFixture = require('../../../../lib/test/fixtures/getSVContractFixture');
 
-const validateIndexedFields = require('../../../../lib/stateView/document/query/validateIndexedFields');
-const validateOrderByFields = require('../../../../lib/stateView/document/query/validateOrderByFields');
+const findNotIndexedFields = require('../../../../lib/stateView/document/query/findNotIndexedFields');
+const findNotIndexedOrderByFields = require('../../../../lib/stateView/document/query/findNotIndexedOrderByFields');
 const getIndexedFieldsFromDocumentSchema = require('../../../../lib/stateView/document/query/getIndexedFieldsFromDocumentSchema');
 
 describe('fetchDocumentsFactory', () => {
@@ -38,8 +38,8 @@ describe('fetchDocumentsFactory', () => {
     const validateQuery = validateQueryFactory(
       findConflictingConditions,
       getIndexedFieldsFromDocumentSchema,
-      validateIndexedFields,
-      validateOrderByFields,
+      findNotIndexedFields,
+      findNotIndexedOrderByFields,
     );
 
     createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(

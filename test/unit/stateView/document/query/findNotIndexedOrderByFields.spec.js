@@ -1,12 +1,12 @@
-const validateOrderByFields = require('../../../../../lib/stateView/document/query/validateOrderByFields');
+const findNotIndexedOrderByFields = require('../../../../../lib/stateView/document/query/findNotIndexedOrderByFields');
 
-describe('validateOrderByFields', () => {
+describe('findNotIndexedOrderByFields', () => {
   let indexedFields;
 
   beforeEach(() => {
     indexedFields = [
       [{ $userId: 'asc' }, { firstName: 'desc' }],
-      [{ $userId: 'asc' }, { lastName: 'desc' }, { secondName: 'asc' }],
+      [{ $userId: 'asc' }, { lastName: 'desc' }, { secondName: 'asc' }, { middleName: 'asc' }],
       [{ $id: 'asc' }],
       [{ $id: 'desc' }],
       [{ address: 'desc' }],
@@ -20,10 +20,12 @@ describe('validateOrderByFields', () => {
   });
 
   it('should pass system $id field', () => {
-    const orderByCondition = [['$id', 'desc']];
+    const orderByCondition = [
+      ['$id', 'desc'],
+    ];
     const whereCondition = [];
 
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
@@ -35,47 +37,61 @@ describe('validateOrderByFields', () => {
     ];
     const whereCondition = [];
 
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
   });
 
   it('should pass with first field on index and where contains that field', () => {
-    const orderByCondition = [['address', 'asc']];
-    const whereCondition = [['address', '==', 'myAddress']];
+    const orderByCondition = [
+      ['address', 'asc'],
+    ];
+    const whereCondition = [
+      ['address', '==', 'myAddress'],
+    ];
 
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
   });
 
   it('should pass with second field on index and where contains first field', () => {
-    const orderByCondition = [['firstName', 'desc']];
-    const whereCondition = [['$userId', '==', 123]];
+    const orderByCondition = [
+      ['firstName', 'desc'],
+    ];
+    const whereCondition = [
+      ['$userId', '==', 123],
+    ];
 
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
   });
 
   it('should order by two fields with where condition', () => {
-    const orderByCondition = [['firstName', 'desc'], ['$userId', 'asc']];
+    const orderByCondition = [
+      ['$userId', 'asc'],
+      ['firstName', 'desc'],
+    ];
     const whereCondition = [['$userId', '==', 123]];
 
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
   });
 
   it('should pass order by two fields with empty where', () => {
-    const orderByCondition = [['firstName', 'desc'], ['$userId', 'asc']];
+    const orderByCondition = [
+      ['$userId', 'asc'],
+      ['firstName', 'desc'],
+    ];
     const whereCondition = [];
 
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
@@ -88,7 +104,7 @@ describe('validateOrderByFields', () => {
     ];
     const whereCondition = [];
 
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(2);
@@ -101,7 +117,7 @@ describe('validateOrderByFields', () => {
     ];
     const whereCondition = [];
 
-    let result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    let result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
@@ -110,17 +126,20 @@ describe('validateOrderByFields', () => {
       ['street', 'desc'],
     ];
 
-    result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
   });
 
   it('should fail on sort by wrong direction of compound key', async () => {
-    const orderByCondition = [['firstName', 'asc'], ['$userId', 'asc']];
+    const orderByCondition = [
+      ['firstName', 'asc'],
+      ['$userId', 'asc'],
+    ];
     const whereCondition = [];
 
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(2);
@@ -131,7 +150,7 @@ describe('validateOrderByFields', () => {
     const orderByCondition = [['firstName', 'desc'], ['$userId', 'desc']];
     const whereCondition = [['$userId', '==', 123]];
 
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(2);
@@ -148,9 +167,40 @@ describe('validateOrderByFields', () => {
       ],
       ]];
 
-    const result = validateOrderByFields(indexedFields, orderByCondition, whereCondition);
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.be.empty();
+  });
+
+  it('should fail when sorting fields order is not equal their indexed order ', () => {
+    const orderByCondition = [
+      ['firstName', 'desc'],
+      ['$userId', 'asc'],
+    ];
+    const whereCondition = [];
+
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.have.lengthOf(1);
+    expect(result).to.deep.members(['firstName']);
+  });
+
+  it('should fail when sorting fields order is not equal their indexed order with where condition', () => {
+    const orderByCondition = [
+      ['middleName', 'asc'],
+      ['secondName', 'asc'],
+    ];
+    const whereCondition = [
+      ['lastName', '==', 'Marsh'],
+      ['$userId', '==', 123],
+    ];
+
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.have.lengthOf(1);
+    expect(result).to.deep.members(['middleName']);
   });
 });
