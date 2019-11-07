@@ -42,7 +42,7 @@ describe('applyStateTransitionHandlerFactory', () => {
 
     dppMock.stateTransition.createFromSerialized.resolves(stateTransition);
 
-    dppMock.stateTransition.validate.resolves({
+    dppMock.stateTransition.validateData.resolves({
       isValid: () => true,
     });
 
@@ -121,7 +121,7 @@ describe('applyStateTransitionHandlerFactory', () => {
   });
 
   it('should throw InvalidArgumentGrpcError if validation of state transition failed', async () => {
-    dppMock.stateTransition.validate.resolves({
+    dppMock.stateTransition.validateData.resolves({
       isValid: () => false,
       getErrors: () => [
         42,
