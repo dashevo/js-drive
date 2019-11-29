@@ -17,7 +17,8 @@ const DriveDataProvider = require('../../lib/dpp/DriveDataProvider');
 const getStateTransitionsFixture = require('../../lib/test/fixtures/getStateTransitionsFixture');
 const registerUser = require('../../lib/test/registerUser');
 
-describe('updateState', function main() {
+// TODO: Make this test integrational
+describe.skip('updateState', function main() {
   let grpcClient;
   let driveApiClient;
   let dapiCoreClient;
@@ -87,7 +88,7 @@ describe('updateState', function main() {
     ]);
   });
 
-  it('should successfully apply state transition and commit data', async () => {
+  it('should successfully apply state transition and commit data', async function it() {
     const startTransactionResponse = await grpcClient.startTransaction(startTransactionRequest);
     const applyStateTransitionResponse = await grpcClient
       .applyStateTransition(applyStateTransitionRequest);
