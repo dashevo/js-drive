@@ -88,7 +88,7 @@ describe.skip('updateState', function main() {
     ]);
   });
 
-  it('should successfully apply state transition and commit data', async function it() {
+  it('should successfully apply state transition and commit data', async () => {
     const startTransactionResponse = await grpcClient.startTransaction(startTransactionRequest);
     const applyStateTransitionResponse = await grpcClient
       .applyStateTransition(applyStateTransitionRequest);
