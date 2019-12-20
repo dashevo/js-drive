@@ -1,3 +1,4 @@
+console.log('updateState before');
 require('dotenv-expand')(require('dotenv-safe').config());
 
 const grpc = require('grpc');
@@ -10,10 +11,12 @@ const UpdateStateAppOptions = require('../lib/app/UpdateStateAppOptions');
 
 const errorHandler = require('../lib/util/errorHandler');
 
+console.log('Starting updateState');
 (async function main() {
+  console.log('updateState creating app');
   const updateStateAppOptions = new UpdateStateAppOptions(process.env);
   const updateStateApp = new UpdateStateApp(updateStateAppOptions);
-  console.log('Starting updateState');
+  console.log('updateState initializing');
   await updateStateApp.init();
   console.log('updateState initialized');
   const grpcServer = createServer(
