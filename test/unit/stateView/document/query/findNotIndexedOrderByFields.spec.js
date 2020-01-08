@@ -203,4 +203,17 @@ describe('findNotIndexedOrderByFields', () => {
     expect(result).to.have.lengthOf(1);
     expect(result).to.deep.members(['middleName']);
   });
+
+  it('should order by reverted fields of compound', async () => {
+    const orderByCondition = [
+      ['$userId', 'desc'],
+      ['firstName', 'asc'],
+    ];
+    const whereCondition = [];
+
+    const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
+
+    expect(result).to.be.an('array');
+    expect(result).to.be.empty();
+  });
 });
