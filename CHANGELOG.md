@@ -1,0 +1,13 @@
+# [0.8.0](https://github.com/dashevo/drive/compare/v0.7.0...v0.8.0) (2020-03-09)
+
+### Bug Fixes
+
+* prevent to update dependencies with major version `0` to minor versions ([9f1dd95](https://github.com/dashevo/js-machine/commit/9f1dd95fe2294de2d0a3157807eec9598d0f0db7))
+
+### Features
+
+* upgrade DPP to v0.11 ([9797e51](https://github.com/dashevo/drive/commit/9797e51bee6899c07aabcf733fa54650037c42cd))
+
+### BREAKING CHANGES
+
+* see [DPP breaking changes](https://github.com/dashevo/js-dpp/blob/v0.11.0/CHANGELOG.md#0110-2020-03-09)
