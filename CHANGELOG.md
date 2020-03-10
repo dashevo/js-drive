@@ -8,6 +8,10 @@
 
 * upgrade DPP to v0.11 ([9797e51](https://github.com/dashevo/drive/commit/9797e51bee6899c07aabcf733fa54650037c42cd))
 
+### Chore
+
+* update gRPC errors ([1d31326](https://github.com/dashevo/drive/commit/1d31326977b2b5f1537426d9d31d89f459aaace6))
+
 ### BREAKING CHANGES
 
 * see [DPP breaking changes](https://github.com/dashevo/js-dpp/blob/v0.11.0/CHANGELOG.md#0110-2020-03-09)
