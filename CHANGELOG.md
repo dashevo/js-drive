@@ -14,4 +14,4 @@
 
 ### BREAKING CHANGES
 
-* see [DPP breaking changes](https://github.com/dashevo/js-dpp/blob/v0.11.0/CHANGELOG.md#0110-2020-03-09)
+* see [DPP breaking changes](https://github.com/dashevo/js-dpp/releases/tag/v0.11.0)
