@@ -1,13 +1,34 @@
 {
   "name": "@dashevo/drive",
-  "version": "0.11.1",
-  "description": "Decentralized application storage on the Dash network",
+  "version": "0.12.0-dev.1",
+  "description": "Decentralized data storage for Dash Platform",
   "engines": {
-    "node": ">=8"
+    "node": ">=12"
   },
+  "contributors": [
+    {
+      "name": "Ivan Shumkov",
+      "email": "ivan@shumkov.ru",
+      "url": "https://github.com/shumkov"
+    },
+    {
+      "name": "Djavid Gabibiyan",
+      "email": "",
+      "url": "https://github.com/jawid-h"
+    },
+    {
+      "name": "Anton Suprunchuk",
+      "email": "",
+      "url": ""
+    },
+    {
+      "name": "Konstantin Shuplenkov",
+      "email": "konstantin.shuplenkov@dash.org",
+      "url": ""
+    }
+  ],
   "scripts": {
-    "api": "node scripts/api",
-    "updateState": "node scripts/updateState",
+    "abci": "node scripts/abci",
     "lint": "eslint .",
     "test": "(EXIT_CODE=0; npm run test:coverage || EXIT_CODE=$?; npm run test:functional || EXIT_CODE=$?; exit $EXIT_CODE)",
     "test:coverage": "nyc --check-coverage --stmts=95 --branch=86 --funcs=93 --lines=95 mocha './test/unit/**/*.spec.js' './test/integration/**/*.spec.js'",
@@ -38,25 +59,33 @@
     "mocha": "^5.2.0",
     "mocha-sinon": "^2.1.0",
     "nyc": "^15.0.0",
-    "proxyquire": "^2.1.0",
     "sinon": "^7.3.0",
-    "sinon-chai": "^3.3.0"
+    "sinon-chai": "^3.3.0",
+    "levelup": "^4.3.2",
+    "memdown": "^5.1.0"
   },
   "dependencies": {
     "@dashevo/dashcore-lib": "~0.18.0",
     "@dashevo/dashd-rpc": "^2.0.0",
-    "@dashevo/dpp": "~0.11.1",
-    "@dashevo/drive-grpc": "~0.3.0",
+    "@dashevo/dpp": "github:dashevo/js-dpp#v0.12-dev",
     "@dashevo/grpc-common": "~0.2.1",
     "ajv": "^6.10.0",
+    "awilix": "^4.2.5",
     "bs58": "^4.0.1",
-    "connect": "^3.6.6",
     "dotenv-expand": "^4.2.0",
     "dotenv-safe": "^6.1.0",
-    "grpc": "^1.24.0",
-    "grpc-health-check": "^1.7.0",
     "jayson": "^2.1.2",
+    "level-rocksdb": "^4.0.0",
     "lodash.escaperegexp": "^4.1.2",
-    "mongodb": "^3.3.3"
+    "lru-cache": "^5.1.1",
+    "mongodb": "^3.3.3",
+    "abci": "^5.0.1",
+    "browserify": "^16.5.0",
+    "cbor": "^5.0.1",
+    "isolated-vm": "github:antouhou/isolated-vm",
+    "level-transactions": "^2.1.4",
+    "long": "^4.0.0",
+    "setimmediate": "^1.0.5",
+    "through2": "^3.0.1"
   }
 }
