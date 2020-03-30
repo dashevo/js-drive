@@ -1,4 +1,4 @@
-# Dash Drive Tests
+# Drive Tests
 
 We believe in [Test Pyramid](http://verraes.net/2015/01/economy-of-tests/).
 
@@ -55,16 +55,6 @@ All tools are [bootstrapped](../lib/test/bootstrap.js) before tests:
 
 ## Evolution helpers
 We use [js-evo-services-ctl](https://github.com/dashevo/js-evo-services-ctl) library to manipulate Evolution's services.
-
-## Fixtures
-
-Fixtures are located in [fixtures/](fixtures) directory:
-- [blocks.json](fixtures/blocks.json)
-
-There are several helpers for loading fixtures:
-- [getBlockFixtures](../lib/test/fixtures/getBlocksFixture.js)
-- [getStateTransitionsFixture](../lib/test/fixtures/getStateTransitionsFixture.js)
-- [getSTPacketsFixture](../lib/test/fixtures/getSTPacketsFixture.js)
 
 ## Other tools
 
