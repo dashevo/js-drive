@@ -1,112 +1,125 @@
-const MachineDataProvider = require('../../../lib/dpp/MachineDataProvider');
+const DriveDataProvider = require('../../../lib/dpp/DriveDataProvider');
 
-describe('MachineDataProvider', () => {
-  let contract;
-  let contractId;
+describe('DriveDataProvider', () => {
   let dataProvider;
-  let contractCacheMock;
-  let driveApiClientMock;
   let identityRepositoryMock;
-  let identity;
+  let data;
+  let dataContractRepositoryMock;
+  let fetchDocumentsMock;
+  let coreRpcClientMock;
+  let blockExecutionDBTransactionsMock;
+  let id;
 
   beforeEach(function beforeEach() {
-    contractId = '123';
-    contract = {};
-    identity = 'identity';
+    data = 'data';
+    id = 'id';
 
-    contractCacheMock = {
-      set: this.sinon.stub(),
-      get: this.sinon.stub(),
+    coreRpcClientMock = {
+      getRawTransaction: this.sinon.stub(),
     };
 
-    driveApiClientMock = {
-      request: this.sinon.stub(),
+    dataContractRepositoryMock = {
+      fetch: this.sinon.stub(),
     };
 
     identityRepositoryMock = {
       fetch: this.sinon.stub(),
     };
 
-    dataProvider = new MachineDataProvider(
-      driveApiClientMock,
-      contractCacheMock,
+    blockExecutionDBTransactionsMock = {
+      getTransaction: this.sinon.stub(),
+    };
+
+    fetchDocumentsMock = this.sinon.stub();
+
+    dataProvider = new DriveDataProvider(
       identityRepositoryMock,
+      dataContractRepositoryMock,
+      fetchDocumentsMock,
+      coreRpcClientMock,
+      blockExecutionDBTransactionsMock,
     );
   });
 
   describe('#fetchDataContract', () => {
-    it('should fetch contract from cache', async () => {
-      contractCacheMock.get.returns(contract);
+    it('should fetch data contract from repository', async () => {
+      dataContractRepositoryMock.fetch.resolves(data);
 
-      const actualContract = await dataProvider.fetchDataContract(contractId);
+      const result = await dataProvider.fetchDataContract(id);
 
-      expect(actualContract).to.equal(contract);
-
-      expect(contractCacheMock.get).to.be.calledOnceWith(contractId);
-      expect(driveApiClientMock.request).to.not.be.called();
-    });
-
-    it('should fetch contract from drive if it is not present in cache', async () => {
-      driveApiClientMock.request.resolves({ result: contract });
-
-      const actualContract = await dataProvider.fetchDataContract(contractId);
-
-      expect(actualContract.toJSON()).to.deep.equal({
-        $schema: 'https://schema.dash.org/dpp-0-4-0/meta/data-contract',
-        version: 1,
-        contractId: undefined,
-        documents: undefined,
-      });
-
-      expect(contractCacheMock.get).to.be.calledOnceWithExactly(contractId);
-      expect(driveApiClientMock.request).to.be.calledOnceWithExactly('fetchContract', { contractId });
-      expect(contractCacheMock.set).to.be.calledOnceWithExactly(contractId, actualContract);
-    });
-
-    it('should throw an error if received an error from Drive with invalid code', async () => {
-      const error = {
-        code: 42,
-        message: 'not the message you are looking for',
-      };
-
-      driveApiClientMock.request.resolves({
-        error,
-      });
-
-      try {
-        await dataProvider.fetchDataContract(contractId);
-
-        expect.fail('Error was not thrown');
-      } catch (e) {
-        expect(e.message).to.equal(`Can't fetch contract: ${error.message}`);
-      }
-    });
-
-    it('should return null if Drive returned invalid argument error', async () => {
-      const error = {
-        code: -32602, // invalid argument error
-      };
-
-      driveApiClientMock.request.resolves({
-        error,
-      });
-
-      const result = await dataProvider.fetchDataContract(contractId);
-
-      expect(result).to.be.null();
+      expect(result).to.equal(data);
+      expect(dataContractRepositoryMock.fetch).to.be.calledOnceWith(id);
     });
   });
 
   describe('#fetchIdentity', () => {
     it('should fetch identity from repository', async () => {
-      const id = 'id';
-      identityRepositoryMock.fetch.resolves(identity);
+      const transaction = 'transaction';
+      identityRepositoryMock.fetch.resolves(data);
+      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
 
       const result = await dataProvider.fetchIdentity(id);
 
-      expect(result).to.equal(identity);
+      expect(result).to.equal(data);
+      expect(identityRepositoryMock.fetch).to.be.calledOnceWith(id, transaction);
+      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identities');
+    });
+  });
 
-      expect(identityRepositoryMock.fetch).to.be.calledOnceWithExactly(id);
+  describe('#fetchDocuments', () => {
+    it('should fetch documents from repository', async () => {
+      const contractId = 'id';
+      const type = 1;
+      const options = {};
+      const transaction = 'transaction';
+      fetchDocumentsMock.resolves(data);
+      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
+
+      const result = await dataProvider.fetchDocuments(contractId, type, options);
+
+      expect(result).to.equal(data);
+      expect(fetchDocumentsMock).to.be.calledOnceWith(contractId, type, options, transaction);
+      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('documents');
+    });
+  });
+
+  describe('#fetchTransaction', () => {
+    it('should fetch transaction from core', async () => {
+      const rawTransaction = 'some result';
+
+      coreRpcClientMock.getRawTransaction.resolves({ result: rawTransaction });
+
+      const result = await dataProvider.fetchTransaction(id);
+
+      expect(result).to.equal(rawTransaction);
+      expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWith(id);
+    });
+
+    it('should return null if core throws Invalid address or key error', async () => {
+      const error = new Error('Some error');
+      error.code = -5;
+
+      coreRpcClientMock.getRawTransaction.throws(error);
+
+      const result = await dataProvider.fetchTransaction(id);
+
+      expect(result).to.equal(null);
+      expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWith(id);
+    });
+
+    it('should throw an error if core throws an unknown error', async () => {
+      const error = new Error('Some error');
+
+      coreRpcClientMock.getRawTransaction.throws(error);
+
+      try {
+        await dataProvider.fetchTransaction(id);
+
+        expect.fail('should throw error');
+      } catch (e) {
+        expect(e).to.equal(error);
+        expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWith(id);
+      }
     });
   });
 });

@@ -2,8 +2,8 @@ const level = require('level-rocksdb');
 const cbor = require('cbor');
 const Long = require('long');
 
-const BlockchainStateLevelDBRepository = require('../../../lib/state/BlockchainStateLevelDBRepository');
-const BlockchainState = require('../../../lib/state/BlockchainState');
+const BlockchainStateLevelDBRepository = require('../../../lib/blockchainState/BlockchainStateLevelDBRepository');
+const BlockchainState = require('../../../lib/blockchainState/BlockchainState');
 
 describe('BlockchainStateLevelDBRepository', () => {
   let db;

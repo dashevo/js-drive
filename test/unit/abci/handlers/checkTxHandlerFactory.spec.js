@@ -7,6 +7,7 @@ const {
 const DashPlatformProtocol = require('@dashevo/dpp');
 
 const getDocumentFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
+
 const level = require('level-rocksdb');
 
 const checkTxHandlerFactory = require('../../../../lib/abci/handlers/checkTxHandlerFactory');
@@ -21,7 +22,10 @@ describe('checkTxHandlerFactory', () => {
   beforeEach(function beforeEach() {
     const dpp = new DashPlatformProtocol();
     const documentFixture = getDocumentFixture();
-    stateTransitionFixture = dpp.document.createStateTransition(documentFixture);
+
+    stateTransitionFixture = dpp.document.createStateTransition({
+      create: documentFixture,
+    });
 
     request = {
       tx: stateTransitionFixture.serialize(),

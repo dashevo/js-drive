@@ -1,32 +1,32 @@
+const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 const BlockExecutionState = require('../../../../lib/blockchainState/blockExecution/BlockExecutionState');
-const getSVContractFixture = require('../../../../lib/test/fixtures/getSVContractFixture');
 
 describe('BlockExecutionState', () => {
   let blockExecutionState;
-  let contract;
+  let dataContract;
 
   beforeEach(() => {
     blockExecutionState = new BlockExecutionState();
-    contract = getSVContractFixture();
+    dataContract = getDataContractFixture();
   });
 
   it('should add contract', async () => {
-    expect(blockExecutionState.getContracts()).to.have.lengthOf(0);
+    expect(blockExecutionState.getDataContracts()).to.have.lengthOf(0);
 
-    blockExecutionState.addContract(contract);
-    const contracts = blockExecutionState.getContracts();
+    blockExecutionState.addDataContract(dataContract);
+    const contracts = blockExecutionState.getDataContracts();
 
     expect(contracts).to.have.lengthOf(1);
-    expect(contracts[0]).to.deep.equal(contract);
+    expect(contracts[0]).to.deep.equal(dataContract);
   });
 
   it('should clear dataContracts', async () => {
-    blockExecutionState.addContract(contract);
+    blockExecutionState.addDataContract(dataContract);
 
-    expect(blockExecutionState.getContracts()).to.have.lengthOf(1);
+    expect(blockExecutionState.getDataContracts()).to.have.lengthOf(1);
 
-    blockExecutionState.clearContracts();
+    blockExecutionState.reset();
 
-    expect(blockExecutionState.getContracts()).to.have.lengthOf(0);
+    expect(blockExecutionState.getDataContracts()).to.have.lengthOf(0);
   });
 });

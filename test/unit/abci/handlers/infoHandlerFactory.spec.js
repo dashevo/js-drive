@@ -6,7 +6,7 @@ const {
 
 const infoHandlerFactory = require('../../../../lib/abci/handlers/infoHandlerFactory');
 
-const BlockchainState = require('../../../../lib/state/BlockchainState');
+const BlockchainState = require('../../../../lib/blockchainState/BlockchainState');
 
 const packageJson = require('./../../../../package');
 

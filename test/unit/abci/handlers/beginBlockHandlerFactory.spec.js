@@ -4,46 +4,31 @@ const {
   },
 } = require('abci/types');
 
-const {
-  StartTransactionRequest,
-} = require('@dashevo/drive-grpc');
-
 const beginBlockHandlerFactory = require('../../../../lib/abci/handlers/beginBlockHandlerFactory');
 
-const BlockchainState = require('../../../../lib/state/BlockchainState');
-const UpdateStatePromiseClientMock = require('../../../../lib/test/mock/UpdateStatePromiseClientMock');
+const BlockchainState = require('../../../../lib/blockchainState/BlockchainState');
+const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionDBTransactionsMock');
+const BlockExecutionStateMock = require('../../../../lib/test/mock/BlockExecutionStateMock');
 
 describe('beginBlockHandlerFactory', () => {
   let beginBlockHandler;
   let request;
   let blockchainState;
-  let driveUpdateStateClientMock;
   let blockHeight;
-  let identityRepositoryMock;
   let blockExecutionDBTransactionsMock;
-  let identityTransaction;
+  let blockExecutionStateMock;
 
   beforeEach(function beforeEach() {
     blockchainState = new BlockchainState();
-    driveUpdateStateClientMock = new UpdateStatePromiseClientMock(this.sinon);
 
-    identityTransaction = {
-      startTransaction: this.sinon.stub(),
-    };
+    blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
 
-    identityRepositoryMock = {
-      createTransaction: this.sinon.stub().returns(identityTransaction),
-    };
-
-    blockExecutionDBTransactionsMock = {
-      setIdentityTransaction: this.sinon.stub(),
-    };
+    blockExecutionStateMock = new BlockExecutionStateMock(this.sinon);
 
     beginBlockHandler = beginBlockHandlerFactory(
-      driveUpdateStateClientMock,
       blockchainState,
-      identityRepositoryMock,
       blockExecutionDBTransactionsMock,
+      blockExecutionStateMock,
     );
 
     blockHeight = 2;
@@ -56,23 +41,13 @@ describe('beginBlockHandlerFactory', () => {
   });
 
   it('should start transaction and return ResponseBeginBlock', async () => {
-    const startTransactionRequest = new StartTransactionRequest();
-    startTransactionRequest.setBlockHeight(blockHeight);
-
     const response = await beginBlockHandler(request);
 
     expect(response).to.be.an.instanceOf(ResponseBeginBlock);
 
     expect(blockchainState.getLastBlockHeight()).to.equal(blockHeight);
 
-    expect(driveUpdateStateClientMock.startTransaction).to.be.calledOnceWith(
-      startTransactionRequest,
-    );
-
-    expect(identityRepositoryMock.createTransaction).to.be.calledOnce();
-
-    expect(blockExecutionDBTransactionsMock.setIdentityTransaction).to.be.calledOnceWithExactly(
-      identityTransaction,
-    );
+    expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
+    expect(blockExecutionStateMock.reset).to.be.calledOnce();
   });
 });

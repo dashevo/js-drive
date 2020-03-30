@@ -38,7 +38,7 @@ describe('unserializeStateTransitionFactory', () => {
       expect.fail('should throw InvalidArgumentAbciError error');
     } catch (e) {
       expect(e).to.be.instanceOf(InvalidArgumentAbciError);
-      expect(e.getMessage()).to.equal('Invalid argument: State Transition is not specified');
+      expect(e.getMessage()).to.equal('State Transition is not specified');
       expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
 
       expect(createIsolatedDppMock).to.not.be.called();
@@ -61,7 +61,7 @@ describe('unserializeStateTransitionFactory', () => {
       expect.fail('should throw InvalidArgumentAbciError error');
     } catch (e) {
       expect(e).to.be.instanceOf(InvalidArgumentAbciError);
-      expect(e.getMessage()).to.equal('Invalid argument: State Transition is invalid');
+      expect(e.getMessage()).to.equal('State Transition is invalid');
       expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
       expect(e.getData()).to.deep.equal({
         errors: [consensusError],

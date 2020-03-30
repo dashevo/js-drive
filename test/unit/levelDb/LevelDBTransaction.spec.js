@@ -22,7 +22,7 @@ describe('LevelDBTransaction', () => {
   });
 
   it('should start transaction', () => {
-    levelDBTransaction.startTransaction();
+    levelDBTransaction.start();
 
     expect(levelDBTransaction.db).to.be.instanceOf(Transactions);
   });
@@ -40,10 +40,10 @@ describe('LevelDBTransaction', () => {
   });
 
   it('should fail if transaction was started twice', async () => {
-    levelDBTransaction.startTransaction();
+    levelDBTransaction.start();
 
     try {
-      levelDBTransaction.startTransaction();
+      levelDBTransaction.start();
 
       expect.fail('Should throw an LevelDBTransactionIsAlreadyStartedError error');
     } catch (e) {

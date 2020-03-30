@@ -1,4 +1,4 @@
-const convertToMongoDbIndices = require('../../../lib/document/mongoDbRepository/convertToMongoDbIndices');
+const convertToMongoDbIndices = require('../../../../lib/document/mongoDbRepository/convertToMongoDbIndices');
 
 describe('convertToMongoDbIndices', () => {
   let indicesFixture;
@@ -7,14 +7,14 @@ describe('convertToMongoDbIndices', () => {
     indicesFixture = [
       {
         properties: [
-          { $userId: 'asc' },
+          { $ownerId: 'asc' },
           { firstName: 'desc' },
         ],
         unique: true,
       },
       {
         properties: [
-          { $userId: 'asc' },
+          { $ownerId: 'asc' },
           { lastName: 'desc' },
         ],
       },
@@ -32,18 +32,18 @@ describe('convertToMongoDbIndices', () => {
 
     expect(convertedIndices).to.deep.equal([{
       key: {
-        userId: 1,
+        ownerId: 1,
         'data.firstName': -1,
       },
       unique: true,
-      name: 'userId_data.firstName',
+      name: 'ownerId_data.firstName',
     }, {
       key: {
-        userId: 1,
+        ownerId: 1,
         'data.lastName': -1,
       },
       unique: false,
-      name: 'userId_data.lastName',
+      name: 'ownerId_data.lastName',
     }, {
       key: {
         _id: 1,

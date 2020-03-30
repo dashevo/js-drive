@@ -4,48 +4,52 @@ const {
   },
 } = require('abci/types');
 
-const {
-  CommitTransactionRequest,
-} = require('@dashevo/drive-grpc');
-const Long = require('long');
+const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 
 const commitHandlerFactory = require('../../../../lib/abci/handlers/commitHandlerFactory');
 
-const UpdateStatePromiseClientMock = require('../../../../lib/test/mock/UpdateStatePromiseClientMock');
-
-const BlockchainState = require('../../../../lib/state/BlockchainState');
+const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionDBTransactionsMock');
+const BlockExecutionStateMock = require('../../../../lib/test/mock/BlockExecutionStateMock');
 
 describe('commitHandlerFactory', () => {
   let commitHandler;
-  let driveUpdateStateClientMock;
-  let blockHeight;
-  let blockHash;
   let appHash;
   let blockchainStateRepositoryMock;
-  let identityRepositoryMock;
+  let blockExecutionDBTransactionsMock;
+  let blockExecutionStateMock;
+  let documentsDatabaseManagerMock;
+  let dataContract;
+  let blockchainStateMock;
 
   beforeEach(function beforeEach() {
-    blockHeight = Long.fromInt(42);
-    blockHash = Buffer.alloc(0);
     appHash = Buffer.alloc(0);
 
-    const blockchainState = new BlockchainState(blockHeight, appHash);
+    blockchainStateMock = {
+      setLastBlockAppHash: this.sinon.stub(),
+    };
 
-    driveUpdateStateClientMock = new UpdateStatePromiseClientMock(this.sinon);
+    dataContract = getDataContractFixture();
 
     blockchainStateRepositoryMock = {
       store: this.sinon.stub(),
     };
 
-    identityRepositoryMock = {
-      commit: this.sinon.stub(),
+    blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
+    blockExecutionStateMock = new BlockExecutionStateMock(this.sinon);
+
+    blockExecutionStateMock.getDataContracts.returns([dataContract]);
+
+    documentsDatabaseManagerMock = {
+      create: this.sinon.stub(),
+      drop: this.sinon.stub(),
     };
 
     commitHandler = commitHandlerFactory(
-      driveUpdateStateClientMock,
-      blockchainState,
+      blockchainStateMock,
       blockchainStateRepositoryMock,
-      identityRepositoryMock,
+      blockExecutionDBTransactionsMock,
+      blockExecutionStateMock,
+      documentsDatabaseManagerMock,
     );
   });
 
@@ -55,22 +59,33 @@ describe('commitHandlerFactory', () => {
     expect(response).to.be.an.instanceOf(ResponseCommit);
     expect(response.data).to.deep.equal(appHash);
 
-    const commitTransactionRequest = new CommitTransactionRequest();
-    commitTransactionRequest.setBlockHeight(blockHeight.toInt());
-    commitTransactionRequest.setBlockHash(blockHash);
+    expect(blockExecutionStateMock.getDataContracts).to.be.calledOnce();
 
-    expect(driveUpdateStateClientMock.commitTransaction).to.be.calledOnceWith(
-      commitTransactionRequest,
-    );
+    expect(documentsDatabaseManagerMock.create).to.be.calledOnceWith(dataContract);
 
-    expect(blockchainStateRepositoryMock.store).to.be.calledOnce();
+    expect(blockExecutionDBTransactionsMock.commit).to.be.calledOnce();
 
-    const blockchainState = blockchainStateRepositoryMock.store.getCall(0).args[0];
+    expect(blockchainStateMock.setLastBlockAppHash).to.be.calledOnceWith(appHash);
 
-    expect(blockchainState).to.be.an.instanceOf(BlockchainState);
-    expect(blockchainState.getLastBlockHeight()).to.equal(blockHeight);
-    expect(blockchainState.getLastBlockAppHash()).to.deep.equal(appHash);
+    expect(blockchainStateRepositoryMock.store).to.be.calledOnceWith(blockchainStateMock);
+    expect(blockExecutionStateMock.reset).to.be.calledOnce();
+  });
 
-    expect(identityRepositoryMock.commit).to.be.calledOnce();
+  it('should throw error and abort DB transaction', async () => {
+    const error = new Error('Some error');
+
+    blockchainStateRepositoryMock.store.throws(error);
+
+    try {
+      await commitHandler();
+
+      expect.fail('should throw error');
+    } catch (e) {
+      expect(e).to.equal(error);
+
+      expect(blockExecutionDBTransactionsMock.abort).to.be.calledOnce();
+      expect(documentsDatabaseManagerMock.drop).to.be.calledOnceWith(dataContract);
+      expect(blockExecutionStateMock.reset).to.be.calledOnce();
+    }
   });
 });
