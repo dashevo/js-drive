@@ -35,23 +35,6 @@ describe('queryHandlerFactory', () => {
     );
   });
 
-  it('should handle route and return data', async () => {
-    const data = 'some data';
-    const encodedData = cbor.decode(Buffer.from(request.data));
-    const sanitizedUrl = 'sanitizedUrl';
-
-    sanitizeUrlMock.returns(sanitizedUrl);
-    routeMock.handler.resolves(data);
-    queryHandlerRouterMock.find.returns(routeMock);
-
-    const result = await queryHandler(request);
-
-    expect(sanitizeUrlMock).to.be.calledOnceWith(request.path);
-    expect(queryHandlerRouterMock.find).to.be.calledOnceWith('GET', sanitizedUrl);
-    expect(routeMock.handler).to.be.calledOnceWith(routeMock.params, encodedData, request);
-    expect(result).to.equal(data);
-  });
-
   it('should throw InvalidArgumentAbciError if route was not found', async () => {
     const sanitizedUrl = 'sanitizedUrl';
 
@@ -114,5 +97,24 @@ describe('queryHandlerFactory', () => {
       expect(queryHandlerRouterMock.find).to.be.calledOnceWith('GET', sanitizedUrl);
       expect(routeMock.handler).to.be.not.called();
     }
+  });
+
+  it('should call route handler without data');
+
+  it('should call route handler and return response', async () => {
+    const data = 'some data';
+    const encodedData = cbor.decode(Buffer.from(request.data));
+    const sanitizedUrl = 'sanitizedUrl';
+
+    sanitizeUrlMock.returns(sanitizedUrl);
+    routeMock.handler.resolves(data);
+    queryHandlerRouterMock.find.returns(routeMock);
+
+    const result = await queryHandler(request);
+
+    expect(sanitizeUrlMock).to.be.calledOnceWith(request.path);
+    expect(queryHandlerRouterMock.find).to.be.calledOnceWith('GET', sanitizedUrl);
+    expect(routeMock.handler).to.be.calledOnceWith(routeMock.params, encodedData, request);
+    expect(result).to.equal(data);
   });
 });
