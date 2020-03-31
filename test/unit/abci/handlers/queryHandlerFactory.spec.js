@@ -1,88 +1,118 @@
-const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
+const cbor = require('cbor');
 
 const queryHandlerFactory = require('../../../../lib/abci/handlers/queryHandlerFactory');
-const InvalidIdentityIdError = require('../../../../lib/identity/errors/InvalidIdentityIdError');
 
 const AbciError = require('../../../../lib/abci/errors/AbciError');
 const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
 
 describe('queryHandlerFactory', () => {
   let queryHandler;
-  let identityRepositoryMock;
-  let identity;
+  let queryHandlerRouterMock;
+  let sanitizeUrlMock;
   let request;
+  let routeMock;
 
   beforeEach(function beforeEach() {
-    identity = getIdentityFixture();
-
     request = {
       path: '/identity',
-      data: [...Buffer.from(identity.getId())],
+      data: cbor.encode(Buffer.from('data')),
     };
 
-    identityRepositoryMock = {
-      fetch: this.sinon.stub(),
+    queryHandlerRouterMock = {
+      find: this.sinon.stub(),
     };
 
-    identityRepositoryMock.fetch.withArgs(identity.getId()).resolves(identity);
-    identityRepositoryMock.fetch.withArgs('unknownId').resolves(null);
-    identityRepositoryMock.fetch.withArgs(null).throws(new InvalidIdentityIdError(null));
+    sanitizeUrlMock = this.sinon.stub();
 
-    queryHandler = queryHandlerFactory(identityRepositoryMock);
+    routeMock = {
+      handler: this.sinon.stub(),
+      params: 'params',
+    };
+
+    queryHandler = queryHandlerFactory(
+      queryHandlerRouterMock,
+      sanitizeUrlMock,
+    );
   });
 
-  it('should fetch identity by id', async () => {
-    const response = await queryHandler(request);
+  it('should handle route and return data', async () => {
+    const data = 'some data';
+    const encodedData = cbor.decode(Buffer.from(request.data));
+    const sanitizedUrl = 'sanitizedUrl';
 
-    expect(response).to.be.an.instanceOf(Object);
-    expect(response.code).to.equal(0);
-    expect(response.value).to.deep.equal(identity.serialize());
+    sanitizeUrlMock.returns(sanitizedUrl);
+    routeMock.handler.resolves(data);
+    queryHandlerRouterMock.find.returns(routeMock);
 
-    expect(identityRepositoryMock.fetch).to.be.calledOnceWithExactly(identity.getId());
+    const result = await queryHandler(request);
+
+    expect(sanitizeUrlMock).to.be.calledOnceWith(request.path);
+    expect(queryHandlerRouterMock.find).to.be.calledOnceWith('GET', sanitizedUrl);
+    expect(routeMock.handler).to.be.calledOnceWith(routeMock.params, encodedData, request);
+    expect(result).to.equal(data);
   });
 
-  it('should return null if id not found', async () => {
-    const id = 'unknownId';
-    request.data = [...Buffer.from(id)];
+  it('should throw InvalidArgumentAbciError if route was not found', async () => {
+    const sanitizedUrl = 'sanitizedUrl';
 
-    const response = await queryHandler(request);
-
-    expect(response).to.be.an.instanceOf(Object);
-    expect(response.code).to.equal(0);
-    expect(response.value).to.equal(null);
-
-    expect(identityRepositoryMock.fetch).to.be.calledOnceWithExactly(id);
-  });
-
-  it('should throw InvalidArgumentAbciError error if data is not defined', async () => {
-    request.data = undefined;
+    sanitizeUrlMock.returns(sanitizedUrl);
+    queryHandlerRouterMock.find.returns(false);
 
     try {
       await queryHandler(request);
 
-      expect.fail('should throw InvalidArgumentAbciError error');
+      expect.fail('should throw InvalidArgumentAbciError');
     } catch (e) {
       expect(e).to.be.instanceOf(InvalidArgumentAbciError);
-      expect(e.getMessage()).to.equal('Invalid argument: Data is not specified');
       expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
 
-      expect(identityRepositoryMock.fetch).to.be.not.called();
+      expect(sanitizeUrlMock).to.be.calledOnceWith(request.path);
+      expect(queryHandlerRouterMock.find).to.be.calledOnceWith('GET', sanitizedUrl);
+      expect(routeMock.handler).to.be.not.called();
     }
   });
 
-  it('should return error if path is wrong', async () => {
-    request.path = '/wrongPath';
+  it('should throw InvalidArgumentAbciError if fail to decode request data', async () => {
+    const sanitizedUrl = 'sanitizedUrl';
+
+    sanitizeUrlMock.returns(sanitizedUrl);
+    queryHandlerRouterMock.find.returns(false);
+
+    request.data = 'Bad data';
 
     try {
       await queryHandler(request);
 
-      expect.fail('should throw InvalidArgumentAbciError error');
+      expect.fail('should throw InvalidArgumentAbciError');
     } catch (e) {
       expect(e).to.be.instanceOf(InvalidArgumentAbciError);
-      expect(e.getMessage()).to.equal('Invalid argument: Invalid path');
       expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
 
-      expect(identityRepositoryMock.fetch).to.be.not.called();
+      expect(sanitizeUrlMock).to.be.calledOnceWith(request.path);
+      expect(queryHandlerRouterMock.find).to.be.calledOnceWith('GET', sanitizedUrl);
+      expect(routeMock.handler).to.be.not.called();
+    }
+  });
+
+  it('should throw InvalidArgumentAbciError on invalid request data', async () => {
+    const sanitizedUrl = 'sanitizedUrl';
+
+    sanitizeUrlMock.returns(sanitizedUrl);
+    queryHandlerRouterMock.find.returns(false);
+
+    request.data = cbor.encode(null);
+
+    try {
+      await queryHandler(request);
+
+      expect.fail('should throw InvalidArgumentAbciError');
+    } catch (e) {
+      expect(e).to.be.instanceOf(InvalidArgumentAbciError);
+      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
+
+      expect(sanitizeUrlMock).to.be.calledOnceWith(request.path);
+      expect(queryHandlerRouterMock.find).to.be.calledOnceWith('GET', sanitizedUrl);
+      expect(routeMock.handler).to.be.not.called();
     }
   });
 });
