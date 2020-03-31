@@ -4,7 +4,6 @@ const createDocumentMongoDbRepositoryFactory = require('../../../../lib/document
 const DocumentMongoDbRepository = require('../../../../lib/document/mongoDbRepository/DocumentMongoDbRepository');
 
 describe('createDocumentMongoDbRepositoryFactory', () => {
-  let mongoClient;
   let mongoDb;
   let createDocumentMongoDbRepository;
   let contractId;
@@ -20,7 +19,6 @@ describe('createDocumentMongoDbRepositoryFactory', () => {
     mongoDb = {
       collection: this.sinon.stub(),
     };
-    mongoClient = {};
 
     convertWhereToMongoDbQuery = this.sinon.stub();
     validateQuery = this.sinon.stub();
