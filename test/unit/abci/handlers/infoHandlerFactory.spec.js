@@ -8,7 +8,7 @@ const infoHandlerFactory = require('../../../../lib/abci/handlers/infoHandlerFac
 
 const BlockchainState = require('../../../../lib/blockchainState/BlockchainState');
 
-const packageJson = require('./../../../../package');
+const packageJson = require('../../../../package');
 
 describe('infoHandlerFactory', () => {
   let lastBlockHeight;
