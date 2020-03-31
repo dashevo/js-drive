@@ -21,43 +21,53 @@ describe('LevelDBTransaction', () => {
     await dbMock.close();
   });
 
-  it('should start transaction', () => {
-    levelDBTransaction.start();
-
-    expect(levelDBTransaction.db).to.be.instanceOf(Transactions);
-  });
-
-  it('should commit transaction', async function it() {
-    const commit = this.sinon.stub();
-    levelDBTransaction.db = {
-      commit,
-    };
-
-    const result = await levelDBTransaction.commit();
-
-    expect(result).to.be.instanceOf(Object);
-    expect(commit).to.be.calledOnce();
-  });
-
-  it('should fail if transaction was started twice', async () => {
-    levelDBTransaction.start();
-
-    try {
+  describe('#start', () => {
+    it('should start transaction', () => {
       levelDBTransaction.start();
 
-      expect.fail('Should throw an LevelDBTransactionIsAlreadyStartedError error');
-    } catch (e) {
-      expect(e).to.be.instanceOf(LevelDBTransactionIsAlreadyStartedError);
-    }
+      expect(levelDBTransaction.db).to.be.instanceOf(Transactions);
+    });
+
+    it('should throw LevelDBTransactionIsAlreadyStartedError if transaction was started twice', async () => {
+      levelDBTransaction.start();
+
+      try {
+        levelDBTransaction.start();
+
+        expect.fail('Should throw an LevelDBTransactionIsAlreadyStartedError error');
+      } catch (e) {
+        expect(e).to.be.instanceOf(LevelDBTransactionIsAlreadyStartedError);
+      }
+    });
   });
 
-  it('should fail on commit if transaction is not started', async () => {
-    try {
-      await levelDBTransaction.commit();
+  describe('#commit', () => {
+    it('should commit transaction', async function it() {
+      const commit = this.sinon.stub();
+      levelDBTransaction.db = {
+        commit,
+      };
 
-      expect.fail('Should throw an LevelDBTransactionIsNotStartedError error');
-    } catch (e) {
-      expect(e).to.be.instanceOf(LevelDBTransactionIsNotStartedError);
-    }
+      const result = await levelDBTransaction.commit();
+
+      expect(result).to.be.instanceOf(Object);
+      expect(commit).to.be.calledOnce();
+    });
+
+    it('should throw LevelDBTransactionIsNotStartedError if transaction is not started', async () => {
+      try {
+        await levelDBTransaction.commit();
+
+        expect.fail('Should throw an LevelDBTransactionIsNotStartedError error');
+      } catch (e) {
+        expect(e).to.be.instanceOf(LevelDBTransactionIsNotStartedError);
+      }
+    });
+  });
+
+  describe('#abort', () => {
+    it('should abort transaction');
+
+    it('should throw LevelDBTransactionIsAlreadyStartedError if transaction is not started');
   });
 });

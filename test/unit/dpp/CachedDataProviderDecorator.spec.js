@@ -67,7 +67,7 @@ describe('CachedDataProviderDecorator', () => {
   });
 
   describe('#fetchDataContract', () => {
-    it('should fetch contract from cache', async () => {
+    it('should fetch data contract from cache', async () => {
       dataContractCacheMock.get.returns(data);
 
       const result = await dataProvider.fetchDataContract(id);
@@ -77,7 +77,7 @@ describe('CachedDataProviderDecorator', () => {
       expect(dataContractCacheMock.get).to.be.calledOnceWith(id);
     });
 
-    it('should fetch contract from repository if it is not present in cache', async () => {
+    it('should fetch data contract from repository if it is not present in cache', async () => {
       dataContractCacheMock.get.returns(null);
       dataProviderMock.fetchDataContract.resolves(data);
 
