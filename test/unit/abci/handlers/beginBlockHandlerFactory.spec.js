@@ -40,7 +40,7 @@ describe('beginBlockHandlerFactory', () => {
     };
   });
 
-  it('should start transaction and return ResponseBeginBlock', async () => {
+  it('should update height, start transactions return ResponseBeginBlock', async () => {
     const response = await beginBlockHandler(request);
 
     expect(response).to.be.an.instanceOf(ResponseBeginBlock);

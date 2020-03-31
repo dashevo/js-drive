@@ -53,7 +53,7 @@ describe('commitHandlerFactory', () => {
     );
   });
 
-  it('should commit transaction and return ResponseCommit', async () => {
+  it('should commit db transactions, update blockchain state, create document dbs and return ResponseCommit', async () => {
     const response = await commitHandler();
 
     expect(response).to.be.an.instanceOf(ResponseCommit);
@@ -71,7 +71,7 @@ describe('commitHandlerFactory', () => {
     expect(blockExecutionStateMock.reset).to.be.calledOnce();
   });
 
-  it('should throw error and abort DB transaction', async () => {
+  it('should throw error and abort DB transactions if can\'t store blockchain state', async () => {
     const error = new Error('Some error');
 
     blockchainStateRepositoryMock.store.throws(error);

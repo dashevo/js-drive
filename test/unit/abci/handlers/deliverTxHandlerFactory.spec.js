@@ -7,7 +7,6 @@ const {
 const DashPlatformProtocol = require('@dashevo/dpp');
 
 const createDPPMock = require('@dashevo/dpp/lib/test/mocks/createDPPMock');
-const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 const getDocumentFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 const BlockExecutionStateMock = require('../../../../lib/test/mock/BlockExecutionStateMock');
@@ -24,9 +23,8 @@ describe('deliverTxHandlerFactory', () => {
   let dataContractRequest;
   let documentRequest;
   let dppMock;
-  let documentsStateTransitionFixture;
-  let dataContractStateTransitionFixture;
-  let identityFixture;
+  let documentsBatchTransitionFixture;
+  let dataContractCreateTransitionFixture;
   let dpp;
   let unserializeStateTransitionMock;
   let blockExecutionStateMock;
@@ -34,22 +32,21 @@ describe('deliverTxHandlerFactory', () => {
   beforeEach(function beforeEach() {
     const dataContractFixture = getDataContractFixture();
     const documentFixture = getDocumentFixture();
-    identityFixture = getIdentityFixture();
 
     dpp = new DashPlatformProtocol();
-    documentsStateTransitionFixture = dpp.document.createStateTransition({
+    documentsBatchTransitionFixture = dpp.document.createStateTransition({
       create: documentFixture,
     });
 
-    dataContractStateTransitionFixture = dpp
+    dataContractCreateTransitionFixture = dpp
       .dataContract.createStateTransition(dataContractFixture);
 
     documentRequest = {
-      tx: documentsStateTransitionFixture.serialize(),
+      tx: documentsBatchTransitionFixture.serialize(),
     };
 
     dataContractRequest = {
-      tx: dataContractStateTransitionFixture.serialize(),
+      tx: dataContractCreateTransitionFixture.serialize(),
     };
 
     dppMock = createDPPMock(this.sinon);
@@ -64,10 +61,8 @@ describe('deliverTxHandlerFactory', () => {
     // @TODO add this to DPP
     dppMock
       .stateTransition
-      .updateState = this.sinon
+      .apply = this.sinon
         .stub();
-
-    dppMock.identity.applyStateTransition = this.sinon.stub().returns(identityFixture);
 
     unserializeStateTransitionMock = this.sinon.stub();
 
@@ -80,8 +75,8 @@ describe('deliverTxHandlerFactory', () => {
     );
   });
 
-  it('should apply a document State Transition and return response with code 0', async () => {
-    unserializeStateTransitionMock.resolves(documentsStateTransitionFixture);
+  it('should apply a DocumentsBatchTransition and return ResponseDeliverTx', async () => {
+    unserializeStateTransitionMock.resolves(documentsBatchTransitionFixture);
 
     const response = await deliverTxHandler(documentRequest);
 
@@ -89,19 +84,19 @@ describe('deliverTxHandlerFactory', () => {
     expect(response.code).to.equal(0);
 
     expect(unserializeStateTransitionMock).to.be.calledOnceWith(
-      documentsStateTransitionFixture.serialize(),
+      documentsBatchTransitionFixture.serialize(),
     );
     expect(dppMock.stateTransition.validateData).to.be.calledOnceWith(
-      documentsStateTransitionFixture,
+      documentsBatchTransitionFixture,
     );
-    expect(dppMock.stateTransition.updateState).to.be.calledOnceWith(
-      documentsStateTransitionFixture,
+    expect(dppMock.stateTransition.apply).to.be.calledOnceWith(
+      documentsBatchTransitionFixture,
     );
     expect(blockExecutionStateMock.addDataContract).to.not.be.called();
   });
 
-  it('should apply a data contract State Transition and return response with code 0', async () => {
-    unserializeStateTransitionMock.resolves(dataContractStateTransitionFixture);
+  it('should apply a DataContractCreateTransition, add it to block execution state and return ResponseDeliverTx', async () => {
+    unserializeStateTransitionMock.resolves(dataContractCreateTransitionFixture);
 
     const response = await deliverTxHandler(dataContractRequest);
 
@@ -109,25 +104,25 @@ describe('deliverTxHandlerFactory', () => {
     expect(response.code).to.equal(0);
 
     expect(unserializeStateTransitionMock).to.be.calledOnceWith(
-      dataContractStateTransitionFixture.serialize(),
+      dataContractCreateTransitionFixture.serialize(),
     );
     expect(dppMock.stateTransition.validateData).to.be.calledOnceWith(
-      dataContractStateTransitionFixture,
+      dataContractCreateTransitionFixture,
     );
-    expect(dppMock.stateTransition.updateState).to.be.calledOnceWith(
-      dataContractStateTransitionFixture,
+    expect(dppMock.stateTransition.apply).to.be.calledOnceWith(
+      dataContractCreateTransitionFixture,
     );
     expect(blockExecutionStateMock.addDataContract).to.be.calledOnceWith(
-      dataContractStateTransitionFixture.getDataContract(),
+      dataContractCreateTransitionFixture.getDataContract(),
     );
   });
 
-  it('should throw InvalidArgumentAbciError if in invalid state transition', async () => {
-    unserializeStateTransitionMock.resolves(dataContractStateTransitionFixture);
+  it('should throw InvalidArgumentAbciError if a state transition is not valid', async () => {
+    unserializeStateTransitionMock.resolves(dataContractCreateTransitionFixture);
 
     const error = new ValidationError('Some error');
-
     const invalidResult = new ValidationResult([error]);
+
     dppMock.stateTransition.validateData.resolves(invalidResult);
 
     try {
