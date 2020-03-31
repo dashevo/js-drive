@@ -667,24 +667,22 @@ describe('validateQueryFactory', () => {
               where: [
                 ['arr', 'length', 2],
               ],
-            });
+            }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
-          },
-          documentSchema);
+          });
 
           it('should return valid result if "length" operator used with zero', () => {
             const result = validateQuery({
               where: [
                 ['arr', 'length', 0],
               ],
-            });
+            }, documentSchema);
 
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.true();
-          },
-          documentSchema);
+          });
 
           it('should return invalid result if "length" operator used with a float numeric value', () => {
             const result = validateQuery({
