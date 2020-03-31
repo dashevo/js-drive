@@ -6,6 +6,7 @@ describe('DriveStateRepository', () => {
   let data;
   let dataContractRepositoryMock;
   let fetchDocumentsMock;
+  let createDocumentRepositoryMock;
   let coreRpcClientMock;
   let blockExecutionDBTransactionsMock;
   let id;
@@ -32,10 +33,13 @@ describe('DriveStateRepository', () => {
 
     fetchDocumentsMock = this.sinon.stub();
 
+    createDocumentRepositoryMock = this.sinon.stub();
+
     stateRepository = new DriveStateRepository(
       identityRepositoryMock,
       dataContractRepositoryMock,
       fetchDocumentsMock,
+      createDocumentRepositoryMock,
       coreRpcClientMock,
       blockExecutionDBTransactionsMock,
     );
@@ -52,6 +56,10 @@ describe('DriveStateRepository', () => {
     });
   });
 
+  describe('#storeDataContract', () => {
+    it('should store data contract to repository');
+  });
+
   describe('#fetchIdentity', () => {
     it('should fetch identity from repository', async () => {
       const transaction = 'transaction';
@@ -64,6 +72,10 @@ describe('DriveStateRepository', () => {
       expect(identityRepositoryMock.fetch).to.be.calledOnceWith(id, transaction);
       expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identities');
     });
+  });
+
+  describe('#storeIdentity', () => {
+    it('should store identity to repository');
   });
 
   describe('#fetchDocuments', () => {
@@ -81,6 +93,14 @@ describe('DriveStateRepository', () => {
       expect(fetchDocumentsMock).to.be.calledOnceWith(contractId, type, options, transaction);
       expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('documents');
     });
+  });
+
+  describe('#storeDocument', () => {
+    it('should store document in repository');
+  });
+
+  describe('#removeDocument', () => {
+    it('should delete document from repository');
   });
 
   describe('#fetchTransaction', () => {

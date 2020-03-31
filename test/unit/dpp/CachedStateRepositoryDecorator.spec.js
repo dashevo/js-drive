@@ -30,7 +30,7 @@ describe('CachedStateRepositoryDecorator', () => {
   });
 
   describe('#fetchIdentity', () => {
-    it('should fetch identity from repository', async () => {
+    it('should fetch identity from state repository', async () => {
       stateRepositoryMock.fetchIdentity.resolves(data);
 
       const result = await stateRepository.fetchIdentity(id);
@@ -40,8 +40,12 @@ describe('CachedStateRepositoryDecorator', () => {
     });
   });
 
+  describe('#storeIdentity', () => {
+    it('should store identity to repository');
+  });
+
   describe('#fetchDocuments', () => {
-    it('should fetch documents from repository', async () => {
+    it('should fetch documents from state repository', async () => {
       const contractId = 'contractId';
       const type = 1;
       const options = {};
@@ -55,8 +59,16 @@ describe('CachedStateRepositoryDecorator', () => {
     });
   });
 
+  describe('#storeDocument', () => {
+    it('should store document in repository');
+  });
+
+  describe('#removeDocument', () => {
+    it('should delete document from repository');
+  });
+
   describe('fetchTransaction', () => {
-    it('should fetch transaction from repository', async () => {
+    it('should fetch transaction from state repository', async () => {
       stateRepositoryMock.fetchTransaction.resolves(data);
 
       const result = await stateRepository.fetchTransaction(id);
@@ -77,7 +89,7 @@ describe('CachedStateRepositoryDecorator', () => {
       expect(dataContractCacheMock.get).to.be.calledOnceWith(id);
     });
 
-    it('should fetch data contract from repository if it is not present in cache', async () => {
+    it('should fetch data contract from state repository if it is not present in cache', async () => {
       dataContractCacheMock.get.returns(null);
       stateRepositoryMock.fetchDataContract.resolves(data);
 
