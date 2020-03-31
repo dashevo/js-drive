@@ -148,7 +148,7 @@ describe('DocumentMongoDbRepository', function main() {
     });
 
     it('should store Document in transaction', async () => {
-      await documentRepository.delete(document);
+      await documentRepository.delete(document.getId());
 
       stateViewTransaction.start();
 
@@ -597,7 +597,7 @@ describe('DocumentMongoDbRepository', function main() {
 
       it('should sort Documents by $id', async () => {
         await Promise.all(
-          documents.map(d => documentRepository.delete(d)),
+          documents.map(d => documentRepository.delete(d.getId())),
         );
 
         await Promise.all(
@@ -635,7 +635,7 @@ describe('DocumentMongoDbRepository', function main() {
     });
 
     it('should delete Document', async () => {
-      await documentRepository.delete(document);
+      await documentRepository.delete(document.getId());
 
       const result = await documentRepository.find(document.getId());
 
@@ -645,7 +645,7 @@ describe('DocumentMongoDbRepository', function main() {
     it('should delete Document in transaction', async () => {
       stateViewTransaction.start();
 
-      await documentRepository.delete(document, stateViewTransaction);
+      await documentRepository.delete(document.getId(), stateViewTransaction);
 
       const removedDocument = await documentRepository
         .find(document.getId(), stateViewTransaction);
@@ -667,7 +667,7 @@ describe('DocumentMongoDbRepository', function main() {
     it('should restore document if transaction aborted', async () => {
       stateViewTransaction.start();
 
-      await documentRepository.delete(document, stateViewTransaction);
+      await documentRepository.delete(document.getId(), stateViewTransaction);
 
       const removedDocument = await documentRepository
         .find(document.getId(), stateViewTransaction);
