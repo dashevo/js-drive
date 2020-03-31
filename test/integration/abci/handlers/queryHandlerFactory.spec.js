@@ -1,0 +1,130 @@
+const { startMongoDb } = require('@dashevo/dp-services-ctl');
+
+const {
+  asValue,
+} = require('awilix');
+
+const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
+const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
+
+const createDIContainer = require('../../../../lib/createDIContainer');
+
+const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
+
+describe('queryHandlerFactory', function main() {
+  this.timeout(25000);
+
+  let container;
+  let mongoDB;
+  let documentsMongoDBUrl;
+  let queryHandler;
+  let identityQueryHandlerMock;
+  let dataContractQueryHandlerMock;
+  let documentsQueryHandlerMock;
+  let dataContract;
+  let documents;
+  let identity;
+
+  before(async () => {
+    mongoDB = await startMongoDb();
+
+    documentsMongoDBUrl = `mongodb://127.0.0.1:${mongoDB.options.getMongoPort()}`
+      + `/?replicaSet=${mongoDB.options.options.replicaSetName}`;
+  });
+
+  after(async () => {
+    await mongoDB.remove();
+  });
+
+  beforeEach(async function beforeEach() {
+    container = await createDIContainer({
+      ...process.env,
+      DOCUMENTS_MONGODB_URL: documentsMongoDBUrl,
+    });
+
+    ({ dataContract } = getDocumentsFixture);
+    documents = getDocumentsFixture();
+    identity = getIdentityFixture();
+
+    identityQueryHandlerMock = this.sinon.stub();
+    identityQueryHandlerMock.resolves(identity);
+
+    dataContractQueryHandlerMock = this.sinon.stub();
+    dataContractQueryHandlerMock.resolves(dataContract);
+
+    documentsQueryHandlerMock = this.sinon.stub();
+    documentsQueryHandlerMock.resolves(documents);
+
+    container.register('identityQueryHandler', asValue(identityQueryHandlerMock));
+    container.register('dataContractQueryHandler', asValue(dataContractQueryHandlerMock));
+    container.register('documentsQueryHandler', asValue(documentsQueryHandlerMock));
+
+    queryHandler = container.resolve('queryHandler');
+  });
+
+  afterEach(async () => {
+    if (container) {
+      await container.dispose();
+    }
+  });
+
+  describe('/identities/:id', () => {
+    it('should call identity handler and return an identity', async () => {
+      const result = await queryHandler({
+        path: '/identities/1',
+        data: Buffer.alloc(0),
+      });
+
+      expect(identityQueryHandlerMock).to.have.been.calledOnceWithExactly(
+        { id: '1' },
+        {},
+        { path: '/identities/1', data: Buffer.alloc(0) },
+      );
+      expect(result).to.deep.equal(identity);
+    });
+  });
+
+  describe('/dataContracts/:id', () => {
+    it('should call data contract handler and return data contract', async () => {
+      const result = await queryHandler({
+        path: '/dataContracts/1',
+        data: Buffer.alloc(0),
+      });
+
+      expect(dataContractQueryHandlerMock).to.have.been.calledOnceWithExactly(
+        { id: '1' },
+        {},
+        { path: '/dataContracts/1', data: Buffer.alloc(0) },
+      );
+      expect(result).to.deep.equal(dataContract);
+    });
+  });
+
+  describe('/dataContracts/:contractId/documents/:type', () => {
+    it('should call documents handler and return documents', async () => {
+      const result = await queryHandler({
+        path: '/dataContracts/1/documents/someType',
+        data: Buffer.alloc(0),
+      });
+
+      expect(documentsQueryHandlerMock).to.have.been.calledOnceWithExactly(
+        { contractId: '1', type: 'someType' },
+        {},
+        { path: '/dataContracts/1/documents/someType', data: Buffer.alloc(0) },
+      );
+      expect(result).to.deep.equal(documents);
+    });
+  });
+
+  it('should throw an error if invalid path is submitted', async () => {
+    try {
+      await queryHandler({
+        path: '/unknownPath',
+        data: Buffer.alloc(0),
+      });
+    } catch (e) {
+      expect(e).to.be.an.instanceOf(InvalidArgumentAbciError);
+      expect(e.getMessage()).to.equal('Invalid path');
+    }
+  });
+});
