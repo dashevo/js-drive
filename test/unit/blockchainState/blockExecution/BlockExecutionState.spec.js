@@ -10,7 +10,7 @@ describe('BlockExecutionState', () => {
     dataContract = getDataContractFixture();
   });
 
-  it('should add contract', async () => {
+  it('should add a Data Contract', async () => {
     expect(blockExecutionState.getDataContracts()).to.have.lengthOf(0);
 
     blockExecutionState.addDataContract(dataContract);
@@ -20,7 +20,7 @@ describe('BlockExecutionState', () => {
     expect(contracts[0]).to.deep.equal(dataContract);
   });
 
-  it('should clear dataContracts', async () => {
+  it('should reset state', async () => {
     blockExecutionState.addDataContract(dataContract);
 
     expect(blockExecutionState.getDataContracts()).to.have.lengthOf(1);

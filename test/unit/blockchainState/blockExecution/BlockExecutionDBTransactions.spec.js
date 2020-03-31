@@ -33,7 +33,9 @@ describe('BlockExecutionDBTransactions', () => {
   });
 
   it('should start transactions', () => {
-    blockExecutionDBTransactions.start();
+    const result = blockExecutionDBTransactions.start();
+
+    expect(result).to.be.a('array').and.has.lengthOf(3);
 
     expect(identityTransactionMock.start).to.be.calledOnce();
     expect(documentsTransactionMock.start).to.be.calledOnce();
@@ -48,8 +50,10 @@ describe('BlockExecutionDBTransactions', () => {
     expect(dataContractsTransactionMock.abort).to.be.not.called();
   });
 
-  it('should commit transactions', () => {
-    blockExecutionDBTransactions.commit();
+  it('should commit transactions', async () => {
+    const result = await blockExecutionDBTransactions.commit();
+
+    expect(result).to.be.a('array').and.has.lengthOf(3);
 
     expect(identityTransactionMock.commit).to.be.calledOnce();
     expect(documentsTransactionMock.commit).to.be.calledOnce();
@@ -64,8 +68,10 @@ describe('BlockExecutionDBTransactions', () => {
     expect(dataContractsTransactionMock.abort).to.be.not.called();
   });
 
-  it('should abort transactions', () => {
-    blockExecutionDBTransactions.abort();
+  it('should abort transactions', async () => {
+    const result = await blockExecutionDBTransactions.abort();
+
+    expect(result).to.be.a('array').and.has.lengthOf(3);
 
     expect(identityTransactionMock.abort).to.be.calledOnce();
     expect(documentsTransactionMock.abort).to.be.calledOnce();
