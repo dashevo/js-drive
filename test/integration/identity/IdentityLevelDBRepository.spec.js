@@ -8,7 +8,6 @@ const Identity = require('@dashevo/dpp/lib/identity/Identity');
 const LevelDBTransaction = require('../../../lib/levelDb/LevelDBTransaction');
 
 const IdentityLevelDBRepository = require('../../../lib/identity/IdentityLevelDBRepository');
-const InvalidIdentityIdError = require('../../../lib/identity/errors/InvalidIdentityIdError');
 
 describe('IdentityLevelDBRepository', () => {
   let db;
@@ -58,6 +57,7 @@ describe('IdentityLevelDBRepository', () => {
 
       expect(transaction).to.be.instanceOf(LevelDBTransaction);
 
+      transaction.start();
       // store data in transaction
       await repository.store(identity, transaction);
 
@@ -111,36 +111,21 @@ describe('IdentityLevelDBRepository', () => {
       expect(storedIdentity.toJSON()).to.deep.equal(identity.toJSON());
     });
 
-    it('should throw InvalidIdentityIdError if id is not defined', async () => {
-      try {
-        await repository.fetch(null);
-
-        expect.fail('Should throw InvalidIdentityIdError');
-      } catch (e) {
-        expect(e).to.be.instanceOf(InvalidIdentityIdError);
-        expect(e.getId()).to.be.null();
-      }
-    });
-
-    it('should throw InvalidIdentityIdError if id is not a string', async () => {
-      try {
-        await repository.fetch({});
-
-        expect.fail('Should throw InvalidIdentityIdError');
-      } catch (e) {
-        expect(e).to.be.instanceOf(InvalidIdentityIdError);
-        expect(e.getId()).to.deep.equal({});
-      }
-    });
-
     it('should return stored identity with transaction', async () => {
       await repository.store(identity);
 
       const transaction = repository.createTransaction();
 
+      transaction.start();
       const storedIdentity = await repository.fetch(identity.getId(), transaction);
 
       expect(storedIdentity.toJSON()).to.deep.equal(identity.toJSON());
+    });
+
+    it('should return null if identity not found', async () => {
+      const storedIdentity = await repository.fetch(null);
+
+      expect(storedIdentity).to.equal(null);
     });
   });
 });

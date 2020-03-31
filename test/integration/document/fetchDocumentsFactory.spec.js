@@ -1,40 +1,43 @@
+const level = require('level-rocksdb');
+const LRUCache = require('lru-cache');
 const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
-
 const DashPlatformProtocol = require('@dashevo/dpp');
 
-const SVDocumentMongoDbRepository = require('../../../lib/document/mongoDbRepository/DocumentMongoDbRepository');
+const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
+
 const convertWhereToMongoDbQuery = require('../../../lib/document/mongoDbRepository/convertWhereToMongoDbQuery');
 const validateQueryFactory = require('../../../lib/document/query/validateQueryFactory');
 const findConflictingConditions = require('../../../lib/document/query/findConflictingConditions');
 const InvalidQueryError = require('../../../lib/document/errors/InvalidQueryError');
 
-const createSVDocumentMongoDbRepositoryFactory = require('../../../lib/document/mongoDbRepository/createDocumentMongoDbRepositoryFactory');
+const createDocumentMongoDbRepositoryFactory = require('../../../lib/document/mongoDbRepository/createDocumentMongoDbRepositoryFactory');
 const fetchDocumentsFactory = require('../../../lib/document/fetchDocumentsFactory');
-const SVContractMongoDbRepository = require('../../../lib/dataContract/SVContractMongoDbRepository');
-
-const getSVDocumentsFixture = require('../../../lib/test/fixtures/getSVDocumentsFixture');
-const getSVContractFixture = require('../../../lib/test/fixtures/getSVContractFixture');
+const DataContractLevelDBRepository = require('../../../lib/dataContract/DataContractLevelDBRepository');
+const getDocumentsDatabaseFactory = require('../../../lib/document/mongoDbRepository/getDocumentDatabaseFactory');
 
 const findNotIndexedFields = require('../../../lib/document/query/findNotIndexedFields');
 const findNotIndexedOrderByFields = require('../../../lib/document/query/findNotIndexedOrderByFields');
 const getIndexedFieldsFromDocumentSchema = require('../../../lib/document/query/getIndexedFieldsFromDocumentSchema');
 
 describe('fetchDocumentsFactory', () => {
-  let createSVDocumentMongoDbRepository;
+  let createDocumentMongoDbRepository;
   let fetchDocuments;
   let mongoClient;
-  let svDocument;
   let documentType;
   let contractId;
   let document;
-  let svContractMongoDbRepository;
-  let svContract;
+  let dataContractRepository;
+  let dataContract;
+  let dataContractCache;
+  let dataContractLevelDB;
 
   startMongoDb().then((mongoDb) => {
     mongoClient = mongoDb.getClient();
   });
 
   beforeEach(async () => {
+    dataContractLevelDB = level('./db/state-test', { valueEncoding: 'binary' });
+
     const validateQuery = validateQueryFactory(
       findConflictingConditions,
       getIndexedFieldsFromDocumentSchema,
@@ -42,40 +45,59 @@ describe('fetchDocumentsFactory', () => {
       findNotIndexedOrderByFields,
     );
 
-    createSVDocumentMongoDbRepository = createSVDocumentMongoDbRepositoryFactory(
+    const documentsMongoDBPrefix = 'test';
+
+    const getDocumentsDatabase = getDocumentsDatabaseFactory(
       mongoClient,
-      SVDocumentMongoDbRepository,
-      convertWhereToMongoDbQuery,
-      validateQuery,
+      documentsMongoDBPrefix,
     );
 
-    const mongo = mongoClient.db('test');
+    createDocumentMongoDbRepository = createDocumentMongoDbRepositoryFactory(
+      convertWhereToMongoDbQuery,
+      validateQuery,
+      getDocumentsDatabase,
+    );
 
-    svContractMongoDbRepository = new SVContractMongoDbRepository(
-      mongo,
+    dataContractRepository = new DataContractLevelDBRepository(
+      dataContractLevelDB,
       new DashPlatformProtocol(),
     );
 
+    dataContractCache = new LRUCache(500);
+
     fetchDocuments = fetchDocumentsFactory(
-      createSVDocumentMongoDbRepository,
-      svContractMongoDbRepository,
+      createDocumentMongoDbRepository,
+      dataContractRepository,
+      dataContractCache,
     );
 
-    svContract = getSVContractFixture();
+    ({ dataContract } = getDocumentsFixture);
 
-    contractId = svContract.getId();
+    contractId = dataContract.getId();
 
-    [svDocument] = getSVDocumentsFixture();
+    [document] = getDocumentsFixture();
 
-    document = svDocument.getDocument();
     documentType = document.getType();
 
-    await svContractMongoDbRepository.store(svContract);
+    dataContract.documents[documentType].indices = [
+      {
+        properties: [
+          { name: 'asc' },
+        ],
+      },
+    ];
+
+    await dataContractRepository.store(dataContract);
+  });
+
+  afterEach(async () => {
+    await dataContractLevelDB.clear();
+    await dataContractLevelDB.close();
   });
 
   it('should fetch Documents for specified contract ID and document type', async () => {
-    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, documentType);
-    await svDocumentRepository.store(svDocument);
+    const documentRepository = createDocumentMongoDbRepository(contractId, documentType);
+    await documentRepository.store(document);
 
     const result = await fetchDocuments(contractId, documentType);
 
@@ -94,8 +116,8 @@ describe('fetchDocumentsFactory', () => {
 
     expect(result).to.deep.equal([]);
 
-    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, documentType);
-    await svDocumentRepository.store(svDocument);
+    const documentRepository = createDocumentMongoDbRepository(contractId, documentType);
+    await documentRepository.store(document);
 
     const query = { where: [['name', '==', document.get('name')]] };
     result = await fetchDocuments(contractId, documentType, query);
@@ -111,8 +133,8 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should return empty array for specified contract ID, document type and name not exist', async () => {
-    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, documentType);
-    await svDocumentRepository.store(svDocument);
+    const documentRepository = createDocumentMongoDbRepository(contractId, documentType);
+    await documentRepository.store(document);
 
     const query = { where: [['name', '==', 'unknown']] };
 
@@ -122,9 +144,9 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should throw InvalidQueryError if contract ID does not exist', async () => {
-    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, documentType);
+    const documentRepository = createDocumentMongoDbRepository(contractId, documentType);
 
-    await svDocumentRepository.store(svDocument);
+    await documentRepository.store(document);
 
     contractId = 'Unknown';
 
@@ -144,9 +166,9 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should throw InvalidQueryError if type does not exist', async () => {
-    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, documentType);
+    const documentRepository = createDocumentMongoDbRepository(contractId, documentType);
 
-    await svDocumentRepository.store(svDocument);
+    await documentRepository.store(document);
 
     documentType = 'Unknown';
 
@@ -166,8 +188,8 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should throw InvalidQueryError if searching by non indexed fields', async () => {
-    const svDocumentRepository = createSVDocumentMongoDbRepository(contractId, documentType);
-    await svDocumentRepository.store(svDocument);
+    const documentRepository = createDocumentMongoDbRepository(contractId, documentType);
+    await documentRepository.store(document);
 
     const query = { where: [['lastName', '==', 'unknown']] };
 

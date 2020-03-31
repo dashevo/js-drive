@@ -27,7 +27,6 @@ describe('createDocumentMongoDbRepositoryFactory', () => {
     getDocumentsDatabaseMock = this.sinon.stub().returns(mongoDb);
 
     createDocumentMongoDbRepository = createDocumentMongoDbRepositoryFactory(
-      mongoClient,
       convertWhereToMongoDbQuery,
       validateQuery,
       getDocumentsDatabaseMock,

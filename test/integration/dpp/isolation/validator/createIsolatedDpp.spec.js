@@ -5,8 +5,9 @@ const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFi
 const getIdentityCreateSTFixture = require(
   '@dashevo/dpp/lib/test/fixtures/getIdentityCreateSTFixture',
 );
-const DocumentsStateTransition = require('@dashevo/dpp/lib/document/stateTransition/DocumentsStateTransition');
-const DataContractStateTransition = require('@dashevo/dpp/lib/dataContract/stateTransition/DataContractStateTransition');
+const getDocumentTransitionsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentTransitionsFixture');
+const DocumentsBatchTransition = require('@dashevo/dpp/lib/document/stateTransition/DocumentsBatchTransition');
+const DataContractCreateTransition = require('@dashevo/dpp/lib/dataContract/stateTransition/DataContractCreateTransition');
 
 const IdentityPublicKey = require('@dashevo/dpp/lib/identity/IdentityPublicKey');
 const { PrivateKey } = require('@dashevo/dashcore-lib');
@@ -21,8 +22,8 @@ describe('createIsolatedDpp', () => {
   let document;
   let identityCreateTransition;
   let identity;
-  let documentsStateTransition;
-  let dataContractStateTransition;
+  let documentsBatchTransition;
+  let dataContractCreateTransition;
 
   let dataProviderMock;
   let createIsolatedDpp;
@@ -53,11 +54,20 @@ describe('createIsolatedDpp', () => {
     ];
 
     identityCreateTransition = getIdentityCreateSTFixture();
-    documentsStateTransition = new DocumentsStateTransition(documents);
-    documentsStateTransition.sign(identityPublicKey, privateKey);
 
-    dataContractStateTransition = new DataContractStateTransition(dataContract);
-    dataContractStateTransition.sign(identityPublicKey, privateKey);
+    const documentTransitions = getDocumentTransitionsFixture(documents);
+    documentsBatchTransition = new DocumentsBatchTransition({
+      ownerId: getDocumentsFixture.ownerId,
+      contractId: getDocumentsFixture.dataContract.getId(),
+      transitions: documentTransitions.map(t => t.toJSON()),
+    });
+    documentsBatchTransition.sign(identityPublicKey, privateKey);
+
+    dataContractCreateTransition = new DataContractCreateTransition({
+      dataContract: dataContract.toJSON(),
+      entropy: dataContract.getEntropy(),
+    });
+    dataContractCreateTransition.sign(identityPublicKey, privateKey);
 
     identityCreateTransition.publicKeys = [new IdentityPublicKey({
       id: 1,
@@ -65,7 +75,7 @@ describe('createIsolatedDpp', () => {
       data: privateKey.toPublicKey().toBuffer().toString('base64'),
       isEnabled: true,
     })];
-    identityCreateTransition.sign(identityCreateTransition.getPublicKeys()[0], privateKey);
+    identityCreateTransition.signByPrivateKey(privateKey);
 
     dataProviderMock = createDataProviderMock(this.sinon);
     dataProviderMock.fetchDataContract.resolves(dataContract);
@@ -82,9 +92,9 @@ describe('createIsolatedDpp', () => {
     describe('#createFromSerialized', () => {
       describe('DocumentsStateTransition', () => {
         it('should pass through validation result', async () => {
-          delete documentsStateTransition.signature;
+          delete documentsBatchTransition.signature;
 
-          const serializedDocumentsStateTransition = documentsStateTransition.serialize();
+          const serializedDocumentsStateTransition = documentsBatchTransition.serialize();
 
           const isolatedDpp = await createIsolatedDpp();
 
@@ -106,7 +116,7 @@ describe('createIsolatedDpp', () => {
         });
 
         it('should create state transition from serialized data', async () => {
-          const serializedDocumentsStateTransition = documentsStateTransition.serialize();
+          const serializedDocumentsStateTransition = documentsBatchTransition.serialize();
 
           const isolatedDpp = await createIsolatedDpp();
 
@@ -115,7 +125,7 @@ describe('createIsolatedDpp', () => {
               serializedDocumentsStateTransition,
             );
 
-            expect(result.toJSON()).to.deep.equal(documentsStateTransition.toJSON());
+            expect(result.toJSON()).to.deep.equal(documentsBatchTransition.toJSON());
           } finally {
             isolatedDpp.dispose();
           }
@@ -124,9 +134,9 @@ describe('createIsolatedDpp', () => {
 
       describe('DataContractStateTransition', () => {
         it('should pass through validation result', async () => {
-          delete dataContractStateTransition.signature;
+          delete dataContractCreateTransition.signature;
 
-          const serializedStateTransition = dataContractStateTransition.serialize();
+          const serializedStateTransition = dataContractCreateTransition.serialize();
 
           const isolatedDpp = await createIsolatedDpp();
 
@@ -148,7 +158,7 @@ describe('createIsolatedDpp', () => {
         });
 
         it('should create state transition from serialized data', async () => {
-          const serializedStateTransition = dataContractStateTransition.serialize();
+          const serializedStateTransition = dataContractCreateTransition.serialize();
 
           const isolatedDpp = await createIsolatedDpp();
 
@@ -157,7 +167,7 @@ describe('createIsolatedDpp', () => {
               serializedStateTransition,
             );
 
-            expect(result.toJSON()).to.deep.equal(dataContractStateTransition.toJSON());
+            expect(result.toJSON()).to.deep.equal(dataContractCreateTransition.toJSON());
           } finally {
             isolatedDpp.dispose();
           }

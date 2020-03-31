@@ -7,12 +7,12 @@ describe('createDIContainer', function describeContainer() {
 
   let container;
   let mongoDB;
-  let documentsMongoDBUrl;
+  let documentMongoDBUrl;
 
   before(async () => {
     mongoDB = await startMongoDb();
 
-    documentsMongoDBUrl = `mongodb://127.0.0.1:${mongoDB.options.getMongoPort()}`
+    documentMongoDBUrl = `mongodb://127.0.0.1:${mongoDB.options.getMongoPort()}`
     + `/?replicaSet=${mongoDB.options.options.replicaSetName}`;
   });
 
@@ -23,7 +23,10 @@ describe('createDIContainer', function describeContainer() {
   beforeEach(async () => {
     container = await createDIContainer({
       ...process.env,
-      DOCUMENTS_MONGODB_URL: documentsMongoDBUrl,
+      DOCUMENT_MONGODB_URL: documentMongoDBUrl,
+      BLOCKCHAIN_STATE_LEVEL_DB_FILE: './db/state-test',
+      IDENTITY_LEVEL_DB_FILE: './db/identity-test',
+      DATA_CONTRACT_LEVEL_DB_FILE: './db/data_contract-test',
     });
   });
 
