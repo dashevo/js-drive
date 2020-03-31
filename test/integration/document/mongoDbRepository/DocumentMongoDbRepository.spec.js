@@ -217,8 +217,6 @@ describe('DocumentMongoDbRepository', function main() {
       expect(error.getErrors()).has.lengthOf(1);
     });
 
-    it('should not fetch Document that is marked as deleted');
-
     describe('where', () => {
       it('should find Documents using "<" operator', async () => {
         const query = {
