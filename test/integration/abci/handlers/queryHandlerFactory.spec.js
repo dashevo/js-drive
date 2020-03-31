@@ -16,11 +16,11 @@ describe('queryHandlerFactory', function main() {
 
   let container;
   let mongoDB;
-  let documentsMongoDBUrl;
+  let documentMongoDBUrl;
   let queryHandler;
   let identityQueryHandlerMock;
   let dataContractQueryHandlerMock;
-  let documentsQueryHandlerMock;
+  let documentQueryHandlerMock;
   let dataContract;
   let documents;
   let identity;
@@ -28,7 +28,7 @@ describe('queryHandlerFactory', function main() {
   before(async () => {
     mongoDB = await startMongoDb();
 
-    documentsMongoDBUrl = `mongodb://127.0.0.1:${mongoDB.options.getMongoPort()}`
+    documentMongoDBUrl = `mongodb://127.0.0.1:${mongoDB.options.getMongoPort()}`
       + `/?replicaSet=${mongoDB.options.options.replicaSetName}`;
   });
 
@@ -39,7 +39,7 @@ describe('queryHandlerFactory', function main() {
   beforeEach(async function beforeEach() {
     container = await createDIContainer({
       ...process.env,
-      DOCUMENTS_MONGODB_URL: documentsMongoDBUrl,
+      DOCUMENT_MONGODB_URL: documentMongoDBUrl,
     });
 
     ({ dataContract } = getDocumentsFixture);
@@ -52,12 +52,12 @@ describe('queryHandlerFactory', function main() {
     dataContractQueryHandlerMock = this.sinon.stub();
     dataContractQueryHandlerMock.resolves(dataContract);
 
-    documentsQueryHandlerMock = this.sinon.stub();
-    documentsQueryHandlerMock.resolves(documents);
+    documentQueryHandlerMock = this.sinon.stub();
+    documentQueryHandlerMock.resolves(documents);
 
     container.register('identityQueryHandler', asValue(identityQueryHandlerMock));
     container.register('dataContractQueryHandler', asValue(dataContractQueryHandlerMock));
-    container.register('documentsQueryHandler', asValue(documentsQueryHandlerMock));
+    container.register('documentQueryHandler', asValue(documentQueryHandlerMock));
 
     queryHandler = container.resolve('queryHandler');
   });
@@ -107,7 +107,7 @@ describe('queryHandlerFactory', function main() {
         data: Buffer.alloc(0),
       });
 
-      expect(documentsQueryHandlerMock).to.have.been.calledOnceWithExactly(
+      expect(documentQueryHandlerMock).to.have.been.calledOnceWithExactly(
         { contractId: '1', type: 'someType' },
         {},
         { path: '/dataContracts/1/documents/someType', data: Buffer.alloc(0) },
