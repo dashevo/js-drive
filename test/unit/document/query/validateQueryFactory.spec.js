@@ -223,8 +223,8 @@ describe('validateQueryFactory', () => {
           expect(result.isValid()).to.be.true();
         });
 
-        it('should return valid result if condition contains "$userId" field', () => {
-          const result = validateQuery({ where: [['$userId', '==', 'userid']] }, documentSchema);
+        it('should return valid result if condition contains "$ownerId" field', () => {
+          const result = validateQuery({ where: [['$ownerId', '==', 'userid']] }, documentSchema);
 
           expect(result).to.be.instanceOf(ValidationResult);
           expect(result.isValid()).to.be.true();
@@ -273,7 +273,7 @@ describe('validateQueryFactory', () => {
             expect(result.errors[0].dataPath).to.be.equal('.where[0][0]');
             expect(result.errors[0].keyword).to.be.equal('pattern');
             expect(result.errors[0].params.pattern).to.be.equal(
-              '^(\\$id|\\$userId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
+              '^(\\$id|\\$ownerId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
             );
           });
         });
@@ -624,11 +624,11 @@ describe('validateQueryFactory', () => {
             expect(result.errors[0].getField()).to.be.equal('$id');
           });
 
-          it('should return invalid result if $userId field is specified', () => {
+          it('should return invalid result if $ownerId field is specified', () => {
             const result = validateQuery({
               where: [
                 ['arr', 'elementMatch',
-                  [['$userId', '>', 1], ['$userId', '<', 3]],
+                  [['$ownerId', '>', 1], ['$ownerId', '<', 3]],
                 ],
               ],
             },
@@ -637,7 +637,7 @@ describe('validateQueryFactory', () => {
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
             expect(result.errors[0]).to.be.an.instanceOf(NestedSystemFieldError);
-            expect(result.errors[0].getField()).to.be.equal('$userId');
+            expect(result.errors[0].getField()).to.be.equal('$ownerId');
           });
 
           it('should return invalid result if value contains nested "elementMatch" operator', () => {
@@ -1088,7 +1088,7 @@ describe('validateQueryFactory', () => {
         expect(result.errors[0].dataPath).to.be.equal('.orderBy[0][0]');
         expect(result.errors[0].keyword).to.be.equal('pattern');
         expect(result.errors[0].params.pattern).to.be.equal(
-          '^(\\$id|\\$userId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
+          '^(\\$id|\\$ownerId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
         );
       });
     });

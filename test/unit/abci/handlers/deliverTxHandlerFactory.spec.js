@@ -58,12 +58,6 @@ describe('deliverTxHandlerFactory', () => {
         isValid: this.sinon.stub().returns(true),
       });
 
-    // @TODO add this to DPP
-    dppMock
-      .stateTransition
-      .apply = this.sinon
-        .stub();
-
     unserializeStateTransitionMock = this.sinon.stub();
 
     blockExecutionStateMock = new BlockExecutionStateMock(this.sinon);

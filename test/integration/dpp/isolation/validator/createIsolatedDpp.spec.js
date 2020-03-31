@@ -1,4 +1,4 @@
-const createDataProviderMock = require('@dashevo/dpp/lib/test/mocks/createDataProviderMock');
+const createStateRepositoryMock = require('@dashevo/dpp/lib/test/mocks/createStateRepositoryMock');
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
@@ -25,7 +25,7 @@ describe('createIsolatedDpp', () => {
   let documentsBatchTransition;
   let dataContractCreateTransition;
 
-  let dataProviderMock;
+  let stateRepositoryMock;
   let createIsolatedDpp;
   let isolatedValidatorSnapshot;
 
@@ -77,30 +77,30 @@ describe('createIsolatedDpp', () => {
     })];
     identityCreateTransition.signByPrivateKey(privateKey);
 
-    dataProviderMock = createDataProviderMock(this.sinon);
-    dataProviderMock.fetchDataContract.resolves(dataContract);
-    dataProviderMock.fetchIdentity.resolves(identity);
+    stateRepositoryMock = createStateRepositoryMock(this.sinon);
+    stateRepositoryMock.fetchDataContract.resolves(dataContract);
+    stateRepositoryMock.fetchIdentity.resolves(identity);
 
     createIsolatedDpp = createIsolatedDppFactory(
       isolatedValidatorSnapshot,
       { memoryLimit: 10, timeout: 300 },
-      dataProviderMock,
+      stateRepositoryMock,
     );
   });
 
   describe('stateTransition', () => {
     describe('#createFromSerialized', () => {
-      describe('DocumentsStateTransition', () => {
+      describe('DocumentsBatchTransition', () => {
         it('should pass through validation result', async () => {
           delete documentsBatchTransition.signature;
 
-          const serializedDocumentsStateTransition = documentsBatchTransition.serialize();
+          const serializedDocumentsBatchTransition = documentsBatchTransition.serialize();
 
           const isolatedDpp = await createIsolatedDpp();
 
           try {
             await isolatedDpp.stateTransition.createFromSerialized(
-              serializedDocumentsStateTransition,
+              serializedDocumentsBatchTransition,
             );
 
             expect.fail('Error was not thrown');
@@ -116,13 +116,13 @@ describe('createIsolatedDpp', () => {
         });
 
         it('should create state transition from serialized data', async () => {
-          const serializedDocumentsStateTransition = documentsBatchTransition.serialize();
+          const serializedDocumentsBatchTransition = documentsBatchTransition.serialize();
 
           const isolatedDpp = await createIsolatedDpp();
 
           try {
             const result = await isolatedDpp.stateTransition.createFromSerialized(
-              serializedDocumentsStateTransition,
+              serializedDocumentsBatchTransition,
             );
 
             expect(result.toJSON()).to.deep.equal(documentsBatchTransition.toJSON());
@@ -132,7 +132,7 @@ describe('createIsolatedDpp', () => {
         });
       });
 
-      describe('DataContractStateTransition', () => {
+      describe('DataContractCreateTransition', () => {
         it('should pass through validation result', async () => {
           delete dataContractCreateTransition.signature;
 

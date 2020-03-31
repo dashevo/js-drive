@@ -13,14 +13,14 @@ describe('getIndexedFieldsFromDocumentSchema', () => {
         },
         {
           properties: [
-            { $userId: 'asc' },
+            { $ownerId: 'asc' },
             { firstName: 'desc' },
           ],
           unique: true,
         },
         {
           properties: [
-            { $userId: 'asc' },
+            { $ownerId: 'asc' },
             { lastName: 'desc' },
           ],
           unique: true,
@@ -45,8 +45,8 @@ describe('getIndexedFieldsFromDocumentSchema', () => {
     expect(result).to.be.an('array');
     expect(result).to.deep.equal([
       [{ middleName: 'asc' }],
-      [{ $userId: 'asc' }, { firstName: 'desc' }],
-      [{ $userId: 'asc' }, { lastName: 'desc' }],
+      [{ $ownerId: 'asc' }, { firstName: 'desc' }],
+      [{ $ownerId: 'asc' }, { lastName: 'desc' }],
       [{ $id: 'asc' }],
       [{ $id: 'desc' }],
     ]);

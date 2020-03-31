@@ -1,7 +1,7 @@
-const DriveDataProvider = require('../../../lib/dpp/DriveDataProvider');
+const DriveStateRepository = require('../../../lib/dpp/DriveStateRepository');
 
-describe('DriveDataProvider', () => {
-  let dataProvider;
+describe('DriveStateRepository', () => {
+  let stateRepository;
   let identityRepositoryMock;
   let data;
   let dataContractRepositoryMock;
@@ -32,7 +32,7 @@ describe('DriveDataProvider', () => {
 
     fetchDocumentsMock = this.sinon.stub();
 
-    dataProvider = new DriveDataProvider(
+    stateRepository = new DriveStateRepository(
       identityRepositoryMock,
       dataContractRepositoryMock,
       fetchDocumentsMock,
@@ -45,7 +45,7 @@ describe('DriveDataProvider', () => {
     it('should fetch data contract from repository', async () => {
       dataContractRepositoryMock.fetch.resolves(data);
 
-      const result = await dataProvider.fetchDataContract(id);
+      const result = await stateRepository.fetchDataContract(id);
 
       expect(result).to.equal(data);
       expect(dataContractRepositoryMock.fetch).to.be.calledOnceWith(id);
@@ -58,7 +58,7 @@ describe('DriveDataProvider', () => {
       identityRepositoryMock.fetch.resolves(data);
       blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
 
-      const result = await dataProvider.fetchIdentity(id);
+      const result = await stateRepository.fetchIdentity(id);
 
       expect(result).to.equal(data);
       expect(identityRepositoryMock.fetch).to.be.calledOnceWith(id, transaction);
@@ -75,7 +75,7 @@ describe('DriveDataProvider', () => {
       fetchDocumentsMock.resolves(data);
       blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
 
-      const result = await dataProvider.fetchDocuments(contractId, type, options);
+      const result = await stateRepository.fetchDocuments(contractId, type, options);
 
       expect(result).to.equal(data);
       expect(fetchDocumentsMock).to.be.calledOnceWith(contractId, type, options, transaction);
@@ -89,7 +89,7 @@ describe('DriveDataProvider', () => {
 
       coreRpcClientMock.getRawTransaction.resolves({ result: rawTransaction });
 
-      const result = await dataProvider.fetchTransaction(id);
+      const result = await stateRepository.fetchTransaction(id);
 
       expect(result).to.equal(rawTransaction);
       expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWith(id);
@@ -101,7 +101,7 @@ describe('DriveDataProvider', () => {
 
       coreRpcClientMock.getRawTransaction.throws(error);
 
-      const result = await dataProvider.fetchTransaction(id);
+      const result = await stateRepository.fetchTransaction(id);
 
       expect(result).to.equal(null);
       expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWith(id);
@@ -113,7 +113,7 @@ describe('DriveDataProvider', () => {
       coreRpcClientMock.getRawTransaction.throws(error);
 
       try {
-        await dataProvider.fetchTransaction(id);
+        await stateRepository.fetchTransaction(id);
 
         expect.fail('should throw error');
       } catch (e) {

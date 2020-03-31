@@ -5,8 +5,8 @@ describe('findNotIndexedFields', () => {
 
   beforeEach(() => {
     indexedFields = [
-      [{ $userId: 'asc' }, { firstName: 'desc' }],
-      [{ $userId: 'asc' }, { lastName: 'desc' }, { secondName: 'asc' }],
+      [{ $ownerId: 'asc' }, { firstName: 'desc' }],
+      [{ $ownerId: 'asc' }, { lastName: 'desc' }, { secondName: 'asc' }],
       [{ $id: 'asc' }],
       [{ $id: 'desc' }],
       [{ 'arrayWithObjects.item': 'desc' }],
@@ -73,7 +73,7 @@ describe('findNotIndexedFields', () => {
 
   it('should check fields by nested conditions', () => {
     const condition = [
-      ['$userId', '==', 'Cutie'],
+      ['$ownerId', '==', 'Cutie'],
       ['arrayWithObjects', 'elementMatch', [
         ['item', '==', 1],
         ['flag', '==', true],
@@ -88,7 +88,7 @@ describe('findNotIndexedFields', () => {
 
   it('should fail with nested conditions', () => {
     const condition = [
-      ['$userId', '==', 123],
+      ['$ownerId', '==', 123],
       ['arrayWithObjects', 'elementMatch', [
         ['item', '==', 1],
         ['anotherFlag', '==', true],
@@ -103,7 +103,7 @@ describe('findNotIndexedFields', () => {
   });
 
   it('should pass query by compound index', () => {
-    const condition = [['firstName', '==', 'name'], ['$userId', '==', 123]];
+    const condition = [['firstName', '==', 'name'], ['$ownerId', '==', 123]];
     const result = findNotIndexedFields(indexedFields, condition);
 
     expect(result).to.be.an('array');

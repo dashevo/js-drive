@@ -5,8 +5,8 @@ describe('findNotIndexedOrderByFields', () => {
 
   beforeEach(() => {
     indexedFields = [
-      [{ $userId: 'asc' }, { firstName: 'desc' }],
-      [{ $userId: 'asc' }, { lastName: 'desc' }, { secondName: 'asc' }, { middleName: 'asc' }],
+      [{ $ownerId: 'asc' }, { firstName: 'desc' }],
+      [{ $ownerId: 'asc' }, { lastName: 'desc' }, { secondName: 'asc' }, { middleName: 'asc' }],
       [{ $id: 'asc' }],
       [{ $id: 'desc' }],
       [{ address: 'desc' }],
@@ -62,7 +62,7 @@ describe('findNotIndexedOrderByFields', () => {
       ['firstName', 'desc'],
     ];
     const whereCondition = [
-      ['$userId', '==', 123],
+      ['$ownerId', '==', 123],
     ];
 
     const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
@@ -73,10 +73,10 @@ describe('findNotIndexedOrderByFields', () => {
 
   it('should order by two fields with where condition', () => {
     const orderByCondition = [
-      ['$userId', 'asc'],
+      ['$ownerId', 'asc'],
       ['firstName', 'desc'],
     ];
-    const whereCondition = [['$userId', '==', 123]];
+    const whereCondition = [['$ownerId', '==', 123]];
 
     const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
@@ -86,7 +86,7 @@ describe('findNotIndexedOrderByFields', () => {
 
   it('should pass order by two fields with empty where', () => {
     const orderByCondition = [
-      ['$userId', 'asc'],
+      ['$ownerId', 'asc'],
       ['firstName', 'desc'],
     ];
     const whereCondition = [];
@@ -100,7 +100,7 @@ describe('findNotIndexedOrderByFields', () => {
   it('should fail on sort by different indices', async () => {
     const orderByCondition = [
       ['address', 'asc'],
-      ['$userId', 'asc'],
+      ['$ownerId', 'asc'],
     ];
     const whereCondition = [];
 
@@ -108,7 +108,7 @@ describe('findNotIndexedOrderByFields', () => {
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(2);
-    expect(result).to.deep.members(['address', '$userId']);
+    expect(result).to.deep.members(['address', '$ownerId']);
   });
 
   it('should order by single field index in two directions', () => {
@@ -135,7 +135,7 @@ describe('findNotIndexedOrderByFields', () => {
   it('should fail on sort by wrong direction of compound key', async () => {
     const orderByCondition = [
       ['firstName', 'asc'],
-      ['$userId', 'asc'],
+      ['$ownerId', 'asc'],
     ];
     const whereCondition = [];
 
@@ -143,18 +143,18 @@ describe('findNotIndexedOrderByFields', () => {
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(2);
-    expect(result).to.deep.members(['firstName', '$userId']);
+    expect(result).to.deep.members(['firstName', '$ownerId']);
   });
 
   it('should fail on order by two fields with wrong direction with where condition', () => {
-    const orderByCondition = [['firstName', 'desc'], ['$userId', 'desc']];
-    const whereCondition = [['$userId', '==', 123]];
+    const orderByCondition = [['firstName', 'desc'], ['$ownerId', 'desc']];
+    const whereCondition = [['$ownerId', '==', 123]];
 
     const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);
 
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(2);
-    expect(result).to.deep.members(['firstName', '$userId']);
+    expect(result).to.deep.members(['firstName', '$ownerId']);
   });
 
   it('should order by second index key with elementMatch where condition ', () => {
@@ -176,7 +176,7 @@ describe('findNotIndexedOrderByFields', () => {
   it('should fail when sorting fields order is not equal their indexed order ', () => {
     const orderByCondition = [
       ['firstName', 'desc'],
-      ['$userId', 'asc'],
+      ['$ownerId', 'asc'],
     ];
     const whereCondition = [];
 
@@ -194,7 +194,7 @@ describe('findNotIndexedOrderByFields', () => {
     ];
     const whereCondition = [
       ['lastName', '==', 'Marsh'],
-      ['$userId', '==', 123],
+      ['$ownerId', '==', 123],
     ];
 
     const result = findNotIndexedOrderByFields(indexedFields, orderByCondition, whereCondition);

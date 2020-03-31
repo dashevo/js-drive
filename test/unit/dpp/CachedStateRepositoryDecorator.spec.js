@@ -1,8 +1,8 @@
-const CachedDataProviderDecorator = require('../../../lib/dpp/CachedDataProviderDecorator');
+const CachedStateRepositoryDecorator = require('../../../lib/dpp/CachedStateRepositoryDecorator');
 
-describe('CachedDataProviderDecorator', () => {
-  let dataProviderMock;
-  let dataProvider;
+describe('CachedStateRepositoryDecorator', () => {
+  let stateRepositoryMock;
+  let stateRepository;
   let dataContractCacheMock;
   let data;
   let id;
@@ -16,27 +16,27 @@ describe('CachedDataProviderDecorator', () => {
       get: this.sinon.stub(),
     };
 
-    dataProviderMock = {
+    stateRepositoryMock = {
       fetchIdentity: this.sinon.stub(),
       fetchDocuments: this.sinon.stub(),
       fetchTransaction: this.sinon.stub(),
       fetchDataContract: this.sinon.stub(),
     };
 
-    dataProvider = new CachedDataProviderDecorator(
-      dataProviderMock,
+    stateRepository = new CachedStateRepositoryDecorator(
+      stateRepositoryMock,
       dataContractCacheMock,
     );
   });
 
   describe('#fetchIdentity', () => {
     it('should fetch identity from repository', async () => {
-      dataProviderMock.fetchIdentity.resolves(data);
+      stateRepositoryMock.fetchIdentity.resolves(data);
 
-      const result = await dataProvider.fetchIdentity(id);
+      const result = await stateRepository.fetchIdentity(id);
 
       expect(result).to.equal(data);
-      expect(dataProviderMock.fetchIdentity).to.be.calledOnceWith(id);
+      expect(stateRepositoryMock.fetchIdentity).to.be.calledOnceWith(id);
     });
   });
 
@@ -46,23 +46,23 @@ describe('CachedDataProviderDecorator', () => {
       const type = 1;
       const options = {};
 
-      dataProviderMock.fetchDocuments.resolves(data);
+      stateRepositoryMock.fetchDocuments.resolves(data);
 
-      const result = await dataProvider.fetchDocuments(contractId, type, options);
+      const result = await stateRepository.fetchDocuments(contractId, type, options);
 
       expect(result).to.equal(data);
-      expect(dataProviderMock.fetchDocuments).to.be.calledOnceWith(contractId, type, options);
+      expect(stateRepositoryMock.fetchDocuments).to.be.calledOnceWith(contractId, type, options);
     });
   });
 
   describe('fetchTransaction', () => {
     it('should fetch transaction from repository', async () => {
-      dataProviderMock.fetchTransaction.resolves(data);
+      stateRepositoryMock.fetchTransaction.resolves(data);
 
-      const result = await dataProvider.fetchTransaction(id);
+      const result = await stateRepository.fetchTransaction(id);
 
       expect(result).to.equal(data);
-      expect(dataProviderMock.fetchTransaction).to.be.calledOnceWith(id);
+      expect(stateRepositoryMock.fetchTransaction).to.be.calledOnceWith(id);
     });
   });
 
@@ -70,22 +70,22 @@ describe('CachedDataProviderDecorator', () => {
     it('should fetch data contract from cache', async () => {
       dataContractCacheMock.get.returns(data);
 
-      const result = await dataProvider.fetchDataContract(id);
+      const result = await stateRepository.fetchDataContract(id);
 
       expect(result).to.equal(data);
-      expect(dataProviderMock.fetchDataContract).to.be.not.called();
+      expect(stateRepositoryMock.fetchDataContract).to.be.not.called();
       expect(dataContractCacheMock.get).to.be.calledOnceWith(id);
     });
 
     it('should fetch data contract from repository if it is not present in cache', async () => {
       dataContractCacheMock.get.returns(null);
-      dataProviderMock.fetchDataContract.resolves(data);
+      stateRepositoryMock.fetchDataContract.resolves(data);
 
-      const result = await dataProvider.fetchDataContract(id);
+      const result = await stateRepository.fetchDataContract(id);
 
       expect(result).to.equal(data);
       expect(dataContractCacheMock.get).to.be.calledOnceWith(id);
-      expect(dataProviderMock.fetchDataContract).to.be.calledOnceWith(id);
+      expect(stateRepositoryMock.fetchDataContract).to.be.calledOnceWith(id);
     });
   });
 });
