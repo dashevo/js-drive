@@ -66,8 +66,26 @@ describe('LevelDBTransaction', () => {
   });
 
   describe('#abort', () => {
-    it('should abort transaction');
+    it('should abort transaction', async function it() {
+      const rollback = this.sinon.stub();
+      levelDBTransaction.db = {
+        rollback,
+      };
 
-    it('should throw LevelDBTransactionIsAlreadyStartedError if transaction is not started');
+      const result = await levelDBTransaction.abort();
+
+      expect(result).to.be.instanceOf(Object);
+      expect(rollback).to.be.calledOnce();
+    });
+
+    it('should throw LevelDBTransactionIsAlreadyStartedError if transaction is not started', async () => {
+      try {
+        await levelDBTransaction.abort();
+
+        expect.fail('should throw LevelDBTransactionIsAlreadyStartedError');
+      } catch (e) {
+        expect(e).to.be.an.instanceof(LevelDBTransactionIsNotStartedError);
+      }
+    });
   });
 });
