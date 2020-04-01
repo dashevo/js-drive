@@ -4,7 +4,6 @@ We believe in [Test Pyramid](http://verraes.net/2015/01/economy-of-tests/).
 
 ## Structure
 
- - `e2e/` - [End-to-end (e2e, system) tests](https://en.wikipedia.org/wiki/System_testing)
  - `integration/` - [Integration tests](https://en.wikipedia.org/wiki/Integration_testing)
  - `unit/` - [Unit tests](https://en.wikipedia.org/wiki/Unit_testing)
 
@@ -28,12 +27,6 @@ Run integration tests:
 
 ```bash
 npm run test:integration
-```
-
-Run e2e tests:
-
-```bash
-npm run test:e2e
 ```
 
 ## How to write tests
