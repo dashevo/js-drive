@@ -691,7 +691,12 @@ describe('DocumentMongoDbRepository', function main() {
       await createDocuments(documentRepository, documents);
     });
 
-    it('should find Document by ID');
+    it('should find Document by ID', async () => {
+      const result = await documentRepository.find(document.getId());
+
+      expect(result).to.be.an.instanceof(Document);
+      expect(result.toJSON()).to.deep.equal(document.toJSON());
+    });
 
     it('should return null if Document was not found', async () => {
       const unknownDocument = await documentRepository.find('unknown');
