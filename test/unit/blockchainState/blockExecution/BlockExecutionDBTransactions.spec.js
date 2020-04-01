@@ -1,7 +1,7 @@
-const BlockExecutionDBTransaction = require('../../../../lib/blockchainState/blockExecution/BlockExecutionDBTransaction');
+const BlockExecutionDBTransactions = require('../../../../lib/blockchainState/blockExecution/BlockExecutionDBTransactions');
 
 describe('BlockExecutionDBTransactions', () => {
-  let blockExecutionDBTransaction;
+  let blockExecutionDBTransactions;
   let identityTransactionMock;
   let documentsTransactionMock;
   let dataContractsTransactionMock;
@@ -25,7 +25,7 @@ describe('BlockExecutionDBTransactions', () => {
       abort: this.sinon.stub(),
     };
 
-    blockExecutionDBTransaction = new BlockExecutionDBTransaction(
+    blockExecutionDBTransactions = new BlockExecutionDBTransactions(
       identityTransactionMock,
       documentsTransactionMock,
       dataContractsTransactionMock,
@@ -33,7 +33,7 @@ describe('BlockExecutionDBTransactions', () => {
   });
 
   it('should start transactions', () => {
-    const result = blockExecutionDBTransaction.start();
+    const result = blockExecutionDBTransactions.start();
 
     expect(result).to.be.a('array').and.has.lengthOf(3);
 
@@ -51,7 +51,7 @@ describe('BlockExecutionDBTransactions', () => {
   });
 
   it('should commit transactions', async () => {
-    const result = await blockExecutionDBTransaction.commit();
+    const result = await blockExecutionDBTransactions.commit();
 
     expect(result).to.be.a('array').and.has.lengthOf(3);
 
@@ -69,7 +69,7 @@ describe('BlockExecutionDBTransactions', () => {
   });
 
   it('should abort transactions', async () => {
-    const result = await blockExecutionDBTransaction.abort();
+    const result = await blockExecutionDBTransactions.abort();
 
     expect(result).to.be.a('array').and.has.lengthOf(3);
 
@@ -87,7 +87,7 @@ describe('BlockExecutionDBTransactions', () => {
   });
 
   it('should return transaction by name', () => {
-    const result = blockExecutionDBTransaction.getTransaction('identity');
+    const result = blockExecutionDBTransactions.getTransaction('identity');
 
     expect(result).to.deep.equal(identityTransactionMock);
   });
