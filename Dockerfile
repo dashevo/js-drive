@@ -37,4 +37,4 @@ RUN cp .env.example .env
 ARG NODE_ENV=production
 ENV NODE_ENV ${NODE_ENV}
 
-EXPOSE 6000 9229
+EXPOSE 26658

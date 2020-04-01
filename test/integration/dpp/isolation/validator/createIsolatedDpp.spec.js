@@ -59,7 +59,7 @@ describe('createIsolatedDpp', () => {
     documentsBatchTransition = new DocumentsBatchTransition({
       ownerId: getDocumentsFixture.ownerId,
       contractId: getDocumentsFixture.dataContract.getId(),
-      transitions: documentTransitions.map(t => t.toJSON()),
+      transitions: documentTransitions.map((t) => t.toJSON()),
     });
     documentsBatchTransition.sign(identityPublicKey, privateKey);
 

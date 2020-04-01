@@ -16,12 +16,12 @@ const findNotIndexedOrderByFields = require('../../../../lib/document/query/find
 const getIndexedFieldsFromDocumentSchema = require('../../../../lib/document/query/getIndexedFieldsFromDocumentSchema');
 
 function jsonizeDocuments(documents) {
-  return documents.map(d => d.toJSON());
+  return documents.map((d) => d.toJSON());
 }
 
 async function createDocuments(documentRepository, documents) {
   return Promise.all(
-    documents.map(o => documentRepository.store(o)),
+    documents.map((o) => documentRepository.store(o)),
   );
 }
 
@@ -501,8 +501,8 @@ describe('DocumentMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawDocuments = result.map(d => d.toJSON());
-        const expectedRawDocuments = documents.splice(1).map(d => d.toJSON());
+        const actualRawDocuments = result.map((d) => d.toJSON());
+        const expectedRawDocuments = documents.splice(1).map((d) => d.toJSON());
 
         expect(actualRawDocuments).to.deep.equal(expectedRawDocuments);
       });
@@ -521,8 +521,8 @@ describe('DocumentMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawDocuments = result.map(d => d.toJSON());
-        const expectedRawDocuments = documents.splice(1).map(d => d.toJSON());
+        const actualRawDocuments = result.map((d) => d.toJSON());
+        const expectedRawDocuments = documents.splice(1).map((d) => d.toJSON());
 
         expect(actualRawDocuments).to.deep.equal(expectedRawDocuments);
       });
@@ -540,8 +540,8 @@ describe('DocumentMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawDocuments = result.map(d => d.toJSON());
-        const expectedRawDocuments = documents.reverse().map(d => d.toJSON());
+        const actualRawDocuments = result.map((d) => d.toJSON());
+        const expectedRawDocuments = documents.reverse().map((d) => d.toJSON());
 
         expect(actualRawDocuments).to.deep.equal(expectedRawDocuments);
       });
@@ -557,8 +557,8 @@ describe('DocumentMongoDbRepository', function main() {
 
         expect(result).to.be.an('array');
 
-        const actualRawDocuments = result.map(d => d.toJSON());
-        const expectedRawDocuments = documents.map(d => d.toJSON());
+        const actualRawDocuments = result.map((d) => d.toJSON());
+        const expectedRawDocuments = documents.map((d) => d.toJSON());
 
         expect(actualRawDocuments).to.deep.equal(expectedRawDocuments);
       });
@@ -571,7 +571,7 @@ describe('DocumentMongoDbRepository', function main() {
         documents[4].set('primaryOrder', 4);
 
         await Promise.all(
-          documents.map(o => documentRepository.store(o)),
+          documents.map((o) => documentRepository.store(o)),
         );
 
         const query = {
@@ -595,7 +595,7 @@ describe('DocumentMongoDbRepository', function main() {
 
       it('should sort Documents by $id', async () => {
         await Promise.all(
-          documents.map(d => documentRepository.delete(d.getId())),
+          documents.map((d) => documentRepository.delete(d.getId())),
         );
 
         await Promise.all(
