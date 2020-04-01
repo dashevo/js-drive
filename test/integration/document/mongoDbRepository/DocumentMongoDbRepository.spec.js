@@ -693,8 +693,6 @@ describe('DocumentMongoDbRepository', function main() {
 
     it('should find Document by ID');
 
-    it('should find Document marked as deleted by ID');
-
     it('should return null if Document was not found', async () => {
       const unknownDocument = await documentRepository.find('unknown');
 

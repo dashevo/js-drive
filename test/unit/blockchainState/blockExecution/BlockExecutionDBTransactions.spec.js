@@ -87,7 +87,7 @@ describe('BlockExecutionDBTransactions', () => {
   });
 
   it('should return transaction by name', () => {
-    const result = blockExecutionDBTransactions.getTransaction('identities');
+    const result = blockExecutionDBTransactions.getTransaction('identity');
 
     expect(result).to.deep.equal(identityTransactionMock);
   });

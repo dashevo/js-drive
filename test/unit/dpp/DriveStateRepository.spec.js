@@ -70,7 +70,7 @@ describe('DriveStateRepository', () => {
 
       expect(result).to.equal(data);
       expect(identityRepositoryMock.fetch).to.be.calledOnceWith(id, transaction);
-      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identities');
+      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identity');
     });
   });
 
@@ -91,7 +91,7 @@ describe('DriveStateRepository', () => {
 
       expect(result).to.equal(data);
       expect(fetchDocumentsMock).to.be.calledOnceWith(contractId, type, options, transaction);
-      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('documents');
+      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('document');
     });
   });
 
