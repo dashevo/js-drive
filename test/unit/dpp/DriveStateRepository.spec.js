@@ -1,3 +1,7 @@
+const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
+const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
+const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
+
 const DriveStateRepository = require('../../../lib/dpp/DriveStateRepository');
 
 describe('DriveStateRepository', () => {
@@ -10,8 +14,14 @@ describe('DriveStateRepository', () => {
   let coreRpcClientMock;
   let blockExecutionDBTransactionsMock;
   let id;
+  let identity;
+  let documents;
+  let dataContract;
 
   beforeEach(function beforeEach() {
+    identity = getIdentityFixture();
+    documents = getDocumentsFixture();
+    dataContract = getDataContractFixture();
     data = 'data';
     id = 'id';
 
@@ -21,10 +31,12 @@ describe('DriveStateRepository', () => {
 
     dataContractRepositoryMock = {
       fetch: this.sinon.stub(),
+      store: this.sinon.stub(),
     };
 
     identityRepositoryMock = {
       fetch: this.sinon.stub(),
+      store: this.sinon.stub(),
     };
 
     blockExecutionDBTransactionsMock = {
@@ -57,7 +69,16 @@ describe('DriveStateRepository', () => {
   });
 
   describe('#storeDataContract', () => {
-    it('should store data contract to repository');
+    it('should store data contract to repository', async () => {
+      const transaction = 'transaction';
+
+      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
+
+      await stateRepository.storeDataContract(dataContract);
+
+      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('dataContract');
+      expect(dataContractRepositoryMock.store).to.be.calledOnceWith(dataContract, transaction);
+    });
   });
 
   describe('#fetchIdentity', () => {
@@ -75,7 +96,16 @@ describe('DriveStateRepository', () => {
   });
 
   describe('#storeIdentity', () => {
-    it('should store identity to repository');
+    it('should store identity to repository', async () => {
+      const transaction = 'transaction';
+
+      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
+
+      await stateRepository.storeIdentity(identity);
+
+      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identity');
+      expect(identityRepositoryMock.store).to.be.calledOnceWith(identity, transaction);
+    });
   });
 
   describe('#fetchDocuments', () => {
@@ -96,11 +126,46 @@ describe('DriveStateRepository', () => {
   });
 
   describe('#storeDocument', () => {
-    it('should store document in repository');
+    it('should store document in repository', async function it() {
+      const transaction = 'transaction';
+
+      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
+
+      const storeMock = this.sinon.stub();
+      createDocumentRepositoryMock.returns({
+        store: storeMock,
+      });
+
+      const [document] = documents;
+      await stateRepository.storeDocument(document);
+
+      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('document');
+      expect(createDocumentRepositoryMock).to.be.calledOnceWith(
+        document.getDataContractId(),
+        document.getType(),
+      );
+      expect(storeMock).to.be.calledOnceWith(document, transaction);
+    });
   });
 
   describe('#removeDocument', () => {
-    it('should delete document from repository');
+    it('should delete document from repository', async function it() {
+      const contractId = 'contractId';
+      const type = 1;
+      const transaction = 'transaction';
+
+      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
+
+      const deleteMock = this.sinon.stub();
+      createDocumentRepositoryMock.returns({
+        delete: deleteMock,
+      });
+
+      await stateRepository.removeDocument(contractId, type, id);
+
+      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('document');
+      expect(deleteMock).to.be.calledOnceWith(id, transaction);
+    });
   });
 
   describe('#fetchTransaction', () => {
