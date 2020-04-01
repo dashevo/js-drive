@@ -14,8 +14,8 @@ const { PrivateKey } = require('@dashevo/dashcore-lib');
 
 const InvalidStateTransitionError = require('@dashevo/dpp/lib/stateTransition/errors/InvalidStateTransitionError');
 
-const createIsolatedValidatorSnapshot = require('../../../../../lib/dpp/isolation/validator/createIsolatedValidatorSnapshot');
-const createIsolatedDppFactory = require('../../../../../lib/dpp/isolation/validator/createIsolatedDppFactory');
+const createIsolatedValidatorSnapshot = require('../../../../lib/dpp/isolation/createIsolatedValidatorSnapshot');
+const createIsolatedDppFactory = require('../../../../lib/dpp/isolation/createIsolatedDppFactory');
 
 describe('createIsolatedDpp', () => {
   let dataContract;
