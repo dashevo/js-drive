@@ -7,7 +7,6 @@ const DriveStateRepository = require('../../../lib/dpp/DriveStateRepository');
 describe('DriveStateRepository', () => {
   let stateRepository;
   let identityRepositoryMock;
-  let data;
   let dataContractRepositoryMock;
   let fetchDocumentsMock;
   let createDocumentRepositoryMock;
@@ -17,12 +16,12 @@ describe('DriveStateRepository', () => {
   let identity;
   let documents;
   let dataContract;
+  let transactionMock;
 
   beforeEach(function beforeEach() {
     identity = getIdentityFixture();
     documents = getDocumentsFixture();
     dataContract = getDataContractFixture();
-    data = 'data';
     id = 'id';
 
     coreRpcClientMock = {
@@ -55,82 +54,71 @@ describe('DriveStateRepository', () => {
       coreRpcClientMock,
       blockExecutionDBTransactionsMock,
     );
+
+    transactionMock = {};
+
+    blockExecutionDBTransactionsMock.getTransaction.returns(transactionMock);
   });
 
   describe('#fetchDataContract', () => {
     it('should fetch data contract from repository', async () => {
-      dataContractRepositoryMock.fetch.resolves(data);
+      dataContractRepositoryMock.fetch.resolves(dataContract);
 
       const result = await stateRepository.fetchDataContract(id);
 
-      expect(result).to.equal(data);
+      expect(result).to.equal(dataContract);
       expect(dataContractRepositoryMock.fetch).to.be.calledOnceWith(id);
     });
   });
 
   describe('#storeDataContract', () => {
     it('should store data contract to repository', async () => {
-      const transaction = 'transaction';
-
-      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
-
       await stateRepository.storeDataContract(dataContract);
 
       expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('dataContract');
-      expect(dataContractRepositoryMock.store).to.be.calledOnceWith(dataContract, transaction);
+      expect(dataContractRepositoryMock.store).to.be.calledOnceWith(dataContract, transactionMock);
     });
   });
 
   describe('#fetchIdentity', () => {
     it('should fetch identity from repository', async () => {
-      const transaction = 'transaction';
-      identityRepositoryMock.fetch.resolves(data);
-      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
+      identityRepositoryMock.fetch.resolves(identity);
 
       const result = await stateRepository.fetchIdentity(id);
 
-      expect(result).to.equal(data);
-      expect(identityRepositoryMock.fetch).to.be.calledOnceWith(id, transaction);
+      expect(result).to.equal(identity);
+      expect(identityRepositoryMock.fetch).to.be.calledOnceWith(id, transactionMock);
       expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identity');
     });
   });
 
   describe('#storeIdentity', () => {
     it('should store identity to repository', async () => {
-      const transaction = 'transaction';
-
-      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
-
       await stateRepository.storeIdentity(identity);
 
       expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identity');
-      expect(identityRepositoryMock.store).to.be.calledOnceWith(identity, transaction);
+      expect(identityRepositoryMock.store).to.be.calledOnceWith(identity, transactionMock);
     });
   });
 
   describe('#fetchDocuments', () => {
     it('should fetch documents from repository', async () => {
       const contractId = 'id';
-      const type = 1;
+      const type = 'documentType';
       const options = {};
-      const transaction = 'transaction';
-      fetchDocumentsMock.resolves(data);
-      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
+
+      fetchDocumentsMock.resolves(documents);
 
       const result = await stateRepository.fetchDocuments(contractId, type, options);
 
-      expect(result).to.equal(data);
-      expect(fetchDocumentsMock).to.be.calledOnceWith(contractId, type, options, transaction);
+      expect(result).to.equal(documents);
+      expect(fetchDocumentsMock).to.be.calledOnceWith(contractId, type, options, transactionMock);
       expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('document');
     });
   });
 
   describe('#storeDocument', () => {
     it('should store document in repository', async function it() {
-      const transaction = 'transaction';
-
-      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
-
       const storeMock = this.sinon.stub();
       createDocumentRepositoryMock.returns({
         store: storeMock,
@@ -144,17 +132,14 @@ describe('DriveStateRepository', () => {
         document.getDataContractId(),
         document.getType(),
       );
-      expect(storeMock).to.be.calledOnceWith(document, transaction);
+      expect(storeMock).to.be.calledOnceWith(document, transactionMock);
     });
   });
 
   describe('#removeDocument', () => {
     it('should delete document from repository', async function it() {
       const contractId = 'contractId';
-      const type = 1;
-      const transaction = 'transaction';
-
-      blockExecutionDBTransactionsMock.getTransaction.returns(transaction);
+      const type = 'documentType';
 
       const deleteMock = this.sinon.stub();
       createDocumentRepositoryMock.returns({
@@ -164,7 +149,8 @@ describe('DriveStateRepository', () => {
       await stateRepository.removeDocument(contractId, type, id);
 
       expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('document');
-      expect(deleteMock).to.be.calledOnceWith(id, transaction);
+      expect(createDocumentRepositoryMock).to.be.calledOnceWith(contractId, type);
+      expect(deleteMock).to.be.calledOnceWith(id, transactionMock);
     });
   });
 

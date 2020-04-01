@@ -1,5 +1,6 @@
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
+const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 
 const CachedStateRepositoryDecorator = require('../../../lib/dpp/CachedStateRepositoryDecorator');
 
@@ -7,16 +8,16 @@ describe('CachedStateRepositoryDecorator', () => {
   let stateRepositoryMock;
   let cachedStateRepository;
   let dataContractCacheMock;
-  let data;
   let id;
   let identity;
   let documents;
+  let dataContract;
 
   beforeEach(function beforeEach() {
-    data = 'some data';
     id = 'id';
     identity = getIdentityFixture();
     documents = getDocumentsFixture();
+    dataContract = getDataContractFixture();
 
     dataContractCacheMock = {
       set: this.sinon.stub(),
@@ -52,27 +53,23 @@ describe('CachedStateRepositoryDecorator', () => {
 
   describe('#storeIdentity', () => {
     it('should store identity to repository', async () => {
-      const resultValue = 'resultValue';
-      stateRepositoryMock.storeIdentity.resolves(resultValue);
-
-      const result = await cachedStateRepository.storeIdentity(identity);
+      await cachedStateRepository.storeIdentity(identity);
 
       expect(stateRepositoryMock.storeIdentity).to.be.calledOnceWith(identity);
-      expect(result).to.equal(resultValue);
     });
   });
 
   describe('#fetchDocuments', () => {
     it('should fetch documents from state repository', async () => {
       const contractId = 'contractId';
-      const type = 1;
+      const type = 'documentType';
       const options = {};
 
-      stateRepositoryMock.fetchDocuments.resolves(data);
+      stateRepositoryMock.fetchDocuments.resolves(documents);
 
       const result = await cachedStateRepository.fetchDocuments(contractId, type, options);
 
-      expect(result).to.equal(data);
+      expect(result).to.equal(documents);
       expect(stateRepositoryMock.fetchDocuments).to.be.calledOnceWith(contractId, type, options);
     });
   });
@@ -80,60 +77,53 @@ describe('CachedStateRepositoryDecorator', () => {
   describe('#storeDocument', () => {
     it('should store document in repository', async () => {
       const [document] = documents;
-      const resultValue = 'resultValue';
-      stateRepositoryMock.storeDocument.resolves(resultValue);
 
-      const result = await cachedStateRepository.storeDocument(document);
+      await cachedStateRepository.storeDocument(document);
 
       expect(stateRepositoryMock.storeDocument).to.be.calledOnceWith(document);
-      expect(result).to.equal(resultValue);
     });
   });
 
   describe('#removeDocument', () => {
     it('should delete document from repository', async () => {
       const contractId = 'contractId';
-      const type = 1;
-      const resultValue = 'resultValue';
+      const type = 'documentType';
 
-      stateRepositoryMock.removeDocument.resolves(resultValue);
-
-      const result = await cachedStateRepository.removeDocument(contractId, type, id);
+      await cachedStateRepository.removeDocument(contractId, type, id);
 
       expect(stateRepositoryMock.removeDocument).to.be.calledOnceWith(contractId, type, id);
-      expect(result).to.equal(resultValue);
     });
   });
 
   describe('fetchTransaction', () => {
     it('should fetch transaction from state repository', async () => {
-      stateRepositoryMock.fetchTransaction.resolves(data);
+      stateRepositoryMock.fetchTransaction.resolves(dataContract);
 
       const result = await cachedStateRepository.fetchTransaction(id);
 
-      expect(result).to.equal(data);
+      expect(result).to.equal(dataContract);
       expect(stateRepositoryMock.fetchTransaction).to.be.calledOnceWith(id);
     });
   });
 
   describe('#fetchDataContract', () => {
     it('should fetch data contract from cache', async () => {
-      dataContractCacheMock.get.returns(data);
+      dataContractCacheMock.get.returns(dataContract);
 
       const result = await cachedStateRepository.fetchDataContract(id);
 
-      expect(result).to.equal(data);
+      expect(result).to.equal(dataContract);
       expect(stateRepositoryMock.fetchDataContract).to.be.not.called();
       expect(dataContractCacheMock.get).to.be.calledOnceWith(id);
     });
 
     it('should fetch data contract from state repository if it is not present in cache', async () => {
       dataContractCacheMock.get.returns(undefined);
-      stateRepositoryMock.fetchDataContract.resolves(data);
+      stateRepositoryMock.fetchDataContract.resolves(dataContract);
 
       const result = await cachedStateRepository.fetchDataContract(id);
 
-      expect(result).to.equal(data);
+      expect(result).to.equal(dataContract);
       expect(dataContractCacheMock.get).to.be.calledOnceWith(id);
       expect(stateRepositoryMock.fetchDataContract).to.be.calledOnceWith(id);
     });

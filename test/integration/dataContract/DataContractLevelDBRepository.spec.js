@@ -17,7 +17,7 @@ describe('DataContractLevelDBRepository', () => {
   let dppMock;
 
   beforeEach(function beforeEach() {
-    db = level('./db/data_contract-test', { valueEncoding: 'binary' });
+    db = level('./db/data-contract-test', { valueEncoding: 'binary' });
 
     dataContract = getDataContractFixture();
 

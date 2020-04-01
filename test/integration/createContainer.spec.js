@@ -1,19 +1,15 @@
 const { startMongoDb } = require('@dashevo/dp-services-ctl');
 
-const createDIContainer = require('../../lib/createDIContainer');
+const createTestDIContainer = require('../../lib/test/createTestDIContainer');
 
 describe('createDIContainer', function describeContainer() {
   this.timeout(25000);
 
   let container;
   let mongoDB;
-  let documentMongoDBUrl;
 
   before(async () => {
     mongoDB = await startMongoDb();
-
-    documentMongoDBUrl = `mongodb://127.0.0.1:${mongoDB.options.getMongoPort()}`
-    + `/?replicaSet=${mongoDB.options.options.replicaSetName}`;
   });
 
   after(async () => {
@@ -21,13 +17,7 @@ describe('createDIContainer', function describeContainer() {
   });
 
   beforeEach(async () => {
-    container = await createDIContainer({
-      ...process.env,
-      DOCUMENT_MONGODB_URL: documentMongoDBUrl,
-      BLOCKCHAIN_STATE_LEVEL_DB_FILE: './db/state-test',
-      IDENTITY_LEVEL_DB_FILE: './db/identity-test',
-      DATA_CONTRACT_LEVEL_DB_FILE: './db/data_contract-test',
-    });
+    container = await createTestDIContainer(mongoDB);
   });
 
   afterEach(async () => {

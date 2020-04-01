@@ -3,6 +3,9 @@ const {
     ResponseQuery,
   },
 } = require('abci/types');
+
+const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
+
 const dataContractQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/dataContractQueryHandlerFactory');
 
 const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
@@ -11,8 +14,11 @@ const AbciError = require('../../../../../lib/abci/errors/AbciError');
 describe('dataContractQueryHandlerFactory', () => {
   let dataContractQueryHandler;
   let dataContractRepositoryMock;
+  let dataContract;
 
   beforeEach(function beforeEach() {
+    dataContract = getDataContractFixture();
+
     dataContractRepositoryMock = {
       fetch: this.sinon.stub(),
     };
@@ -22,19 +28,17 @@ describe('dataContractQueryHandlerFactory', () => {
     );
   });
 
-  it('should return serialized data contract', async function it() {
+  it('should return serialized data contract', async () => {
     const id = 'id';
-    const resultValue = Buffer.from('resultValue');
 
-    dataContractRepositoryMock.fetch.resolves({
-      serialize: this.sinon.stub().returns(resultValue),
-    });
+    dataContractRepositoryMock.fetch.resolves(dataContract);
 
     const result = await dataContractQueryHandler({ id });
 
     expect(dataContractRepositoryMock.fetch).to.be.calledOnceWith(id);
     expect(result).to.be.an.instanceof(ResponseQuery);
-    expect(result.value).to.deep.equal(resultValue);
+    expect(result.code).to.equal(0);
+    expect(result.value).to.deep.equal(dataContract.serialize());
   });
 
   it('should throw InvalidArgumentAbciError if data contract not found', async () => {

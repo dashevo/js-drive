@@ -7,7 +7,7 @@ const {
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
 
-const createDIContainer = require('../../../../lib/createDIContainer');
+const createTestDIContainer = require('../../../../lib/test/createTestDIContainer');
 
 const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
 
@@ -16,7 +16,6 @@ describe('queryHandlerFactory', function main() {
 
   let container;
   let mongoDB;
-  let documentMongoDBUrl;
   let queryHandler;
   let identityQueryHandlerMock;
   let dataContractQueryHandlerMock;
@@ -27,9 +26,6 @@ describe('queryHandlerFactory', function main() {
 
   before(async () => {
     mongoDB = await startMongoDb();
-
-    documentMongoDBUrl = `mongodb://127.0.0.1:${mongoDB.options.getMongoPort()}`
-      + `/?replicaSet=${mongoDB.options.options.replicaSetName}`;
   });
 
   after(async () => {
@@ -37,10 +33,7 @@ describe('queryHandlerFactory', function main() {
   });
 
   beforeEach(async function beforeEach() {
-    container = await createDIContainer({
-      ...process.env,
-      DOCUMENT_MONGODB_URL: documentMongoDBUrl,
-    });
+    container = await createTestDIContainer(mongoDB);
 
     ({ dataContract } = getDocumentsFixture);
     documents = getDocumentsFixture();

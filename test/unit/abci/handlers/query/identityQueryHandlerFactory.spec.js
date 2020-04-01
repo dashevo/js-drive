@@ -3,6 +3,9 @@ const {
     ResponseQuery,
   },
 } = require('abci/types');
+
+const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
+
 const identityQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/identityQueryHandlerFactory');
 
 const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
@@ -11,6 +14,7 @@ const AbciError = require('../../../../../lib/abci/errors/AbciError');
 describe('identityQueryHandlerFactory', () => {
   let identityQueryHandler;
   let identityRepositoryMock;
+  let identity;
 
   beforeEach(function beforeEach() {
     identityRepositoryMock = {
@@ -20,21 +24,21 @@ describe('identityQueryHandlerFactory', () => {
     identityQueryHandler = identityQueryHandlerFactory(
       identityRepositoryMock,
     );
+
+    identity = getIdentityFixture();
   });
 
-  it('should return serialized identity', async function it() {
+  it('should return serialized identity', async () => {
     const id = 'id';
-    const resultValue = Buffer.from('resultValue');
 
-    identityRepositoryMock.fetch.resolves({
-      serialize: this.sinon.stub().returns(resultValue),
-    });
+    identityRepositoryMock.fetch.resolves(identity);
 
     const result = await identityQueryHandler({ id });
 
     expect(identityRepositoryMock.fetch).to.be.calledOnceWith(id);
     expect(result).to.be.an.instanceof(ResponseQuery);
-    expect(result.value).to.deep.equal(resultValue);
+    expect(result.code).to.equal(0);
+    expect(result.value).to.deep.equal(identity.serialize());
   });
 
   it('should throw InvalidArgumentAbciError if identity not found', async () => {
