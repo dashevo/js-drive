@@ -128,7 +128,7 @@ describe('CachedStateRepositoryDecorator', () => {
     });
 
     it('should fetch data contract from state repository if it is not present in cache', async () => {
-      dataContractCacheMock.get.returns(null);
+      dataContractCacheMock.get.returns(undefined);
       stateRepositoryMock.fetchDataContract.resolves(data);
 
       const result = await cachedStateRepository.fetchDataContract(id);
