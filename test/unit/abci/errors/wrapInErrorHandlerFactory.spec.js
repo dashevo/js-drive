@@ -40,7 +40,6 @@ describe('wrapInErrorHandlerFactory', () => {
           message: 'Internal error',
         },
       }),
-      tags: [],
     });
   });
 
@@ -60,7 +59,6 @@ describe('wrapInErrorHandlerFactory', () => {
           data: error.getData(),
         },
       }),
-      tags: [],
     });
   });
 
@@ -80,7 +78,6 @@ describe('wrapInErrorHandlerFactory', () => {
           data: error.getData(),
         },
       }),
-      tags: [],
     });
   });
 });
