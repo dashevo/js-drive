@@ -18,15 +18,15 @@ describe('queryHandlerFactory', () => {
       data: cbor.encode(Buffer.from('data')),
     };
 
-    queryHandlerRouterMock = {
-      find: this.sinon.stub(),
-    };
-
     sanitizeUrlMock = this.sinon.stub();
 
     routeMock = {
       handler: this.sinon.stub(),
       params: 'params',
+    };
+
+    queryHandlerRouterMock = {
+      find: this.sinon.stub().returns(routeMock),
     };
 
     queryHandler = queryHandlerFactory(
@@ -59,9 +59,8 @@ describe('queryHandlerFactory', () => {
     const sanitizedUrl = 'sanitizedUrl';
 
     sanitizeUrlMock.returns(sanitizedUrl);
-    queryHandlerRouterMock.find.returns(false);
 
-    request.data = 'Bad data';
+    request.data = Buffer.from('bb');
 
     try {
       await queryHandler(request);
@@ -81,7 +80,6 @@ describe('queryHandlerFactory', () => {
     const sanitizedUrl = 'sanitizedUrl';
 
     sanitizeUrlMock.returns(sanitizedUrl);
-    queryHandlerRouterMock.find.returns(false);
 
     request.data = cbor.encode(null);
 

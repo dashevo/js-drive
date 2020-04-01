@@ -119,4 +119,14 @@ describe('unserializeStateTransitionFactory', () => {
       expect(isolatedDppMock.dispose).to.be.calledOnce();
     }
   });
+
+  it('should return stateTransition', async () => {
+    const stateTransition = getIdentityCreateSTFixture();
+
+    isolatedDppMock.stateTransition.createFromSerialized.resolves(stateTransition);
+
+    const result = await unserializeStateTransition(stateTransitionFixture);
+
+    expect(result).to.deep.equal(stateTransition);
+  });
 });
