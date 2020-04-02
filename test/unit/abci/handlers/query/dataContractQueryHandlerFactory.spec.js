@@ -8,7 +8,7 @@ const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataCo
 
 const dataContractQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/dataContractQueryHandlerFactory');
 
-const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
+const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
 
 describe('dataContractQueryHandlerFactory', () => {
@@ -41,17 +41,17 @@ describe('dataContractQueryHandlerFactory', () => {
     expect(result.value).to.deep.equal(dataContract.serialize());
   });
 
-  it('should throw InvalidArgumentAbciError if data contract not found', async () => {
+  it('should throw NotFoundAbciError if data contract not found', async () => {
     const id = 'id';
 
     try {
       await dataContractQueryHandler({ id });
 
-      expect.fail('should throw InvalidArgumentAbciError');
+      expect.fail('should throw NotFoundAbciError');
     } catch (e) {
-      expect(e).to.be.an.instanceof(InvalidArgumentAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
-      expect(e.message).to.equal('Data Contract with specified ID is not found');
+      expect(e).to.be.an.instanceof(NotFoundAbciError);
+      expect(e.getCode()).to.equal(AbciError.CODES.NOT_FOUND);
+      expect(e.message).to.equal('Data Contract not found');
       expect(dataContractRepositoryMock.fetch).to.be.calledOnceWith(id);
     }
   });
