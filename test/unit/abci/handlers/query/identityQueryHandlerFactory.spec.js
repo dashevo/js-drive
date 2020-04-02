@@ -8,7 +8,7 @@ const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFi
 
 const identityQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/identityQueryHandlerFactory');
 
-const NotFoundAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
+const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
 
 describe('identityQueryHandlerFactory', () => {
