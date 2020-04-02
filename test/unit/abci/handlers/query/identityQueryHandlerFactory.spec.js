@@ -41,17 +41,17 @@ describe('identityQueryHandlerFactory', () => {
     expect(result.value).to.deep.equal(identity.serialize());
   });
 
-  it('should throw InvalidArgumentAbciError if identity not found', async () => {
+  it('should throw NotFoundAbciError if identity not found', async () => {
     const id = 'id';
 
     try {
       await identityQueryHandler({ id });
 
-      expect.fail('should throw InvalidArgumentAbciError');
+      expect.fail('should throw NotFoundAbciError');
     } catch (e) {
       expect(e).to.be.an.instanceof(InvalidArgumentAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
-      expect(e.message).to.equal('Identity with specified ID is not found');
+      expect(e.getCode()).to.equal(AbciError.CODES.NOT_FOUND);
+      expect(e.message).to.equal('Identity not found');
       expect(identityRepositoryMock.fetch).to.be.calledOnceWith(id);
     }
   });
