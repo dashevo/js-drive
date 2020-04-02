@@ -8,7 +8,7 @@ const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFi
 
 const identityQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/identityQueryHandlerFactory');
 
-const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
+const NotFoundAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
 
 describe('identityQueryHandlerFactory', () => {
@@ -49,7 +49,7 @@ describe('identityQueryHandlerFactory', () => {
 
       expect.fail('should throw NotFoundAbciError');
     } catch (e) {
-      expect(e).to.be.an.instanceof(InvalidArgumentAbciError);
+      expect(e).to.be.an.instanceof(NotFoundAbciError);
       expect(e.getCode()).to.equal(AbciError.CODES.NOT_FOUND);
       expect(e.message).to.equal('Identity not found');
       expect(identityRepositoryMock.fetch).to.be.calledOnceWith(id);
