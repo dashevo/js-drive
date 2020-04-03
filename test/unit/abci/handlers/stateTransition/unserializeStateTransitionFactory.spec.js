@@ -162,6 +162,6 @@ describe('unserializeStateTransitionFactory', () => {
 
     expect(result).to.deep.equal(stateTransition);
 
-    expect(isolatedDppMock.stateTransition.validateFee).to.be.calledOnce();
+    expect(isolatedDppMock.stateTransition.validateFee).to.be.calledOnceWith(stateTransition);
   });
 });

@@ -70,6 +70,7 @@ describe('commitHandlerFactory', () => {
 
     expect(blockchainStateMock.setLastBlockAppHash).to.be.calledOnceWith(appHash);
 
+
     expect(blockchainStateMock.setCreditsDistributionPool).to.be.calledOnceWith(accumulativeFees);
 
     expect(blockExecutionStateMock.getAccumulativeFees).to.be.calledOnce();

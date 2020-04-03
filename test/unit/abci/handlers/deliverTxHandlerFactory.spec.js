@@ -136,6 +136,7 @@ describe('deliverTxHandlerFactory', () => {
     expect(blockExecutionStateMock.addDataContract).to.be.calledOnceWith(
       dataContractCreateTransitionFixture.getDataContract(),
     );
+
     expect(blockExecutionStateMock.incrementAccumulativeFees).to.be.calledOnceWith(
       dataContractCreateTransitionFixture.calculateFee(),
     );

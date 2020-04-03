@@ -125,6 +125,19 @@ describe('CachedStateRepositoryDecorator', () => {
 
       expect(result).to.equal(dataContract);
       expect(dataContractCacheMock.get).to.be.calledOnceWith(id);
+      expect(dataContractCacheMock.set).to.be.calledOnceWith(id, dataContract);
+      expect(stateRepositoryMock.fetchDataContract).to.be.calledOnceWith(id);
+    });
+
+    it('should not store null in cache if data contract is not present in state repository', async () => {
+      stateRepositoryMock.fetchDataContract.resolves(null);
+
+      const result = await cachedStateRepository.fetchDataContract(id);
+
+      expect(result).to.be.null();
+
+      expect(dataContractCacheMock.get).to.be.calledOnceWith(id);
+      expect(dataContractCacheMock.set).to.not.be.called();
       expect(stateRepositoryMock.fetchDataContract).to.be.calledOnceWith(id);
     });
   });
