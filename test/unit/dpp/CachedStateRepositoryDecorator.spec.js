@@ -8,6 +8,7 @@ describe('CachedStateRepositoryDecorator', () => {
   let stateRepositoryMock;
   let cachedStateRepository;
   let dataContractCacheMock;
+  let identityCacheMock;
   let id;
   let identity;
   let documents;
@@ -20,6 +21,11 @@ describe('CachedStateRepositoryDecorator', () => {
     dataContract = getDataContractFixture();
 
     dataContractCacheMock = {
+      set: this.sinon.stub(),
+      get: this.sinon.stub(),
+    };
+
+    identityCacheMock = {
       set: this.sinon.stub(),
       get: this.sinon.stub(),
     };
@@ -37,16 +43,42 @@ describe('CachedStateRepositoryDecorator', () => {
     cachedStateRepository = new CachedStateRepositoryDecorator(
       stateRepositoryMock,
       dataContractCacheMock,
+      identityCacheMock,
     );
   });
 
   describe('#fetchIdentity', () => {
-    it('should fetch identity from state repository', async () => {
+    it('should fetch identity from cache', async () => {
+      identityCacheMock.get.returns(identity);
+
+      const result = await cachedStateRepository.fetchIdentity(id);
+
+      expect(result).to.equal(identity);
+      expect(stateRepositoryMock.fetchIdentity).to.be.not.called();
+      expect(identityCacheMock.get).to.be.calledOnceWith(id);
+    });
+
+    it('should fetch identity from state repository if it is not present in cache', async () => {
+      identityCacheMock.get.returns(undefined);
       stateRepositoryMock.fetchIdentity.resolves(identity);
 
       const result = await cachedStateRepository.fetchIdentity(id);
 
-      expect(result).to.deep.equal(identity);
+      expect(result).to.equal(identity);
+      expect(identityCacheMock.get).to.be.calledOnceWith(id);
+      expect(identityCacheMock.set).to.be.calledOnceWith(id, identity);
+      expect(stateRepositoryMock.fetchIdentity).to.be.calledOnceWith(id);
+    });
+
+    it('should not store null in cache if identity is not present in state repository', async () => {
+      stateRepositoryMock.fetchIdentity.resolves(null);
+
+      const result = await cachedStateRepository.fetchIdentity(id);
+
+      expect(result).to.be.null();
+
+      expect(identityCacheMock.get).to.be.calledOnceWith(id);
+      expect(identityCacheMock.set).to.not.be.called();
       expect(stateRepositoryMock.fetchIdentity).to.be.calledOnceWith(id);
     });
   });
