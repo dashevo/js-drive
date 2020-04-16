@@ -32,25 +32,27 @@ if [[ "$PACKAGE_TAG" != "$TRAVIS_TAG" ]]; then
   exit 1
 fi
 
-# Login to Docker Hub
-echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
 IMAGE_NAME="dashpay/drive"
 
 # If prerelease is empty it is a stable release
 # so we add latest tag, otherwise a full version tag
-LAST_TAG="${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}-${PRERELEASE}"
+LAST_TAG="${MAJOR}.${MINOR}.${PATCH}-${PRERELEASE}"
+TAG_POSTFIX="-dev"
 if [[ -z "$PRERELEASE" ]]; then
   LAST_TAG="latest"
+  TAG_POSTFIX=""
 fi
 
 # Build an image with multiple tags
 docker build --build-arg NODE_ENV=development \
-  -t "${IMAGE_NAME}:${MAJOR}" \
-  -t "${IMAGE_NAME}:${MAJOR}.${MINOR}" \
-  -t "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}" \
+  -t "${IMAGE_NAME}:${MAJOR}${TAG_POSTFIX}" \
+  -t "${IMAGE_NAME}:${MAJOR}.${MINOR}${TAG_POSTFIX}" \
+  -t "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}${TAG_POSTFIX}" \
   -t "${IMAGE_NAME}:${LAST_TAG}" \
   .
+
+# Login to Docker Hub
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 # Push an image and all the tags
 docker push "${IMAGE_NAME}:${MAJOR}"
