@@ -38,33 +38,22 @@ echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 IMAGE_NAME="dashpay/drive"
 
 # If prerelease is empty it is a stable release
-# so we add latest tag
+# so we add latest tag, otherwise a full version tag
+LAST_TAG="${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}-${PRERELEASE}"
 if [[ -z "$PRERELEASE" ]]; then
-  # Build an image with multiple tags
-  docker build --build-arg NODE_ENV=development \
-    -t "${IMAGE_NAME}:${MAJOR}" \
-    -t "${IMAGE_NAME}:${MAJOR}.${MINOR}" \
-    -t "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}" \
-    -t "${IMAGE_NAME}:latest" \
-    .
-
-  # Push an image and all the tags
-  docker push "${IMAGE_NAME}:${MAJOR}"
-  docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}"
-  docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}"
-  docker push "${IMAGE_NAME}:latest"
-else
-  # Build an image with multiple tags
-  docker build --build-arg NODE_ENV=development \
-    -t "${IMAGE_NAME}:${MAJOR}" \
-    -t "${IMAGE_NAME}:${MAJOR}.${MINOR}" \
-    -t "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}" \
-    -t "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}-${PRERELEASE}" \
-    .
-
-  # Push an image and all the tags
-  docker push "${IMAGE_NAME}:${MAJOR}"
-  docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}"
-  docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}"
-  docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}-${PRERELEASE}"
+  LAST_TAG="latest"
 fi
+
+# Build an image with multiple tags
+docker build --build-arg NODE_ENV=development \
+  -t "${IMAGE_NAME}:${MAJOR}" \
+  -t "${IMAGE_NAME}:${MAJOR}.${MINOR}" \
+  -t "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}" \
+  -t "${IMAGE_NAME}:${LAST_TAG}" \
+  .
+
+# Push an image and all the tags
+docker push "${IMAGE_NAME}:${MAJOR}"
+docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}"
+docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}"
+docker push "${IMAGE_NAME}:${LAST_TAG}"
