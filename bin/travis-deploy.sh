@@ -55,7 +55,7 @@ docker build --build-arg NODE_ENV=development \
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 # Push an image and all the tags
-docker push "${IMAGE_NAME}:${MAJOR}"
-docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}"
-docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}"
+docker push "${IMAGE_NAME}:${MAJOR}${TAG_POSTFIX}"
+docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}${TAG_POSTFIX}"
+docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}${TAG_POSTFIX}"
 docker push "${IMAGE_NAME}:${LAST_TAG}"
