@@ -15,31 +15,56 @@ if [[ "$TRAVIS_NODE_VERSION" != "$LATEST_LTS_VERSION" ]]; then
   exit 0
 fi
 
-# Ensure the tag matches the one in package.json, otherwise abort.
+# Parse version and it's segments
 VERSION="$(jq -r .version package.json)"
 PACKAGE_TAG=v"$VERSION"
 
+VERSION_NO_PRERELEASE=$(awk -F- '{print $1}' <<< $VERSION)
+PRERELEASE=$(awk -F- '{print $2}' <<< $VERSION)
+
+MAJOR=$(awk -F. '{print $1}' <<< $VERSION_NO_PRERELEASE)
+MINOR=$(awk -F. '{print $2}' <<< $VERSION_NO_PRERELEASE)
+PATCH=$(awk -F. '{print $3}' <<< $VERSION_NO_PRERELEASE)
+
+# Ensure the tag matches the one in package.json, otherwise abort.
 if [[ "$PACKAGE_TAG" != "$TRAVIS_TAG" ]]; then
   echo "Travis tag (\"$TRAVIS_TAG\") is not equal to package.json tag (\"$PACKAGE_TAG\"). Please push a correct tag and try again."
   exit 1
 fi
 
-IMAGE_NAME="dashpay/drive"
-
-# Use regex pattern matching to check if "dev" exists in tag
-DOCKER_TAG="latest"
-if [[ $PACKAGE_TAG =~ dev ]]; then
-  DOCKER_TAG="dev"
-fi
-
-docker build --build-arg NODE_ENV=development \
-             -t "${IMAGE_NAME}:${DOCKER_TAG}" \
-             -t "${IMAGE_NAME}:${VERSION}" \
-             .
-
 # Login to Docker Hub
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-# Push images to the registry
-docker push "${IMAGE_NAME}:${DOCKER_TAG}"
-docker push "${IMAGE_NAME}:${VERSION}"
+IMAGE_NAME="dashpay/drive"
+
+# If prerelease is empty it is a stable release
+# so we add latest tag
+if [[ -z "$PRERELEASE" ]]; then
+  # Build an image with multiple tags
+  docker build --build-arg NODE_ENV=development \
+    -t "${IMAGE_NAME}:${MAJOR}" \
+    -t "${IMAGE_NAME}:${MAJOR}.${MINOR}" \
+    -t "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}" \
+    -t "${IMAGE_NAME}:latest" \
+    .
+
+  # Push an image and all the tags
+  docker push "${IMAGE_NAME}:${MAJOR}"
+  docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}"
+  docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}"
+  docker push "${IMAGE_NAME}:latest"
+else
+  # Build an image with multiple tags
+  docker build --build-arg NODE_ENV=development \
+    -t "${IMAGE_NAME}:${MAJOR}" \
+    -t "${IMAGE_NAME}:${MAJOR}.${MINOR}" \
+    -t "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}" \
+    -t "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}-${PRERELEASE}" \
+    .
+
+  # Push an image and all the tags
+  docker push "${IMAGE_NAME}:${MAJOR}"
+  docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}"
+  docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}"
+  docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}-${PRERELEASE}"
+fi
