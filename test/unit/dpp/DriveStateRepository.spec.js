@@ -7,6 +7,7 @@ const DriveStateRepository = require('../../../lib/dpp/DriveStateRepository');
 describe('DriveStateRepository', () => {
   let stateRepository;
   let identityRepositoryMock;
+  let publicKeyIdentityIdRepositoryMock;
   let dataContractRepositoryMock;
   let fetchDocumentsMock;
   let createDocumentRepositoryMock;
@@ -38,6 +39,11 @@ describe('DriveStateRepository', () => {
       store: this.sinon.stub(),
     };
 
+    publicKeyIdentityIdRepositoryMock = {
+      fetch: this.sinon.stub(),
+      store: this.sinon.stub(),
+    };
+
     blockExecutionDBTransactionsMock = {
       getTransaction: this.sinon.stub(),
     };
@@ -48,6 +54,7 @@ describe('DriveStateRepository', () => {
 
     stateRepository = new DriveStateRepository(
       identityRepositoryMock,
+      publicKeyIdentityIdRepositoryMock,
       dataContractRepositoryMock,
       fetchDocumentsMock,
       createDocumentRepositoryMock,
@@ -98,6 +105,18 @@ describe('DriveStateRepository', () => {
 
       expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identity');
       expect(identityRepositoryMock.store).to.be.calledOnceWith(identity, transactionMock);
+
+      expect(publicKeyIdentityIdRepositoryMock.store).to.have.callCount(
+        identity.getPublicKeys().length,
+      );
+
+      identity.getPublicKeys().forEach((publicKey, index) => {
+        expect(publicKeyIdentityIdRepositoryMock.store.getCall(index).args).to.deep.equal([
+          publicKey.getData(),
+          identity.getId(),
+          transactionMock,
+        ]);
+      });
     });
   });
 
