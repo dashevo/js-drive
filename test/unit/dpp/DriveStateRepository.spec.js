@@ -156,17 +156,6 @@ describe('DriveStateRepository', () => {
 
   describe('#fetchTransaction', () => {
     it('should fetch transaction from core', async () => {
-      const rawTransaction = 'some result';
-
-      coreRpcClientMock.getRawTransaction.resolves({ result: rawTransaction });
-
-      const result = await stateRepository.fetchTransaction(id);
-
-      expect(result).to.equal(rawTransaction);
-      expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWith(id);
-    });
-
-    it('should fetch transaction from core', async () => {
       const rawTransaction = {
         data: 'some result',
       };
@@ -175,8 +164,8 @@ describe('DriveStateRepository', () => {
 
       const result = await stateRepository.fetchTransaction(id);
 
-      expect(result).to.equal(rawTransaction);
-      expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWith(id);
+      expect(result).to.deep.equal(rawTransaction);
+      expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWithExactly(id, true);
     });
 
     it('should return null if core throws Invalid address or key error', async () => {
