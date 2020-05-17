@@ -112,7 +112,7 @@ describe('DriveStateRepository', () => {
 
       identity.getPublicKeys().forEach((publicKey, index) => {
         expect(publicKeyIdentityIdRepositoryMock.store.getCall(index).args).to.deep.equal([
-          publicKey.getData(),
+          publicKey.hash(),
           identity.getId(),
           transactionMock,
         ]);
