@@ -1,6 +1,7 @@
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
+const IdentityPublicKey = require('@dashevo/dpp/lib/identity/IdentityPublicKey');
 
 const DriveStateRepository = require('../../../lib/dpp/DriveStateRepository');
 
@@ -21,6 +22,14 @@ describe('DriveStateRepository', () => {
 
   beforeEach(function beforeEach() {
     identity = getIdentityFixture();
+    identity.publicKeys = [
+      new IdentityPublicKey({
+        id: 0,
+        type: IdentityPublicKey.TYPES.ECDSA_SECP256K1,
+        data: '02c18a9df635941906c9b4cb8b49fe1070b7469c38d4a5c8723049104d8e008976',
+        isEnabled: true,
+      }),
+    ];
     documents = getDocumentsFixture();
     dataContract = getDataContractFixture();
     id = 'id';
