@@ -1,6 +1,7 @@
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
+const IdentityPublicKey = require('@dashevo/dpp/lib/identity/IdentityPublicKey');
 
 const DriveStateRepository = require('../../../lib/dpp/DriveStateRepository');
 
@@ -21,6 +22,14 @@ describe('DriveStateRepository', () => {
 
   beforeEach(function beforeEach() {
     identity = getIdentityFixture();
+    identity.publicKeys = [
+      new IdentityPublicKey({
+        id: 0,
+        type: IdentityPublicKey.TYPES.ECDSA_SECP256K1,
+        data: '02c18a9df635941906c9b4cb8b49fe1070b7469c38d4a5c8723049104d8e008976',
+        isEnabled: true,
+      }),
+    ];
     documents = getDocumentsFixture();
     dataContract = getDataContractFixture();
     id = 'id';
@@ -112,7 +121,7 @@ describe('DriveStateRepository', () => {
 
       identity.getPublicKeys().forEach((publicKey, index) => {
         expect(publicKeyIdentityIdRepositoryMock.store.getCall(index).args).to.deep.equal([
-          publicKey.getData(),
+          publicKey.hash(),
           identity.getId(),
           transactionMock,
         ]);
@@ -175,14 +184,16 @@ describe('DriveStateRepository', () => {
 
   describe('#fetchTransaction', () => {
     it('should fetch transaction from core', async () => {
-      const rawTransaction = 'some result';
+      const rawTransaction = {
+        data: 'some result',
+      };
 
       coreRpcClientMock.getRawTransaction.resolves({ result: rawTransaction });
 
       const result = await stateRepository.fetchTransaction(id);
 
-      expect(result).to.equal(rawTransaction);
-      expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWith(id);
+      expect(result).to.deep.equal(rawTransaction);
+      expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWithExactly(id, true);
     });
 
     it('should return null if core throws Invalid address or key error', async () => {
