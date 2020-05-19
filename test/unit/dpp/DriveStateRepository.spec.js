@@ -114,14 +114,53 @@ describe('DriveStateRepository', () => {
 
       expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identity');
       expect(identityRepositoryMock.store).to.be.calledOnceWith(identity, transactionMock);
+    });
+  });
 
-      const [firstPublicKey] = identity.getPublicKeys();
+  describe('#storePublicKeyIdentityId', () => {
+    it('should store public key hash and identity id pair to repository', async () => {
+      await stateRepository.storePublicKeyIdentityId(
+        identity.getPublicKeyById(0).hash(), identity.getId(),
+      );
 
+      expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identity');
       expect(publicKeyIdentityIdRepositoryMock.store).to.have.been.calledOnceWithExactly(
-        firstPublicKey.hash(),
+        identity.getPublicKeyById(0).hash(),
         identity.getId(),
         transactionMock,
       );
+    });
+  });
+
+  describe('#fetchPublicKeyIdentityId', () => {
+    it('should fetch previously stored public key hash and identity id pair', async () => {
+      const publicKeyHash = identity.getPublicKeyById(0).hash();
+
+      publicKeyIdentityIdRepositoryMock
+        .fetch
+        .withArgs(publicKeyHash)
+        .resolves(identity.getId());
+
+      const result = await stateRepository.fetchPublicKeyIdentityId(
+        identity.getPublicKeyById(0).hash(),
+      );
+
+      expect(result).to.deep.equal(identity.getId());
+    });
+
+    it('should return null if pair was not found', async () => {
+      const publicKeyHash = identity.getPublicKeyById(0).hash();
+
+      publicKeyIdentityIdRepositoryMock
+        .fetch
+        .withArgs(publicKeyHash)
+        .resolves(null);
+
+      const result = await stateRepository.fetchPublicKeyIdentityId(
+        identity.getPublicKeyById(0).hash(),
+      );
+
+      expect(result).to.be.null();
     });
   });
 
