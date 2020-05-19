@@ -115,17 +115,13 @@ describe('DriveStateRepository', () => {
       expect(blockExecutionDBTransactionsMock.getTransaction).to.be.calledOnceWith('identity');
       expect(identityRepositoryMock.store).to.be.calledOnceWith(identity, transactionMock);
 
-      expect(publicKeyIdentityIdRepositoryMock.store).to.have.callCount(
-        identity.getPublicKeys().length,
-      );
+      const [firstPublicKey] = identity.getPublicKeys();
 
-      identity.getPublicKeys().forEach((publicKey, index) => {
-        expect(publicKeyIdentityIdRepositoryMock.store.getCall(index).args).to.deep.equal([
-          publicKey.hash(),
-          identity.getId(),
-          transactionMock,
-        ]);
-      });
+      expect(publicKeyIdentityIdRepositoryMock.store).to.have.been.calledOnceWithExactly(
+        firstPublicKey.hash(),
+        identity.getId(),
+        transactionMock,
+      );
     });
   });
 
