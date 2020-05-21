@@ -1,3 +1,12 @@
+## [0.12.2](https://github.com/dashevo/drive/compare/v0.12.1...v0.12.2) (2020-05-21)
+
+
+### Bug Fixes
+
+* validateFee error handling expects only BalanceIsNotEnoughError ([#343](https://github.com/dashevo/drive/issues/343))
+
+
+
 ## [0.12.1](https://github.com/dashevo/drive/compare/v0.12.0...v0.12.1) (2020-04-22)
 
 
