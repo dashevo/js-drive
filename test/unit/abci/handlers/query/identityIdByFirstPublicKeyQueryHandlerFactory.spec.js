@@ -1,3 +1,5 @@
+const bs58 = require('bs58');
+
 const {
   abci: {
     ResponseQuery,
@@ -26,8 +28,8 @@ describe('identityIdByFirstPublicKeyQueryHandlerFactory', () => {
       publicKeyIdentityIdRepositoryMock,
     );
 
-    publicKeyHash = 'publicKeyHash';
-    identityId = 'identityId';
+    publicKeyHash = '784ca12495d2e61f992db9e55d1f9599b0cf1328';
+    identityId = 'F55Ln4ibxcZB7K9bcwCHYifCvrtQcWRWkJejPgEsz2px';
   });
 
   it('should return identity id', async () => {
@@ -38,7 +40,7 @@ describe('identityIdByFirstPublicKeyQueryHandlerFactory', () => {
     expect(publicKeyIdentityIdRepositoryMock.fetch).to.be.calledOnceWith(publicKeyHash);
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(identityId);
+    expect(bs58.encode(result.value)).to.equal(identityId);
   });
 
   it('should throw NotFoundAbciError if identityId not found', async () => {
