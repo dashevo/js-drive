@@ -9,6 +9,9 @@ const errorHandler = require('../lib/errorHandler');
 (async function main() {
   const container = await createDIContainer(process.env);
 
+  const checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
+  await checkCoreSyncFinished();
+
   const server = createServer(
     container.resolve('abciHandlers'),
   );
