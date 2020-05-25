@@ -11,6 +11,7 @@ const errorHandler = require('../lib/errorHandler');
 
   const logger = container.resolve('logger');
 
+  logger.info('Connecting to Core');
   const checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
   await checkCoreSyncFinished((currentBlockHeight, currentHeaderNumber) => {
     logger.info(
@@ -26,6 +27,8 @@ const errorHandler = require('../lib/errorHandler');
     container.resolve('abciPort'),
     container.resolve('abciHost'),
   );
+
+  logger.info(`Drive ABCI is listening on port ${container.resolve('abciPort')}`);
 }());
 
 process
