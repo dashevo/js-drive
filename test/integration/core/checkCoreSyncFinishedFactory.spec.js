@@ -37,14 +37,18 @@ describe('checkCoreSyncFinishedFactory', function main() {
     container = await createTestDIContainer(mongoDB, secondDashCore);
     checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
 
-    let blockHeight = 0;
-    let headerHeight = 0;
-    await checkCoreSyncFinished((currentBlockHeight, currentHeaderCount) => {
-      blockHeight = currentBlockHeight;
-      headerHeight = currentHeaderCount;
-    });
+    await checkCoreSyncFinished(() => {});
 
-    expect(blockHeight).to.equal(1000);
-    expect(headerHeight).to.equal(1000);
+    const secondApi = secondDashCore.getApi();
+
+    const {
+      result: {
+        blocks: currentBlockHeight,
+        headers: currentHeadersNumber,
+      },
+    } = await secondApi.getBlockchainInfo();
+
+    expect(currentBlockHeight).to.equal(1000);
+    expect(currentHeadersNumber).to.equal(1000);
   });
 });
