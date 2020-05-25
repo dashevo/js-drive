@@ -7,6 +7,7 @@ describe('checkCoreSyncFinishedFactory', function main() {
 
   let mongoDB;
   let firstDashCore;
+  let secondDashCore;
   let container;
   let checkCoreSyncFinished;
 
@@ -19,6 +20,8 @@ describe('checkCoreSyncFinishedFactory', function main() {
 
   after(async () => {
     await mongoDB.remove();
+    await firstDashCore.remove();
+    await secondDashCore.remove();
   });
 
   afterEach(async () => {
@@ -28,7 +31,7 @@ describe('checkCoreSyncFinishedFactory', function main() {
   });
 
   it('should wait until Dash Core is synced', async () => {
-    const secondDashCore = await startDashCore();
+    secondDashCore = await startDashCore();
     await secondDashCore.connect(firstDashCore);
 
     container = await createTestDIContainer(mongoDB, secondDashCore);
