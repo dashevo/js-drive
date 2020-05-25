@@ -11,11 +11,10 @@ const errorHandler = require('../lib/errorHandler');
 
   const logger = container.resolve('logger');
 
-  logger.info('checking Core has finished syncing...');
   const checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
   await checkCoreSyncFinished((currentBlockHeight, currentHeaderNumber) => {
     logger.info(
-      `currently synced ${currentBlockHeight} blocks and ${currentHeaderNumber} headers`,
+      `waiting for Core to finish sync ${currentBlockHeight}/${currentHeaderNumber}`,
     );
   });
 
