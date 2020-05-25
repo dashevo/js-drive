@@ -13,7 +13,8 @@ describe('checkCoreSyncFinishedFactory', function main() {
   before(async () => {
     mongoDB = await startMongoDb();
     firstDashCore = await startDashCore();
-    await firstDashCore.getApi().generate(10000);
+    const { result: randomAddress } = await firstDashCore.getApi().getNewAddress();
+    await firstDashCore.getApi().generateToAddress(1000, randomAddress);
   });
 
   after(async () => {
@@ -33,6 +34,14 @@ describe('checkCoreSyncFinishedFactory', function main() {
     container = await createTestDIContainer(mongoDB, secondDashCore);
     checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
 
-    await checkCoreSyncFinished();
+    let blockHeight = 0;
+    let headerHeight = 0;
+    await checkCoreSyncFinished((currentBlockHeight, currentHeaderCount) => {
+      blockHeight = currentBlockHeight;
+      headerHeight = currentHeaderCount;
+    });
+
+    expect(blockHeight).to.equal(1000);
+    expect(headerHeight).to.equal(1000);
   });
 });
