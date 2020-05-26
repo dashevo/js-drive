@@ -21,8 +21,8 @@ const waitReplicaSetInitializeFactory = require(
   const logger = container.resolve('logger');
 
   logger.info('Connecting to Core');
-  const checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
-  await checkCoreSyncFinished((currentBlockHeight, currentHeaderNumber) => {
+  const waitForCoreSync = container.resolve('waitForCoreSync');
+  await waitForCoreSync((currentBlockHeight, currentHeaderNumber) => {
     logger.info(
       `waiting for Core to finish sync ${currentBlockHeight}/${currentHeaderNumber}`,
     );
