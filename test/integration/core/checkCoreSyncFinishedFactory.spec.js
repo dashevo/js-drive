@@ -2,6 +2,8 @@ const { startMongoDb, startDashCore } = require('@dashevo/dp-services-ctl');
 
 const createTestDIContainer = require('../../../lib/test/createTestDIContainer');
 
+const wait = require('../../../lib/util/wait');
+
 describe('checkCoreSyncFinishedFactory', function main() {
   this.timeout(90000);
 
@@ -33,6 +35,9 @@ describe('checkCoreSyncFinishedFactory', function main() {
   it('should wait until Dash Core is synced', async () => {
     secondDashCore = await startDashCore();
     await secondDashCore.connect(firstDashCore);
+
+    // wait for node to be added into peer list
+    await wait(10000);
 
     container = await createTestDIContainer(mongoDB, secondDashCore);
     checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
