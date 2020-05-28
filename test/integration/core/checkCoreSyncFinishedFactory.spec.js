@@ -37,7 +37,7 @@ describe('checkCoreSyncFinishedFactory', function main() {
     }
   });
 
-  it('should wait until Dash Core with peers is synced', async () => {
+  it('should wait until Dash Core in regtest mode with peers is synced', async () => {
     firstDashCore = await startDashCore();
     const { result: randomAddress } = await firstDashCore.getApi().getNewAddress();
     await firstDashCore.getApi().generateToAddress(1000, randomAddress);
@@ -63,7 +63,7 @@ describe('checkCoreSyncFinishedFactory', function main() {
     expect(currentHeadersNumber).to.equal(1000);
   });
 
-  it('should wait until Dash Core without peers is synced', async () => {
+  it('shouldn\'t wait if Dash Core in regtest mode without peers', async () => {
     thirdDashCore = await startDashCore();
 
     container = await createTestDIContainer(mongoDB, thirdDashCore);
