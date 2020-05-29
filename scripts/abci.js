@@ -15,7 +15,7 @@ const errorHandler = require('../lib/errorHandler');
   const waitReplicaSetInitialize = container.resolve('waitReplicaSetInitialize');
   await waitReplicaSetInitialize((retry, maxRetries) => {
     logger.info(
-      `Waiting for replica set to be initialized ${retry}/${maxRetries}`,
+      `waiting for replica set to be initialized ${retry}/${maxRetries}...`,
     );
   });
 
@@ -23,7 +23,7 @@ const errorHandler = require('../lib/errorHandler');
   const checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
   await checkCoreSyncFinished((currentBlockHeight, currentHeaderNumber) => {
     logger.info(
-      `Waiting for Core to finish sync ${currentBlockHeight}/${currentHeaderNumber}`,
+      `waiting for Core to finish sync ${currentBlockHeight}/${currentHeaderNumber}...`,
     );
   });
 
