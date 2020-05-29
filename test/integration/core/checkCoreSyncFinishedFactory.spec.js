@@ -2,7 +2,7 @@ const { startMongoDb, startDashCore } = require('@dashevo/dp-services-ctl');
 
 const createTestDIContainer = require('../../../lib/test/createTestDIContainer');
 
-describe('waitForCoreSyncFactory', function main() {
+describe('checkCoreSyncFinishedFactory', function main() {
   this.timeout(90000);
 
   let mongoDB;
