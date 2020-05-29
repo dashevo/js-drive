@@ -10,7 +10,7 @@ describe('waitForCoreSyncFactory', function main() {
   let secondDashCore;
   let thirdDashCore;
   let container;
-  let checkCoreSyncFinished;
+  let waitForCoreSync;
 
   before(async () => {
     mongoDB = await startMongoDb();
@@ -46,9 +46,9 @@ describe('waitForCoreSyncFactory', function main() {
     await secondDashCore.connect(firstDashCore);
 
     container = await createTestDIContainer(mongoDB, secondDashCore);
-    checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
+    waitForCoreSync = container.resolve('waitForCoreSync');
 
-    await checkCoreSyncFinished(() => {});
+    await waitForCoreSync(() => {});
 
     const secondApi = secondDashCore.getApi();
 
@@ -68,9 +68,9 @@ describe('waitForCoreSyncFactory', function main() {
 
     container = await createTestDIContainer(mongoDB, thirdDashCore);
 
-    checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
+    waitForCoreSync = container.resolve('waitForCoreSync');
 
-    await checkCoreSyncFinished(() => {});
+    await waitForCoreSync(() => {});
 
     const api = thirdDashCore.getApi();
 
