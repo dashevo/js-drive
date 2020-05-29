@@ -9,7 +9,7 @@ describe('waitReplicaSetInitializeFactory', function main() {
   let dashCore;
 
   before(async () => {
-    // mongoDB = await startMongoDb();
+    mongoDB = await startMongoDb();
     dashCore = await startDashCore();
   });
 
@@ -18,8 +18,6 @@ describe('waitReplicaSetInitializeFactory', function main() {
   });
 
   it('should wait until mongodb replica set is initialed', async () => {
-    mongoDB = await startMongoDb();
-
     await createTestDIContainer(mongoDB, dashCore);
 
     const status = await mongoDB.getClient().db('test')
