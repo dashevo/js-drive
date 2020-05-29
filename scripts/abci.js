@@ -13,13 +13,17 @@ const errorHandler = require('../lib/errorHandler');
   logger.info('Connecting to MongoDB');
 
   const waitReplicaSetInitialize = container.resolve('waitReplicaSetInitialize');
-  await waitReplicaSetInitialize();
+  await waitReplicaSetInitialize((retry, maxRetries) => {
+    logger.info(
+      `Waiting for replica set to be initialized ${retry}/${maxRetries}`,
+    );
+  });
 
   logger.info('Connecting to Core');
   const checkCoreSyncFinished = container.resolve('checkCoreSyncFinished');
   await checkCoreSyncFinished((currentBlockHeight, currentHeaderNumber) => {
     logger.info(
-      `waiting for Core to finish sync ${currentBlockHeight}/${currentHeaderNumber}`,
+      `Waiting for Core to finish sync ${currentBlockHeight}/${currentHeaderNumber}`,
     );
   });
 
