@@ -10,7 +10,7 @@ const errorHandler = require('../lib/errorHandler');
   const container = await createDIContainer(process.env);
 
   const logger = container.resolve('logger');
-  
+
   logger.info('Connecting to MongoDB');
   const waitReplicaSetInitialize = container.resolve('waitReplicaSetInitialize');
   await waitReplicaSetInitialize((retry, maxRetries) => {
