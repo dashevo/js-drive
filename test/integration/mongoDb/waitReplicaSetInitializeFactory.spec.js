@@ -7,6 +7,8 @@ describe('waitReplicaSetInitializeFactory', function main() {
 
   let mongoDB;
   let dashCore;
+  let container;
+  let waitReplicaSetInitialize;
 
   before(async () => {
     mongoDB = await startMongoDb();
@@ -17,8 +19,18 @@ describe('waitReplicaSetInitializeFactory', function main() {
     await mongoDB.remove();
   });
 
+  afterEach(async () => {
+    if (container) {
+      await container.dispose();
+    }
+  });
+
   it('should wait until mongodb replica set is initialed', async () => {
-    await createTestDIContainer(mongoDB, dashCore);
+    container = await createTestDIContainer(mongoDB, dashCore);
+
+    waitReplicaSetInitialize = container.resolve('waitReplicaSetInitialize');
+
+    await waitReplicaSetInitialize(() => {});
 
     const status = await mongoDB.getClient().db('test')
       .admin()
