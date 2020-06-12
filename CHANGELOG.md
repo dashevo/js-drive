@@ -1,3 +1,12 @@
+## [0.13.2](https://github.com/dashevo/drive/compare/v0.13.0-dev.2...v0.13.2) (2020-06-12)
+
+
+### Bug Fixes
+
+* internal errors lead to inability to fix bugs as it leads to a state inconsistency ([#360](https://github.com/dashevo/drive/issues/360))
+
+
+
 ## [0.13.1](https://github.com/dashevo/drive/compare/v0.13.0...v0.13.1) (2020-06-12)
 
 
