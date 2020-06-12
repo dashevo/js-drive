@@ -91,15 +91,14 @@ describe('wrapInErrorHandlerFactory', () => {
     methodMock.throws(unknownError);
 
     handler = wrapInErrorHandler(
-      methodMock, true,
+      methodMock, { throwNonABCIErrors: true },
     );
 
     try {
       await handler(request);
       expect.fail('Error was not re-thrown');
     } catch (e) {
-      expect(e).to.be.an.instanceOf(InternalAbciError);
-      expect(e.getError()).to.equal(unknownError);
+      expect(e).to.equal(unknownError);
     }
   });
 });
