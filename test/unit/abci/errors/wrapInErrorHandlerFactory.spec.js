@@ -83,4 +83,16 @@ describe('wrapInErrorHandlerFactory', () => {
       tags: [],
     });
   });
+
+  it('should rethrow internal errors in case `rethrowInternalErrors` options is set', async () => {
+    const unknownError = new Error('Some internal error indicating a bug');
+
+    methodMock.throws(unknownError);
+
+    try {
+      await handler(request);
+    } catch (e) {
+      expect(e).to.equal(unknownError);
+    }
+  });
 });
