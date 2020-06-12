@@ -8,6 +8,7 @@ describe('wrapInErrorHandlerFactory', () => {
   let methodMock;
   let request;
   let handler;
+  let wrapInErrorHandler;
 
   beforeEach(function beforeEach() {
     request = {
@@ -18,7 +19,7 @@ describe('wrapInErrorHandlerFactory', () => {
       error: this.sinon.stub(),
     };
 
-    const wrapInErrorHandler = wrapInErrorHandlerFactory(loggerMock);
+    wrapInErrorHandler = wrapInErrorHandlerFactory(loggerMock);
     methodMock = this.sinon.stub();
 
     handler = wrapInErrorHandler(
@@ -89,10 +90,16 @@ describe('wrapInErrorHandlerFactory', () => {
 
     methodMock.throws(unknownError);
 
+    handler = wrapInErrorHandler(
+      methodMock, true,
+    );
+
     try {
       await handler(request);
+      expect.fail('Error was not re-thrown');
     } catch (e) {
-      expect(e).to.equal(unknownError);
+      expect(e).to.be.an.instanceOf(InternalAbciError);
+      expect(e.getError()).to.equal(unknownError);
     }
   });
 });
