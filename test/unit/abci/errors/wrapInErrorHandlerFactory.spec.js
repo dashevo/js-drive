@@ -23,7 +23,7 @@ describe('wrapInErrorHandlerFactory', () => {
     methodMock = this.sinon.stub();
 
     handler = wrapInErrorHandler(
-      methodMock,
+      methodMock, { throwNonABCIErrors: false },
     );
   });
 
