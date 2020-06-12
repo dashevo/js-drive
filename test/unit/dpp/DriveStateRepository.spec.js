@@ -174,7 +174,7 @@ describe('DriveStateRepository', () => {
   describe('#storeDocument', () => {
     it('should store document in repository', async function it() {
       const storeMock = this.sinon.stub();
-      createDocumentRepositoryMock.returns({
+      createDocumentRepositoryMock.resolves({
         store: storeMock,
       });
 
@@ -196,7 +196,7 @@ describe('DriveStateRepository', () => {
       const type = 'documentType';
 
       const deleteMock = this.sinon.stub();
-      createDocumentRepositoryMock.returns({
+      createDocumentRepositoryMock.resolves({
         delete: deleteMock,
       });
 
