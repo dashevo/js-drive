@@ -5,6 +5,7 @@ const ConflictingConditionsError = require('../../../../lib/document/query/error
 const NestedSystemFieldError = require('../../../../lib/document/query/errors/NestedSystemFieldError');
 const NestedElementMatchError = require('../../../../lib/document/query/errors/NestedElementMatchError');
 const DuplicateSortingFieldError = require('../../../../lib/document/query/errors/DuplicateSortingFieldError');
+const InvalidDateFieldError = require('../../../../lib/document/query/errors/InvalidDateFieldError');
 
 const typesTestCases = {
   number: {
@@ -276,6 +277,30 @@ describe('validateQueryFactory', () => {
               '^(\\$id|\\$ownerId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
             );
           });
+        });
+
+        it('should return invalid result if reserved date fields are not numbers', () => {
+          const result = validateQuery({ where: [['$createdAt', '==', '1']] }, documentSchema);
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+
+          const [error] = result.getErrors();
+
+          expect(error).to.be.an.instanceOf(InvalidDateFieldError);
+          expect(error.getFieldName()).to.equal('$createdAt');
+        });
+
+        it('should return invalid result if reserved date fields are not positive numbers', () => {
+          const result = validateQuery({ where: [['$createdAt', '==', -1]] }, documentSchema);
+
+          expect(result).to.be.instanceOf(ValidationResult);
+          expect(result.isValid()).to.be.false();
+
+          const [error] = result.getErrors();
+
+          expect(error).to.be.an.instanceOf(InvalidDateFieldError);
+          expect(error.getFieldName()).to.equal('$createdAt');
         });
       });
 
