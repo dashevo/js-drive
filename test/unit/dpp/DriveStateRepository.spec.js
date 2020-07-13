@@ -64,8 +64,8 @@ describe('DriveStateRepository', () => {
       fetchDocumentsMock,
       createDocumentRepositoryMock,
       coreRpcClientMock,
-      blockExecutionDBTransactionsMock,
       blockExecutionStateMock,
+      blockExecutionDBTransactionsMock,
     );
 
     transactionMock = {};

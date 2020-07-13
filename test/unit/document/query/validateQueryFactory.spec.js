@@ -274,7 +274,7 @@ describe('validateQueryFactory', () => {
             expect(result.errors[0].dataPath).to.be.equal('.where[0][0]');
             expect(result.errors[0].keyword).to.be.equal('pattern');
             expect(result.errors[0].params.pattern).to.be.equal(
-              '^(\\$id|\\$ownerId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
+              '^(\\$id|\\$ownerId|\\$createdAt|\\$updatedAt|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
             );
           });
         });
@@ -1113,7 +1113,7 @@ describe('validateQueryFactory', () => {
         expect(result.errors[0].dataPath).to.be.equal('.orderBy[0][0]');
         expect(result.errors[0].keyword).to.be.equal('pattern');
         expect(result.errors[0].params.pattern).to.be.equal(
-          '^(\\$id|\\$ownerId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
+          '^(\\$id|\\$ownerId|\\$createdAt|\\$updatedAt|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
         );
       });
     });
