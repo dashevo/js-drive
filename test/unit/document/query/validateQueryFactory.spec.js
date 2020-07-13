@@ -5,7 +5,6 @@ const ConflictingConditionsError = require('../../../../lib/document/query/error
 const NestedSystemFieldError = require('../../../../lib/document/query/errors/NestedSystemFieldError');
 const NestedElementMatchError = require('../../../../lib/document/query/errors/NestedElementMatchError');
 const DuplicateSortingFieldError = require('../../../../lib/document/query/errors/DuplicateSortingFieldError');
-const InvalidDateFieldError = require('../../../../lib/document/query/errors/InvalidDateFieldError');
 
 const typesTestCases = {
   number: {
@@ -274,33 +273,9 @@ describe('validateQueryFactory', () => {
             expect(result.errors[0].dataPath).to.be.equal('.where[0][0]');
             expect(result.errors[0].keyword).to.be.equal('pattern');
             expect(result.errors[0].params.pattern).to.be.equal(
-              '^(\\$id|\\$ownerId|\\$createdAt|\\$updatedAt|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
+              '^(\\$id|\\$ownerId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
             );
           });
-        });
-
-        it('should return invalid result if reserved date fields are not numbers', () => {
-          const result = validateQuery({ where: [['$createdAt', '==', '1']] }, documentSchema);
-
-          expect(result).to.be.instanceOf(ValidationResult);
-          expect(result.isValid()).to.be.false();
-
-          const [error] = result.getErrors();
-
-          expect(error).to.be.an.instanceOf(InvalidDateFieldError);
-          expect(error.getFieldName()).to.equal('$createdAt');
-        });
-
-        it('should return invalid result if reserved date fields are not positive numbers', () => {
-          const result = validateQuery({ where: [['$createdAt', '==', -1]] }, documentSchema);
-
-          expect(result).to.be.instanceOf(ValidationResult);
-          expect(result.isValid()).to.be.false();
-
-          const [error] = result.getErrors();
-
-          expect(error).to.be.an.instanceOf(InvalidDateFieldError);
-          expect(error.getFieldName()).to.equal('$createdAt');
         });
       });
 
@@ -341,7 +316,7 @@ describe('validateQueryFactory', () => {
             expect(result).to.be.instanceOf(ValidationResult);
             expect(result.isValid()).to.be.false();
 
-            expect(result.errors[6].dataPath).to.be.equal('.where[0]');
+            expect(result.errors[6].dataPath).to.be.equal('.where[0][1]');
             expect(result.errors[6].keyword).to.be.equal('oneOf');
           });
 
@@ -1113,7 +1088,7 @@ describe('validateQueryFactory', () => {
         expect(result.errors[0].dataPath).to.be.equal('.orderBy[0][0]');
         expect(result.errors[0].keyword).to.be.equal('pattern');
         expect(result.errors[0].params.pattern).to.be.equal(
-          '^(\\$id|\\$ownerId|\\$createdAt|\\$updatedAt|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
+          '^(\\$id|\\$ownerId|[a-zA-Z0-9-_]|[a-zA-Z0-9-_]+(.[a-zA-Z0-9-_]+)+?)$',
         );
       });
     });
