@@ -82,6 +82,8 @@
     "long": "^4.0.0",
     "lru-cache": "^5.1.1",
     "mongodb": "^3.5.5",
+    "pino": "^6.4.0",
+    "pino-pretty": "^4.0.3",
     "setimmediate": "^1.0.5",
     "through2": "^3.0.1",
     "winston": "^3.3.3"
