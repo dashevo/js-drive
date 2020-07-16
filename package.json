@@ -85,7 +85,6 @@
     "pino": "^6.4.0",
     "pino-pretty": "^4.0.3",
     "setimmediate": "^1.0.5",
-    "through2": "^3.0.1",
-    "winston": "^3.3.3"
+    "through2": "^3.0.1"
   }
 }
