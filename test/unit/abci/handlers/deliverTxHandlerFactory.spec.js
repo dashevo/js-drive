@@ -75,10 +75,15 @@ describe('deliverTxHandlerFactory', () => {
 
     blockExecutionStateMock = new BlockExecutionStateMock(this.sinon);
 
+    const loggerMock = {
+      debug: this.sinon.stub(),
+    };
+
     deliverTxHandler = deliverTxHandlerFactory(
       unserializeStateTransitionMock,
       dppMock,
       blockExecutionStateMock,
+      loggerMock,
     );
   });
 

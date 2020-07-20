@@ -41,10 +41,17 @@ describe('commitHandlerFactory', () => {
 
     blockExecutionStateMock.getDataContracts.returns([dataContract]);
     blockExecutionStateMock.getAccumulativeFees.returns(accumulativeFees);
+    blockExecutionStateMock.getHeader.returns({
+      height: 42,
+    });
 
     documentsDatabaseManagerMock = {
       create: this.sinon.stub(),
       drop: this.sinon.stub(),
+    };
+
+    const loggerMock = {
+      debug: this.sinon.stub(),
     };
 
     commitHandler = commitHandlerFactory(
@@ -53,6 +60,7 @@ describe('commitHandlerFactory', () => {
       blockExecutionDBTransactionsMock,
       blockExecutionStateMock,
       documentsDatabaseManagerMock,
+      loggerMock,
     );
   });
 
