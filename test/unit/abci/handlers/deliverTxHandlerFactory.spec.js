@@ -74,9 +74,13 @@ describe('deliverTxHandlerFactory', () => {
     unserializeStateTransitionMock = this.sinon.stub();
 
     blockExecutionStateMock = new BlockExecutionStateMock(this.sinon);
+    blockExecutionStateMock.getHeader.returns({
+      height: 42,
+    });
 
     const loggerMock = {
       debug: this.sinon.stub(),
+      info: this.sinon.stub(),
     };
 
     deliverTxHandler = deliverTxHandlerFactory(

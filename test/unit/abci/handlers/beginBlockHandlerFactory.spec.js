@@ -28,6 +28,7 @@ describe('beginBlockHandlerFactory', () => {
 
     const loggerMock = {
       debug: this.sinon.stub(),
+      info: this.sinon.stub(),
     };
 
     beginBlockHandler = beginBlockHandlerFactory(

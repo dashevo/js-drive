@@ -52,6 +52,7 @@ describe('commitHandlerFactory', () => {
 
     const loggerMock = {
       debug: this.sinon.stub(),
+      info: this.sinon.stub(),
     };
 
     commitHandler = commitHandlerFactory(
