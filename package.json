@@ -49,6 +49,7 @@
   "homepage": "https://github.com/dashevo/drive",
   "devDependencies": {
     "@dashevo/dp-services-ctl": "^0.13.1",
+    "@types/pino": "^6.3.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "dirty-chai": "^2.0.1",
@@ -66,7 +67,6 @@
     "@dashevo/dashcore-lib": "~0.18.1",
     "@dashevo/dashd-rpc": "^2.0.0",
     "@dashevo/dpp": "~0.14.0-dev.4",
-    "@types/pino": "^6.3.0",
     "abci": "^5.0.1",
     "ajv": "^6.10.0",
     "awilix": "^4.2.5",
