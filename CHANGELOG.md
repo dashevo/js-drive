@@ -1,3 +1,29 @@
+# [0.14.0](https://github.com/dashevo/drive/compare/v0.13.2...v0.14.0) (2020-07-23)
+
+
+### Features
+
+* increase MongoDB query allowed field length ([#366](https://github.com/dashevo/drive/issues/366))
+* logging of block execution process ([#365](https://github.com/dashevo/drive/issues/365))
+* use test suite to run functional and e2e tests ([#362](https://github.com/dashevo/drive/issues/362))
+* update to DPP v0.14 with timestamps ([#363](https://github.com/dashevo/drive/issues/363))
+
+
+### BREAKING CHANGES
+
+* See [DPP v0.14 breaking changes](https://github.com/dashevo/js-dpp/releases/tag/v0.14.0)
+
+
+
+## [0.13.2](https://github.com/dashevo/drive/compare/v0.13.1...v0.13.2) (2020-06-12)
+
+
+### Bug Fixes
+
+* internal errors lead to inability to fix bugs as it leads to a state inconsistency ([#360](https://github.com/dashevo/drive/issues/360)) ([f815346](https://github.com/dashevo/drive/commit/f815346d820910e585639795a717e8bd43f7b055))
+
+
+
 ## [0.13.2](https://github.com/dashevo/drive/compare/v0.13.0-dev.2...v0.13.2) (2020-06-12)
 
 
