@@ -53,23 +53,9 @@ describe('fetchDocumentsFactory', () => {
       documentsMongoDBPrefix,
     );
 
-    createDocumentMongoDbRepository = createDocumentMongoDbRepositoryFactory(
-      convertWhereToMongoDbQuery,
-      validateQuery,
-      getDocumentDatabase,
-    );
-
     dataContractRepository = new DataContractLevelDBRepository(
       dataContractLevelDB,
       new DashPlatformProtocol(),
-    );
-
-    dataContractCache = new LRUCache(500);
-
-    fetchDocuments = fetchDocumentsFactory(
-      createDocumentMongoDbRepository,
-      dataContractRepository,
-      dataContractCache,
     );
 
     ({ dataContract } = getDocumentsFixture);
@@ -89,6 +75,21 @@ describe('fetchDocumentsFactory', () => {
     ];
 
     await dataContractRepository.store(dataContract);
+
+    createDocumentMongoDbRepository = createDocumentMongoDbRepositoryFactory(
+      convertWhereToMongoDbQuery,
+      validateQuery,
+      getDocumentDatabase,
+      dataContractRepository,
+    );
+
+    dataContractCache = new LRUCache(500);
+
+    fetchDocuments = fetchDocumentsFactory(
+      createDocumentMongoDbRepository,
+      dataContractRepository,
+      dataContractCache,
+    );
   });
 
   afterEach(async () => {

@@ -46,10 +46,15 @@ describe('DocumentDatabaseManager', function main() {
       documentMongoDBPrefix,
     );
 
+    const dataContractRepositoryMock = {
+      fetch: () => dataContract,
+    };
+
     createDocumentRepository = createDocumentMongoDbRepositoryFactory(
       convertWhereToMongoDbQuery,
       validateQuery,
       getDocumentDatabase,
+      dataContractRepositoryMock,
     );
   });
 

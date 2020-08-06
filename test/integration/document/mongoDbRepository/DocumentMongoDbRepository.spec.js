@@ -128,7 +128,7 @@ describe('DocumentMongoDbRepository', function main() {
       mongoDatabase,
       convertWhereToMongoDbQuery,
       validateQuery,
-      document.getDataContractId(),
+      getDocumentsFixture.dataContract,
       document.getType(),
     );
 
