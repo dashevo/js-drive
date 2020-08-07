@@ -52,7 +52,9 @@ describe('DocumentDatabaseManager', function main() {
     };
 
     blockExecutionDBTransactionsMock = {
-      getTransaction: () => undefined,
+      getTransaction: () => ({
+        isStarted: () => false,
+      }),
     };
 
     createDocumentRepository = createDocumentMongoDbRepositoryFactory(

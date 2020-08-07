@@ -78,7 +78,9 @@ describe('fetchDocumentsFactory', () => {
     await dataContractRepository.store(dataContract);
 
     const blockExecutionDBTransactionsMock = {
-      getTransaction: () => undefined,
+      getTransaction: () => ({
+        isStarted: () => false,
+      }),
     };
 
     createDocumentMongoDbRepository = createDocumentMongoDbRepositoryFactory(

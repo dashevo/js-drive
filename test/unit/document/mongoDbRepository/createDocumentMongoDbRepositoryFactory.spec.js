@@ -32,7 +32,9 @@ describe('createDocumentMongoDbRepositoryFactory', () => {
     };
 
     const blockExecutionDBTransactionsMock = {
-      getTransaction: () => undefined,
+      getTransaction: () => ({
+        isStarted: () => false,
+      }),
     };
 
     createDocumentMongoDbRepository = createDocumentMongoDbRepositoryFactory(
