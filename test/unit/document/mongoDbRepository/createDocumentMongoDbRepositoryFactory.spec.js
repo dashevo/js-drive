@@ -31,11 +31,16 @@ describe('createDocumentMongoDbRepositoryFactory', () => {
       fetch: this.sinon.stub().resolves(dataContract),
     };
 
+    const blockExecutionDBTransactionsMock = {
+      getTransaction: () => undefined,
+    };
+
     createDocumentMongoDbRepository = createDocumentMongoDbRepositoryFactory(
       convertWhereToMongoDbQuery,
       validateQuery,
       getDocumentsDatabaseMock,
       dataContractRepositoryMock,
+      blockExecutionDBTransactionsMock,
     );
   });
 

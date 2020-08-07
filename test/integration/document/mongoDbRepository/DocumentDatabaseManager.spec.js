@@ -60,6 +60,7 @@ describe('DocumentDatabaseManager', function main() {
       validateQuery,
       getDocumentDatabase,
       dataContractRepositoryMock,
+      blockExecutionDBTransactionsMock,
     );
   });
 
@@ -76,7 +77,6 @@ describe('DocumentDatabaseManager', function main() {
       createDocumentRepository,
       convertToMongoDbIndices,
       getDocumentDatabase,
-      blockExecutionDBTransactionsMock,
     );
 
     await documentDatabaseManager.create(dataContract);
@@ -100,7 +100,6 @@ describe('DocumentDatabaseManager', function main() {
       createDocumentRepository,
       convertToMongoDbIndices,
       getDocumentDatabase,
-      blockExecutionDBTransactionsMock,
     );
 
     await documentDatabaseManager.create(dataContract);

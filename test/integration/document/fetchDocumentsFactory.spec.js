@@ -77,11 +77,16 @@ describe('fetchDocumentsFactory', () => {
 
     await dataContractRepository.store(dataContract);
 
+    const blockExecutionDBTransactionsMock = {
+      getTransaction: () => undefined,
+    };
+
     createDocumentMongoDbRepository = createDocumentMongoDbRepositoryFactory(
       convertWhereToMongoDbQuery,
       validateQuery,
       getDocumentDatabase,
       dataContractRepository,
+      blockExecutionDBTransactionsMock,
     );
 
     dataContractCache = new LRUCache(500);
