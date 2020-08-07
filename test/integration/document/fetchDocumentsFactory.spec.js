@@ -3,6 +3,7 @@ const LRUCache = require('lru-cache');
 const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
 const DashPlatformProtocol = require('@dashevo/dpp');
 
+const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 
 const convertWhereToMongoDbQuery = require('../../../lib/document/mongoDbRepository/convertWhereToMongoDbQuery');
@@ -58,11 +59,11 @@ describe('fetchDocumentsFactory', () => {
       new DashPlatformProtocol(),
     );
 
-    ({ dataContract } = getDocumentsFixture);
+    dataContract = getDataContractFixture();
 
     contractId = dataContract.getId();
 
-    [document] = getDocumentsFixture();
+    [document] = getDocumentsFixture(dataContract);
 
     documentType = document.getType();
 
@@ -146,7 +147,7 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should fetch documents by an equal date', async () => {
-    const [, , , indexedDocument] = getDocumentsFixture();
+    const [, , , indexedDocument] = getDocumentsFixture(dataContract);
 
     const documentRepository = await createDocumentMongoDbRepository(contractId, 'indexedDocument');
     await documentRepository.store(indexedDocument);
@@ -165,7 +166,7 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should fetch documents by a date range', async () => {
-    const [, , , indexedDocument] = getDocumentsFixture();
+    const [, , , indexedDocument] = getDocumentsFixture(dataContract);
 
     const documentRepository = await createDocumentMongoDbRepository(contractId, 'indexedDocument');
     await documentRepository.store(indexedDocument);
@@ -191,7 +192,7 @@ describe('fetchDocumentsFactory', () => {
   });
 
   it('should fetch empty array in case date is out of range', async () => {
-    const [, , , indexedDocument] = getDocumentsFixture();
+    const [, , , indexedDocument] = getDocumentsFixture(dataContract);
 
     const documentRepository = await createDocumentMongoDbRepository(contractId, 'indexedDocument');
     await documentRepository.store(indexedDocument);

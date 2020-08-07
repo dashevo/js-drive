@@ -1,4 +1,5 @@
 const createStateRepositoryMock = require('@dashevo/dpp/lib/test/mocks/createStateRepositoryMock');
+const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
 const getIdentityCreateSTFixture = require(
@@ -42,8 +43,8 @@ describe('createIsolatedDpp', () => {
       .setType(IdentityPublicKey.TYPES.ECDSA_SECP256K1)
       .setData(publicKey);
 
-    dataContract = getDocumentsFixture.dataContract;
-    const documents = getDocumentsFixture();
+    dataContract = getDataContractFixture();
+    const documents = getDocumentsFixture(dataContract);
     [document] = documents;
     document.contractId = dataContract.getId();
     identity = getIdentityFixture();
@@ -54,10 +55,12 @@ describe('createIsolatedDpp', () => {
 
     identityCreateTransition = getIdentityCreateSTFixture();
 
-    const documentTransitions = getDocumentTransitionsFixture(documents);
+    const documentTransitions = getDocumentTransitionsFixture({
+      create: documents,
+    });
     documentsBatchTransition = new DocumentsBatchTransition({
       ownerId: getDocumentsFixture.ownerId,
-      contractId: getDocumentsFixture.dataContract.getId(),
+      contractId: dataContract.getId(),
       transitions: documentTransitions.map((t) => t.toObject()),
     }, [dataContract]);
     documentsBatchTransition.sign(identityPublicKey, privateKey);
