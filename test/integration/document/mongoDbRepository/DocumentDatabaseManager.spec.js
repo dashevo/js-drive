@@ -21,6 +21,7 @@ describe('DocumentDatabaseManager', function main() {
   let dataContract;
   let mongoDB;
   let connectToDocumentMongoDB;
+  let blockExecutionDBTransactionsMock;
 
   before(async () => {
     mongoDB = await startMongoDb();
@@ -50,6 +51,10 @@ describe('DocumentDatabaseManager', function main() {
       fetch: () => dataContract,
     };
 
+    blockExecutionDBTransactionsMock = {
+      getTransaction: () => undefined,
+    };
+
     createDocumentRepository = createDocumentMongoDbRepositoryFactory(
       convertWhereToMongoDbQuery,
       validateQuery,
@@ -71,6 +76,7 @@ describe('DocumentDatabaseManager', function main() {
       createDocumentRepository,
       convertToMongoDbIndices,
       getDocumentDatabase,
+      blockExecutionDBTransactionsMock,
     );
 
     await documentDatabaseManager.create(dataContract);
@@ -94,6 +100,7 @@ describe('DocumentDatabaseManager', function main() {
       createDocumentRepository,
       convertToMongoDbIndices,
       getDocumentDatabase,
+      blockExecutionDBTransactionsMock,
     );
 
     await documentDatabaseManager.create(dataContract);
