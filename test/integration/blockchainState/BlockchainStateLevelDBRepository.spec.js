@@ -9,6 +9,7 @@ describe('BlockchainStateLevelDBRepository', () => {
   let db;
   let repository;
   let blockchainState;
+  let appVersion;
   let lastBlockHeight;
   let lastBlockAppHash;
 
@@ -17,10 +18,11 @@ describe('BlockchainStateLevelDBRepository', () => {
 
     repository = new BlockchainStateLevelDBRepository(db);
 
+    appVersion = 10;
     lastBlockHeight = Long.fromInt(42);
     lastBlockAppHash = Buffer.from('something');
 
-    blockchainState = new BlockchainState(lastBlockHeight, lastBlockAppHash);
+    blockchainState = new BlockchainState(appVersion, lastBlockHeight, lastBlockAppHash);
   });
 
   afterEach(async () => {
@@ -40,6 +42,8 @@ describe('BlockchainStateLevelDBRepository', () => {
 
       const storedState = cbor.decode(storedStateBuffer);
 
+      expect(storedState).to.have.property('appVersion', appVersion);
+
       expect(storedState).to.have.property('lastBlockHeight', lastBlockHeight.toString());
 
       expect(storedState).to.have.property('lastBlockAppHash');
@@ -52,6 +56,7 @@ describe('BlockchainStateLevelDBRepository', () => {
       const storedState = await repository.fetch();
 
       expect(storedState).to.be.instanceOf(BlockchainState);
+      expect(storedState.getProtocolVersion()).to.be.instanceOf(Number);
       expect(storedState.getLastBlockHeight()).to.be.instanceOf(Long);
       expect(storedState.getLastBlockHeight().toInt()).to.equal(0);
       expect(storedState.getLastBlockAppHash()).to.deep.equal(Buffer.alloc(0));
@@ -65,6 +70,7 @@ describe('BlockchainStateLevelDBRepository', () => {
       const storedState = await repository.fetch();
 
       expect(storedState).to.be.instanceOf(BlockchainState);
+      expect(storedState.getProtocolVersion()).to.be.instanceOf(Number);
       expect(storedState.getLastBlockHeight()).to.be.instanceOf(Long);
       expect(storedState.getLastBlockHeight()).to.deep.equal(lastBlockHeight);
       expect(storedState.getLastBlockAppHash()).to.deep.equal(lastBlockAppHash);
