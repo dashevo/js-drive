@@ -11,17 +11,17 @@ const BlockchainState = require('../../../../lib/blockchainState/BlockchainState
 const packageJson = require('../../../../package');
 
 describe('infoHandlerFactory', () => {
+  let appVersion;
   let lastBlockHeight;
-  let protocolVersion;
   let lastBlockAppHash;
   let infoHandler;
 
   beforeEach(() => {
     lastBlockHeight = 1;
     lastBlockAppHash = Buffer.alloc(0);
-    protocolVersion = 1;
+    appVersion = 1;
 
-    const blockchainState = new BlockchainState(protocolVersion, lastBlockHeight, lastBlockAppHash);
+    const blockchainState = new BlockchainState(appVersion, lastBlockHeight, lastBlockAppHash);
 
     infoHandler = infoHandlerFactory(blockchainState);
   });
@@ -33,7 +33,7 @@ describe('infoHandlerFactory', () => {
 
     expect(response).to.deep.include({
       version: packageJson.version,
-      appVersion: protocolVersion,
+      appVersion,
       lastBlockHeight,
       lastBlockAppHash,
     });

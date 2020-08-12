@@ -11,6 +11,7 @@ const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/Bloc
 const BlockExecutionStateMock = require('../../../../lib/test/mock/BlockExecutionStateMock');
 
 describe('beginBlockHandlerFactory', () => {
+  let appVersion;
   let beginBlockHandler;
   let request;
   let blockchainState;
@@ -39,8 +40,10 @@ describe('beginBlockHandlerFactory', () => {
     );
 
     blockHeight = 2;
+    appVersion = 1;
 
     header = {
+      appVersion,
       height: blockHeight,
       time: {
         seconds: Math.ceil(new Date().getTime() / 1000),
@@ -58,6 +61,7 @@ describe('beginBlockHandlerFactory', () => {
     expect(response).to.be.an.instanceOf(ResponseBeginBlock);
 
     expect(blockchainState.getLastBlockHeight()).to.equal(blockHeight);
+    expect(blockchainState.getAppVersion()).to.equal(appVersion);
 
     expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
     expect(blockExecutionStateMock.reset).to.be.calledOnce();
