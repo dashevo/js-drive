@@ -21,9 +21,9 @@ describe('infoHandlerFactory', () => {
     lastBlockAppHash = Buffer.alloc(0);
     appVersion = 1;
 
-    const blockchainState = new BlockchainState(appVersion, lastBlockHeight, lastBlockAppHash);
+    const blockchainState = new BlockchainState(lastBlockHeight, lastBlockAppHash);
 
-    infoHandler = infoHandlerFactory(blockchainState);
+    infoHandler = infoHandlerFactory(blockchainState, appVersion);
   });
 
   it('should return ResponseInfo', async () => {
