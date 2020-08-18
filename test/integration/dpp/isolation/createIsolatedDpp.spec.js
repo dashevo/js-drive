@@ -122,8 +122,6 @@ describe('createIsolatedDpp', () => {
         it('should create state transition from serialized data', async () => {
           const serializedDocumentsBatchTransition = documentsBatchTransition.serialize();
 
-          console.dir(documentsBatchTransition.toJSON());
-
           const isolatedDpp = await createIsolatedDpp();
 
           try {
@@ -132,9 +130,6 @@ describe('createIsolatedDpp', () => {
             );
 
             expect(result.toJSON()).to.deep.equal(documentsBatchTransition.toJSON());
-          } catch (e) {
-            console.dir(e);
-            throw e;
           } finally {
             isolatedDpp.dispose();
           }
