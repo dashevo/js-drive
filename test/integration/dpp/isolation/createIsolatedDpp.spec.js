@@ -61,6 +61,7 @@ describe('createIsolatedDpp', () => {
     documentsBatchTransition = new DocumentsBatchTransition({
       ownerId: getDocumentsFixture.ownerId,
       contractId: dataContract.getId(),
+      protocolVersion: 0,
       transitions: documentTransitions.map((t) => t.toObject()),
     }, [dataContract]);
     documentsBatchTransition.sign(identityPublicKey, privateKey);
@@ -68,6 +69,7 @@ describe('createIsolatedDpp', () => {
     dataContractCreateTransition = new DataContractCreateTransition({
       dataContract: dataContract.toJSON(),
       entropy: dataContract.getEntropy(),
+      protocolVersion: 0,
     });
     dataContractCreateTransition.sign(identityPublicKey, privateKey);
 
@@ -120,6 +122,8 @@ describe('createIsolatedDpp', () => {
         it('should create state transition from serialized data', async () => {
           const serializedDocumentsBatchTransition = documentsBatchTransition.serialize();
 
+          console.dir(documentsBatchTransition.toJSON());
+
           const isolatedDpp = await createIsolatedDpp();
 
           try {
@@ -128,6 +132,9 @@ describe('createIsolatedDpp', () => {
             );
 
             expect(result.toJSON()).to.deep.equal(documentsBatchTransition.toJSON());
+          } catch (e) {
+            console.dir(e);
+            throw e;
           } finally {
             isolatedDpp.dispose();
           }
