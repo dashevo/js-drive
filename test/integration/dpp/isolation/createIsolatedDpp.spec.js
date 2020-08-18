@@ -185,7 +185,7 @@ describe('createIsolatedDpp', () => {
 
       describe('IdentityCreateTransition', () => {
         it('should pass through validation result', async () => {
-          delete identityCreateTransition.lockedOutPoint;
+          delete identityCreateTransition.protocolVersion;
 
           const isolatedDpp = await createIsolatedDpp();
 
@@ -199,7 +199,7 @@ describe('createIsolatedDpp', () => {
 
             const [error] = e.getErrors();
             expect(error.name).to.equal('JsonSchemaError');
-            expect(error.params.missingProperty).to.equal('lockedOutPoint');
+            expect(error.params.missingProperty).to.equal('protocolVersion');
           } finally {
             isolatedDpp.dispose();
           }
