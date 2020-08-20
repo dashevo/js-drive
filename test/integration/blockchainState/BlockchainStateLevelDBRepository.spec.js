@@ -9,7 +9,6 @@ describe('BlockchainStateLevelDBRepository', () => {
   let db;
   let repository;
   let blockchainState;
-  let appVersion;
   let lastBlockHeight;
   let lastBlockAppHash;
 
@@ -18,11 +17,10 @@ describe('BlockchainStateLevelDBRepository', () => {
 
     repository = new BlockchainStateLevelDBRepository(db);
 
-    appVersion = 10;
     lastBlockHeight = Long.fromInt(42);
     lastBlockAppHash = Buffer.from('something');
 
-    blockchainState = new BlockchainState(appVersion, lastBlockHeight, lastBlockAppHash);
+    blockchainState = new BlockchainState(lastBlockHeight, lastBlockAppHash);
   });
 
   afterEach(async () => {
@@ -33,7 +31,6 @@ describe('BlockchainStateLevelDBRepository', () => {
   describe('#store', () => {
     it('should store blockchain state', async () => {
       const repositoryInstance = await repository.store(blockchainState);
-
       expect(repositoryInstance).to.equal(repository);
 
       const storedStateBuffer = await db.get(BlockchainStateLevelDBRepository.KEY_NAME);
@@ -41,8 +38,6 @@ describe('BlockchainStateLevelDBRepository', () => {
       expect(storedStateBuffer).to.be.instanceOf(Buffer);
 
       const storedState = cbor.decode(storedStateBuffer);
-
-      expect(storedState).to.have.property('appVersion', appVersion);
 
       expect(storedState).to.have.property('lastBlockHeight', lastBlockHeight.toString());
 
@@ -56,7 +51,6 @@ describe('BlockchainStateLevelDBRepository', () => {
       const storedState = await repository.fetch();
 
       expect(storedState).to.be.instanceOf(BlockchainState);
-      expect(storedState.getProtocolVersion()).to.be.instanceOf(Number);
       expect(storedState.getLastBlockHeight()).to.be.instanceOf(Long);
       expect(storedState.getLastBlockHeight().toInt()).to.equal(0);
       expect(storedState.getLastBlockAppHash()).to.deep.equal(Buffer.alloc(0));
@@ -70,7 +64,6 @@ describe('BlockchainStateLevelDBRepository', () => {
       const storedState = await repository.fetch();
 
       expect(storedState).to.be.instanceOf(BlockchainState);
-      expect(storedState.getProtocolVersion()).to.be.instanceOf(Number);
       expect(storedState.getLastBlockHeight()).to.be.instanceOf(Long);
       expect(storedState.getLastBlockHeight()).to.deep.equal(lastBlockHeight);
       expect(storedState.getLastBlockAppHash()).to.deep.equal(lastBlockAppHash);

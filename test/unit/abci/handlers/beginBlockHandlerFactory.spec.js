@@ -23,6 +23,8 @@ describe('beginBlockHandlerFactory', () => {
   beforeEach(function beforeEach() {
     blockchainState = new BlockchainState();
 
+    appVersion = 1;
+
     blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
 
     blockExecutionStateMock = new BlockExecutionStateMock(this.sinon);
@@ -36,14 +38,16 @@ describe('beginBlockHandlerFactory', () => {
       blockchainState,
       blockExecutionDBTransactionsMock,
       blockExecutionStateMock,
+      appVersion,
       loggerMock,
     );
 
     blockHeight = 2;
-    appVersion = 1;
 
     header = {
-      appVersion,
+      version: {
+        App: appVersion,
+      },
       height: blockHeight,
       time: {
         seconds: Math.ceil(new Date().getTime() / 1000),
@@ -61,8 +65,6 @@ describe('beginBlockHandlerFactory', () => {
     expect(response).to.be.an.instanceOf(ResponseBeginBlock);
 
     expect(blockchainState.getLastBlockHeight()).to.equal(blockHeight);
-    expect(blockchainState.getAppVersion()).to.equal(appVersion);
-
     expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
     expect(blockExecutionStateMock.reset).to.be.calledOnce();
     expect(blockExecutionStateMock.setHeader).to.be.calledOnceWithExactly(header);
