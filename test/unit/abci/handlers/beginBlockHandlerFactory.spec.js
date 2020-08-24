@@ -11,7 +11,7 @@ const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/Bloc
 const BlockExecutionStateMock = require('../../../../lib/test/mock/BlockExecutionStateMock');
 
 describe('beginBlockHandlerFactory', () => {
-  let appVersion;
+  let protocolVersion;
   let beginBlockHandler;
   let request;
   let blockchainState;
@@ -23,7 +23,7 @@ describe('beginBlockHandlerFactory', () => {
   beforeEach(function beforeEach() {
     blockchainState = new BlockchainState();
 
-    appVersion = 1;
+    protocolVersion = 1;
 
     blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
 
@@ -38,7 +38,7 @@ describe('beginBlockHandlerFactory', () => {
       blockchainState,
       blockExecutionDBTransactionsMock,
       blockExecutionStateMock,
-      appVersion,
+      protocolVersion,
       loggerMock,
     );
 
@@ -46,7 +46,7 @@ describe('beginBlockHandlerFactory', () => {
 
     header = {
       version: {
-        App: appVersion,
+        App: protocolVersion,
       },
       height: blockHeight,
       time: {
