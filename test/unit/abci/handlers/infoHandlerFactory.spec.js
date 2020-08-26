@@ -1,3 +1,5 @@
+const Long = require('long');
+
 const {
   abci: {
     ResponseInfo,
@@ -19,7 +21,7 @@ describe('infoHandlerFactory', () => {
   beforeEach(() => {
     lastBlockHeight = 1;
     lastBlockAppHash = Buffer.alloc(0);
-    protocolVersion = 1;
+    protocolVersion = Long.fromInt(1);
 
     const blockchainState = new BlockchainState(lastBlockHeight, lastBlockAppHash);
 
