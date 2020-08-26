@@ -71,6 +71,7 @@ describe('beginBlockHandlerFactory', () => {
     expect(blockExecutionStateMock.reset).to.be.calledOnce();
     expect(blockExecutionStateMock.setHeader).to.be.calledOnceWithExactly(header);
   });
+
   it('should reject not supported protocol version', async () => {
     request.header.version.App = Long.fromInt(42);
 
