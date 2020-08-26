@@ -21,7 +21,7 @@ describe('infoHandlerFactory', () => {
   beforeEach(() => {
     lastBlockHeight = 1;
     lastBlockAppHash = Buffer.alloc(0);
-    protocolVersion = Long.fromInt(1);
+    protocolVersion = Long.fromInt(0);
 
     const blockchainState = new BlockchainState(lastBlockHeight, lastBlockAppHash);
 

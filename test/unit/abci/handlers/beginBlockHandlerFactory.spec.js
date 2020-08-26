@@ -1,3 +1,5 @@
+const Long = require('long');
+
 const {
   abci: {
     ResponseBeginBlock,
@@ -23,7 +25,7 @@ describe('beginBlockHandlerFactory', () => {
   beforeEach(function beforeEach() {
     blockchainState = new BlockchainState();
 
-    protocolVersion = 1;
+    protocolVersion = Long.fromInt(0);
 
     blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
 
@@ -68,5 +70,17 @@ describe('beginBlockHandlerFactory', () => {
     expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
     expect(blockExecutionStateMock.reset).to.be.calledOnce();
     expect(blockExecutionStateMock.setHeader).to.be.calledOnceWithExactly(header);
+  });
+  it('should reject not supported protocol version', async () => {
+    request.header.version.App = Long.fromInt(42);
+
+    try {
+      await beginBlockHandler(request);
+      throw new Error('Expected exception to be thrown');
+    } catch (err) {
+      expect(err).to.be.an('Error');
+      expect(err.message).to.equal('Block protocol version 42 not supported. Expected to be less or equal to 0.')
+      expect(err.name).to.equal('NotSupportedProtocolVersionError');
+    }
   });
 });
