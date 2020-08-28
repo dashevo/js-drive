@@ -77,10 +77,11 @@ describe('beginBlockHandlerFactory', () => {
 
     try {
       await beginBlockHandler(request);
-      throw new Error('Expected exception to be thrown');
+
+      expect.fail('Expected exception to be thrown');
     } catch (err) {
       expect(err).to.be.an('Error');
-      expect(err.message).to.equal('Block protocol version 42 not supported. Expected to be less or equal to 0.')
+      expect(err.message).to.equal('Block protocol version 42 not supported. Expected to be less or equal to 0.');
       expect(err.name).to.equal('NotSupportedProtocolVersionError');
     }
   });
