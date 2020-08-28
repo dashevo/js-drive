@@ -756,6 +756,11 @@ describe('DocumentMongoDbRepository', function main() {
         key: {
           name: 1,
         },
+        partialFilterExpression: {
+          name: {
+            $exists: true,
+          },
+        },
         name: 'index_name',
         ns: 'test.documents_niceDocument',
       }]);
