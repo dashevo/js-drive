@@ -35,7 +35,7 @@ describe('infoHandlerFactory', () => {
 
     expect(response).to.deep.include({
       version: packageJson.version,
-      protocolVersion,
+      appVersion: protocolVersion,
       lastBlockHeight,
       lastBlockAppHash,
     });
