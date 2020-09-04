@@ -19,7 +19,7 @@ describe('wrapInErrorHandlerFactory', () => {
       error: this.sinon.stub(),
     };
 
-    wrapInErrorHandler = wrapInErrorHandlerFactory(loggerMock);
+    wrapInErrorHandler = wrapInErrorHandlerFactory(loggerMock, true);
     methodMock = this.sinon.stub();
 
     handler = wrapInErrorHandler(
@@ -141,7 +141,7 @@ describe('wrapInErrorHandlerFactory', () => {
   });
 
   it('should respond with verbose error containing message and stack in debug mode', async () => {
-    wrapInErrorHandler = wrapInErrorHandlerFactory(loggerMock, true);
+    wrapInErrorHandler = wrapInErrorHandlerFactory(loggerMock, false);
 
     const error = new Error('Custom error');
 
