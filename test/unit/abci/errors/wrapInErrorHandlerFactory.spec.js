@@ -140,7 +140,7 @@ describe('wrapInErrorHandlerFactory', () => {
     }
   });
 
-  it('should throw an internal error with message and stack in debug mode', async () => {
+  it('should respond with verbose error containing message and stack in debug mode', async () => {
     wrapInErrorHandler = wrapInErrorHandlerFactory(loggerMock, true);
 
     const error = new Error('Custom error');
