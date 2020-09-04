@@ -139,4 +139,36 @@ describe('wrapInErrorHandlerFactory', () => {
       expect(e).to.equal(unknownError);
     }
   });
+
+  it('should throw an internal error with message and stack in debug mode', async () => {
+    wrapInErrorHandler = wrapInErrorHandlerFactory(loggerMock, true);
+
+    const error = new Error('Custom error');
+
+    methodMock.throws(error);
+
+    handler = wrapInErrorHandler(
+      methodMock, { respondWithInternalError: true },
+    );
+
+    methodMock.throws(error);
+
+    const response = await handler(request);
+
+    const [, errorPath] = error.stack.toString().split(/\r\n|\n/);
+
+    expect(response).to.deep.equal({
+      code: 1,
+      log: JSON.stringify({
+        error: {
+          message: `${error.message} ${errorPath.trim()}`,
+          data: {
+            stack: error.stack,
+            data: undefined,
+          },
+        },
+      }),
+      tags: [],
+    });
+  });
 });
