@@ -3,7 +3,6 @@ const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFi
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 
 const CachedStateRepositoryDecorator = require('../../../lib/dpp/CachedStateRepositoryDecorator');
-const { expect } = require('chai');
 
 describe('CachedStateRepositoryDecorator', () => {
   let stateRepositoryMock;
