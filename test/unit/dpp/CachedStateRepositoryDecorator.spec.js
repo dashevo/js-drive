@@ -35,6 +35,7 @@ describe('CachedStateRepositoryDecorator', () => {
       storePublicKeyIdentityId: this.sinon.stub(),
       fetchPublicKeyIdentityId: this.sinon.stub(),
       fetchLatestPlatformBlockHeader: this.sinon.stub(),
+      fetchIdentityIdsByPublicKeys: this.sinon.stub(),
     };
 
     cachedStateRepository = new CachedStateRepositoryDecorator(
@@ -90,6 +91,29 @@ describe('CachedStateRepositoryDecorator', () => {
         firstPublicKey.hash(),
       );
       expect(result).to.deep.equal(identity.getId());
+    });
+  });
+
+  describe('#fetchIdentityIdsByPublicKeys', () => {
+    it('should fetch identity id and public key hash pairs map from repository', async () => {
+      const publicKeys = identity.getPublicKeys();
+
+      stateRepositoryMock.fetchIdentityIdsByPublicKeys.resolves({
+        [publicKeys[0].hash()]: identity.getId(),
+        [publicKeys[1].hash()]: identity.getId(),
+      });
+
+      const result = await cachedStateRepository.fetchIdentityIdsByPublicKeys(
+        publicKeys.map((pk) => pk.hash()),
+      );
+
+      expect(stateRepositoryMock.fetchIdentityIdsByPublicKeys).to.be.calledOnceWithExactly(
+        publicKeys.map((pk) => pk.hash()),
+      );
+      expect(result).to.deep.equal({
+        [publicKeys[0].hash()]: identity.getId(),
+        [publicKeys[1].hash()]: identity.getId(),
+      });
     });
   });
 
