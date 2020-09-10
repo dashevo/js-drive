@@ -33,7 +33,7 @@ describe('CachedStateRepositoryDecorator', () => {
       storeDocument: this.sinon.stub(),
       removeDocument: this.sinon.stub(),
       storePublicKeyIdentityId: this.sinon.stub(),
-      storeIdentityIdPublicKeys: this.sinon.stub(),
+      storeIdentityIdPublicKeyHashes: this.sinon.stub(),
       fetchPublicKeyIdentityId: this.sinon.stub(),
       fetchLatestPlatformBlockHeader: this.sinon.stub(),
     };
@@ -77,15 +77,15 @@ describe('CachedStateRepositoryDecorator', () => {
     });
   });
 
-  describe('#storeIdentityIdPublicKeys', () => {
+  describe('#storeIdentityIdPublicKeyHashes', () => {
     it('should store identity id and public key hashes to repository', async () => {
       const publicKeyHashes = identity.getPublicKeys().map((pk) => pk.hash());
 
-      await cachedStateRepository.storeIdentityIdPublicKeys(
+      await cachedStateRepository.storeIdentityIdPublicKeyHashes(
         identity.getId(), publicKeyHashes,
       );
 
-      expect(stateRepositoryMock.storeIdentityIdPublicKeys).to.be.calledOnceWithExactly(
+      expect(stateRepositoryMock.storeIdentityIdPublicKeyHashes).to.be.calledOnceWithExactly(
         identity.getId(), publicKeyHashes,
       );
     });
