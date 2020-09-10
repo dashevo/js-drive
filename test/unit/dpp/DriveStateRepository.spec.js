@@ -161,7 +161,7 @@ describe('DriveStateRepository', () => {
     });
   });
 
-  describe('#fetchIdentityIdsByPublicKeys', () => {
+  describe('#fetchIdentityIdsByPublicKeyHashes', () => {
     it('should fetch map of previously stored public key hash and identity id pairs', async () => {
       const publicKeyHashes = [
         identity.getPublicKeyById(0).hash(),
@@ -178,7 +178,7 @@ describe('DriveStateRepository', () => {
         .withArgs(publicKeyHashes[1])
         .resolves(identity.getId());
 
-      const result = await stateRepository.fetchIdentityIdsByPublicKeys(
+      const result = await stateRepository.fetchIdentityIdsByPublicKeyHashes(
         publicKeyHashes,
       );
 
@@ -204,7 +204,7 @@ describe('DriveStateRepository', () => {
         .withArgs(publicKeyHashes[1])
         .resolves(null);
 
-      const result = await stateRepository.fetchIdentityIdsByPublicKeys(
+      const result = await stateRepository.fetchIdentityIdsByPublicKeyHashes(
         publicKeyHashes,
       );
 
