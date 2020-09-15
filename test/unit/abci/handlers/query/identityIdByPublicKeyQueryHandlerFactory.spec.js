@@ -6,15 +6,15 @@ const {
   },
 } = require('abci/types');
 
-const identityIdByPublicKeyQueryHandlerFactory = require(
-  '../../../../../lib/abci/handlers/query/identityIdByPublicKeyQueryHandlerFactory',
+const identityIdByPublicKeyHashQueryHandlerFactory = require(
+  '../../../../../lib/abci/handlers/query/identityIdByPublicKeyHashQueryHandlerFactory',
 );
 
 const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
 
-describe('identityIdByPublicKeyQueryHandlerFactory', () => {
-  let identityIdByPublicKeyQueryHandler;
+describe('identityIdByPublicKeyHashQueryHandlerFactory', () => {
+  let identityIdByPublicKeyHashQueryHandler;
   let publicKeyIdentityIdRepositoryMock;
   let publicKeyHash;
   let identityId;
@@ -24,7 +24,7 @@ describe('identityIdByPublicKeyQueryHandlerFactory', () => {
       fetch: this.sinon.stub(),
     };
 
-    identityIdByPublicKeyQueryHandler = identityIdByPublicKeyQueryHandlerFactory(
+    identityIdByPublicKeyHashQueryHandler = identityIdByPublicKeyHashQueryHandlerFactory(
       publicKeyIdentityIdRepositoryMock,
     );
 
@@ -35,7 +35,7 @@ describe('identityIdByPublicKeyQueryHandlerFactory', () => {
   it('should return identity id', async () => {
     publicKeyIdentityIdRepositoryMock.fetch.resolves(identityId);
 
-    const result = await identityIdByPublicKeyQueryHandler({ publicKeyHash });
+    const result = await identityIdByPublicKeyHashQueryHandler({ publicKeyHash });
 
     expect(publicKeyIdentityIdRepositoryMock.fetch).to.be.calledOnceWith(publicKeyHash);
     expect(result).to.be.an.instanceof(ResponseQuery);
@@ -45,7 +45,7 @@ describe('identityIdByPublicKeyQueryHandlerFactory', () => {
 
   it('should throw NotFoundAbciError if identityId not found', async () => {
     try {
-      await identityIdByPublicKeyQueryHandler({ publicKeyHash });
+      await identityIdByPublicKeyHashQueryHandler({ publicKeyHash });
 
       expect.fail('should throw NotFoundAbciError');
     } catch (e) {
