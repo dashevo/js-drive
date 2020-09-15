@@ -129,9 +129,9 @@ describe('DriveStateRepository', () => {
     });
   });
 
-  describe('#storeIdentityIdPublicKeyHashes', () => {
+  describe('#storeIdentityPublicKeyHashes', () => {
     it('should store public key hashes for an identity id to repository', async () => {
-      await stateRepository.storeIdentityIdPublicKeyHashes(
+      await stateRepository.storeIdentityPublicKeyHashes(
         identity.getId(),
         [
           identity.getPublicKeyById(0).hash(),
