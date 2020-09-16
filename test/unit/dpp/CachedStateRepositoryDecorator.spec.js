@@ -33,8 +33,10 @@ describe('CachedStateRepositoryDecorator', () => {
       storeDocument: this.sinon.stub(),
       removeDocument: this.sinon.stub(),
       storePublicKeyIdentityId: this.sinon.stub(),
+      storeIdentityPublicKeyHashes: this.sinon.stub(),
       fetchPublicKeyIdentityId: this.sinon.stub(),
       fetchLatestPlatformBlockHeader: this.sinon.stub(),
+      fetchIdentityIdsByPublicKeyHashes: this.sinon.stub(),
     };
 
     cachedStateRepository = new CachedStateRepositoryDecorator(
@@ -76,6 +78,20 @@ describe('CachedStateRepositoryDecorator', () => {
     });
   });
 
+  describe('#storeIdentityPublicKeyHashes', () => {
+    it('should store identity id and public key hashes to repository', async () => {
+      const publicKeyHashes = identity.getPublicKeys().map((pk) => pk.hash());
+
+      await cachedStateRepository.storeIdentityPublicKeyHashes(
+        identity.getId(), publicKeyHashes,
+      );
+
+      expect(stateRepositoryMock.storeIdentityPublicKeyHashes).to.be.calledOnceWithExactly(
+        identity.getId(), publicKeyHashes,
+      );
+    });
+  });
+
   describe('#fetchPublicKeyIdentityId', () => {
     it('should fetch identity id by public key hash from repository', async () => {
       const [firstPublicKey] = identity.getPublicKeys();
@@ -90,6 +106,29 @@ describe('CachedStateRepositoryDecorator', () => {
         firstPublicKey.hash(),
       );
       expect(result).to.deep.equal(identity.getId());
+    });
+  });
+
+  describe('#fetchIdentityIdsByPublicKeyHashes', () => {
+    it('should fetch identity id and public key hash pairs map from repository', async () => {
+      const publicKeys = identity.getPublicKeys();
+
+      stateRepositoryMock.fetchIdentityIdsByPublicKeyHashes.resolves({
+        [publicKeys[0].hash()]: identity.getId(),
+        [publicKeys[1].hash()]: identity.getId(),
+      });
+
+      const result = await cachedStateRepository.fetchIdentityIdsByPublicKeyHashes(
+        publicKeys.map((pk) => pk.hash()),
+      );
+
+      expect(stateRepositoryMock.fetchIdentityIdsByPublicKeyHashes).to.be.calledOnceWithExactly(
+        publicKeys.map((pk) => pk.hash()),
+      );
+      expect(result).to.deep.equal({
+        [publicKeys[0].hash()]: identity.getId(),
+        [publicKeys[1].hash()]: identity.getId(),
+      });
     });
   });
 
