@@ -66,7 +66,7 @@ describe('identityIdsByPublicKeyHashesQueryHandlerFactory', () => {
 
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(cbor.encodeCanonical({
+    expect(result.value).to.deep.equal(cbor.encode({
       publicKeyHashIdentityIdMap,
     }));
   });

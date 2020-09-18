@@ -6,6 +6,8 @@ const {
   },
 } = require('abci/types');
 
+const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
+
 const identitiesByPublicKeyHashesQueryHandlerFactory = require(
   '../../../../../lib/abci/handlers/query/identitiesByPublicKeyHashesQueryHandlerFactory',
 );
@@ -16,7 +18,8 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
   let identityRepositoryMock;
   let publicKeyHashes;
   let identityIds;
-  let publicKeyHashIdentitiesMap;
+  let identities;
+  let publicKeyHashIdentityMap;
 
   beforeEach(function beforeEach() {
     publicKeyIdentityIdRepositoryMock = {
@@ -37,10 +40,11 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       '784ca12495d2e61f992db9e55d1f9599b0cf1329',
       '784ca12495d2e61f992db9e55d1f9599b0cf1330',
     ];
-    identityIds = [
-      'F55Ln4ibxcZB7K9bcwCHYifCvrtQcWRWkJejPgEsz2px',
-      'F55Ln4ibxcZB7K9bcwCHYifCvrtQcWRWkJejPgEsz3px',
+    identities = [
+      getIdentityFixture(),
+      getIdentityFixture(),
     ];
+    identityIds = identities.map((identity) => identity.getId());
 
     publicKeyIdentityIdRepositoryMock
       .fetch
@@ -54,17 +58,25 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
 
     identityRepositoryMock.fetch
       .withArgs(identityIds[0])
-      .resolves({});
+      .resolves(identities[0]);
 
     identityRepositoryMock.fetch
       .withArgs(identityIds[1])
-      .resolves({});
+      .resolves(identities[1]);
 
-    publicKeyHashIdentitiesMap = publicKeyHashes.reduce((result, publicKeyHash, index) => {
-      const identityId = identityIds[index];
+    publicKeyHashIdentityMap = publicKeyHashes.reduce((result, publicKeyHash, index) => {
+      const identity = identities[index];
+
+      if (!identity) {
+        return {
+          ...result,
+          [publicKeyHash]: null,
+        };
+      }
+
       return {
         ...result,
-        [publicKeyHash]: identityId,
+        [publicKeyHash]: identity.serialize(),
       };
     }, {});
   });
@@ -84,7 +96,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
     expect(result.value).to.deep.equal(cbor.encode({
-      publicKeyHashIdentitiesMap,
+      publicKeyHashIdentityMap,
     }));
   });
 });
