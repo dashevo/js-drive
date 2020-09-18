@@ -16,7 +16,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
   let identityRepositoryMock;
   let publicKeyHashes;
   let identityIds;
-  let publicKeyHashIdentityIdMap;
+  let publicKeyHashIdentitiesMap;
 
   beforeEach(function beforeEach() {
     publicKeyIdentityIdRepositoryMock = {
@@ -60,7 +60,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       .withArgs(identityIds[1])
       .resolves({});
 
-    publicKeyHashIdentityMap = publicKeyHashes.reduce((result, publicKeyHash, index) => {
+    publicKeyHashIdentitiesMap = publicKeyHashes.reduce((result, publicKeyHash, index) => {
       const identityId = identityIds[index];
       return {
         ...result,
@@ -83,8 +83,8 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
 
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(cbor.encodeCanonical({
-      publicKeyHashIdentityMap,
+    expect(result.value).to.deep.equal(cbor.encode({
+      publicKeyHashIdentitiesMap,
     }));
   });
 });
