@@ -27,6 +27,10 @@ const errorHandler = require('../lib/errorHandler');
     );
   });
 
+  logger.info('Synchronizing latestChainlock');
+  const waitForCoreChainLockSync = container.resolve('waitForCoreChainLockSync');
+  await waitForCoreChainLockSync();
+
   const server = createServer(
     container.resolve('abciHandlers'),
   );
