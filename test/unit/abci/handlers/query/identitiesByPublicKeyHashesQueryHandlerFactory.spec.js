@@ -19,7 +19,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
   let publicKeyHashes;
   let identityIds;
   let identities;
-  let publicKeyHashIdentityMap;
+  let identitiesByPublicKeyHashes;
 
   beforeEach(function beforeEach() {
     publicKeyIdentityIdRepositoryMock = {
@@ -64,21 +64,15 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       .withArgs(identityIds[1])
       .resolves(identities[1]);
 
-    publicKeyHashIdentityMap = publicKeyHashes.reduce((result, publicKeyHash, index) => {
+    identitiesByPublicKeyHashes = publicKeyHashes.map((publicKeyHash, index) => {
       const identity = identities[index];
 
       if (!identity) {
-        return {
-          ...result,
-          [publicKeyHash]: null,
-        };
+        return null;
       }
 
-      return {
-        ...result,
-        [publicKeyHash]: identity.serialize(),
-      };
-    }, {});
+      return identity.serialize();
+    });
   });
 
   it('should return identity id map', async () => {
@@ -96,7 +90,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
     expect(result.value).to.deep.equal(cbor.encode({
-      publicKeyHashIdentityMap,
+      identities: identitiesByPublicKeyHashes,
     }));
   });
 });
