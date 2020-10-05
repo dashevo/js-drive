@@ -4,22 +4,25 @@ const waitForCoreChainLockSyncFactory = require('../../../lib/core/waitForCoreCh
 describe('waitForCoreChainLockSyncFactory', () => {
   let waitForCoreChainLockHandler;
   let latestCoreChainLock;
-  let loggerMock;
   let coreRpcClientMock;
   let coreZMQClientMock;
-  beforeEach(() => {
-    const loggerMock = {
-      debug: this.sinon.stub(),
-      info: this.sinon.stub(),
-    };
+
+  beforeEach(function beforeEach() {
+    latestCoreChainLock = new LatestCoreChainLock(this.sinon);
     coreRpcClientMock = {
       getBestChainLock: this.sinon.stub(),
+      getBlock: this.sinon.stub(),
     };
     coreZMQClientMock = {
       connect: this.sinon.stub(),
       subscribe: this.sinon.stub(),
+      on: this.sinon.stub(),
+      emit: this.sinon.stub(),
     };
-    latestCoreChainLock = new LatestCoreChainLock(this.sinon);
+    const loggerMock = {
+      debug: this.sinon.stub(),
+      info: this.sinon.stub(),
+    };
     waitForCoreChainLockHandler = waitForCoreChainLockSyncFactory(
       coreZMQClientMock,
       coreRpcClientMock,
@@ -30,13 +33,6 @@ describe('waitForCoreChainLockSyncFactory', () => {
 
   it('should wait for chainlock to be synced', async () => {
     const response = await waitForCoreChainLockHandler();
-
-    console.log({response});
-    // expect(response).to.be.an.instanceOf(ResponseBeginBlock);
-    //
-    // expect(blockchainState.getLastBlockHeight()).to.equal(blockHeight);
-    // expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
-    // expect(blockExecutionStateMock.reset).to.be.calledOnce();
-    // expect(blockExecutionStateMock.setHeader).to.be.calledOnceWithExactly(header);
+    expect(response.latestCoreChainLock).to.be.an.instanceOf(LatestCoreChainLock);
   });
 });
