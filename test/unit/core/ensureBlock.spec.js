@@ -6,7 +6,7 @@ chai.should();
 
 const ZMQClient = require('@dashevo/dashd-zmq');
 const EventEmitter = require('events');
-const ensureBlock = require('../../../lib/util/ensureBlock');
+const ensureBlock = require('../../../lib/core/ensureBlock');
 
 describe('ensureBlock', () => {
   const hash = '00000';

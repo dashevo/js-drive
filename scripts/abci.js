@@ -27,7 +27,7 @@ const errorHandler = require('../lib/errorHandler');
     );
   });
 
-  logger.info('Synchronizing latestChainlock');
+  logger.info('Obtaining the latest Core ChainLock...');
   const waitForCoreChainLockSync = container.resolve('waitForCoreChainLockSync');
   await waitForCoreChainLockSync();
 
