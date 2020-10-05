@@ -4,7 +4,7 @@ describe('LatestCoreChainLock', () => {
   beforeEach(() => {
   });
 
-  describe('instantiation', () => {
+  describe('#constructor', () => {
     it('should instantiates', () => {
       const latestCoreChainLock = new LatestCoreChainLock();
       expect(latestCoreChainLock.chainLock).to.equal(null);
@@ -12,7 +12,7 @@ describe('LatestCoreChainLock', () => {
       expect(latestCoreChainLockWithValue.chainLock).to.equal('someValue');
     });
   });
-  describe('usage', () => {
+  describe('#update', () => {
     it('should update', () => {
       const latestCoreChainLock = new LatestCoreChainLock();
       latestCoreChainLock.update('someValue');
