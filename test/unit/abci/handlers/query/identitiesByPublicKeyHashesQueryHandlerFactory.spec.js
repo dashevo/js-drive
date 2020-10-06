@@ -68,7 +68,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       const identity = identities[index];
 
       if (!identity) {
-        return null;
+        return Buffer.alloc(0);
       }
 
       return identity.serialize();
