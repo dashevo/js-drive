@@ -1,4 +1,5 @@
 const cbor = require('cbor');
+const bs58 = require('bs58');
 
 const {
   abci: {
@@ -47,7 +48,13 @@ describe('identityIdsByPublicKeyHashesQueryHandlerFactory', () => {
       .resolves(identityIds[1]);
 
     identityIdsByPublicKeyHashes = publicKeyHashes
-      .map((publicKeyHash, index) => (identityIds[index]));
+      .map((publicKeyHash, index) => {
+        if (identityIds[index]) {
+          return bs58.decode(identityIds[index]);
+        }
+
+        return Buffer.alloc(0);
+      });
   });
 
   it('should return identity id map', async () => {
