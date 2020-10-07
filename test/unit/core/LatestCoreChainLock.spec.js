@@ -5,7 +5,7 @@ describe('LatestCoreChainLock', () => {
   });
 
   describe('#constructor', () => {
-    it('should instantiates', () => {
+    it('should instantiate', () => {
       const latestCoreChainLock = new LatestCoreChainLock();
       expect(latestCoreChainLock.chainLock).to.equal(undefined);
       const latestCoreChainLockWithValue = new LatestCoreChainLock('someValue');
