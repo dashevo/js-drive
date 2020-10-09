@@ -17,6 +17,8 @@ const findNotIndexedFields = require('../../../../lib/document/query/findNotInde
 const findNotIndexedOrderByFields = require('../../../../lib/document/query/findNotIndexedOrderByFields');
 const getIndexedFieldsFromDocumentSchema = require('../../../../lib/document/query/getIndexedFieldsFromDocumentSchema');
 
+const Identifier = require('@dashevo/dpp/lib/Identifier');
+
 function jsonizeDocuments(documents) {
   return documents.map((d) => d.toJSON());
 }
@@ -490,7 +492,7 @@ describe('DocumentMongoDbRepository', function main() {
             // Ensure unique ID
 
             // eslint-disable-next-line no-param-reassign
-            svDoc.id = i + 1;
+            svDoc.id = Identifier.from(Buffer.alloc(32, i + 1));
 
             return documentRepository.store(svDoc);
           }),
@@ -616,7 +618,7 @@ describe('DocumentMongoDbRepository', function main() {
         await Promise.all(
           documents.map((svDoc, i) => {
             // eslint-disable-next-line no-param-reassign
-            svDoc.id = i + 1;
+            svDoc.id = Identifier.from(Buffer.alloc(32, i + 1));
 
             return documentRepository.store(svDoc);
           }),

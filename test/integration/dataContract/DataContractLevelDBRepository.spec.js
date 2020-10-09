@@ -1,3 +1,4 @@
+const bs58 = require('bs58');
 const level = require('level-rocksdb');
 const cbor = require('cbor');
 
@@ -24,12 +25,12 @@ describe('DataContractLevelDBRepository', () => {
     dppMock = createDPPMock(this.sinon);
     dppMock
       .dataContract
-      .createFromSerialized
+      .createFromBuffer
       .resolves(dataContract);
 
     repository = new DataContractLevelDBRepository(db, dppMock);
 
-    key = `${DataContractLevelDBRepository.KEY_PREFIX}:${dataContract.getId()}`;
+    key = `${DataContractLevelDBRepository.KEY_PREFIX}:${bs58.encode(dataContract.getId())}`;
   });
 
   afterEach(async () => {
@@ -49,7 +50,7 @@ describe('DataContractLevelDBRepository', () => {
 
       const storedDataContract = cbor.decode(storedDataContractBuffer);
 
-      expect(storedDataContract).to.deep.equal(dataContract.toJSON());
+      expect(storedDataContract).to.deep.equal(dataContract.toObject());
     });
 
     it('should store data contract in transaction', async () => {
@@ -80,7 +81,7 @@ describe('DataContractLevelDBRepository', () => {
       const dataContractFromTransaction = await repository.fetch(dataContract.getId(), transaction);
 
       expect(dataContractFromTransaction).to.be.instanceOf(DataContract);
-      expect(dataContractFromTransaction.toJSON()).to.deep.equal(dataContract.toJSON());
+      expect(dataContractFromTransaction.toObject()).to.deep.equal(dataContract.toObject());
 
       await transaction.commit();
 
@@ -91,7 +92,7 @@ describe('DataContractLevelDBRepository', () => {
 
       const storedDataContract = cbor.decode(storedDataContractBuffer);
 
-      expect(storedDataContract).to.deep.equal(dataContract.toJSON());
+      expect(storedDataContract).to.deep.equal(dataContract.toObject());
     });
   });
 
@@ -105,7 +106,7 @@ describe('DataContractLevelDBRepository', () => {
     });
 
     it('should return stored data contract', async () => {
-      await db.put(key, dataContract.serialize());
+      await db.put(key, dataContract.toBuffer());
 
       const storedDataContract = await repository.fetch(dataContract.getId());
 

@@ -23,13 +23,13 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
     publicKey = new IdentityPublicKey({
       id: 0,
       type: IdentityPublicKey.TYPES.ECDSA_SECP256K1,
-      data: 'A3NCyQmImEGgr7j2kR+rTumHLORpCGYC6XeCqVODZgSm',
+      data: Buffer.from('A3NCyQmImEGgr7j2kR+rTumHLORpCGYC6XeCqVODZgSm', 'base64'),
       isEnabled: true,
     });
 
     repository = new PublicKeyIdentityIdMapLevelDBRepository(db);
 
-    key = `${PublicKeyIdentityIdMapLevelDBRepository.KEY_PREFIX}:${publicKey.hash()}`;
+    key = `${PublicKeyIdentityIdMapLevelDBRepository.KEY_PREFIX}:${publicKey.hash().toString('base64')}`;
   });
 
   afterEach(async () => {
@@ -46,7 +46,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
       const storedIdentityId = await db.get(key);
 
       expect(storedIdentityId).to.be.instanceOf(Buffer);
-      expect(storedIdentityId.toString()).to.deep.equal(identity.getId());
+      expect(storedIdentityId).to.deep.equal(identity.getId());
     });
 
     it('should store identity id in transaction', async () => {
@@ -68,12 +68,12 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
       }
 
       // check we can't fetch data without transaction
-      const notFoundIdentity = await repository.fetch(publicKey.hash());
+      const notFoundIdentity = await repository.fetch(publicKey.hash().toString('base64'));
 
       expect(notFoundIdentity).to.be.null();
 
       // check we can fetch data inside transaction
-      const identityIdFromTransaction = await repository.fetch(publicKey.hash(), transaction);
+      const identityIdFromTransaction = await repository.fetch(publicKey.hash().toString('base64'), transaction);
 
       expect(identityIdFromTransaction).to.deep.equal(identity.getId());
 
@@ -83,7 +83,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
       const storedIdentityIdBuffer = await db.get(key);
 
       expect(storedIdentityIdBuffer).to.be.instanceOf(Buffer);
-      expect(storedIdentityIdBuffer.toString()).to.deep.equal(identity.getId());
+      expect(storedIdentityIdBuffer).to.deep.equal(identity.getId());
     });
   });
 
@@ -99,7 +99,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
     it('should return stored identity id', async () => {
       await db.put(key, identity.getId());
 
-      const storedIdentityId = await repository.fetch(publicKey.hash());
+      const storedIdentityId = await repository.fetch(publicKey.hash().toString('base64'));
 
       expect(storedIdentityId).to.deep.equal(identity.getId());
     });
@@ -110,7 +110,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
       const transaction = repository.createTransaction();
 
       transaction.start();
-      const storedIdentityId = await repository.fetch(publicKey.hash(), transaction);
+      const storedIdentityId = await repository.fetch(publicKey.hash().toString('base64'), transaction);
 
       expect(storedIdentityId).to.deep.equal(identity.getId());
     });

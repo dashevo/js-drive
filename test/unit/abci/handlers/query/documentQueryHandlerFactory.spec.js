@@ -43,7 +43,7 @@ describe('documentQueryHandlerFactory', () => {
     expect(result.code).to.equal(0);
 
     const documentsResponse = cbor.encode(
-      documents.map((d) => d.serialize()),
+      documents.map((d) => d.toBuffer()),
     );
 
     expect(result.value).to.deep.equal(documentsResponse);

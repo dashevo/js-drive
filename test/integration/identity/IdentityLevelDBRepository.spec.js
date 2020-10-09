@@ -24,7 +24,7 @@ describe('IdentityLevelDBRepository', () => {
     dppMock = createDPPMock(this.sinon);
     dppMock
       .identity
-      .createFromSerialized
+      .createFromBuffer
       .resolves(identity);
 
     repository = new IdentityLevelDBRepository(db, dppMock);
@@ -49,7 +49,7 @@ describe('IdentityLevelDBRepository', () => {
 
       const storedIdentity = cbor.decode(storedIdentityBuffer);
 
-      expect(storedIdentity).to.deep.equal(identity.toJSON());
+      expect(storedIdentity).to.deep.equal(identity.toObject());
     });
 
     it('should store identity in transaction', async () => {
@@ -90,7 +90,7 @@ describe('IdentityLevelDBRepository', () => {
 
       const storedIdentity = cbor.decode(storedIdentityBuffer);
 
-      expect(storedIdentity).to.deep.equal(identity.toJSON());
+      expect(storedIdentity).to.deep.equal(identity.toObject());
     });
   });
 
@@ -104,7 +104,7 @@ describe('IdentityLevelDBRepository', () => {
     });
 
     it('should return stored identity', async () => {
-      await db.put(key, identity.serialize());
+      await db.put(key, identity.toBuffer());
 
       const storedIdentity = await repository.fetch(identity.getId());
 

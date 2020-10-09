@@ -38,7 +38,7 @@ describe('dataContractQueryHandlerFactory', () => {
     expect(dataContractRepositoryMock.fetch).to.be.calledOnceWith(id);
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(dataContract.serialize());
+    expect(result.value).to.deep.equal(dataContract.toBuffer());
   });
 
   it('should throw NotFoundAbciError if data contract not found', async () => {

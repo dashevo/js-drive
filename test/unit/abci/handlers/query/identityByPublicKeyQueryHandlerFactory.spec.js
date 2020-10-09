@@ -50,7 +50,7 @@ describe('identityByPublicKeyHashQueryHandlerFactory', () => {
     expect(publicKeyIdentityIdRepositoryMock.fetch).to.be.calledOnceWith(publicKeyHash);
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(identity.serialize());
+    expect(result.value).to.deep.equal(identity.toBuffer());
   });
 
   it('should throw NotFoundAbciError if identityId not found', async () => {

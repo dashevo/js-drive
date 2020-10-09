@@ -71,7 +71,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
         return Buffer.alloc(0);
       }
 
-      return identity.serialize();
+      return identity.toBuffer();
     });
   });
 
