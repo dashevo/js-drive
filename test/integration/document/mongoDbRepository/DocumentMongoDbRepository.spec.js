@@ -3,6 +3,7 @@ const { mocha: { startMongoDb } } = require('@dashevo/dp-services-ctl');
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 const Document = require('@dashevo/dpp/lib/document/Document');
+const Identifier = require('@dashevo/dpp/lib/Identifier');
 
 const DocumentMongoDbRepository = require('../../../../lib/document/mongoDbRepository/DocumentMongoDbRepository');
 
@@ -17,7 +18,6 @@ const findNotIndexedFields = require('../../../../lib/document/query/findNotInde
 const findNotIndexedOrderByFields = require('../../../../lib/document/query/findNotIndexedOrderByFields');
 const getIndexedFieldsFromDocumentSchema = require('../../../../lib/document/query/getIndexedFieldsFromDocumentSchema');
 
-const Identifier = require('@dashevo/dpp/lib/Identifier');
 
 function jsonizeDocuments(documents) {
   return documents.map((d) => d.toJSON());

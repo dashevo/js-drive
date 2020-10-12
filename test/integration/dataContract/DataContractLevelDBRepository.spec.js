@@ -1,4 +1,3 @@
-const bs58 = require('bs58');
 const level = require('level-rocksdb');
 const cbor = require('cbor');
 
@@ -30,7 +29,7 @@ describe('DataContractLevelDBRepository', () => {
 
     repository = new DataContractLevelDBRepository(db, dppMock);
 
-    key = `${DataContractLevelDBRepository.KEY_PREFIX}:${bs58.encode(dataContract.getId())}`;
+    key = `${DataContractLevelDBRepository.KEY_PREFIX}:${dataContract.getId()}`;
   });
 
   afterEach(async () => {
