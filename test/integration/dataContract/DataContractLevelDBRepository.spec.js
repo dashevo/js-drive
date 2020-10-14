@@ -29,7 +29,7 @@ describe('DataContractLevelDBRepository', () => {
 
     repository = new DataContractLevelDBRepository(db, dppMock);
 
-    key = `${DataContractLevelDBRepository.KEY_PREFIX}:${dataContract.getId()}`;
+    key = dataContract.getId();
   });
 
   afterEach(async () => {
@@ -99,7 +99,7 @@ describe('DataContractLevelDBRepository', () => {
     it('should return null if data contract was not found', async () => {
       await repository.store(dataContract);
 
-      const storedDataContract = await repository.fetch('nonExistingId');
+      const storedDataContract = await repository.fetch(Buffer.alloc(32));
 
       expect(storedDataContract).to.be.null();
     });
@@ -125,7 +125,7 @@ describe('DataContractLevelDBRepository', () => {
     });
 
     it('should return null if data contract not found', async () => {
-      const storedDataContract = await repository.fetch(null);
+      const storedDataContract = await repository.fetch(Buffer.alloc(32));
 
       expect(storedDataContract).to.equal(null);
     });
