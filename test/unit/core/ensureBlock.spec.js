@@ -39,15 +39,21 @@ describe('ensureBlock', () => {
     }, 5);
   });
   it('should throw on unexpected error', async () => {
+    const err = new Error();
+    err.code = -6;
+    err.message = 'Another error';
+
     rpcClient = {
       getBlock: async () => {
-        const err = new Error();
-        err.code = -6;
-        err.message = 'Another error';
         throw err;
       },
     };
-    const p = ensureBlock(socketClient, rpcClient, hash);
-    p.should.be.rejectedWith(Error, 'Another error');
+
+    try {
+      await ensureBlock(socketClient, rpcClient, hash);
+      expect.fail('Internal error must be thrown');
+    } catch (e) {
+      expect(e).to.equal(err);
+    }
   });
 });
