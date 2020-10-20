@@ -13,11 +13,10 @@ describe('DataContractLevelDBRepository', () => {
   let db;
   let repository;
   let dataContract;
-  let key;
   let dppMock;
 
   beforeEach(function beforeEach() {
-    db = level('./db/data-contract-test', { valueEncoding: 'binary' });
+    db = level('./db/data-contract-test', { keyEncoding: 'binary', valueEncoding: 'binary' });
 
     dataContract = getDataContractFixture();
 
@@ -28,8 +27,6 @@ describe('DataContractLevelDBRepository', () => {
       .resolves(dataContract);
 
     repository = new DataContractLevelDBRepository(db, dppMock);
-
-    key = dataContract.getId();
   });
 
   afterEach(async () => {
@@ -43,7 +40,7 @@ describe('DataContractLevelDBRepository', () => {
 
       expect(repositoryInstance).to.equal(repository);
 
-      const storedDataContractBuffer = await db.get(key);
+      const storedDataContractBuffer = await db.get(dataContract.getId());
 
       expect(storedDataContractBuffer).to.be.instanceOf(Buffer);
 
@@ -64,7 +61,7 @@ describe('DataContractLevelDBRepository', () => {
 
       // check we don't have data in db before commit
       try {
-        await db.get(key);
+        await db.get(dataContract.getId());
 
         expect.fail('Should fail with NotFoundError error');
       } catch (e) {
@@ -72,7 +69,7 @@ describe('DataContractLevelDBRepository', () => {
       }
 
       // check we can't fetch data without transaction
-      const notFoundDataContract = await repository.fetch(key);
+      const notFoundDataContract = await repository.fetch(dataContract.getId());
 
       expect(notFoundDataContract).to.be.null();
 
@@ -85,7 +82,7 @@ describe('DataContractLevelDBRepository', () => {
       await transaction.commit();
 
       // check we have data in db after commit
-      const storedDataContractBuffer = await db.get(key);
+      const storedDataContractBuffer = await db.get(dataContract.getId());
 
       expect(storedDataContractBuffer).to.be.instanceOf(Buffer);
 
@@ -105,7 +102,7 @@ describe('DataContractLevelDBRepository', () => {
     });
 
     it('should return stored data contract', async () => {
-      await db.put(key, dataContract.toBuffer());
+      await db.put(dataContract.getId(), dataContract.toBuffer());
 
       const storedDataContract = await repository.fetch(dataContract.getId());
 

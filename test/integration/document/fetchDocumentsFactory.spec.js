@@ -37,7 +37,7 @@ describe('fetchDocumentsFactory', () => {
   });
 
   beforeEach(async () => {
-    dataContractLevelDB = level('./db/blockchain-state-test', { valueEncoding: 'binary' });
+    dataContractLevelDB = level('./db/blockchain-state-test', { keyEncoding: 'binary', valueEncoding: 'binary' });
 
     const validateQuery = validateQueryFactory(
       findConflictingConditions,

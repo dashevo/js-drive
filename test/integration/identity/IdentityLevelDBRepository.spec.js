@@ -17,7 +17,7 @@ describe('IdentityLevelDBRepository', () => {
   let dppMock;
 
   beforeEach(function beforeEach() {
-    db = level('./db/identity-test', { valueEncoding: 'binary' });
+    db = level('./db/identity-test', { keyEncoding: 'binary', valueEncoding: 'binary' });
 
     identity = getIdentityFixture();
 
@@ -41,7 +41,7 @@ describe('IdentityLevelDBRepository', () => {
 
       expect(repositoryInstance).to.equal(repository);
 
-      const storedIdentityBuffer = await db.get(identity.getId().toString());
+      const storedIdentityBuffer = await db.get(identity.getId());
 
       expect(storedIdentityBuffer).to.be.instanceOf(Buffer);
 
@@ -61,7 +61,7 @@ describe('IdentityLevelDBRepository', () => {
 
       // check we don't have data in db before commit
       try {
-        await db.get(identity.getId().toString());
+        await db.get(identity.getId());
 
         expect.fail('Should fail with NotFoundError error');
       } catch (e) {
@@ -82,7 +82,7 @@ describe('IdentityLevelDBRepository', () => {
       await transaction.commit();
 
       // check we have data in db after commit
-      const storedIdentityBuffer = await db.get(identity.getId().toString());
+      const storedIdentityBuffer = await db.get(identity.getId());
 
       expect(storedIdentityBuffer).to.be.instanceOf(Buffer);
 
@@ -102,7 +102,7 @@ describe('IdentityLevelDBRepository', () => {
     });
 
     it('should return stored identity', async () => {
-      await db.put(identity.getId().toString(), identity.toBuffer());
+      await db.put(identity.getId(), identity.toBuffer());
 
       const storedIdentity = await repository.fetch(identity.getId());
 

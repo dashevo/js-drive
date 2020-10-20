@@ -18,7 +18,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
   let publicKey;
 
   beforeEach(() => {
-    db = level('./db/identity-test', { valueEncoding: 'binary' });
+    db = level('./db/identity-test', { keyEncoding: 'binary', valueEncoding: 'binary' });
 
     identity = getIdentityFixture();
     publicKey = new IdentityPublicKey({
@@ -41,7 +41,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
 
       expect(repositoryInstance).to.equal(repository);
 
-      const storedIdentityId = await db.get(publicKey.hash().toString('hex'));
+      const storedIdentityId = await db.get(publicKey.hash());
 
       expect(storedIdentityId).to.be.instanceOf(Buffer);
       expect(storedIdentityId).to.deep.equal(identity.getId());
@@ -58,7 +58,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
 
       // check we don't have data in db before commit
       try {
-        await db.get(publicKey.hash().toString('hex'));
+        await db.get(publicKey.hash());
 
         expect.fail('Should fail with NotFoundError error');
       } catch (e) {
@@ -70,6 +70,9 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
 
       expect(notFoundIdentity).to.be.null();
 
+      const result = await transaction.db.get(publicKey.hash());
+      expect(result).to.be.instanceOf(Buffer);
+
       // check we can fetch data inside transaction
       const identityIdFromTransaction = await repository.fetch(publicKey.hash(), transaction);
 
@@ -78,7 +81,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
       await transaction.commit();
 
       // check we have data in db after commit
-      const storedIdentityIdBuffer = await db.get(publicKey.hash().toString('hex'));
+      const storedIdentityIdBuffer = await db.get(publicKey.hash());
 
       expect(storedIdentityIdBuffer).to.be.instanceOf(Buffer);
       expect(storedIdentityIdBuffer).to.deep.equal(identity.getId());
@@ -95,7 +98,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
     });
 
     it('should return stored identity id', async () => {
-      await db.put(publicKey.hash().toString('hex'), identity.getId());
+      await db.put(publicKey.hash(), identity.getId());
 
       const storedIdentityId = await repository.fetch(publicKey.hash());
 
