@@ -55,7 +55,7 @@ describe('unserializeStateTransitionFactory', () => {
     const consensusError = new ConsensusError('Invalid state transition');
     const error = new InvalidStateTransitionError(
       [consensusError],
-      stateTransitionFixture.toJSON(),
+      stateTransitionFixture,
     );
 
     isolatedDppMock.stateTransition.createFromBuffer.throws(error);

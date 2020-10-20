@@ -67,7 +67,7 @@ describe('createIsolatedDpp', () => {
     documentsBatchTransition.sign(identityPublicKey, privateKey);
 
     dataContractCreateTransition = new DataContractCreateTransition({
-      dataContract: dataContract.toJSON(),
+      dataContract: dataContract.toObject(),
       entropy: dataContract.getEntropy(),
       protocolVersion: 0,
     });
@@ -129,7 +129,7 @@ describe('createIsolatedDpp', () => {
               serializedDocumentsBatchTransition,
             );
 
-            expect(result.toJSON()).to.deep.equal(documentsBatchTransition.toJSON());
+            expect(result.toObject()).to.deep.equal(documentsBatchTransition.toObject());
           } finally {
             isolatedDpp.dispose();
           }
@@ -171,7 +171,7 @@ describe('createIsolatedDpp', () => {
               serializedStateTransition,
             );
 
-            expect(result.toJSON()).to.deep.equal(dataContractCreateTransition.toJSON());
+            expect(result.toObject()).to.deep.equal(dataContractCreateTransition.toObject());
           } finally {
             isolatedDpp.dispose();
           }
@@ -208,7 +208,7 @@ describe('createIsolatedDpp', () => {
               identityCreateTransition.toBuffer(),
             );
 
-            expect(result.toJSON()).to.deep.equal(identityCreateTransition.toJSON());
+            expect(result.toObject()).to.deep.equal(identityCreateTransition.toObject());
           } finally {
             isolatedDpp.dispose();
           }

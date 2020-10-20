@@ -109,7 +109,7 @@ describe('DataContractLevelDBRepository', () => {
 
       const storedDataContract = await repository.fetch(dataContract.getId());
 
-      expect(storedDataContract.toJSON()).to.deep.equal(dataContract.toJSON());
+      expect(storedDataContract.toObject()).to.deep.equal(dataContract.toObject());
     });
 
     it('should return stored data contract with transaction', async () => {
@@ -121,7 +121,7 @@ describe('DataContractLevelDBRepository', () => {
 
       const storedDataContract = await repository.fetch(dataContract.getId(), transaction);
 
-      expect(storedDataContract.toJSON()).to.deep.equal(dataContract.toJSON());
+      expect(storedDataContract.toObject()).to.deep.equal(dataContract.toObject());
     });
 
     it('should return null if data contract not found', async () => {

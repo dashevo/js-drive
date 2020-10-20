@@ -1,5 +1,7 @@
 const level = require('level-rocksdb');
 
+const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
+
 const IdentityPublicKey = require('@dashevo/dpp/lib/identity/IdentityPublicKey');
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
 
@@ -14,7 +16,6 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
   let repository;
   let identity;
   let publicKey;
-  let key;
 
   beforeEach(() => {
     db = level('./db/identity-test', { valueEncoding: 'binary' });
@@ -24,12 +25,9 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
       id: 0,
       type: IdentityPublicKey.TYPES.ECDSA_SECP256K1,
       data: Buffer.from('A3NCyQmImEGgr7j2kR+rTumHLORpCGYC6XeCqVODZgSm', 'base64'),
-      isEnabled: true,
     });
 
     repository = new PublicKeyIdentityIdMapLevelDBRepository(db);
-
-    key = `${PublicKeyIdentityIdMapLevelDBRepository.KEY_PREFIX}:${publicKey.hash().toString('base64')}`;
   });
 
   afterEach(async () => {
@@ -43,7 +41,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
 
       expect(repositoryInstance).to.equal(repository);
 
-      const storedIdentityId = await db.get(key);
+      const storedIdentityId = await db.get(publicKey.hash().toString('hex'));
 
       expect(storedIdentityId).to.be.instanceOf(Buffer);
       expect(storedIdentityId).to.deep.equal(identity.getId());
@@ -60,7 +58,7 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
 
       // check we don't have data in db before commit
       try {
-        await db.get(key);
+        await db.get(publicKey.hash().toString('hex'));
 
         expect.fail('Should fail with NotFoundError error');
       } catch (e) {
@@ -68,19 +66,19 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
       }
 
       // check we can't fetch data without transaction
-      const notFoundIdentity = await repository.fetch(publicKey.hash().toString('base64'));
+      const notFoundIdentity = await repository.fetch(publicKey.hash());
 
       expect(notFoundIdentity).to.be.null();
 
       // check we can fetch data inside transaction
-      const identityIdFromTransaction = await repository.fetch(publicKey.hash().toString('base64'), transaction);
+      const identityIdFromTransaction = await repository.fetch(publicKey.hash(), transaction);
 
       expect(identityIdFromTransaction).to.deep.equal(identity.getId());
 
       await transaction.commit();
 
       // check we have data in db after commit
-      const storedIdentityIdBuffer = await db.get(key);
+      const storedIdentityIdBuffer = await db.get(publicKey.hash().toString('hex'));
 
       expect(storedIdentityIdBuffer).to.be.instanceOf(Buffer);
       expect(storedIdentityIdBuffer).to.deep.equal(identity.getId());
@@ -97,9 +95,9 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
     });
 
     it('should return stored identity id', async () => {
-      await db.put(key, identity.getId());
+      await db.put(publicKey.hash().toString('hex'), identity.getId());
 
-      const storedIdentityId = await repository.fetch(publicKey.hash().toString('base64'));
+      const storedIdentityId = await repository.fetch(publicKey.hash());
 
       expect(storedIdentityId).to.deep.equal(identity.getId());
     });
@@ -110,13 +108,13 @@ describe('PublicKeyIdentityIdMapLevelDBRepository', () => {
       const transaction = repository.createTransaction();
 
       transaction.start();
-      const storedIdentityId = await repository.fetch(publicKey.hash().toString('base64'), transaction);
+      const storedIdentityId = await repository.fetch(publicKey.hash(), transaction);
 
       expect(storedIdentityId).to.deep.equal(identity.getId());
     });
 
     it('should return null if identity not found', async () => {
-      const storedIdentityId = await repository.fetch(null);
+      const storedIdentityId = await repository.fetch(generateRandomIdentifier());
 
       expect(storedIdentityId).to.equal(null);
     });
