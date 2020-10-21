@@ -23,22 +23,6 @@ describe('LoggedStateRepositoryDecorator', () => {
     );
   });
 
-  describe('#log', () => {
-    it('should call logger', () => {
-      const method = 'methodName';
-      const parameters = { method };
-      const response = { result: true };
-
-      loggedStateRepositoryDecorator.log(method, parameters, response);
-
-      expect(loggerMock.trace).to.be.calledOnceWithExactly({
-        method,
-        parameters,
-        response,
-      }, `StateRepository#${method}`);
-    });
-  });
-
   describe('#fetchIdentity', () => {
     let id;
 
