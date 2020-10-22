@@ -5,6 +5,7 @@ const DashPlatformProtocol = require('@dashevo/dpp');
 
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
+const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
 
 const convertWhereToMongoDbQuery = require('../../../lib/document/mongoDbRepository/convertWhereToMongoDbQuery');
 const validateQueryFactory = require('../../../lib/document/query/validateQueryFactory');
@@ -37,7 +38,7 @@ describe('fetchDocumentsFactory', () => {
   });
 
   beforeEach(async () => {
-    dataContractLevelDB = level('./db/blockchain-state-test', { valueEncoding: 'binary' });
+    dataContractLevelDB = level('./db/blockchain-state-test', { keyEncoding: 'binary', valueEncoding: 'binary' });
 
     const validateQuery = validateQueryFactory(
       findConflictingConditions,
@@ -116,9 +117,7 @@ describe('fetchDocumentsFactory', () => {
 
     const [actualDocument] = result;
 
-    const documentJSON = document.toJSON();
-
-    expect(actualDocument.toJSON()).to.deep.equal(documentJSON);
+    expect(actualDocument.toObject()).to.deep.equal(document.toObject());
   });
 
   it('should fetch Documents for specified contract id, document type and name', async () => {
@@ -137,9 +136,7 @@ describe('fetchDocumentsFactory', () => {
 
     const [actualDocument] = result;
 
-    const documentJSON = document.toJSON();
-
-    expect(actualDocument.toJSON()).to.deep.equal(documentJSON);
+    expect(actualDocument.toObject()).to.deep.equal(document.toObject());
   });
 
   it('should return empty array for specified contract ID, document type and name not exist', async () => {
@@ -167,8 +164,8 @@ describe('fetchDocumentsFactory', () => {
 
     const result = await fetchDocuments(contractId, 'indexedDocument', query);
 
-    expect(result[0].toJSON()).to.deep.equal(
-      indexedDocument.toJSON(),
+    expect(result[0].toObject()).to.deep.equal(
+      indexedDocument.toObject(),
     );
   });
 
@@ -193,8 +190,8 @@ describe('fetchDocumentsFactory', () => {
 
     const result = await fetchDocuments(contractId, 'indexedDocument', query);
 
-    expect(result[0].toJSON()).to.deep.equal(
-      indexedDocument.toJSON(),
+    expect(result[0].toObject()).to.deep.equal(
+      indexedDocument.toObject(),
     );
   });
 
@@ -222,12 +219,8 @@ describe('fetchDocumentsFactory', () => {
     expect(result).to.have.length(0);
   });
 
-  it('should throw InvalidQueryError if contract ID does not exist', async () => {
-    const documentRepository = await createDocumentMongoDbRepository(contractId, documentType);
-
-    await documentRepository.store(document);
-
-    contractId = 'Unknown';
+  it('should throw InvalidQueryError if contract ID is not valid', async () => {
+    contractId = 'something';
 
     try {
       await fetchDocuments(contractId, documentType);
@@ -240,7 +233,28 @@ describe('fetchDocumentsFactory', () => {
 
       const [error] = e.getErrors();
 
-      expect(error.getContractId()).to.be.equal(contractId);
+      expect(error.getContractId()).to.be.deep.equal(contractId);
+    }
+  });
+
+  it('should throw InvalidQueryError if contract ID does not exist', async () => {
+    const documentRepository = await createDocumentMongoDbRepository(contractId, documentType);
+    await documentRepository.store(document);
+
+    contractId = generateRandomIdentifier();
+
+    try {
+      await fetchDocuments(contractId, documentType);
+
+      expect.fail('should throw InvalidQueryError');
+    } catch (e) {
+      expect(e).to.be.instanceOf(InvalidQueryError);
+      expect(e.getErrors()).to.be.an('array');
+      expect(e.getErrors()).to.have.lengthOf(1);
+
+      const [error] = e.getErrors();
+
+      expect(error.getContractId()).to.be.deep.equal(contractId);
     }
   });
 
