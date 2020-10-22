@@ -11,6 +11,9 @@ const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFi
 const identitiesByPublicKeyHashesQueryHandlerFactory = require(
   '../../../../../lib/abci/handlers/query/identitiesByPublicKeyHashesQueryHandlerFactory',
 );
+const MaxRequestedItemsError = require(
+  '../../../../../lib/abci/handlers/errors/MaxRequestedItemsError',
+);
 
 describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
   let identitiesByPublicKeyHashesQueryHandler;
@@ -32,6 +35,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
     identitiesByPublicKeyHashesQueryHandler = identitiesByPublicKeyHashesQueryHandlerFactory(
       publicKeyIdentityIdRepositoryMock,
       identityRepositoryMock,
+      5,
     );
 
     publicKeyHashes = [
@@ -68,6 +72,24 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       identities[1].toBuffer(),
       Buffer.alloc(0),
     ];
+  });
+
+  it('should throw an error if maximum requested items exceeded', async () => {
+    const params = {};
+    const data = { publicKeyHashes };
+
+    identitiesByPublicKeyHashesQueryHandler = identitiesByPublicKeyHashesQueryHandlerFactory(
+      publicKeyIdentityIdRepositoryMock,
+      identityRepositoryMock,
+      1,
+    );
+
+    try {
+      await identitiesByPublicKeyHashesQueryHandler(params, data);
+      expect.fail('Error was not thrown');
+    } catch (e) {
+      expect(e).to.be.an.instanceOf(MaxRequestedItemsError);
+    }
   });
 
   it('should return identity id map', async () => {

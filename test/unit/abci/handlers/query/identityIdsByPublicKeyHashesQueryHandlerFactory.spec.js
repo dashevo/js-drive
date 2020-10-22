@@ -11,6 +11,9 @@ const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRa
 const identityIdsByPublicKeyHashesQueryHandlerFactory = require(
   '../../../../../lib/abci/handlers/query/identityIdsByPublicKeyHashesQueryHandlerFactory',
 );
+const MaxRequestedItemsError = require(
+  '../../../../../lib/abci/handlers/errors/MaxRequestedItemsError',
+);
 
 describe('identityIdsByPublicKeyHashesQueryHandlerFactory', () => {
   let identityIdsByPublicKeyHashesQueryHandler;
@@ -26,6 +29,7 @@ describe('identityIdsByPublicKeyHashesQueryHandlerFactory', () => {
 
     identityIdsByPublicKeyHashesQueryHandler = identityIdsByPublicKeyHashesQueryHandlerFactory(
       publicKeyIdentityIdRepositoryMock,
+      5,
     );
 
     publicKeyHashes = [
@@ -54,6 +58,23 @@ describe('identityIdsByPublicKeyHashesQueryHandlerFactory', () => {
       identityIds[1],
       Buffer.alloc(0),
     ];
+  });
+
+  it('should throw an error if maximum requested items exceeded', async () => {
+    const params = {};
+    const data = { publicKeyHashes };
+
+    identityIdsByPublicKeyHashesQueryHandler = identityIdsByPublicKeyHashesQueryHandlerFactory(
+      publicKeyIdentityIdRepositoryMock,
+      1,
+    );
+
+    try {
+      await identityIdsByPublicKeyHashesQueryHandler(params, data);
+      expect.fail('Error was not thrown');
+    } catch (e) {
+      expect(e).to.be.an.instanceOf(MaxRequestedItemsError);
+    }
   });
 
   it('should return identity id map', async () => {
