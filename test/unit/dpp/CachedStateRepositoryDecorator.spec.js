@@ -32,9 +32,7 @@ describe('CachedStateRepositoryDecorator', () => {
       storeIdentity: this.sinon.stub(),
       storeDocument: this.sinon.stub(),
       removeDocument: this.sinon.stub(),
-      storePublicKeyIdentityId: this.sinon.stub(),
       storeIdentityPublicKeyHashes: this.sinon.stub(),
-      fetchPublicKeyIdentityId: this.sinon.stub(),
       fetchLatestPlatformBlockHeader: this.sinon.stub(),
       fetchIdentityIdsByPublicKeyHashes: this.sinon.stub(),
     };
@@ -64,20 +62,6 @@ describe('CachedStateRepositoryDecorator', () => {
     });
   });
 
-  describe('#storePublicKeyIdentityId', () => {
-    it('should store identity id and public key hash pair to repository', async () => {
-      const [firstPublicKey] = identity.getPublicKeys();
-
-      await cachedStateRepository.storePublicKeyIdentityId(
-        firstPublicKey.hash(), identity.getId(),
-      );
-
-      expect(stateRepositoryMock.storePublicKeyIdentityId).to.be.calledOnceWithExactly(
-        firstPublicKey.hash(), identity.getId(),
-      );
-    });
-  });
-
   describe('#storeIdentityPublicKeyHashes', () => {
     it('should store identity id and public key hashes to repository', async () => {
       const publicKeyHashes = identity.getPublicKeys().map((pk) => pk.hash());
@@ -89,23 +73,6 @@ describe('CachedStateRepositoryDecorator', () => {
       expect(stateRepositoryMock.storeIdentityPublicKeyHashes).to.be.calledOnceWithExactly(
         identity.getId(), publicKeyHashes,
       );
-    });
-  });
-
-  describe('#fetchPublicKeyIdentityId', () => {
-    it('should fetch identity id by public key hash from repository', async () => {
-      const [firstPublicKey] = identity.getPublicKeys();
-
-      stateRepositoryMock.fetchPublicKeyIdentityId.resolves(identity.getId());
-
-      const result = await cachedStateRepository.fetchPublicKeyIdentityId(
-        firstPublicKey.hash(),
-      );
-
-      expect(stateRepositoryMock.fetchPublicKeyIdentityId).to.be.calledOnceWithExactly(
-        firstPublicKey.hash(),
-      );
-      expect(result).to.deep.equal(identity.getId());
     });
   });
 

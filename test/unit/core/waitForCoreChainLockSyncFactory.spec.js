@@ -29,6 +29,8 @@ describe('waitForCoreChainLockSyncFactory', () => {
     const loggerMock = {
       debug: this.sinon.stub(),
       info: this.sinon.stub(),
+      trace: this.sinon.stub(),
+      error: this.sinon.stub(),
     };
     waitForCoreChainLockHandler = waitForCoreChainLockSyncFactory(
       coreZMQClientMock,
