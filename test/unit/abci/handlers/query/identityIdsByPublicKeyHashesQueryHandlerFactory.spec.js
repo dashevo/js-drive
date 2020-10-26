@@ -11,8 +11,8 @@ const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRa
 const identityIdsByPublicKeyHashesQueryHandlerFactory = require(
   '../../../../../lib/abci/handlers/query/identityIdsByPublicKeyHashesQueryHandlerFactory',
 );
-const MaxRequestedItemsError = require(
-  '../../../../../lib/abci/handlers/errors/MaxRequestedItemsError',
+const InvalidArgumentAbciError = require(
+  '../../../../../lib/abci/errors/InvalidArgumentAbciError',
 );
 
 describe('identityIdsByPublicKeyHashesQueryHandlerFactory', () => {
@@ -73,7 +73,10 @@ describe('identityIdsByPublicKeyHashesQueryHandlerFactory', () => {
       await identityIdsByPublicKeyHashesQueryHandler(params, data);
       expect.fail('Error was not thrown');
     } catch (e) {
-      expect(e).to.be.an.instanceOf(MaxRequestedItemsError);
+      expect(e).to.be.an.instanceOf(InvalidArgumentAbciError);
+      expect(e.getData()).to.deep.equal({
+        maxIdentitiesPerRequest: 1,
+      });
     }
   });
 

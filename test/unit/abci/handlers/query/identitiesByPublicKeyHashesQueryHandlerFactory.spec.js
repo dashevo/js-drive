@@ -11,8 +11,8 @@ const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFi
 const identitiesByPublicKeyHashesQueryHandlerFactory = require(
   '../../../../../lib/abci/handlers/query/identitiesByPublicKeyHashesQueryHandlerFactory',
 );
-const MaxRequestedItemsError = require(
-  '../../../../../lib/abci/handlers/errors/MaxRequestedItemsError',
+const InvalidArgumentAbciError = require(
+  '../../../../../lib/abci/errors/InvalidArgumentAbciError',
 );
 
 describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
@@ -88,7 +88,10 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       await identitiesByPublicKeyHashesQueryHandler(params, data);
       expect.fail('Error was not thrown');
     } catch (e) {
-      expect(e).to.be.an.instanceOf(MaxRequestedItemsError);
+      expect(e).to.be.an.instanceOf(InvalidArgumentAbciError);
+      expect(e.getData()).to.deep.equal({
+        maxIdentitiesPerRequest: 1,
+      });
     }
   });
 
