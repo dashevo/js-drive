@@ -80,7 +80,7 @@ describe('identityIdsByPublicKeyHashesQueryHandlerFactory', () => {
     } catch (e) {
       expect(e).to.be.an.instanceOf(InvalidArgumentAbciError);
       expect(e.getData()).to.deep.equal({
-        maxIdentitiesPerRequest: 1,
+        maxIdentitiesPerRequest,
       });
     }
   });
