@@ -22,6 +22,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
   let publicKeyHashes;
   let identities;
   let identitiesByPublicKeyHashes;
+  let maxIdentitiesPerRequest;
 
   beforeEach(function beforeEach() {
     publicKeyIdentityIdRepositoryMock = {
@@ -32,10 +33,12 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       fetch: this.sinon.stub(),
     };
 
+    maxIdentitiesPerRequest = 5;
+
     identitiesByPublicKeyHashesQueryHandler = identitiesByPublicKeyHashesQueryHandlerFactory(
       publicKeyIdentityIdRepositoryMock,
       identityRepositoryMock,
-      5,
+      maxIdentitiesPerRequest,
     );
 
     publicKeyHashes = [
@@ -78,10 +81,12 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
     const params = {};
     const data = { publicKeyHashes };
 
+    maxIdentitiesPerRequest = 1;
+
     identitiesByPublicKeyHashesQueryHandler = identitiesByPublicKeyHashesQueryHandlerFactory(
       publicKeyIdentityIdRepositoryMock,
       identityRepositoryMock,
-      1,
+      maxIdentitiesPerRequest,
     );
 
     try {
