@@ -20,16 +20,25 @@ const errorHandler = require('../lib/errorHandler');
   });
 
   logger.info('Connecting to Core');
-  const waitForCoreSync = container.resolve('waitForCoreSync');
-  await waitForCoreSync((currentBlockHeight, currentHeaderNumber) => {
-    logger.info(
-      `waiting for Core to finish sync ${currentBlockHeight}/${currentHeaderNumber}...`,
-    );
-  });
+  const getIsStandaloneRegtestMode = container.resolve('getIsStandaloneRegtestMode');
 
-  logger.info('Obtaining the latest Core ChainLock...');
-  const waitForCoreChainLockSync = container.resolve('waitForCoreChainLockSync');
-  await waitForCoreChainLockSync();
+  const isStandaloneRegtestMode = await getIsStandaloneRegtestMode();
+
+  if (!isStandaloneRegtestMode) {
+    const waitForCoreSync = container.resolve('waitForCoreSync');
+    await waitForCoreSync((currentBlockHeight, currentHeaderNumber) => {
+      logger.info(
+        `waiting for Core to finish sync ${currentBlockHeight}/${currentHeaderNumber}...`,
+      );
+    });
+
+    logger.info('Obtaining the latest Core ChainLock...');
+    const waitForCoreChainLockSync = container.resolve('waitForCoreChainLockSync');
+    await waitForCoreChainLockSync();
+  } else {
+    const fallbackChainLockSync = container.resolve('fallbackChainLockSync');
+    await fallbackChainLockSync();
+  }
 
   const server = createServer(
     container.resolve('abciHandlers'),

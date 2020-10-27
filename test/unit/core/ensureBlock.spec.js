@@ -13,47 +13,52 @@ describe('ensureBlock', () => {
   const otherHash = '00001';
   const socketClient = new EventEmitter();
   let rpcClient;
-  it('should ensure a block exist before returning promise', (done) => {
+
+  beforeEach(function beforeEach() {
     rpcClient = {
-      getBlock: async () => true,
+      getBlock: this.sinon.stub().resolves(true),
     };
-    ensureBlock(socketClient, rpcClient, hash)
-      .then(() => done());
   });
+
+  it('should ensure a block exist before returning promise', async () => {
+    await ensureBlock(socketClient, rpcClient, hash);
+
+    expect(rpcClient.getBlock).to.be.calledOnceWithExactly(hash);
+  });
+
   it('should wait for block if not found before returning promise', (done) => {
-    rpcClient = {
-      getBlock: async () => {
-        const err = new Error();
-        err.code = -5;
-        err.message = 'Block not found';
-        throw err;
-      },
-    };
+    const err = new Error();
+    err.code = -5;
+    err.message = 'Block not found';
+
+    rpcClient.getBlock.throws(err);
+
     ensureBlock(socketClient, rpcClient, hash).then(done);
 
     setTimeout(() => {
       socketClient.emit(ZMQClient.TOPICS.hashblock, otherHash);
+
       setTimeout(() => {
         socketClient.emit(ZMQClient.TOPICS.hashblock, hash);
       }, 5);
     }, 5);
+
+    expect(rpcClient.getBlock).to.be.calledOnceWithExactly(hash);
   });
+
   it('should throw on unexpected error', async () => {
     const err = new Error();
     err.code = -6;
     err.message = 'Another error';
 
-    rpcClient = {
-      getBlock: async () => {
-        throw err;
-      },
-    };
+    rpcClient.getBlock.throws(err);
 
     try {
       await ensureBlock(socketClient, rpcClient, hash);
       expect.fail('Internal error must be thrown');
     } catch (e) {
       expect(e).to.equal(err);
+      expect(rpcClient.getBlock).to.be.calledOnceWithExactly(hash);
     }
   });
 });
