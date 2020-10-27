@@ -15,6 +15,8 @@ describe('ensureBlock', () => {
   let rpcClient;
 
   beforeEach(function beforeEach() {
+    socketClient.subscribe = this.sinon.stub();
+
     rpcClient = {
       getBlock: this.sinon.stub().resolves(true),
     };
@@ -35,13 +37,13 @@ describe('ensureBlock', () => {
 
     ensureBlock(socketClient, rpcClient, hash).then(done);
 
-    setTimeout(() => {
+    setImmediate(() => {
       socketClient.emit(ZMQClient.TOPICS.hashblock, otherHash);
+    });
 
-      setTimeout(() => {
-        socketClient.emit(ZMQClient.TOPICS.hashblock, hash);
-      }, 5);
-    }, 5);
+    setImmediate(() => {
+      socketClient.emit(ZMQClient.TOPICS.hashblock, hash);
+    });
 
     expect(rpcClient.getBlock).to.be.calledOnceWithExactly(hash);
   });

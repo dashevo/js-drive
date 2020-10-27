@@ -36,8 +36,9 @@ const errorHandler = require('../lib/errorHandler');
     const waitForCoreChainLockSync = container.resolve('waitForCoreChainLockSync');
     await waitForCoreChainLockSync();
   } else {
-    const fallbackChainLockSync = container.resolve('fallbackChainLockSync');
-    await fallbackChainLockSync();
+    logger.info('Obtaining the latest core block for chain lock sync fallback...');
+    const waitForCoreChainLockSyncFallback = container.resolve('waitForCoreChainLockSyncFallback');
+    await waitForCoreChainLockSyncFallback();
   }
 
   const server = createServer(
