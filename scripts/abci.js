@@ -20,9 +20,9 @@ const errorHandler = require('../lib/errorHandler');
   });
 
   logger.info('Connecting to Core');
-  const getIsStandaloneRegtestMode = container.resolve('getIsStandaloneRegtestMode');
+  const detectStandaloneRegtestMode = container.resolve('detectStandaloneRegtestMode');
 
-  const isStandaloneRegtestMode = await getIsStandaloneRegtestMode();
+  const isStandaloneRegtestMode = await detectStandaloneRegtestMode();
 
   if (!isStandaloneRegtestMode) {
     const waitForCoreSync = container.resolve('waitForCoreSync');
