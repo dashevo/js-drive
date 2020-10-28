@@ -5,11 +5,9 @@ const {
 } = require('abci/types');
 
 const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
-
 const endBlockHandlerFactory = require('../../../../lib/abci/handlers/endBlockHandlerFactory');
 const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionDBTransactionsMock');
 const NoDPNSContractFoundError = require('../../../../lib/abci/handlers/errors/NoDPNSContractFoundError');
-const { expect } = require('chai');
 
 describe('endBlockHandlerFactory', () => {
   let endBlockHandler;
@@ -18,7 +16,7 @@ describe('endBlockHandlerFactory', () => {
   let blockExecutionDBTransactionsMock;
   let header;
   let dpnsContractId;
-  let dpnsContractHeight;
+  let dpnsContractBlockHeight;
   let blockHeight;
   let transaction;
   let loggerMock;
@@ -44,7 +42,7 @@ describe('endBlockHandlerFactory', () => {
     endBlockHandler = endBlockHandlerFactory(
       blockExecutionDBTransactionsMock,
       dataContractRepositoryMock,
-      dpnsContractHeight,
+      dpnsContractBlockHeight,
       dpnsContractId,
       loggerMock,
     );
@@ -77,12 +75,12 @@ describe('endBlockHandlerFactory', () => {
 
   it('should throw and error if DPNS contract is not present at specific height and DPNS setttings were set', async () => {
     dpnsContractId = generateRandomIdentifier();
-    dpnsContractHeight = blockHeight;
+    dpnsContractBlockHeight = blockHeight;
 
     endBlockHandler = endBlockHandlerFactory(
       blockExecutionDBTransactionsMock,
       dataContractRepositoryMock,
-      dpnsContractHeight,
+      dpnsContractBlockHeight,
       dpnsContractId,
       loggerMock,
     );
