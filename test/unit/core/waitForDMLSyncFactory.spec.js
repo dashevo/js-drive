@@ -3,9 +3,11 @@ const { expect } = require('chai');
 const EventEmitter = require('events');
 const LatestCoreChainLock = require('../../../lib/core/LatestCoreChainLock');
 const waitForDMLSyncFactory = require('../../../lib/core/waitForDMLSyncFactory');
+const MissingChainlockError = require('../../../lib/core/errors/MissingChainlockError');
+const wait = require('../../../lib/util/wait');
 
 describe('waitForDMLSyncFactory', function main() {
-  this.timeout(200000);
+  this.timeout(20000);
 
   let waitForDMLSync;
   let coreRpcClientMock;
@@ -64,18 +66,24 @@ describe('waitForDMLSyncFactory', function main() {
 
     smlMaxListsLimit = 2;
 
+    const loggerMock = {
+      debug: this.sinon.stub(),
+      info: this.sinon.stub(),
+      trace: this.sinon.stub(),
+      error: this.sinon.stub(),
+    };
+
     waitForDMLSync = waitForDMLSyncFactory(
       coreRpcClientMock,
       latestCoreChainLockMock,
       simplifiedMasternodeListMock,
       smlMaxListsLimit,
       network,
+      loggerMock,
     );
   });
 
   it('should wait for 1000 height', async () => {
-    latestCoreChainLockMock.getChainLock.returns(null);
-
     coreRpcClientMock.getBlockCount.onCall(0).resolves({ result: 999 });
     coreRpcClientMock.getBlockCount.onCall(1).resolves({ result: 1000 });
 
@@ -84,10 +92,19 @@ describe('waitForDMLSyncFactory', function main() {
     expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnce();
   });
 
-  it('should obtain diff from core rpc', async () => {
-    coreRpcClientMock.getBlockCount.onCall(0).resolves({ result: 999 });
-    coreRpcClientMock.getBlockCount.onCall(1).resolves({ result: 1000 });
+  it('should throw MissingChainlockError if chainlock is empty', async () => {
+    latestCoreChainLockMock.getChainLock.returns(null);
 
+    try {
+      await waitForDMLSync();
+
+      expect.fail();
+    } catch (e) {
+      expect(e).to.be.an.instanceOf(MissingChainlockError);
+    }
+  });
+
+  it('should obtain diff from core rpc', async () => {
     await waitForDMLSync();
 
     expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnce();
@@ -115,52 +132,74 @@ describe('waitForDMLSyncFactory', function main() {
     }
 
     const simplifiedMNListDiffArray = [];
-    for (let i = 1; i < proTxCallCount; i++) {
+    for (let i = 0; i < proTxCallCount; i++) {
       simplifiedMNListDiffArray.push(new SimplifiedMNListDiff(rawDiff, network));
     }
 
-    expect(simplifiedMasternodeListMock.applyDiff.getCall(0).args).to.have.deep.members([
-      simplifiedMNListDiffArray,
-    ]);
+    const argsDiffsBuffers = simplifiedMasternodeListMock.applyDiff.getCall(0).args[0].map(
+      (item) => item.toBuffer(),
+    );
+    const simplifiedMNListDiffBufers = simplifiedMNListDiffArray.map((item) => item.toBuffer());
+
+    expect(argsDiffsBuffers).to.deep.equal(simplifiedMNListDiffBufers);
   });
 
   it('should update diff on chainLock update', async () => {
-    latestCoreChainLockMock.getChainLock.returns(null);
-
-    coreRpcClientMock.getBlockCount.onCall(0).resolves({ result: 999 });
-    coreRpcClientMock.getBlockCount.onCall(1).resolves({ result: 1000 });
-
-    await waitForDMLSync();
-
-    expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnce();
+    let resolvePromise;
+    const done = new Promise((resolve) => {
+      resolvePromise = resolve;
+    });
 
     const updatedChainLock = {
       height: 3,
     };
 
-    latestCoreChainLockMock.emit(LatestCoreChainLock.TOPICS.update, updatedChainLock);
+    await waitForDMLSync();
+    for (let i = 0; i < smlMaxListsLimit; i += 1) {
+      latestCoreChainLockMock.emit(LatestCoreChainLock.TOPICS.update, updatedChainLock);
 
-    const proTxCallCount = updatedChainLock.height - 2;
+      await wait(100);
+    }
 
-    expect(coreRpcClientMock.protx.callCount).to.equal(proTxCallCount);
+    setTimeout(() => {
+      expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnce();
 
-    for (let i = 0; i < proTxCallCount; i++) {
-      expect(coreRpcClientMock.protx.getCall(i).args).to.have.deep.members(
+      const proTxCallCount = smlMaxListsLimit + 1;
+
+      expect(coreRpcClientMock.protx.callCount).to.equal(proTxCallCount);
+
+      expect(coreRpcClientMock.protx.getCall(0).args).to.have.deep.members(
         [
           'diff',
-          (updatedChainLock.height - 2) + i,
-          (updatedChainLock.height - 2) + i + 1,
+          1,
+          (chainLock.height - smlMaxListsLimit),
         ],
       );
-    }
 
-    const simplifiedMNListDiffArray = [];
-    for (let i = 0; i < proTxCallCount; i++) {
-      simplifiedMNListDiffArray.push(new SimplifiedMNListDiff(rawDiff, network));
-    }
+      for (let i = 1; i < proTxCallCount; i++) {
+        expect(coreRpcClientMock.protx.getCall(i).args).to.have.deep.members(
+          [
+            'diff',
+            (chainLock.height - smlMaxListsLimit) + (i - 1),
+            (chainLock.height - smlMaxListsLimit) + (i - 1) + 1,
+          ],
+        );
+      }
 
-    expect(simplifiedMasternodeListMock.applyDiff.getCall(0).args).to.have.deep.members([
-      simplifiedMNListDiffArray,
-    ]);
+      const simplifiedMNListDiffArray = [];
+      for (let i = 0; i < proTxCallCount; i++) {
+        simplifiedMNListDiffArray.push(new SimplifiedMNListDiff(rawDiff, network));
+      }
+      const argsDiffsBuffers = simplifiedMasternodeListMock.applyDiff.getCall(0).args[0].map(
+        (item) => item.toBuffer(),
+      );
+      const simplifiedMNListDiffBufers = simplifiedMNListDiffArray.map((item) => item.toBuffer());
+
+      expect(argsDiffsBuffers).to.deep.equal(simplifiedMNListDiffBufers);
+
+      resolvePromise();
+    }, smlMaxListsLimit * 100 + 100);
+
+    await done;
   });
 });
