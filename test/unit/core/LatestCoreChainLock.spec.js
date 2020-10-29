@@ -24,7 +24,7 @@ describe('LatestCoreChainLock', () => {
       const chainLock = 'someValue';
       const latestCoreChainLock = new LatestCoreChainLock();
 
-      latestCoreChainLock.on(LatestCoreChainLock.TOPICS.update, (data) => {
+      latestCoreChainLock.on(LatestCoreChainLock.EVENTS.update, (data) => {
         expect(data).to.equal(chainLock);
 
         done();

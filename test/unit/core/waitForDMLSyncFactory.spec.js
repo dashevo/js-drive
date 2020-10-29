@@ -156,7 +156,7 @@ describe('waitForDMLSyncFactory', function main() {
 
     await waitForDMLSync();
     for (let i = 0; i < smlMaxListsLimit; i += 1) {
-      latestCoreChainLockMock.emit(LatestCoreChainLock.TOPICS.update, updatedChainLock);
+      latestCoreChainLockMock.emit(LatestCoreChainLock.EVENTS.update, updatedChainLock);
 
       await wait(100);
     }
