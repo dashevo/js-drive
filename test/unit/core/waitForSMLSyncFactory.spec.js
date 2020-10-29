@@ -2,14 +2,14 @@ const SimplifiedMNListDiff = require('@dashevo/dashcore-lib/lib/deterministicmnl
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const LatestCoreChainLock = require('../../../lib/core/LatestCoreChainLock');
-const waitForDMLSyncFactory = require('../../../lib/core/waitForDMLSyncFactory');
+const waitForSMLSyncFactory = require('../../../lib/core/waitForSMLSyncFactory');
 const MissingChainlockError = require('../../../lib/core/errors/MissingChainLockError');
 const wait = require('../../../lib/util/wait');
 
-describe('waitForDMLSyncFactory', function main() {
+describe('waitForSMLSyncFactory', function main() {
   this.timeout(20000);
 
-  let waitForDMLSync;
+  let waitForSMLSync;
   let coreRpcClientMock;
   let network;
   let latestCoreChainLockMock;
@@ -73,7 +73,7 @@ describe('waitForDMLSyncFactory', function main() {
       error: this.sinon.stub(),
     };
 
-    waitForDMLSync = waitForDMLSyncFactory(
+    waitForSMLSync = waitForSMLSyncFactory(
       coreRpcClientMock,
       latestCoreChainLockMock,
       simplifiedMasternodeListMock,
@@ -87,7 +87,7 @@ describe('waitForDMLSyncFactory', function main() {
     coreRpcClientMock.getBlockCount.onCall(0).resolves({ result: 999 });
     coreRpcClientMock.getBlockCount.onCall(1).resolves({ result: 1000 });
 
-    await waitForDMLSync();
+    await waitForSMLSync();
 
     expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnce();
   });
@@ -96,7 +96,7 @@ describe('waitForDMLSyncFactory', function main() {
     latestCoreChainLockMock.getChainLock.returns(null);
 
     try {
-      await waitForDMLSync();
+      await waitForSMLSync();
 
       expect.fail();
     } catch (e) {
@@ -105,7 +105,7 @@ describe('waitForDMLSyncFactory', function main() {
   });
 
   it('should obtain diff from core rpc', async () => {
-    await waitForDMLSync();
+    await waitForSMLSync();
 
     expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnce();
 
@@ -154,7 +154,7 @@ describe('waitForDMLSyncFactory', function main() {
       height: 3,
     };
 
-    await waitForDMLSync();
+    await waitForSMLSync();
     for (let i = 0; i < smlMaxListsLimit; i += 1) {
       latestCoreChainLockMock.emit(LatestCoreChainLock.EVENTS.update, updatedChainLock);
 
