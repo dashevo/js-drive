@@ -43,7 +43,7 @@ const errorHandler = require('../lib/errorHandler');
 
   const waitForDMLSync = container.resolve('waitForDMLSync');
 
-  logger.info('Obtaining DML...');
+  logger.info('Obtaining Simplified Masternode List...');
 
   await waitForDMLSync();
 
