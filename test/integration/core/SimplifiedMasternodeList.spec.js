@@ -71,13 +71,13 @@ describe('SimplifiedMasternodeList', () => {
 
   describe('#applyDiff', () => {
     it('should create simplifiedMNList', async () => {
-      let simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+      let simplifiedMNList = simplifiedMasternodeList.getList();
 
       expect(simplifiedMNList).to.deep.equal(undefined);
 
       simplifiedMasternodeList.applyDiff(simplifiedMNListDiffArray);
 
-      simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+      simplifiedMNList = simplifiedMasternodeList.getList();
 
       expect(simplifiedMNList.baseSimplifiedMNList.baseBlockHash).to.equal(
         rawDiff.baseBlockHash,
@@ -94,13 +94,13 @@ describe('SimplifiedMasternodeList', () => {
     });
 
     it('should add diff to simplifiedMNList', async () => {
-      let simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+      let simplifiedMNList = simplifiedMasternodeList.getList();
 
       expect(simplifiedMNList).to.deep.equal(undefined);
 
       simplifiedMasternodeList.applyDiff(simplifiedMNListDiffArray);
 
-      simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+      simplifiedMNList = simplifiedMasternodeList.getList();
 
       expect(simplifiedMNList.baseSimplifiedMNList.baseBlockHash).to.equal(
         rawDiff.baseBlockHash,
@@ -117,7 +117,7 @@ describe('SimplifiedMasternodeList', () => {
 
       simplifiedMasternodeList.applyDiff(updatedSimplifiedMNListDiffArray);
 
-      simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+      simplifiedMNList = simplifiedMasternodeList.getList();
 
       expect(simplifiedMNList.baseSimplifiedMNList.baseBlockHash).to.equal(
         rawDiff.baseBlockHash,
@@ -134,15 +134,15 @@ describe('SimplifiedMasternodeList', () => {
     });
   });
 
-  describe('#getSimplifiedMNList', () => {
+  describe('#getList', () => {
     it('should return simplifiedMNList', async () => {
-      let simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+      let simplifiedMNList = simplifiedMasternodeList.getList();
 
       expect(simplifiedMNList).to.deep.equal(undefined);
 
       simplifiedMasternodeList.applyDiff(simplifiedMNListDiffArray);
 
-      simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+      simplifiedMNList = simplifiedMasternodeList.getList();
 
       expect(simplifiedMNList).to.deep.equal(simplifiedMasternodeList.simplifiedMNList);
     });

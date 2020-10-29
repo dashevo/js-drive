@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const EventEmitter = require('events');
 const LatestCoreChainLock = require('../../../lib/core/LatestCoreChainLock');
 const waitForDMLSyncFactory = require('../../../lib/core/waitForDMLSyncFactory');
-const MissingChainlockError = require('../../../lib/core/errors/MissingChainlockError');
+const MissingChainlockError = require('../../../lib/core/errors/MissingChainLockError');
 const wait = require('../../../lib/util/wait');
 
 describe('waitForDMLSyncFactory', function main() {
