@@ -7,6 +7,8 @@ describe('SimplifiedMasternodeList', () => {
   let simplifiedMNListDiffArray;
   let updatedSimplifiedMNListDiffArray;
   let network;
+  let rawDiff;
+  let updatedRawDiff;
 
   beforeEach(() => {
     network = 'regtest';
@@ -15,7 +17,7 @@ describe('SimplifiedMasternodeList', () => {
       smlMaxListsLimit,
     });
 
-    const rawDiff = {
+    rawDiff = {
       baseBlockHash: '644bd9dcbc0537026af6d31181570f934d868f121c55513009bb36f509ec816e',
       blockHash: '23beac1b700c4a49855a9653e036219384ac2fab7eeba2ec45b3e2d0063d1285',
       cbTxMerkleTree: '03000000032f7f142e19bee0c595dac9f900695d1e428a4db70a805fda6c834cfec0de506a0d39baea39dbbaf9827a1f3b8f381a65ebcf4c2ef415025bc4d20afd372e680d12c226f084a6e28e421fbedff22b13aa1191d6a80744d104fa75ede12332467d0107',
@@ -37,7 +39,7 @@ describe('SimplifiedMasternodeList', () => {
       merkleRootQuorums: '0000000000000000000000000000000000000000000000000000000000000000',
     };
 
-    const updatedRawDiff = {
+    updatedRawDiff = {
       baseBlockHash: '644bd9dcbc0537026af6d31181570f934d868f121c55513009bb36f509ec816e',
       blockHash: '65cbdeb9027b64385d4d86ef34b8f270183c9a54a4f9d26b913a9cad590ce667',
       cbTxMerkleTree: '01000000011e99e0a974bfd455b1d9e9ed3093a48520ea8b61f29b4f67f3a1eee1d05284850101',
@@ -69,13 +71,66 @@ describe('SimplifiedMasternodeList', () => {
 
   describe('#applyDiff', () => {
     it('should create simplifiedMNList', async () => {
+      let simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+
+      expect(simplifiedMNList).to.deep.equal(undefined);
+
       simplifiedMasternodeList.applyDiff(simplifiedMNListDiffArray);
+
+      simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+
+      expect(simplifiedMNList.baseSimplifiedMNList.baseBlockHash).to.equal(
+        rawDiff.baseBlockHash,
+      );
+      expect(simplifiedMNList.baseSimplifiedMNList.blockHash).to.equal(
+        rawDiff.blockHash,
+      );
+      expect(simplifiedMNList.currentSML.baseBlockHash).to.equal(
+        rawDiff.baseBlockHash,
+      );
+      expect(simplifiedMNList.currentSML.blockHash).to.equal(
+        rawDiff.blockHash,
+      );
     });
 
     it('should add diff to simplifiedMNList', async () => {
+      let simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+
+      expect(simplifiedMNList).to.deep.equal(undefined);
+
       simplifiedMasternodeList.applyDiff(simplifiedMNListDiffArray);
 
+      simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+
+      expect(simplifiedMNList.baseSimplifiedMNList.baseBlockHash).to.equal(
+        rawDiff.baseBlockHash,
+      );
+      expect(simplifiedMNList.baseSimplifiedMNList.blockHash).to.equal(
+        rawDiff.blockHash,
+      );
+      expect(simplifiedMNList.currentSML.baseBlockHash).to.equal(
+        rawDiff.baseBlockHash,
+      );
+      expect(simplifiedMNList.currentSML.blockHash).to.equal(
+        rawDiff.blockHash,
+      );
+
       simplifiedMasternodeList.applyDiff(updatedSimplifiedMNListDiffArray);
+
+      simplifiedMNList = simplifiedMasternodeList.getSimplifiedMNList();
+
+      expect(simplifiedMNList.baseSimplifiedMNList.baseBlockHash).to.equal(
+        rawDiff.baseBlockHash,
+      );
+      expect(simplifiedMNList.baseSimplifiedMNList.blockHash).to.equal(
+        rawDiff.blockHash,
+      );
+      expect(simplifiedMNList.currentSML.baseBlockHash).to.equal(
+        updatedRawDiff.baseBlockHash,
+      );
+      expect(simplifiedMNList.currentSML.blockHash).to.equal(
+        updatedRawDiff.blockHash,
+      );
     });
   });
 
