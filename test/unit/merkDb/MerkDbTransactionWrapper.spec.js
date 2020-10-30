@@ -50,6 +50,8 @@ describe('MerkDbTransactionWrapper', () => {
       const key = Buffer.from([1, 2, 3]);
       const value = null;
 
+      merkDBMock.getSync.returns(value);
+
       merkDbTransactionWrapper.deleted.add(key.toString('hex'));
 
       const result = merkDbTransactionWrapper.get(key);
