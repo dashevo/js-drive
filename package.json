@@ -86,6 +86,7 @@
     "lodash.set": "^4.3.2",
     "long": "^4.0.0",
     "lru-cache": "^5.1.1",
+    "merk": "^2.1.2",
     "mongodb": "^3.5.5",
     "pino": "^6.4.0",
     "pino-pretty": "^4.0.3",
