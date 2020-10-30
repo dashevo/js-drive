@@ -61,7 +61,7 @@ describe('waitForSMLSyncFactory', function main() {
     latestCoreChainLockMock.getChainLock = this.sinon.stub().returns(chainLock);
 
     simplifiedMasternodeListMock = {
-      applyDiff: this.sinon.stub(),
+      applyDiffs: this.sinon.stub(),
     };
 
     smlMaxListsLimit = 2;
@@ -131,17 +131,18 @@ describe('waitForSMLSyncFactory', function main() {
       );
     }
 
-    const simplifiedMNListDiffArray = [];
+    const smlDiffs = [];
     for (let i = 0; i < proTxCallCount; i++) {
-      simplifiedMNListDiffArray.push(new SimplifiedMNListDiff(rawDiff, network));
+      smlDiffs.push(new SimplifiedMNListDiff(rawDiff, network));
     }
 
-    const argsDiffsBuffers = simplifiedMasternodeListMock.applyDiff.getCall(0).args[0].map(
+    const argsDiffBuffers = simplifiedMasternodeListMock.applyDiffs.getCall(0).args[0].map(
       (item) => item.toBuffer(),
     );
-    const simplifiedMNListDiffBufers = simplifiedMNListDiffArray.map((item) => item.toBuffer());
 
-    expect(argsDiffsBuffers).to.deep.equal(simplifiedMNListDiffBufers);
+    const smlDiffBuffers = smlDiffs.map((item) => item.toBuffer());
+
+    expect(argsDiffBuffers).to.deep.equal(smlDiffBuffers);
   });
 
   it('should update diff on chainLock update', async () => {
@@ -187,15 +188,18 @@ describe('waitForSMLSyncFactory', function main() {
       }
 
       const simplifiedMNListDiffArray = [];
+
       for (let i = 0; i < proTxCallCount; i++) {
         simplifiedMNListDiffArray.push(new SimplifiedMNListDiff(rawDiff, network));
       }
-      const argsDiffsBuffers = simplifiedMasternodeListMock.applyDiff.getCall(0).args[0].map(
+
+      const argsDiffsBuffers = simplifiedMasternodeListMock.applyDiffs.getCall(0).args[0].map(
         (item) => item.toBuffer(),
       );
-      const simplifiedMNListDiffBufers = simplifiedMNListDiffArray.map((item) => item.toBuffer());
 
-      expect(argsDiffsBuffers).to.deep.equal(simplifiedMNListDiffBufers);
+      const smlDiffBuffers = simplifiedMNListDiffArray.map((item) => item.toBuffer());
+
+      expect(argsDiffsBuffers).to.deep.equal(smlDiffBuffers);
 
       resolvePromise();
     }, smlMaxListsLimit * 100 + 100);
