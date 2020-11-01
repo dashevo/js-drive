@@ -34,7 +34,7 @@ describe('waitForSMLSyncFactory', function main() {
 
     const simplifiedMasternodeList = container.resolve('simplifiedMasternodeList');
 
-    expect(simplifiedMasternodeList.getList()).to.equal(undefined);
+    expect(simplifiedMasternodeList.getStore()).to.equal(undefined);
 
     const { result: randomAddress } = await dashCore.getApi().getNewAddress();
 
@@ -47,7 +47,7 @@ describe('waitForSMLSyncFactory', function main() {
 
     await waitForSMLSync();
 
-    expect(simplifiedMasternodeList.getList())
+    expect(simplifiedMasternodeList.getStore())
       .to.be.an.instanceOf(SimplifiedMNListStore);
   });
 });

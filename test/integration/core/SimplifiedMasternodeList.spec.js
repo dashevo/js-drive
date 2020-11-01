@@ -71,13 +71,13 @@ describe('SimplifiedMasternodeList', () => {
 
   describe('#applyDiffs', () => {
     it('should create simplifiedMNList', async () => {
-      let simplifiedMNList = simplifiedMasternodeList.getList();
+      let simplifiedMNList = simplifiedMasternodeList.getStore();
 
       expect(simplifiedMNList).to.deep.equal(undefined);
 
       simplifiedMasternodeList.applyDiffs(initialSmlDiffs);
 
-      simplifiedMNList = simplifiedMasternodeList.getList();
+      simplifiedMNList = simplifiedMasternodeList.getStore();
 
       expect(simplifiedMNList.baseSimplifiedMNList.baseBlockHash).to.equal(
         initialRawDiff.baseBlockHash,
@@ -94,13 +94,13 @@ describe('SimplifiedMasternodeList', () => {
     });
 
     it('should add diff to simplifiedMNList', async () => {
-      let simplifiedMNList = simplifiedMasternodeList.getList();
+      let simplifiedMNList = simplifiedMasternodeList.getStore();
 
       expect(simplifiedMNList).to.deep.equal(undefined);
 
       simplifiedMasternodeList.applyDiffs(initialSmlDiffs);
 
-      simplifiedMNList = simplifiedMasternodeList.getList();
+      simplifiedMNList = simplifiedMasternodeList.getStore();
 
       expect(simplifiedMNList.baseSimplifiedMNList.baseBlockHash).to.equal(
         initialRawDiff.baseBlockHash,
@@ -117,7 +117,7 @@ describe('SimplifiedMasternodeList', () => {
 
       simplifiedMasternodeList.applyDiffs(updatedSmlDiffs);
 
-      simplifiedMNList = simplifiedMasternodeList.getList();
+      simplifiedMNList = simplifiedMasternodeList.getStore();
 
       expect(simplifiedMNList.baseSimplifiedMNList.baseBlockHash).to.equal(
         initialRawDiff.baseBlockHash,
@@ -134,17 +134,17 @@ describe('SimplifiedMasternodeList', () => {
     });
   });
 
-  describe('#getList', () => {
+  describe('#getStore', () => {
     it('should return simplifiedMNList', async () => {
-      let simplifiedMNList = simplifiedMasternodeList.getList();
+      let simplifiedMNList = simplifiedMasternodeList.getStore();
 
       expect(simplifiedMNList).to.deep.equal(undefined);
 
       simplifiedMasternodeList.applyDiffs(initialSmlDiffs);
 
-      simplifiedMNList = simplifiedMasternodeList.getList();
+      simplifiedMNList = simplifiedMasternodeList.getStore();
 
-      expect(simplifiedMNList).to.deep.equal(simplifiedMasternodeList.sml);
+      expect(simplifiedMNList).to.deep.equal(simplifiedMasternodeList.store);
     });
   });
 });
