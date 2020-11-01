@@ -18,7 +18,6 @@ describe('endBlockHandlerFactory', () => {
   let blockExecutionContextMock;
   let dpnsContractId;
   let dpnsContractBlockHeight;
-  let blockHeight;
   let loggerMock;
 
   beforeEach(function beforeEach() {
@@ -30,7 +29,7 @@ describe('endBlockHandlerFactory', () => {
     };
 
     dpnsContractId = generateRandomIdentifier();
-    dpnsContractBlockHeight = blockHeight;
+    dpnsContractBlockHeight = 2;
 
     endBlockHandler = endBlockHandlerFactory(
       blockExecutionContextMock,
@@ -39,10 +38,8 @@ describe('endBlockHandlerFactory', () => {
       loggerMock,
     );
 
-    blockHeight = 2;
-
     request = {
-      height: blockHeight,
+      height: dpnsContractBlockHeight,
     };
   });
 
@@ -83,7 +80,7 @@ describe('endBlockHandlerFactory', () => {
     } catch (e) {
       expect(e).to.be.an.instanceOf(NoDPNSContractFoundError);
       expect(e.getContractId()).to.equal(dpnsContractId);
-      expect(e.getHeight()).to.equal(blockHeight);
+      expect(e.getHeight()).to.equal(dpnsContractBlockHeight);
 
       expect(blockExecutionContextMock.hasDataContract).to.have.been.calledOnceWithExactly(
         dpnsContractId,
