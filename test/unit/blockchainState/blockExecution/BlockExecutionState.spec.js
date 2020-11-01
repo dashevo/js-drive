@@ -1,5 +1,5 @@
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
-const BlockExecutionState = require('../../../../lib/blockchainState/blockExecution/BlockExecutionState');
+const BlockExecutionState = require('../../../../lib/chainInfo/blockExecution/BlockExecutionState');
 
 describe('BlockExecutionState', () => {
   let blockExecutionState;
