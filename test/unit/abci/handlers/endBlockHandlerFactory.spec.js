@@ -16,7 +16,6 @@ describe('endBlockHandlerFactory', () => {
   let endBlockHandler;
   let request;
   let blockExecutionContextMock;
-  let header;
   let dpnsContractId;
   let dpnsContractBlockHeight;
   let blockHeight;
@@ -42,18 +41,8 @@ describe('endBlockHandlerFactory', () => {
 
     blockHeight = 2;
 
-    header = {
-      version: {
-        App: 1,
-      },
-      height: blockHeight,
-      time: {
-        seconds: Math.ceil(new Date().getTime() / 1000),
-      },
-    };
-
     request = {
-      header,
+      height: blockHeight,
     };
   });
 
