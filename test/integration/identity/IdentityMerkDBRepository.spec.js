@@ -43,7 +43,7 @@ describe('IdentityMerkDBRepository', () => {
 
       expect(repositoryInstance).to.equal(repository);
 
-      const storedIdentityBuffer = await db.getSync(identity.getId());
+      const storedIdentityBuffer = db.getSync(identity.getId());
 
       expect(storedIdentityBuffer).to.be.instanceOf(Buffer);
 
@@ -63,7 +63,7 @@ describe('IdentityMerkDBRepository', () => {
 
       // check we don't have data in db before commit
       try {
-        await db.getSync(identity.getId());
+        db.getSync(identity.getId());
 
         expect.fail('Should fail with NotFoundError error');
       } catch (e) {
@@ -84,7 +84,7 @@ describe('IdentityMerkDBRepository', () => {
       await transaction.commit();
 
       // check we have data in db after commit
-      const storedIdentityBuffer = await db.getSync(identity.getId());
+      const storedIdentityBuffer = db.getSync(identity.getId());
 
       expect(storedIdentityBuffer).to.be.instanceOf(Buffer);
 
@@ -104,7 +104,7 @@ describe('IdentityMerkDBRepository', () => {
     });
 
     it('should return stored identity', async () => {
-      await db.batch().put(identity.getId(), identity.toBuffer()).commitSync();
+      db.batch().put(identity.getId(), identity.toBuffer()).commitSync();
 
       const storedIdentity = await repository.fetch(identity.getId());
 

@@ -1,7 +1,7 @@
-const MerkDbTransactionWrapper = require('../../../lib/merkDb/MerkDbTransactionDecorator');
+const MerkDbInMemoryDecorator = require('../../../lib/merkDb/MerkDbInMemoryDecorator');
 
-describe('MerkDbTransactionWrapper', () => {
-  let merkDbTransactionDecorator;
+describe('MerkDbInMemoryDecorator', () => {
+  let merkDbInMemoryDecorator;
   let merkDBMock;
   let batchMock;
 
@@ -21,17 +21,17 @@ describe('MerkDbTransactionWrapper', () => {
       batch: this.sinon.stub().returns(batchMock),
     };
 
-    merkDbTransactionDecorator = new MerkDbTransactionWrapper(merkDBMock);
+    merkDbInMemoryDecorator = new MerkDbInMemoryDecorator(merkDBMock);
   });
 
-  describe('#get', () => {
+  describe('#getSync', () => {
     it('should return value from transaction', () => {
       const key = Buffer.from([1, 2, 3]);
       const value = Buffer.from([4, 2]);
 
-      merkDbTransactionDecorator.data.set(key.toString('hex'), value);
+      merkDbInMemoryDecorator.data.set(key.toString('hex'), value);
 
-      const result = merkDbTransactionDecorator.get(key);
+      const result = merkDbInMemoryDecorator.getSync(key);
 
       expect(result).to.deep.equal(value);
     });
@@ -42,7 +42,7 @@ describe('MerkDbTransactionWrapper', () => {
 
       merkDBMock.getSync.returns(value);
 
-      const result = merkDbTransactionDecorator.get(key);
+      const result = merkDbInMemoryDecorator.getSync(key);
 
       expect(result).to.deep.equal(value);
     });
@@ -53,9 +53,9 @@ describe('MerkDbTransactionWrapper', () => {
 
       merkDBMock.getSync.returns(value);
 
-      merkDbTransactionDecorator.deleted.add(key.toString('hex'));
+      merkDbInMemoryDecorator.deleted.add(key.toString('hex'));
 
-      const result = merkDbTransactionDecorator.get(key);
+      const result = merkDbInMemoryDecorator.getSync(key);
 
       expect(result).to.deep.equal(value);
     });
@@ -66,12 +66,12 @@ describe('MerkDbTransactionWrapper', () => {
       const key = Buffer.from([1, 2, 3]);
       const value = Buffer.from([4, 2]);
 
-      merkDbTransactionDecorator.deleted.add(key.toString('hex'));
+      merkDbInMemoryDecorator.deleted.add(key.toString('hex'));
 
-      merkDbTransactionDecorator.put(key, value);
+      merkDbInMemoryDecorator.put(key, value);
 
-      expect(merkDbTransactionDecorator.deleted.has(key.toString('hex'))).to.be.false();
-      expect(merkDbTransactionDecorator.data.get(key.toString('hex'))).to.deep.equals(
+      expect(merkDbInMemoryDecorator.deleted.has(key.toString('hex'))).to.be.false();
+      expect(merkDbInMemoryDecorator.data.get(key.toString('hex'))).to.deep.equals(
         value,
       );
     });
@@ -82,12 +82,12 @@ describe('MerkDbTransactionWrapper', () => {
       const key = Buffer.from([1, 2, 3]);
       const value = Buffer.from([4, 2]);
 
-      merkDbTransactionDecorator.data.set(key.toString('hex'), value);
+      merkDbInMemoryDecorator.data.set(key.toString('hex'), value);
 
-      merkDbTransactionDecorator.delete(key);
+      merkDbInMemoryDecorator.delete(key);
 
-      expect(merkDbTransactionDecorator.deleted.has(key.toString('hex'))).to.be.true();
-      expect(merkDbTransactionDecorator.data.get(key.toString('hex'))).to.be.undefined();
+      expect(merkDbInMemoryDecorator.deleted.has(key.toString('hex'))).to.be.true();
+      expect(merkDbInMemoryDecorator.data.get(key.toString('hex'))).to.be.undefined();
       expect(merkDBMock.getSync).to.be.calledOnce();
     });
 
@@ -98,10 +98,10 @@ describe('MerkDbTransactionWrapper', () => {
 
       merkDBMock.getSync.throws(error);
 
-      merkDbTransactionDecorator.delete(key);
+      merkDbInMemoryDecorator.delete(key);
 
-      expect(merkDbTransactionDecorator.deleted.has(key.toString('hex'))).to.be.false();
-      expect(merkDbTransactionDecorator.data.get(key.toString('hex'))).to.be.undefined();
+      expect(merkDbInMemoryDecorator.deleted.has(key.toString('hex'))).to.be.false();
+      expect(merkDbInMemoryDecorator.data.get(key.toString('hex'))).to.be.undefined();
       expect(merkDBMock.getSync).to.be.calledOnce();
     });
 
@@ -113,7 +113,7 @@ describe('MerkDbTransactionWrapper', () => {
       merkDBMock.getSync.throws(error);
 
       try {
-        merkDbTransactionDecorator.delete(key);
+        merkDbInMemoryDecorator.delete(key);
 
         expect.fail('should throw unknown error');
       } catch (e) {
@@ -128,13 +128,13 @@ describe('MerkDbTransactionWrapper', () => {
       const keyToRemove = Buffer.from([1, 2, 3]);
       const valueToAdd = Buffer.from([4, 2]);
 
-      merkDbTransactionDecorator.data.set(keyToAdd.toString('hex'), valueToAdd);
-      merkDbTransactionDecorator.deleted.add(keyToRemove.toString('hex'));
+      merkDbInMemoryDecorator.data.set(keyToAdd.toString('hex'), valueToAdd);
+      merkDbInMemoryDecorator.deleted.add(keyToRemove.toString('hex'));
 
-      merkDbTransactionDecorator.commit();
+      merkDbInMemoryDecorator.commit();
 
-      expect(merkDbTransactionDecorator.data.size).to.be.equal(0);
-      expect(merkDbTransactionDecorator.deleted.size).to.be.equal(0);
+      expect(merkDbInMemoryDecorator.data.size).to.be.equal(0);
+      expect(merkDbInMemoryDecorator.deleted.size).to.be.equal(0);
 
       expect(merkDBMock.batch).to.be.calledOnce();
       expect(batchMock.put).to.be.calledOnce();
@@ -143,13 +143,13 @@ describe('MerkDbTransactionWrapper', () => {
     });
 
     it('should skip commit if nothing to commit', async () => {
-      expect(merkDbTransactionDecorator.data.size).to.be.equal(0);
-      expect(merkDbTransactionDecorator.deleted.size).to.be.equal(0);
+      expect(merkDbInMemoryDecorator.data.size).to.be.equal(0);
+      expect(merkDbInMemoryDecorator.deleted.size).to.be.equal(0);
 
-      merkDbTransactionDecorator.commit();
+      merkDbInMemoryDecorator.commit();
 
-      expect(merkDbTransactionDecorator.data.size).to.be.equal(0);
-      expect(merkDbTransactionDecorator.deleted.size).to.be.equal(0);
+      expect(merkDbInMemoryDecorator.data.size).to.be.equal(0);
+      expect(merkDbInMemoryDecorator.deleted.size).to.be.equal(0);
 
       expect(merkDBMock.batch).to.be.not.called();
       expect(batchMock.put).to.be.not.called();
@@ -163,13 +163,13 @@ describe('MerkDbTransactionWrapper', () => {
       const key = Buffer.from([1, 2, 3]);
       const value = Buffer.from([4, 2]);
 
-      merkDbTransactionDecorator.deleted.add(key.toString('hex'));
-      merkDbTransactionDecorator.data.set(key.toString('hex'), value);
+      merkDbInMemoryDecorator.deleted.add(key.toString('hex'));
+      merkDbInMemoryDecorator.data.set(key.toString('hex'), value);
 
-      merkDbTransactionDecorator.rollback();
+      merkDbInMemoryDecorator.rollback();
 
-      expect(merkDbTransactionDecorator.deleted.size).to.equal(0);
-      expect(merkDbTransactionDecorator.data.size).to.equal(0);
+      expect(merkDbInMemoryDecorator.deleted.size).to.equal(0);
+      expect(merkDbInMemoryDecorator.data.size).to.equal(0);
     });
   });
 });
