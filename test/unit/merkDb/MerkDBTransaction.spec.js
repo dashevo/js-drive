@@ -2,7 +2,7 @@ const merk = require('merk');
 const rimraf = require('rimraf');
 
 const MerkDbTransaction = require('../../../lib/merkDb/MerkDbTransaction');
-const MerkDbTransactionWrapper = require('../../../lib/merkDb/MerkDbTransactionWrapper');
+const MerkDbTransactionWrapper = require('../../../lib/merkDb/MerkDbTransactionDecorator');
 
 const MerkDBTransactionIsNotStartedError = require('../../../lib/merkDb/errors/MerkDBTransactionIsNotStartedError');
 const MerkDBTransactionIsAlreadyStartedError = require('../../../lib/merkDb/errors/MerkDBTransactionIsAlreadyStartedError');
