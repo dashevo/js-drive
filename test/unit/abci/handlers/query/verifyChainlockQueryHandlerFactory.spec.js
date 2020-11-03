@@ -15,13 +15,13 @@ const AbciError = require('../../../../../lib/abci/errors/AbciError');
 const chainlockJSON = {
   height: 394216,
   blockHash: '000008cc02119a783921e214f358c72eb42941d1f972e0111da5037f5007270b',
-  signature: '061476c699fee312a29c0e7a604a5288237073e9317ac458f5772e0e40793fcca83ba72fe3b8f42f4cf1499c02764fb313b6661e873b084bb8e65cd087567060743fca85a73782a6f53503d4c336cc07b69780c6b9e98a4bfcce0d4b17d3d889'
+  signature: '061476c699fee312a29c0e7a604a5288237073e9317ac458f5772e0e40793fcca83ba72fe3b8f42f4cf1499c02764fb313b6661e873b084bb8e65cd087567060743fca85a73782a6f53503d4c336cc07b69780c6b9e98a4bfcce0d4b17d3d889',
 };
 
 const chainlockJSONinvalid = {
   height: 394216,
   blockHash: '000008cc02119a783921e214f358c72eb42941d1f972e0111da5037f5007270b',
-  signature: '071476c699fee312a29c0e7a604a5288237073e9317ac458f5772e0e40793fcca83ba72fe3b8f42f4cf1499c02764fb313b6661e873b084bb8e65cd087567060743fca85a73782a6f53503d4c336cc07b69780c6b9e98a4bfcce0d4b17d3d889'
+  signature: '071476c699fee312a29c0e7a604a5288237073e9317ac458f5772e0e40793fcca83ba72fe3b8f42f4cf1499c02764fb313b6661e873b084bb8e65cd087567060743fca85a73782a6f53503d4c336cc07b69780c6b9e98a4bfcce0d4b17d3d889',
 };
 
 describe('identityQueryHandlerFactory', () => {
@@ -34,7 +34,7 @@ describe('identityQueryHandlerFactory', () => {
   let data;
   let dataInvalid;
 
-  beforeEach(function beforeEach() {
+  beforeEach(() => {
     smlDiffs = SimplifiedMasternodeListFixtures.getChainlockDiffArray();
     simplifiedMasternodeList = new SimplifiedMasternodeList();
     simplifiedMasternodeList.applyDiffs(smlDiffs);
@@ -69,8 +69,7 @@ describe('identityQueryHandlerFactory', () => {
       expect(e).to.be.an.instanceof(InvalidArgumentAbciError);
       expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
       expect(e.message).to.equal(`Signature invalid for chainlock
-         ${chainlock}`,
-        );
+         ${chainlock}`);
     }
   });
 });
