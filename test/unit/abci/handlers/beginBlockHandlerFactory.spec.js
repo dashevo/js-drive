@@ -8,28 +8,28 @@ const {
 
 const beginBlockHandlerFactory = require('../../../../lib/abci/handlers/beginBlockHandlerFactory');
 
-const BlockchainState = require('../../../../lib/blockchainState/BlockchainState');
+const ChainInfo = require('../../../../lib/chainInfo/ChainInfo');
 const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionDBTransactionsMock');
-const BlockExecutionStateMock = require('../../../../lib/test/mock/BlockExecutionStateMock');
+const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 
 describe('beginBlockHandlerFactory', () => {
   let protocolVersion;
   let beginBlockHandler;
   let request;
-  let blockchainState;
+  let chainInfo;
   let blockHeight;
   let blockExecutionDBTransactionsMock;
-  let blockExecutionStateMock;
+  let blockExecutionContextMock;
   let header;
 
   beforeEach(function beforeEach() {
-    blockchainState = new BlockchainState();
+    chainInfo = new ChainInfo();
 
     protocolVersion = Long.fromInt(0);
 
     blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
 
-    blockExecutionStateMock = new BlockExecutionStateMock(this.sinon);
+    blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
     const loggerMock = {
       debug: this.sinon.stub(),
@@ -37,9 +37,9 @@ describe('beginBlockHandlerFactory', () => {
     };
 
     beginBlockHandler = beginBlockHandlerFactory(
-      blockchainState,
+      chainInfo,
       blockExecutionDBTransactionsMock,
-      blockExecutionStateMock,
+      blockExecutionContextMock,
       protocolVersion,
       loggerMock,
     );
@@ -66,10 +66,10 @@ describe('beginBlockHandlerFactory', () => {
 
     expect(response).to.be.an.instanceOf(ResponseBeginBlock);
 
-    expect(blockchainState.getLastBlockHeight()).to.equal(blockHeight);
+    expect(chainInfo.getLastBlockHeight()).to.equal(blockHeight);
     expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
-    expect(blockExecutionStateMock.reset).to.be.calledOnce();
-    expect(blockExecutionStateMock.setHeader).to.be.calledOnceWithExactly(header);
+    expect(blockExecutionContextMock.reset).to.be.calledOnce();
+    expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
   });
 
   it('should reject not supported protocol version', async () => {
