@@ -102,4 +102,71 @@ describe('MerkDbStore', () => {
       expect(result).to.deep.equal(value);
     });
   });
+
+  describe('#delete', () => {
+    it('should delete value', () => {
+      merkDb.batch()
+        .put(key, value)
+        .commitSync();
+
+      // store.delete(key);
+
+      merkDb.batch()
+        .delete(key)
+        .commitSync();
+
+      try {
+        merkDb.getSync(key);
+
+        expect.fail('should throw key not found error');
+      } catch (e) {
+        expect(e);
+      }
+    });
+
+    it('should store value in transaction', async () => {
+      const transaction = store.createTransaction();
+
+      expect(transaction).to.be.instanceOf(MerkDbTransaction);
+
+      transaction.start();
+
+      // store data in transaction
+      store.put(key, value, transaction);
+
+      // check we don't have data in db before commit
+      try {
+        merkDb.getSync(key);
+
+        expect.fail('Should fail with NotFoundError error');
+      } catch (e) {
+        expect(e.message.startsWith('key not found')).to.be.true();
+      }
+
+      // check we can't fetch data without transaction
+      const notFoundValue = store.get(key);
+
+      expect(notFoundValue).to.be.null();
+
+      // check we can fetch data inside transaction
+      const valueFromTransaction = store.get(key, transaction);
+
+      expect(valueFromTransaction).to.deep.equal(value);
+
+      await transaction.commit();
+
+      // check we have data in db after commit
+      const storedValue = merkDb.getSync(key);
+
+      expect(storedValue).to.deep.equal(value);
+    });
+  });
+
+  describe('#getRootHash', () => {
+
+  });
+
+  describe('#createTransaction', () => {
+
+  });
 });
