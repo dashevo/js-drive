@@ -19,7 +19,7 @@ const InvalidQueryError = require('../../../lib/document/errors/InvalidQueryErro
 const createDocumentMongoDbRepositoryFactory = require('../../../lib/document/mongoDbRepository/createDocumentMongoDbRepositoryFactory');
 const fetchDocumentsFactory = require('../../../lib/document/fetchDocumentsFactory');
 const DataContractStoreRepository = require('../../../lib/dataContract/DataContractStoreRepository');
-const getDocumentDatabaseFactory = require('../../../lib/document/mongoDbRepository/getDocumentDatabaseFactory');
+const getDocumentDatabaseFactory = require('../../../lib/document/mongoDbRepository/getDocumentMongoDbDatabaseFactory');
 
 const findNotIndexedFields = require('../../../lib/document/query/findNotIndexedFields');
 const findNotIndexedOrderByFields = require('../../../lib/document/query/findNotIndexedOrderByFields');

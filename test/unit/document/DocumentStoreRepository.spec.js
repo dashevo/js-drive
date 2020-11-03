@@ -30,8 +30,7 @@ describe('DocumentStoreRepository', () => {
 
   describe('#store', () => {
     it('should store document', async () => {
-      const result = await repository.store(document, transactionMock);
-      expect(result).to.equal(repository);
+      await repository.store(document, transactionMock);
 
       expect(storeMock.put).to.be.calledOnceWithExactly(
         document.getId(),
