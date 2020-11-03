@@ -46,10 +46,10 @@ describe('identityQueryHandlerFactory', () => {
     chainlockInvalid = new ChainLock(chainlockJSONinvalid);
     params = {};
     data = {
-      chainLock: chainlock,
+      chainLock: chainlock.toBuffer(),
     };
     dataInvalid = {
-      chainLock: chainlockInvalid,
+      chainLock: chainlockInvalid.toBuffer(),
     };
   });
 
