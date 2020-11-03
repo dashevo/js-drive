@@ -157,10 +157,30 @@ describe('DocumentMongoDbRepository', function main() {
     });
 
     it('should store Document', async () => {
-      const result = await documentRepository.find(document.getId());
+      const findQuery = {
+        _id: {
+          $eq: document.getId(),
+        },
+      };
 
-      expect(result).to.be.an.instanceOf(Document);
-      expect(result.toObject()).to.deep.equal(document.toObject());
+      const findOptions = {
+        promoteBuffers: true,
+        projection: {
+          _id: 1,
+        },
+        limit: 100,
+      };
+
+      const result = await documentRepository
+        .mongoCollection
+        .find(findQuery, findOptions)
+        .toArray();
+
+      expect(result).to.have.lengthOf(1);
+      // eslint-disable-next-line no-underscore-dangle
+      const [documentId] = result.map((mongoDbDocument) => new Identifier(mongoDbDocument._id));
+
+      expect(documentId).to.deep.equal(document.getId());
     });
 
     it('should store Document in transaction', async () => {
@@ -170,19 +190,32 @@ describe('DocumentMongoDbRepository', function main() {
 
       await documentRepository.store(document, stateViewTransaction);
 
-      const transactionDocument = await documentRepository
-        .find(document.getId(), stateViewTransaction);
-      const notFoundDocument = await documentRepository.find(document.getId());
+      const transactionDocumentIds = await documentRepository
+        .find({
+          where: [['$id', '==', document.getId()]],
+        }, stateViewTransaction);
+      const notFoundDocument = await documentRepository.find({
+        where: [['$id', '==', document.getId()]],
+      });
 
       await stateViewTransaction.commit();
 
-      const createdDocument = await documentRepository.find(document.getId());
+      const createdDocumentIds = await documentRepository.find({
+        where: [['$id', '==', document.getId()]],
+      });
 
-      expect(notFoundDocument).to.be.a('null');
-      expect(transactionDocument).to.be.an.instanceOf(Document);
-      expect(transactionDocument.toObject()).to.deep.equal(document.toObject());
-      expect(createdDocument).to.be.an.instanceOf(Document);
-      expect(createdDocument.toObject()).to.deep.equal(document.toObject());
+      expect(notFoundDocument).to.have.lengthOf(0);
+      expect(transactionDocumentIds).to.have.lengthOf(1);
+
+      const [transactionDocumentId] = transactionDocumentIds;
+
+      expect(transactionDocumentId).to.be.an.instanceOf(Identifier);
+      expect(transactionDocumentId).to.deep.equal(document.getId());
+
+      expect(createdDocumentIds).to.have.lengthOf(1);
+
+      const [createdDocumentId] = createdDocumentIds;
+      expect(createdDocumentId).to.deep.equal(document.getId());
     });
   });
 
@@ -192,15 +225,14 @@ describe('DocumentMongoDbRepository', function main() {
     });
 
     it('should find Documents', async () => {
-      const result = await documentRepository.find();
+      const documentIds = await documentRepository.find();
 
-      expect(result).to.be.an('array');
-      expect(result).to.have.lengthOf(documents.length);
+      expect(documentIds).to.be.an('array');
+      expect(documentIds).to.have.lengthOf(documents.length);
 
-      const actualRawDocuments = convertToRaw(result);
-      const expectedRawDocuments = convertToRaw(documents);
-
-      expect(actualRawDocuments).to.have.deep.members(expectedRawDocuments);
+      expect(documentIds).to.have.deep.members(
+        documents.map((doc) => doc.getId()),
+      );
     });
 
     it('should fetch Documents in transaction', async () => {
