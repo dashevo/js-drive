@@ -186,13 +186,13 @@ describe('DocumentMongoDbRepository', function main() {
     });
   });
 
-  describe('#fetch', () => {
+  describe('#find', () => {
     beforeEach(async () => {
       await createDocuments(documentRepository, documents);
     });
 
-    it('should fetch Documents', async () => {
-      const result = await documentRepository.fetch();
+    it('should find Documents', async () => {
+      const result = await documentRepository.find();
 
       expect(result).to.be.an('array');
       expect(result).to.have.lengthOf(documents.length);
@@ -206,7 +206,7 @@ describe('DocumentMongoDbRepository', function main() {
     it('should fetch Documents in transaction', async () => {
       await stateViewTransaction.start();
 
-      const result = await documentRepository.fetch({}, {}, stateViewTransaction);
+      const result = await documentRepository.find({}, {}, stateViewTransaction);
 
       await stateViewTransaction.commit();
 
@@ -224,7 +224,7 @@ describe('DocumentMongoDbRepository', function main() {
 
       let error;
       try {
-        await documentRepository.fetch(invalidQuery);
+        await documentRepository.find(invalidQuery);
       } catch (e) {
         error = e;
       }
@@ -239,7 +239,7 @@ describe('DocumentMongoDbRepository', function main() {
           where: [['order', '<', documents[1].get('order')]],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -254,7 +254,7 @@ describe('DocumentMongoDbRepository', function main() {
           where: [['order', '<=', documents[1].get('order')]],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(2);
@@ -271,7 +271,7 @@ describe('DocumentMongoDbRepository', function main() {
           where: [['name', '==', document.get('name')]],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -286,7 +286,7 @@ describe('DocumentMongoDbRepository', function main() {
           where: [['order', '>', documents[1].get('order')]],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(documents.length - 2);
@@ -303,7 +303,7 @@ describe('DocumentMongoDbRepository', function main() {
           where: [['order', '>=', documents[1].get('order')]],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(documents.length - 1);
@@ -326,7 +326,7 @@ describe('DocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(2);
@@ -343,7 +343,7 @@ describe('DocumentMongoDbRepository', function main() {
           where: [['arrayWithObjects', 'length', 2]],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -358,7 +358,7 @@ describe('DocumentMongoDbRepository', function main() {
           where: [['lastName', 'startsWith', 'Swe']],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -377,7 +377,7 @@ describe('DocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -394,7 +394,7 @@ describe('DocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -411,7 +411,7 @@ describe('DocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(2);
@@ -428,7 +428,7 @@ describe('DocumentMongoDbRepository', function main() {
           where: [['name', '==', 'Dash enthusiast']],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.deep.equal([]);
       });
@@ -440,7 +440,7 @@ describe('DocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -461,7 +461,7 @@ describe('DocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(1);
@@ -478,7 +478,7 @@ describe('DocumentMongoDbRepository', function main() {
           limit: 1,
         };
 
-        const result = await documentRepository.fetch(options, documentSchema);
+        const result = await documentRepository.find(options, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.have.lengthOf(1);
@@ -497,7 +497,7 @@ describe('DocumentMongoDbRepository', function main() {
           }),
         );
 
-        const result = await documentRepository.fetch();
+        const result = await documentRepository.find();
 
         expect(result).to.be.an('array');
         expect(result).to.have.lengthOf(100);
@@ -513,7 +513,7 @@ describe('DocumentMongoDbRepository', function main() {
           startAt: 2,
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
 
@@ -533,7 +533,7 @@ describe('DocumentMongoDbRepository', function main() {
           startAfter: 1,
         };
 
-        const result = await documentRepository.fetch(options, documentSchema);
+        const result = await documentRepository.find(options, documentSchema);
 
         expect(result).to.be.an('array');
 
@@ -552,7 +552,7 @@ describe('DocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
 
@@ -569,7 +569,7 @@ describe('DocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
 
@@ -597,7 +597,7 @@ describe('DocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(documents.length);
@@ -629,7 +629,7 @@ describe('DocumentMongoDbRepository', function main() {
           ],
         };
 
-        const result = await documentRepository.fetch(query, documentSchema);
+        const result = await documentRepository.find(query, documentSchema);
 
         expect(result).to.be.an('array');
         expect(result).to.be.lengthOf(documents.length);
@@ -651,7 +651,9 @@ describe('DocumentMongoDbRepository', function main() {
     it('should delete Document', async () => {
       await documentRepository.delete(document.getId());
 
-      const result = await documentRepository.find(document.getId());
+      const result = await documentRepository.find({
+        where: [['$id', '==', document.getId()]],
+      });
 
       expect(result).to.be.null();
     });
@@ -699,25 +701,6 @@ describe('DocumentMongoDbRepository', function main() {
       expect(notRemovedDocument.toObject()).to.deep.equal(document.toObject());
       expect(restoredDocument).to.be.an.instanceOf(Document);
       expect(restoredDocument.toObject()).to.deep.equal(document.toObject());
-    });
-  });
-
-  describe('#find', () => {
-    beforeEach(async () => {
-      await createDocuments(documentRepository, documents);
-    });
-
-    it('should find Document by ID', async () => {
-      const result = await documentRepository.find(document.getId());
-
-      expect(result).to.be.an.instanceof(Document);
-      expect(result.toObject()).to.deep.equal(document.toObject());
-    });
-
-    it('should return null if Document was not found', async () => {
-      const unknownDocument = await documentRepository.find('unknown');
-
-      expect(unknownDocument).to.be.null();
     });
   });
 
