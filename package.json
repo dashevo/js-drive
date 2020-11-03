@@ -91,7 +91,6 @@
     "pino-pretty": "^4.0.3",
     "rimraf": "^3.0.2",
     "setimmediate": "^1.0.5",
-    "through2": "^3.0.1",
-    "rimraf": "^3.0.2"
+    "through2": "^3.0.1"
   }
 }
