@@ -21,11 +21,17 @@ describe('DocumentStoreRepository', () => {
       .createFromBuffer
       .resolves(document);
 
+    const containerMock = {
+      resolve() {
+        return dppMock;
+      },
+    };
+
     storeMock = new StoreMock(this.sinon);
 
     transactionMock = {};
 
-    repository = new DocumentStoreRepository(storeMock, dppMock);
+    repository = new DocumentStoreRepository(storeMock, containerMock);
   });
 
   describe('#store', () => {
