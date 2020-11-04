@@ -71,6 +71,7 @@ describe('verifyChainlockQueryHandlerFactory', () => {
     } catch (e) {
       expect(e).to.be.an.instanceof(InvalidArgumentAbciError);
       expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
+      expect(e.message).to.equal('Signature invalid for chainlock');
     }
   });
 });
