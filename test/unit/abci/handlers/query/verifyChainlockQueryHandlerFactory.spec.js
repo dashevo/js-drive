@@ -39,10 +39,12 @@ describe('verifyChainlockQueryHandlerFactory', () => {
     chainlockDataValid = {
       chainLock: chainlock.toBuffer(),
       verify: this.sinon.stub().returns(true),
+      toJSON: this.sinon.stub(),
     };
     chainlockDataInvalid = {
       chainLock: chainlockInvalid.toBuffer(),
       verify: this.sinon.stub().returns(false),
+      toJSON: this.sinon.stub(),
     };
     decodeChainLockMockValid = this.sinon.stub().returns(chainlockDataValid);
     decodeChainLockMockInvalid = this.sinon.stub().returns(chainlockDataInvalid);
