@@ -75,4 +75,15 @@ describe('DocumentStoreRepository', () => {
       );
     });
   });
+
+  describe('#delete', () => {
+    it('should delete document', async () => {
+      await repository.delete(document.getId(), transactionMock);
+
+      expect(storeMock.delete).to.be.calledOnceWithExactly(
+        document.getId(),
+        transactionMock,
+      );
+    });
+  });
 });
