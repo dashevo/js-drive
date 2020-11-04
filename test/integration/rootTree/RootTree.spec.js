@@ -13,7 +13,7 @@ describe('RootTree', () => {
   beforeEach(() => {
     const leafOneRootHash = Buffer.alloc(32).fill(1);
     const leafTwoRootHash = Buffer.alloc(32).fill(2);
-    rootHash = Buffer.from('b41f077ca124f5ef535370daf41c74a2bc48ba7eb868e7337cc1f7f4abff1cae', 'hex');
+    rootHash = Buffer.from('e1cea2a83f3686b0183922ba4baf0e0d2f3e0622', 'hex');
 
     leafOneMock = {
       getIndex() {
@@ -60,7 +60,7 @@ describe('RootTree', () => {
       expect(proof).to.deep.equal([
         {
           position: 'right',
-          data: Buffer.from('d9818087de7244abc1b5fcf28e55e42c7ff9c678c0605181f37ac5d7414a7b95', 'hex'),
+          data: Buffer.from('f0faf5f55674905a68eba1be2f946e667c1cb501', 'hex'),
         },
       ]);
     });
@@ -71,7 +71,7 @@ describe('RootTree', () => {
       expect(proof).to.deep.equal([
         {
           position: 'left',
-          data: Buffer.from('f40ceaf86e5776923332b8d8fd3bef849cadb19c6996bc272af1f648d9566a4c', 'hex'),
+          data: Buffer.from('fa5c47912cc22dce628071b48d2386bd511656e3', 'hex'),
         },
       ]);
     });
