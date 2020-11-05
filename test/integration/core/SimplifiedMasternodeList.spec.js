@@ -6,11 +6,8 @@ describe('SimplifiedMasternodeList', () => {
   let smlMaxListsLimit;
   let initialSmlDiffs;
   let updatedSmlDiffs;
-  let network;
 
   beforeEach(() => {
-    network = 'regtest';
-
     simplifiedMasternodeList = new SimplifiedMasternodeList({
       smlMaxListsLimit,
     });
@@ -43,7 +40,7 @@ describe('SimplifiedMasternodeList', () => {
         initialSmlDiffs[0].baseBlockHash,
       );
       expect(simplifiedMNList.currentSML.blockHash).to.equal(
-        initialSmlDiffs[initialSmlDiffs.length -1].blockHash,
+        initialSmlDiffs[initialSmlDiffs.length - 1].blockHash,
       );
     });
 
