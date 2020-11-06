@@ -3,6 +3,7 @@ FROM node:12-alpine
 RUN apk update && \
     apk --no-cache upgrade && \
     apk add --no-cache linux-headers \
+                       cmake \
                        git \
                        openssh-client \
                        python \
