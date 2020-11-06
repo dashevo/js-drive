@@ -22,6 +22,9 @@ describe('RootTree', () => {
       getHash() {
         return hashFunction(leafOneRootHash);
       },
+      getProof() {
+        return Buffer.from('03046b657931060076616c75653103046b657932060076616c75653210', 'hex');
+      },
     };
 
     leafTwoMock = {
@@ -74,6 +77,18 @@ describe('RootTree', () => {
           data: Buffer.from('fa5c47912cc22dce628071b48d2386bd511656e3', 'hex'),
         },
       ]);
+    });
+  });
+
+  describe('#getFullProof', () => {
+    it('should return a full proof', () => {
+      const leafKeys = [
+        Buffer.from([1]),
+      ];
+
+      const fullProof = rootTree.getFullProof(leafOneMock, leafKeys);
+
+      expect(fullProof).to.be.deep.equal(Buffer.from('', 'hex'));
     });
   });
 
