@@ -16,23 +16,27 @@ describe('verifyChainLockQueryHandlerFactory', () => {
   let params;
   let decodeChainLockMock;
   let encodedChainLock;
+  let chainLockMock;
 
   beforeEach(function beforeEach() {
-    decodeChainLockMock = this.sinon.stub();
-
     params = {};
 
     simplifiedMasternodeListMock = {
       getStore: this.sinon.stub(),
     };
 
+    chainLockMock = {
+      verify: this.sinon.stub(),
+      toJSON: this.sinon.stub(),
+    };
+
+    decodeChainLockMock = this.sinon.stub().returns(chainLockMock);
+
     encodedChainLock = Buffer.alloc(0);
   });
 
   it('should validate a valid chainlock', async function it() {
-    decodeChainLockMock.returns({
-      verify: this.sinon.stub().returns(true),
-    });
+    chainLockMock.verify.returns(true);
 
     verifyChainLockQueryHandler = verifyChainLockQueryHandlerFactory(
       simplifiedMasternodeListMock, decodeChainLockMock,
@@ -47,10 +51,7 @@ describe('verifyChainLockQueryHandlerFactory', () => {
   });
 
   it('should throw InvalidArgumentAbciError if chainlock is not valid', async function it() {
-    decodeChainLockMock.returns({
-      verify: this.sinon.stub().returns(false),
-      toJSON: this.sinon.stub(),
-    });
+    chainLockMock.verify.returns(false);
 
     verifyChainLockQueryHandler = verifyChainLockQueryHandlerFactory(
       simplifiedMasternodeListMock, decodeChainLockMock,
