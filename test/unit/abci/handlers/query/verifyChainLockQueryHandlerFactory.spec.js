@@ -35,7 +35,7 @@ describe('verifyChainLockQueryHandlerFactory', () => {
     encodedChainLock = Buffer.alloc(0);
   });
 
-  it('should validate a valid chainlock', async function it() {
+  it('should validate a valid chainlock', async () => {
     chainLockMock.verify.returns(true);
 
     verifyChainLockQueryHandler = verifyChainLockQueryHandlerFactory(
@@ -50,7 +50,7 @@ describe('verifyChainLockQueryHandlerFactory', () => {
     expect(decodeChainLockMock).to.be.calledOnceWithExactly(encodedChainLock);
   });
 
-  it('should throw InvalidArgumentAbciError if chainlock is not valid', async function it() {
+  it('should throw InvalidArgumentAbciError if chainlock is not valid', async () => {
     chainLockMock.verify.returns(false);
 
     verifyChainLockQueryHandler = verifyChainLockQueryHandlerFactory(
