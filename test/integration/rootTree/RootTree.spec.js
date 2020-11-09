@@ -88,7 +88,9 @@ describe('RootTree', () => {
 
       const fullProof = rootTree.getFullProof(leafOneMock, leafKeys);
 
-      expect(fullProof).to.be.deep.equal(Buffer.from('', 'hex'));
+      expect(fullProof).to.be.deep.equal(
+        Buffer.from('1b0100000001f0faf5f55674905a68eba1be2f946e667c1cb50101011d03046b657931060076616c75653103046b657932060076616c75653210', 'hex'),
+      );
     });
   });
 

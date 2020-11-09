@@ -17,14 +17,24 @@ describe('identityQueryHandlerFactory', () => {
   let identity;
   let params;
   let data;
+  let rootTreeMock;
+  let identitiesStoreRootTreeLeafMock;
 
   beforeEach(function beforeEach() {
     identityRepositoryMock = {
       fetch: this.sinon.stub(),
     };
 
+    rootTreeMock = {
+      getFullProof: this.sinon.stub(),
+    };
+
+    identitiesStoreRootTreeLeafMock = this.sinon.stub();
+
     identityQueryHandler = identityQueryHandlerFactory(
       identityRepositoryMock,
+      rootTreeMock,
+      identitiesStoreRootTreeLeafMock,
     );
 
     identity = getIdentityFixture();
@@ -38,7 +48,7 @@ describe('identityQueryHandlerFactory', () => {
   it('should return serialized identity', async () => {
     identityRepositoryMock.fetch.resolves(identity);
 
-    const result = await identityQueryHandler(params, data);
+    const result = await identityQueryHandler(params, data, {});
 
     expect(identityRepositoryMock.fetch).to.be.calledOnceWith(data.id);
     expect(result).to.be.an.instanceof(ResponseQuery);
@@ -48,7 +58,7 @@ describe('identityQueryHandlerFactory', () => {
 
   it('should throw NotFoundAbciError if identity not found', async () => {
     try {
-      await identityQueryHandler(params, data);
+      await identityQueryHandler(params, data, {});
 
       expect.fail('should throw NotFoundAbciError');
     } catch (e) {
@@ -57,5 +67,23 @@ describe('identityQueryHandlerFactory', () => {
       expect(e.message).to.equal('Identity not found');
       expect(identityRepositoryMock.fetch).to.be.calledOnceWith(data.id);
     }
+  });
+
+  it('should return serialized identity with proof', async () => {
+    const proof = Buffer.from('843176bc004504d6baf735cf0215e9d9a3fecf1d', 'hex');
+
+    identityRepositoryMock.fetch.resolves(identity);
+    rootTreeMock.getFullProof.returns(proof);
+
+    const result = await identityQueryHandler(params, data, { prove: 'true' });
+    expect(identityRepositoryMock.fetch).to.be.calledOnceWith(data.id);
+    expect(result).to.be.an.instanceof(ResponseQuery);
+    expect(result.code).to.equal(0);
+    expect(result.value).to.deep.equal(identity.toBuffer());
+    expect(rootTreeMock.getFullProof).to.be.calledOnceWith(
+      identitiesStoreRootTreeLeafMock,
+      [identity.toBuffer()],
+    );
+    expect(result.proof).to.deep.equal(proof);
   });
 });
