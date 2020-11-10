@@ -5,15 +5,13 @@ const MerkDbStore = require('../../../lib/merkDb/MerkDbStore');
 const MerkDbTransaction = require('../../../lib/merkDb/MerkDbTransaction');
 
 describe('MerkDbStore', () => {
-  let dbPath;
   let merkDb;
   let store;
   let key;
   let value;
 
   beforeEach(() => {
-    dbPath = './db/merkdb-test';
-    merkDb = new Merk(`${dbPath}/${Math.random()}`);
+    merkDb = new Merk('./db/merkdb-test');
 
     store = new MerkDbStore(merkDb);
 
