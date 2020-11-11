@@ -54,6 +54,17 @@ describe('RootTree', () => {
 
       expect(actualRootHash).to.deep.equal(rootHash);
     });
+
+    it('should return empty buffer if leafHashes consist of empty buffers', () => {
+      leafOneMock.getHash = () => Buffer.alloc(20);
+      leafTwoMock.getHash = () => Buffer.alloc(20);
+
+      rootTree = new RootTree([leafOneMock, leafTwoMock]);
+
+      const actualRootHash = rootTree.getRootHash();
+
+      expect(actualRootHash).to.deep.equal(Buffer.alloc(0));
+    });
   });
 
   describe('#getProof', () => {
@@ -88,9 +99,10 @@ describe('RootTree', () => {
 
       const fullProof = rootTree.getFullProof(leafOneMock, leafKeys);
 
-      expect(fullProof).to.be.deep.equal(
-        Buffer.from('1b0100000001f0faf5f55674905a68eba1be2f946e667c1cb50101011d03046b657931060076616c75653103046b657932060076616c75653210', 'hex'),
-      );
+      expect(fullProof).to.be.deep.equal({
+        rootTreeProof: Buffer.from('0100000001f0faf5f55674905a68eba1be2f946e667c1cb5010101', 'hex'),
+        storeTreeProof: Buffer.from('03046b657931060076616c75653103046b657932060076616c75653210', 'hex'),
+      });
     });
   });
 

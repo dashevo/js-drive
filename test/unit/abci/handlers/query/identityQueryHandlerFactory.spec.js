@@ -3,6 +3,7 @@ const {
     ResponseQuery,
   },
 } = require('abci/types');
+const cbor = require('cbor');
 
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
 
@@ -53,7 +54,9 @@ describe('identityQueryHandlerFactory', () => {
     expect(identityRepositoryMock.fetch).to.be.calledOnceWith(data.id);
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(identity.toBuffer());
+    expect(result.value).to.deep.equal(cbor.encode({
+      data: identity.toBuffer(),
+    }));
   });
 
   it('should throw NotFoundAbciError if identity not found', async () => {
@@ -70,7 +73,10 @@ describe('identityQueryHandlerFactory', () => {
   });
 
   it('should return serialized identity with proof', async () => {
-    const proof = Buffer.from('843176bc004504d6baf735cf0215e9d9a3fecf1d', 'hex');
+    const proof = {
+      rootTreeProof: Buffer.from('0100000001f0faf5f55674905a68eba1be2f946e667c1cb5010101', 'hex'),
+      storeTreeProof: Buffer.from('03046b657931060076616c75653103046b657932060076616c75653210', 'hex'),
+    };
 
     identityRepositoryMock.fetch.resolves(identity);
     rootTreeMock.getFullProof.returns(proof);
@@ -79,11 +85,16 @@ describe('identityQueryHandlerFactory', () => {
     expect(identityRepositoryMock.fetch).to.be.calledOnceWith(data.id);
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(identity.toBuffer());
+
+    const value = {
+      data: identity.toBuffer(),
+      proof,
+    };
+
+    expect(result.value).to.deep.equal(cbor.encode(value));
     expect(rootTreeMock.getFullProof).to.be.calledOnceWith(
       identitiesStoreRootTreeLeafMock,
-      [identity.toBuffer()],
+      [identity.getId()],
     );
-    expect(result.proof).to.deep.equal(proof);
   });
 });
