@@ -71,23 +71,17 @@ describe('RootTree', () => {
     it('should return a proof for the first leaf', () => {
       const proof = rootTree.getProof(leafOneMock);
 
-      expect(proof).to.deep.equal([
-        {
-          position: 'right',
-          data: Buffer.from('f0faf5f55674905a68eba1be2f946e667c1cb501', 'hex'),
-        },
-      ]);
+      expect(proof).to.deep.equal(
+        Buffer.from('0100000001f0faf5f55674905a68eba1be2f946e667c1cb5010101', 'hex'),
+      );
     });
 
     it('should return a proof for the second leaf', () => {
       const proof = rootTree.getProof(leafTwoMock);
 
-      expect(proof).to.deep.equal([
-        {
-          position: 'left',
-          data: Buffer.from('fa5c47912cc22dce628071b48d2386bd511656e3', 'hex'),
-        },
-      ]);
+      expect(proof).to.deep.equal(
+        Buffer.from('0100000001fa5c47912cc22dce628071b48d2386bd511656e30100', 'hex'),
+      );
     });
   });
 
