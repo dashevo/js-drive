@@ -164,5 +164,10 @@ describe('identityIdsByPublicKeyHashesQueryHandlerFactory', () => {
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
     expect(result.value).to.deep.equal(value);
+    expect(rootTreeMock.getFullProof).to.be.calledOnce();
+    expect(rootTreeMock.getFullProof.getCall(0).args).to.deep.equal([
+      publicKeyToIdentityIdStoreRootTreeLeafMock,
+      publicKeyHashes,
+    ]);
   });
 });
