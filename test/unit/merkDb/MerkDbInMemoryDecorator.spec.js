@@ -19,6 +19,7 @@ describe('MerkDbInMemoryDecorator', () => {
     merkDBMock = {
       getSync: this.sinon.stub(),
       batch: this.sinon.stub().returns(batchMock),
+      flushSync: this.sinon.stub(),
     };
 
     merkDbInMemoryDecorator = new MerkDbInMemoryDecorator(merkDBMock);
@@ -167,6 +168,7 @@ describe('MerkDbInMemoryDecorator', () => {
       expect(batchMock.put).to.be.calledThrice();
       expect(batchMock.delete).to.be.calledThrice();
       expect(batchMock.commitSync).to.be.calledOnce();
+      expect(merkDBMock.flushSync).to.be.calledOnce();
 
       expect(batchMock.put.getCall(0).args).to.have.deep.members([keysToAdd[1], valuesToAdd[1]]);
       expect(batchMock.put.getCall(1).args).to.have.deep.members([keysToAdd[2], valuesToAdd[2]]);
@@ -190,6 +192,7 @@ describe('MerkDbInMemoryDecorator', () => {
       expect(batchMock.put).to.be.not.called();
       expect(batchMock.delete).to.be.not.called();
       expect(batchMock.commitSync).to.be.not.called();
+      expect(merkDBMock.flushSync).to.be.not.called();
     });
   });
 
