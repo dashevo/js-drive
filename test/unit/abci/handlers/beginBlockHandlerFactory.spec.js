@@ -18,9 +18,12 @@ describe('beginBlockHandlerFactory', () => {
   let request;
   let chainInfo;
   let blockHeight;
+  let coreHeight;
   let blockExecutionDBTransactionsMock;
   let blockExecutionContextMock;
   let header;
+  let waitForSMLSyncMock;
+  let waitForChainlockedHeightMock;
 
   beforeEach(function beforeEach() {
     chainInfo = new ChainInfo();
@@ -36,15 +39,21 @@ describe('beginBlockHandlerFactory', () => {
       info: this.sinon.stub(),
     };
 
+    waitForSMLSyncMock = this.sinon.stub();
+    waitForChainlockedHeightMock = this.sinon.stub();
+
     beginBlockHandler = beginBlockHandlerFactory(
       chainInfo,
       blockExecutionDBTransactionsMock,
       blockExecutionContextMock,
       protocolVersion,
+      waitForSMLSyncMock,
+      waitForChainlockedHeightMock,
       loggerMock,
     );
 
     blockHeight = 2;
+    blockHeight = 1;
 
     header = {
       version: {
@@ -54,6 +63,7 @@ describe('beginBlockHandlerFactory', () => {
       time: {
         seconds: Math.ceil(new Date().getTime() / 1000),
       },
+      coreHeight,
     };
 
     request = {
@@ -70,6 +80,8 @@ describe('beginBlockHandlerFactory', () => {
     expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
     expect(blockExecutionContextMock.reset).to.be.calledOnce();
     expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
+    expect(waitForSMLSyncMock).to.be.calledOnceWithExactly(coreHeight);
+    expect(waitForChainlockedHeightMock).to.be.calledOnceWithExactly(coreHeight);
   });
 
   it('should reject not supported protocol version', async () => {

@@ -52,11 +52,11 @@ const errorHandlerFactory = require('../lib/errorHandlerFactory');
     await waitForCoreChainLockSyncFallback();
   }
 
-  const waitForSMLSync = container.resolve('waitForSMLSync');
+  const waitForDmlActivated = container.resolve('waitForDmlActivated');
 
-  logger.info('Obtaining Simplified Masternode List...');
+  logger.info('Checking DML is activated...');
 
-  await waitForSMLSync();
+  await waitForDmlActivated();
 
   const server = createServer(
     container.resolve('abciHandlers'),

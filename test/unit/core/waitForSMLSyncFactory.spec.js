@@ -1,22 +1,15 @@
 const SimplifiedMNListDiff = require('@dashevo/dashcore-lib/lib/deterministicmnlist/SimplifiedMNListDiff');
 const { expect } = require('chai');
-const EventEmitter = require('events');
-const LatestCoreChainLock = require('../../../lib/core/LatestCoreChainLock');
 const waitForSMLSyncFactory = require('../../../lib/core/waitForSMLSyncFactory');
-const MissingChainlockError = require('../../../lib/core/errors/MissingChainLockError');
-const wait = require('../../../lib/util/wait');
 
-describe('waitForSMLSyncFactory', function main() {
-  this.timeout(20000);
-
+describe('waitForSMLSyncFactory', () => {
   let waitForSMLSync;
   let coreRpcClientMock;
   let network;
-  let latestCoreChainLockMock;
-  let chainLock;
   let smlMaxListsLimit;
   let simplifiedMasternodeListMock;
   let rawDiff;
+  let coreHeight;
 
   beforeEach(function beforeEach() {
     network = 'regtest';
@@ -43,22 +36,15 @@ describe('waitForSMLSyncFactory', function main() {
       merkleRootQuorums: '0000000000000000000000000000000000000000000000000000000000000000',
     };
 
-    chainLock = {
-      height: 84202,
-      signature: '0a43f1c3e5b3e8dbd670bca8d437dc25572f72d8e1e9be673e9ebbb606570307c3e5f5d073f7beb209dd7e0b8f96c751060ab3a7fb69a71d5ccab697b8cfa5a91038a6fecf76b7a827d75d17f01496302942aa5e2c7f4a48246efc8d3941bf6c',
-    };
+    coreHeight = 84202;
 
     coreRpcClientMock = {
-      getBlockCount: this.sinon.stub().resolves({ result: 1000 }),
       protx: this.sinon.stub(),
     };
 
     coreRpcClientMock.protx.resolves({
       result: rawDiff,
     });
-
-    latestCoreChainLockMock = new EventEmitter();
-    latestCoreChainLockMock.getChainLock = this.sinon.stub().returns(chainLock);
 
     simplifiedMasternodeListMock = {
       applyDiffs: this.sinon.stub(),
@@ -75,7 +61,6 @@ describe('waitForSMLSyncFactory', function main() {
 
     waitForSMLSync = waitForSMLSyncFactory(
       coreRpcClientMock,
-      latestCoreChainLockMock,
       simplifiedMasternodeListMock,
       smlMaxListsLimit,
       network,
@@ -83,33 +68,10 @@ describe('waitForSMLSyncFactory', function main() {
     );
   });
 
-  it('should wait for 1000 height', async () => {
-    coreRpcClientMock.getBlockCount.onCall(0).resolves({ result: 999 });
-    coreRpcClientMock.getBlockCount.onCall(1).resolves({ result: 1000 });
-
-    await waitForSMLSync();
-
-    expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnce();
-  });
-
-  it('should throw MissingChainlockError if chainlock is empty', async () => {
-    latestCoreChainLockMock.getChainLock.returns(null);
-
-    try {
-      await waitForSMLSync();
-
-      expect.fail();
-    } catch (e) {
-      expect(e).to.be.an.instanceOf(MissingChainlockError);
-    }
-  });
-
   it('should obtain diff from core rpc', async () => {
-    await waitForSMLSync();
+    await waitForSMLSync(coreHeight);
 
-    expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnce();
-
-    const proTxCallCount = chainLock.height - (chainLock.height - smlMaxListsLimit) + 1;
+    const proTxCallCount = coreHeight - (coreHeight - smlMaxListsLimit) + 1;
 
     expect(coreRpcClientMock.protx.callCount).to.equal(proTxCallCount);
 
@@ -117,7 +79,7 @@ describe('waitForSMLSyncFactory', function main() {
       [
         'diff',
         1,
-        (chainLock.height - smlMaxListsLimit),
+        (coreHeight - smlMaxListsLimit),
       ],
     );
 
@@ -125,8 +87,8 @@ describe('waitForSMLSyncFactory', function main() {
       expect(coreRpcClientMock.protx.getCall(i).args).to.have.deep.members(
         [
           'diff',
-          (chainLock.height - smlMaxListsLimit) + (i - 1),
-          (chainLock.height - smlMaxListsLimit) + (i - 1) + 1,
+          (coreHeight - smlMaxListsLimit) + (i - 1),
+          (coreHeight - smlMaxListsLimit) + (i - 1) + 1,
         ],
       );
     }
@@ -146,64 +108,43 @@ describe('waitForSMLSyncFactory', function main() {
   });
 
   it('should update diff on chainLock update', async () => {
-    let resolvePromise;
-    const done = new Promise((resolve) => {
-      resolvePromise = resolve;
-    });
+    await waitForSMLSync(coreHeight);
+    await waitForSMLSync(coreHeight + 1);
 
-    const updatedChainLock = {
-      height: 3,
-    };
+    const proTxCallCount = smlMaxListsLimit + 2;
 
-    await waitForSMLSync();
-    for (let i = 0; i < smlMaxListsLimit; i += 1) {
-      latestCoreChainLockMock.emit(LatestCoreChainLock.EVENTS.update, updatedChainLock);
+    expect(coreRpcClientMock.protx.callCount).to.equal(proTxCallCount);
 
-      await wait(100);
-    }
+    expect(coreRpcClientMock.protx.getCall(0).args).to.have.deep.members(
+      [
+        'diff',
+        1,
+        (coreHeight - smlMaxListsLimit),
+      ],
+    );
 
-    setTimeout(() => {
-      expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnce();
-
-      const proTxCallCount = smlMaxListsLimit + 1;
-
-      expect(coreRpcClientMock.protx.callCount).to.equal(proTxCallCount);
-
-      expect(coreRpcClientMock.protx.getCall(0).args).to.have.deep.members(
+    for (let i = 1; i < proTxCallCount; i++) {
+      expect(coreRpcClientMock.protx.getCall(i).args).to.have.deep.members(
         [
           'diff',
-          1,
-          (chainLock.height - smlMaxListsLimit),
+          (coreHeight - smlMaxListsLimit) + (i - 1),
+          (coreHeight - smlMaxListsLimit) + (i - 1) + 1,
         ],
       );
+    }
 
-      for (let i = 1; i < proTxCallCount; i++) {
-        expect(coreRpcClientMock.protx.getCall(i).args).to.have.deep.members(
-          [
-            'diff',
-            (chainLock.height - smlMaxListsLimit) + (i - 1),
-            (chainLock.height - smlMaxListsLimit) + (i - 1) + 1,
-          ],
-        );
-      }
+    const simplifiedMNListDiffArray = [];
 
-      const simplifiedMNListDiffArray = [];
+    for (let i = 0; i < proTxCallCount - 1; i++) {
+      simplifiedMNListDiffArray.push(new SimplifiedMNListDiff(rawDiff, network));
+    }
 
-      for (let i = 0; i < proTxCallCount; i++) {
-        simplifiedMNListDiffArray.push(new SimplifiedMNListDiff(rawDiff, network));
-      }
+    const argsDiffsBuffers = simplifiedMasternodeListMock.applyDiffs.getCall(0).args[0].map(
+      (item) => item.toBuffer(),
+    );
 
-      const argsDiffsBuffers = simplifiedMasternodeListMock.applyDiffs.getCall(0).args[0].map(
-        (item) => item.toBuffer(),
-      );
+    const smlDiffBuffers = simplifiedMNListDiffArray.map((item) => item.toBuffer());
 
-      const smlDiffBuffers = simplifiedMNListDiffArray.map((item) => item.toBuffer());
-
-      expect(argsDiffsBuffers).to.deep.equal(smlDiffBuffers);
-
-      resolvePromise();
-    }, smlMaxListsLimit * 100 + 100);
-
-    await done;
+    expect(argsDiffsBuffers).to.deep.equal(smlDiffBuffers);
   });
 });

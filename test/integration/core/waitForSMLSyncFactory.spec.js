@@ -45,7 +45,7 @@ describe('waitForSMLSyncFactory', function main() {
 
     const waitForSMLSync = container.resolve('waitForSMLSync');
 
-    await waitForSMLSync();
+    await waitForSMLSync(1000);
 
     expect(simplifiedMasternodeList.getStore())
       .to.be.an.instanceOf(SimplifiedMNListStore);
