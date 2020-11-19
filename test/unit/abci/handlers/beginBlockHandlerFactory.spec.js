@@ -21,6 +21,7 @@ describe('beginBlockHandlerFactory', () => {
   let blockExecutionDBTransactionsMock;
   let blockExecutionContextMock;
   let updateMongoDbFromStoreTransactionFactoryMock;
+  let createDocumentDbFromStoreTransactionMock;
   let header;
 
   beforeEach(function beforeEach() {
@@ -34,6 +35,7 @@ describe('beginBlockHandlerFactory', () => {
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
     updateMongoDbFromStoreTransactionFactoryMock = this.sinon.stub();
+    createDocumentDbFromStoreTransactionMock = this.sinon.stub();
 
     const loggerMock = {
       debug: this.sinon.stub(),
@@ -45,6 +47,7 @@ describe('beginBlockHandlerFactory', () => {
       blockExecutionDBTransactionsMock,
       blockExecutionContextMock,
       updateMongoDbFromStoreTransactionFactoryMock,
+      createDocumentDbFromStoreTransactionMock,
       protocolVersion,
       loggerMock,
     );
