@@ -20,6 +20,7 @@ describe('beginBlockHandlerFactory', () => {
   let blockHeight;
   let blockExecutionDBTransactionsMock;
   let blockExecutionContextMock;
+  let updateMongoDbFromStoreTransactionFactoryMock;
   let header;
 
   beforeEach(function beforeEach() {
@@ -28,8 +29,11 @@ describe('beginBlockHandlerFactory', () => {
     protocolVersion = Long.fromInt(0);
 
     blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
+    blockExecutionDBTransactionsMock.getPreviousTransactions.returns({});
 
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
+
+    updateMongoDbFromStoreTransactionFactoryMock = this.sinon.stub();
 
     const loggerMock = {
       debug: this.sinon.stub(),
@@ -40,6 +44,7 @@ describe('beginBlockHandlerFactory', () => {
       chainInfo,
       blockExecutionDBTransactionsMock,
       blockExecutionContextMock,
+      updateMongoDbFromStoreTransactionFactoryMock,
       protocolVersion,
       loggerMock,
     );

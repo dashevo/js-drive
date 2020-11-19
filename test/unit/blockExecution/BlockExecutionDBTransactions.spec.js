@@ -6,6 +6,11 @@ describe('BlockExecutionDBTransactions', () => {
   let documentsTransactionMock;
   let dataContractsTransactionMock;
   let publicKeyToIdentityIdTransactionMock;
+  let previousIdentitiesTransactionMock;
+  let previousDocumentsTransactionMock;
+  let previousDataContractsTransactionMock;
+  let previousPublicKeyToIdentityIdTransactionMock;
+  let blockExecutionTransactionStoreMock;
 
   beforeEach(function beforeEach() {
     identitiesTransactionMock = {
@@ -32,11 +37,45 @@ describe('BlockExecutionDBTransactions', () => {
       abort: this.sinon.stub(),
     };
 
+    previousIdentitiesTransactionMock = {
+      commit: this.sinon.stub(),
+      start: this.sinon.stub(),
+      abort: this.sinon.stub(),
+    };
+
+    previousDocumentsTransactionMock = {
+      commit: this.sinon.stub(),
+      start: this.sinon.stub(),
+      abort: this.sinon.stub(),
+    };
+
+    previousDataContractsTransactionMock = {
+      commit: this.sinon.stub(),
+      start: this.sinon.stub(),
+      abort: this.sinon.stub(),
+    };
+
+    previousPublicKeyToIdentityIdTransactionMock = {
+      commit: this.sinon.stub(),
+      start: this.sinon.stub(),
+      abort: this.sinon.stub(),
+    };
+
+    blockExecutionTransactionStoreMock = {
+      store: this.sinon.stub(),
+      fetchAndUpdate: this.sinon.stub(),
+    };
+
     blockExecutionDBTransactions = new BlockExecutionDBTransactions(
       identitiesTransactionMock,
       documentsTransactionMock,
       dataContractsTransactionMock,
       publicKeyToIdentityIdTransactionMock,
+      previousIdentitiesTransactionMock,
+      previousDocumentsTransactionMock,
+      previousDataContractsTransactionMock,
+      previousPublicKeyToIdentityIdTransactionMock,
+      blockExecutionTransactionStoreMock,
     );
   });
 
