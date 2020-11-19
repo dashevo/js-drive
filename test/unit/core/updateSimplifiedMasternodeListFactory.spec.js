@@ -1,9 +1,9 @@
 const SimplifiedMNListDiff = require('@dashevo/dashcore-lib/lib/deterministicmnlist/SimplifiedMNListDiff');
 const { expect } = require('chai');
-const waitForSMLSyncFactory = require('../../../lib/core/waitForSMLSyncFactory');
+const updateSimplifiedMasternodeListFactory = require('../../../lib/core/updateSimplifiedMasternodeListFactory');
 
-describe('waitForSMLSyncFactory', () => {
-  let waitForSMLSync;
+describe('updateSimplifiedMasternodeListFactory', () => {
+  let updateSimplifiedMasternodeList;
   let coreRpcClientMock;
   let network;
   let smlMaxListsLimit;
@@ -59,7 +59,7 @@ describe('waitForSMLSyncFactory', () => {
       error: this.sinon.stub(),
     };
 
-    waitForSMLSync = waitForSMLSyncFactory(
+    updateSimplifiedMasternodeList = updateSimplifiedMasternodeListFactory(
       coreRpcClientMock,
       simplifiedMasternodeListMock,
       smlMaxListsLimit,
@@ -69,7 +69,7 @@ describe('waitForSMLSyncFactory', () => {
   });
 
   it('should obtain diff from core rpc', async () => {
-    await waitForSMLSync(coreHeight);
+    await updateSimplifiedMasternodeList(coreHeight);
 
     const proTxCallCount = coreHeight - (coreHeight - smlMaxListsLimit) + 1;
 
@@ -108,8 +108,8 @@ describe('waitForSMLSyncFactory', () => {
   });
 
   it('should update diff on chainLock update', async () => {
-    await waitForSMLSync(coreHeight);
-    await waitForSMLSync(coreHeight + 1);
+    await updateSimplifiedMasternodeList(coreHeight);
+    await updateSimplifiedMasternodeList(coreHeight + 1);
 
     const proTxCallCount = smlMaxListsLimit + 2;
 

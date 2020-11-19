@@ -22,7 +22,7 @@ describe('beginBlockHandlerFactory', () => {
   let blockExecutionDBTransactionsMock;
   let blockExecutionContextMock;
   let header;
-  let waitForSMLSyncMock;
+  let updateSimplifiedMasternodeListMock;
   let waitForChainlockedHeightMock;
 
   beforeEach(function beforeEach() {
@@ -39,7 +39,7 @@ describe('beginBlockHandlerFactory', () => {
       info: this.sinon.stub(),
     };
 
-    waitForSMLSyncMock = this.sinon.stub();
+    updateSimplifiedMasternodeListMock = this.sinon.stub();
     waitForChainlockedHeightMock = this.sinon.stub();
 
     beginBlockHandler = beginBlockHandlerFactory(
@@ -47,7 +47,7 @@ describe('beginBlockHandlerFactory', () => {
       blockExecutionDBTransactionsMock,
       blockExecutionContextMock,
       protocolVersion,
-      waitForSMLSyncMock,
+      updateSimplifiedMasternodeListMock,
       waitForChainlockedHeightMock,
       loggerMock,
     );
@@ -80,7 +80,7 @@ describe('beginBlockHandlerFactory', () => {
     expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
     expect(blockExecutionContextMock.reset).to.be.calledOnce();
     expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
-    expect(waitForSMLSyncMock).to.be.calledOnceWithExactly(coreHeight);
+    expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(coreHeight);
     expect(waitForChainlockedHeightMock).to.be.calledOnceWithExactly(coreHeight);
   });
 

@@ -1,9 +1,9 @@
+const EventEmitter = require('events');
 const waitForChainlockedHeightFactory = require('../../../lib/core/waitForChainlockedHeightFactory');
 const MissingChainlockError = require('../../../lib/core/errors/MissingChainLockError');
+const LatestCoreChainLock = require('../../../lib/core/LatestCoreChainLock');
 
-describe('waitForChainlockedHeightFactory', function main() {
-  this.timeout(20000);
-
+describe('waitForChainlockedHeightFactory', () => {
   let waitForChainlockedHeight;
   let latestCoreChainLockMock;
   let chainLock;
@@ -17,9 +17,8 @@ describe('waitForChainlockedHeightFactory', function main() {
       signature: '0a43f1c3e5b3e8dbd670bca8d437dc25572f72d8e1e9be673e9ebbb606570307c3e5f5d073f7beb209dd7e0b8f96c751060ab3a7fb69a71d5ccab697b8cfa5a91038a6fecf76b7a827d75d17f01496302942aa5e2c7f4a48246efc8d3941bf6c',
     };
 
-    latestCoreChainLockMock = {
-      getChainLock: this.sinon.stub().returns(chainLock),
-    };
+    latestCoreChainLockMock = new EventEmitter();
+    latestCoreChainLockMock.getChainLock = this.sinon.stub().returns(chainLock);
 
     waitForChainlockedHeight = waitForChainlockedHeightFactory(
       latestCoreChainLockMock,
@@ -38,16 +37,21 @@ describe('waitForChainlockedHeightFactory', function main() {
     }
   });
 
-  it('should wait for chainLock height to be equal coreHeight', async () => {
+  it('should wait for chainLock height to be equal coreHeight', (done) => {
     coreHeight = chainLock.height + 1;
 
-    latestCoreChainLockMock.getChainLock.onCall(1).resolves({
-      ...chainLock,
-      height: chainLock.height + 1,
+    waitForChainlockedHeight(coreHeight)
+      .then(() => {
+        expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnce();
+
+        done();
+      });
+
+    setImmediate(() => {
+      latestCoreChainLockMock.emit(LatestCoreChainLock.EVENTS.update, {
+        ...chainLock,
+        height: chainLock.height + 1,
+      });
     });
-
-    await waitForChainlockedHeight(coreHeight);
-
-    expect(latestCoreChainLockMock.getChainLock).to.have.been.calledTwice();
   });
 });

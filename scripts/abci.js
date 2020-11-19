@@ -33,6 +33,12 @@ const errorHandlerFactory = require('../lib/errorHandlerFactory');
   logger.info('Connecting to Core');
   const detectStandaloneRegtestMode = container.resolve('detectStandaloneRegtestMode');
 
+  const waitForDmlActivated = container.resolve('waitForDmlActivated');
+
+  logger.info('Waiting for DML being activated...');
+
+  await waitForDmlActivated();
+
   const isStandaloneRegtestMode = await detectStandaloneRegtestMode();
 
   if (!isStandaloneRegtestMode) {
@@ -51,12 +57,6 @@ const errorHandlerFactory = require('../lib/errorHandlerFactory');
     const waitForCoreChainLockSyncFallback = container.resolve('waitForCoreChainLockSyncFallback');
     await waitForCoreChainLockSyncFallback();
   }
-
-  const waitForDmlActivated = container.resolve('waitForDmlActivated');
-
-  logger.info('Checking DML is activated...');
-
-  await waitForDmlActivated();
 
   const server = createServer(
     container.resolve('abciHandlers'),
