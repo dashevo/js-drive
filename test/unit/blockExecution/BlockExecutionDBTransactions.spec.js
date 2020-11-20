@@ -115,6 +115,8 @@ describe('BlockExecutionDBTransactions', () => {
     expect(documentsTransactionMock.abort).to.be.not.called();
     expect(dataContractsTransactionMock.abort).to.be.not.called();
     expect(publicKeyToIdentityIdTransactionMock.abort).to.be.not.called();
+
+    expect(blockExecutionTransactionStoreMock.store).to.be.calledOnce();
   });
 
   it('should abort transactions', async () => {
@@ -140,5 +142,25 @@ describe('BlockExecutionDBTransactions', () => {
     const result = blockExecutionDBTransactions.getTransaction('identity');
 
     expect(result).to.deep.equal(identitiesTransactionMock);
+  });
+
+  it('should return previous transactions', () => {
+    const result = blockExecutionDBTransactions.getPreviousTransactions();
+
+    expect(blockExecutionTransactionStoreMock.fetchAndUpdate).to.be.calledOnceWithExactly(
+      {
+        identity: previousIdentitiesTransactionMock,
+        document: previousDocumentsTransactionMock,
+        dataContract: previousDataContractsTransactionMock,
+        publicKeyToIdentityId: previousPublicKeyToIdentityIdTransactionMock,
+      },
+    );
+
+    expect(result).to.deep.equal({
+      identity: previousIdentitiesTransactionMock,
+      document: previousDocumentsTransactionMock,
+      dataContract: previousDataContractsTransactionMock,
+      publicKeyToIdentityId: previousPublicKeyToIdentityIdTransactionMock,
+    },);
   });
 });
