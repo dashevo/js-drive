@@ -12,6 +12,8 @@ describe('DocumentsDbTransaction', () => {
       start: this.sinon.stub(),
       commit: this.sinon.stub(),
       abort: this.sinon.stub(),
+      toPlainObject: this.sinon.stub(),
+      updateFromPlainObject: this.sinon.stub(),
     };
     documentMongoDBTransactionMock = {
       start: this.sinon.stub(),
@@ -121,6 +123,34 @@ describe('DocumentsDbTransaction', () => {
       isStarted = documentsDbTransaction.isStarted();
 
       expect(isStarted).to.be.true();
+    });
+  });
+
+  describe('#toPlainObject', () => {
+    it('should return transaction as plain object', () => {
+      const plainObject = {
+        data: 'soma data',
+      };
+
+      documentsStoreTransactionMock.toPlainObject.returns(plainObject);
+
+      const result = documentsDbTransaction.toPlainObject();
+
+      expect(result).to.deep.equal(plainObject);
+    });
+  });
+
+  describe('#updateFromPlainObject', () => {
+    it('should update transaction using plain object', () => {
+      const plainObject = {
+        data: 'soma data',
+      };
+
+      documentsDbTransaction.updateFromPlainObject(plainObject);
+
+      expect(documentsStoreTransactionMock.updateFromPlainObject).to.be.calledOnceWithExactly(
+        plainObject,
+      );
     });
   });
 });
