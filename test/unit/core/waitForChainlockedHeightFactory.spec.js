@@ -48,7 +48,7 @@ describe('waitForChainlockedHeightFactory', () => {
       });
 
     setImmediate(() => {
-      latestCoreChainLockMock.emit(LatestCoreChainLock.EVENTS.update, {
+      latestCoreChainLockMock.emit(`${LatestCoreChainLock.EVENTS.update}:${chainLock.height + 1}`, {
         ...chainLock,
         height: chainLock.height + 1,
       });
