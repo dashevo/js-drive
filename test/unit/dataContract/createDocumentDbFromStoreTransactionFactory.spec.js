@@ -1,7 +1,7 @@
 const createDPPMock = require('@dashevo/dpp/lib/test/mocks/createDPPMock');
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 
-const createDocumentDbFromStoreTransactionFactory = require('../../../lib/dataContract/createDocumentDbFromStoreTransactionFactory');
+const createDocumentDbFromStoreTransactionFactory = require('../../../lib/dataContract/createPreviousDocumentDatabasesFromTransactionObjectFactory');
 const MerkDBTransactionIsNotStartedError = require('../../../lib/merkDb/errors/MerkDBTransactionIsNotStartedError');
 
 describe('createDocumentDbFromStoreTransactionFactory', () => {

@@ -1,4 +1,4 @@
-const DocumentsDbTransaction = require('../../../lib/document/DocumentsCombinedTransaction');
+const DocumentsDbTransaction = require('../../../lib/document/DocumentsIndexedTransaction');
 const DocumentsDBTransactionIsNotStartedError = require('../../../lib/document/errors/DocumentsDBTransactionIsNotStartedError');
 const DocumentsDBTransactionIsAlreadyStartedError = require('../../../lib/document/errors/DocumentsDBTransactionIsAlreadyStartedError');
 
