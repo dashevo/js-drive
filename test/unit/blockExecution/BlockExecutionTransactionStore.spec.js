@@ -1,6 +1,6 @@
 const cbor = require('cbor');
 
-const BlockExecutionTransactionStore = require('../../../lib/blockExecution/BlockExecutionTransactionStore');
+const BlockExecutionTransactionStore = require('../../../lib/blockExecution/PreviousBlockExecutionStoreTransactionsRepository');
 
 describe('BlockExecutionTransactionStore', () => {
   let blockExecutionTransactionStore;

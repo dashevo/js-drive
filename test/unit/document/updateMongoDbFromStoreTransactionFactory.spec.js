@@ -1,7 +1,7 @@
 const createDPPMock = require('@dashevo/dpp/lib/test/mocks/createDPPMock');
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 
-const updateMongoDbFromStoreTransactionFactory = require('../../../lib/document/updateMongoDbFromStoreTransactionFactory');
+const updateMongoDbFromStoreTransactionFactory = require('../../../lib/document/populateMongoDbTransactionFromObjectFactory');
 const DocumentsDBTransactionIsNotStartedError = require('../../../lib/document/errors/DocumentsDBTransactionIsNotStartedError');
 
 describe('updateMongoDbFromStoreTransactionFactory', () => {

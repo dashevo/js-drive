@@ -105,7 +105,7 @@ describe('MerkDbTransaction', () => {
     });
   });
 
-  describe('#toPlainObject', () => {
+  describe('#toObject', () => {
     it('should throw MerkDBTransactionIsNotStartedError if transaction is not started', () => {
       try {
         merkDBTransaction.toPlainObject();

@@ -1,4 +1,4 @@
-const DocumentsDbTransaction = require('../../../lib/document/DocumentsDbTransaction');
+const DocumentsDbTransaction = require('../../../lib/document/DocumentsCombinedTransaction');
 const DocumentsDBTransactionIsNotStartedError = require('../../../lib/document/errors/DocumentsDBTransactionIsNotStartedError');
 const DocumentsDBTransactionIsAlreadyStartedError = require('../../../lib/document/errors/DocumentsDBTransactionIsAlreadyStartedError');
 
@@ -126,7 +126,7 @@ describe('DocumentsDbTransaction', () => {
     });
   });
 
-  describe('#toPlainObject', () => {
+  describe('#toObject', () => {
     it('should return transaction as plain object', () => {
       const plainObject = {
         data: 'soma data',
