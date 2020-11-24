@@ -9,6 +9,7 @@ describe('ChainInfoCommonStoreRepository', () => {
   let repository;
   let chainInfo;
   let lastBlockHeight;
+  let transactionMock;
 
   beforeEach(function beforeEach() {
     commonStoreMock = {
@@ -21,16 +22,19 @@ describe('ChainInfoCommonStoreRepository', () => {
     lastBlockHeight = Long.fromInt(42);
 
     chainInfo = new ChainInfo(lastBlockHeight);
+
+    transactionMock = 'transaction';
   });
 
   describe('#store', () => {
     it('should store chain info', async () => {
-      const repositoryInstance = await repository.store(chainInfo);
+      const repositoryInstance = await repository.store(chainInfo, transactionMock);
       expect(repositoryInstance).to.equal(repository);
 
       expect(commonStoreMock.put).to.be.calledOnceWithExactly(
         ChainInfoCommonStoreRepository.COMMON_STORE_KEY_NAME,
         cbor.encodeCanonical(chainInfo.toJSON()),
+        transactionMock,
       );
     });
   });
@@ -39,7 +43,7 @@ describe('ChainInfoCommonStoreRepository', () => {
     it('should return empty chain info if it is not stored', async () => {
       commonStoreMock.get.returns(null);
 
-      const result = await repository.fetch();
+      const result = await repository.fetch(transactionMock);
 
       expect(result).to.be.instanceOf(ChainInfo);
       expect(result.getLastBlockHeight()).to.be.instanceOf(Long);
@@ -47,6 +51,7 @@ describe('ChainInfoCommonStoreRepository', () => {
 
       expect(commonStoreMock.get).to.be.calledOnceWithExactly(
         ChainInfoCommonStoreRepository.COMMON_STORE_KEY_NAME,
+        transactionMock,
       );
     });
 
@@ -55,7 +60,7 @@ describe('ChainInfoCommonStoreRepository', () => {
 
       commonStoreMock.get.returns(storedStateBuffer);
 
-      const result = await repository.fetch();
+      const result = await repository.fetch(transactionMock);
 
       expect(result).to.be.instanceOf(ChainInfo);
       expect(result.getLastBlockHeight()).to.be.instanceOf(Long);
@@ -63,6 +68,7 @@ describe('ChainInfoCommonStoreRepository', () => {
 
       expect(commonStoreMock.get).to.be.calledOnceWithExactly(
         ChainInfoCommonStoreRepository.COMMON_STORE_KEY_NAME,
+        transactionMock
       );
     });
   });

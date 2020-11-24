@@ -108,7 +108,7 @@ describe('MerkDbTransaction', () => {
   describe('#toObject', () => {
     it('should throw MerkDBTransactionIsNotStartedError if transaction is not started', () => {
       try {
-        merkDBTransaction.toPlainObject();
+        merkDBTransaction.toObject();
 
         expect.fail('should throw MerkDBTransactionIsNotStartedError');
       } catch (e) {
@@ -128,25 +128,25 @@ describe('MerkDbTransaction', () => {
       merkDBTransaction.db.data = dataMap;
       merkDBTransaction.db.deleted = deletedMap;
 
-      const result = merkDBTransaction.toPlainObject();
+      const result = merkDBTransaction.toObject();
 
       expect(result).to.deep.equal({
-        createOps: { dataKey: 'dataValue' },
-        deleteOps: { deletedKey: 'deletedValue' },
+        updates: { dataKey: 'dataValue' },
+        deletes: { deletedKey: 'deletedValue' },
       });
     });
   });
 
-  describe('#updateFromPlainObject', () => {
-    it('should update operations from plain object', async () => {
+  describe('#populateFromObject', () => {
+    it('should populate operations from plain object', async () => {
       const plainObject = {
-        createOps: { dataKey: 'dataValue' },
-        deleteOps: { deletedKey: 'deletedValue' },
+        updates: { dataKey: 'dataValue' },
+        deletes: { deletedKey: 'deletedValue' },
       };
 
       await merkDBTransaction.start();
 
-      merkDBTransaction.updateFromPlainObject(plainObject);
+      merkDBTransaction.populateFromObject(plainObject);
 
       expect(merkDBTransaction.db.data.get('dataKey')).to.equal('dataValue');
       expect(merkDBTransaction.db.deleted.get('deletedKey')).to.equal('deletedValue');

@@ -1,8 +1,8 @@
-const DocumentsDbTransaction = require('../../../lib/document/DocumentsIndexedTransaction');
+const DocumentsIndexedTransaction = require('../../../lib/document/DocumentsIndexedTransaction');
 const DocumentsDBTransactionIsNotStartedError = require('../../../lib/document/errors/DocumentsDBTransactionIsNotStartedError');
 const DocumentsDBTransactionIsAlreadyStartedError = require('../../../lib/document/errors/DocumentsDBTransactionIsAlreadyStartedError');
 
-describe('DocumentsDbTransaction', () => {
+describe('DocumentsIndexedTransaction', () => {
   let documentsDbTransaction;
   let documentsStoreTransactionMock;
   let documentMongoDBTransactionMock;
@@ -12,8 +12,8 @@ describe('DocumentsDbTransaction', () => {
       start: this.sinon.stub(),
       commit: this.sinon.stub(),
       abort: this.sinon.stub(),
-      toPlainObject: this.sinon.stub(),
-      updateFromPlainObject: this.sinon.stub(),
+      toObject: this.sinon.stub(),
+      populateFromObject: this.sinon.stub(),
     };
     documentMongoDBTransactionMock = {
       start: this.sinon.stub(),
@@ -21,7 +21,7 @@ describe('DocumentsDbTransaction', () => {
       abort: this.sinon.stub(),
     };
 
-    documentsDbTransaction = new DocumentsDbTransaction(
+    documentsDbTransaction = new DocumentsIndexedTransaction(
       documentsStoreTransactionMock,
       documentMongoDBTransactionMock,
     );
@@ -132,23 +132,25 @@ describe('DocumentsDbTransaction', () => {
         data: 'soma data',
       };
 
-      documentsStoreTransactionMock.toPlainObject.returns(plainObject);
+      documentsStoreTransactionMock.toObject.returns(plainObject);
 
-      const result = documentsDbTransaction.toPlainObject();
+      const result = documentsDbTransaction.toObject();
 
       expect(result).to.deep.equal(plainObject);
     });
   });
 
-  describe('#updateFromPlainObject', () => {
-    it('should update transaction using plain object', () => {
+  describe('#populateFromObject', () => {
+    it('should populate transaction using plain object', async () => {
       const plainObject = {
         data: 'soma data',
       };
 
-      documentsDbTransaction.updateFromPlainObject(plainObject);
+      await documentsDbTransaction.start();
 
-      expect(documentsStoreTransactionMock.updateFromPlainObject).to.be.calledOnceWithExactly(
+      documentsDbTransaction.populateFromObject(plainObject);
+
+      expect(documentsStoreTransactionMock.populateFromObject).to.be.calledOnceWithExactly(
         plainObject,
       );
     });

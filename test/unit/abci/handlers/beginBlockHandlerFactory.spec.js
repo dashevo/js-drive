@@ -9,7 +9,7 @@ const {
 const beginBlockHandlerFactory = require('../../../../lib/abci/handlers/beginBlockHandlerFactory');
 
 const ChainInfo = require('../../../../lib/chainInfo/ChainInfo');
-const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionDBTransactionsMock');
+const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionStoreTransactionsMock');
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 
 describe('beginBlockHandlerFactory', () => {
@@ -20,48 +20,16 @@ describe('beginBlockHandlerFactory', () => {
   let blockHeight;
   let blockExecutionDBTransactionsMock;
   let blockExecutionContextMock;
-  let updateMongoDbFromStoreTransactionMock;
-  let createDocumentDbFromStoreTransactionMock;
   let header;
-  let previousIdentitiesTransactionMock;
-  let previousDocumentsDbTransactionMock;
-  let previousDataContractsTransactionMock;
-  let previousPublicKeyToIdentityIdTransactionMock;
 
   beforeEach(function beforeEach() {
     chainInfo = new ChainInfo();
 
     protocolVersion = Long.fromInt(0);
 
-    previousIdentitiesTransactionMock = {
-      commit: this.sinon.stub(),
-      start: this.sinon.stub(),
-    };
-    previousDocumentsDbTransactionMock = {
-      commit: this.sinon.stub(),
-      start: this.sinon.stub(),
-    };
-    previousDataContractsTransactionMock = {
-      commit: this.sinon.stub(),
-      start: this.sinon.stub(),
-    };
-    previousPublicKeyToIdentityIdTransactionMock = {
-      commit: this.sinon.stub(),
-      start: this.sinon.stub(),
-    };
-
     blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
-    blockExecutionDBTransactionsMock.getPreviousTransactions.returns({
-      identity: previousIdentitiesTransactionMock,
-      document: previousDocumentsDbTransactionMock,
-      dataContract: previousDataContractsTransactionMock,
-      publicKeyToIdentityId: previousPublicKeyToIdentityIdTransactionMock,
-    });
 
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
-
-    updateMongoDbFromStoreTransactionMock = this.sinon.stub();
-    createDocumentDbFromStoreTransactionMock = this.sinon.stub();
 
     const loggerMock = {
       debug: this.sinon.stub(),
@@ -72,8 +40,6 @@ describe('beginBlockHandlerFactory', () => {
       chainInfo,
       blockExecutionDBTransactionsMock,
       blockExecutionContextMock,
-      updateMongoDbFromStoreTransactionMock,
-      createDocumentDbFromStoreTransactionMock,
       protocolVersion,
       loggerMock,
     );
@@ -104,21 +70,6 @@ describe('beginBlockHandlerFactory', () => {
     expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
     expect(blockExecutionContextMock.reset).to.be.calledOnce();
     expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
-
-    expect(previousIdentitiesTransactionMock.start).to.be.calledOnce();
-    expect(previousIdentitiesTransactionMock.commit).to.be.calledOnce();
-
-    expect(previousDocumentsDbTransactionMock.start).to.be.calledOnce();
-    expect(previousDocumentsDbTransactionMock.commit).to.be.calledOnce();
-
-    expect(previousDataContractsTransactionMock.start).to.be.calledOnce();
-    expect(previousDataContractsTransactionMock.commit).to.be.calledOnce();
-
-    expect(previousPublicKeyToIdentityIdTransactionMock.start).to.be.calledOnce();
-    expect(previousPublicKeyToIdentityIdTransactionMock.commit).to.be.calledOnce();
-
-    expect(createDocumentDbFromStoreTransactionMock).to.be.calledOnce();
-    expect(updateMongoDbFromStoreTransactionMock).to.be.calledOnce();
   });
 
   it('should reject not supported protocol version', async () => {
