@@ -1,15 +1,16 @@
 const createDPPMock = require('@dashevo/dpp/lib/test/mocks/createDPPMock');
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 
-const updateMongoDbFromStoreTransactionFactory = require('../../../lib/document/populateMongoDbTransactionFromObjectFactory');
+const populateMongoDbTransactionFromObjectFactory = require('../../../lib/document/populateMongoDbTransactionFromObjectFactory');
 const DocumentsDBTransactionIsNotStartedError = require('../../../lib/document/errors/DocumentsDBTransactionIsNotStartedError');
 
-describe('updateMongoDbFromStoreTransactionFactory', () => {
-  let updateMongoDbFromStoreTransaction;
-  let getDocumentMongoDbDatabaseMock;
+describe('populateMongoDbTransactionFromObjectFactory', () => {
+  let populateMongoDbTransactionFromObject;
+  let createPreviousDocumentMongoDbRepositoryMock;
   let dppMock;
-  let mongoDbMock;
+  let mongoDbRepositoryMock;
   let transactionMock;
+  let transactionObjectMock;
   let dataToUpdate;
   let dataToDelete;
   let documentToCreate;
@@ -18,34 +19,35 @@ describe('updateMongoDbFromStoreTransactionFactory', () => {
   beforeEach(function beforeEach() {
     [documentToCreate, documentToDelete] = getDocumentsFixture();
 
-    dataToUpdate = new Map();
-    dataToUpdate.set('documentIdToCreate', documentToCreate.toBuffer());
+    dataToUpdate = {
+      documentIdToCreate: documentToCreate.toBuffer(),
+    };
 
-    dataToDelete = new Map();
-    dataToDelete.set('documentIdToDelete', documentToDelete.toBuffer());
+    dataToDelete = {
+      documentIdToDelete: documentToDelete.toBuffer(),
+    };
 
     transactionMock = {
       isStarted: this.sinon.stub(),
-      storeTransaction: {
-        db: {
-          data: dataToUpdate,
-          deleted: dataToDelete,
-        },
-      },
     };
 
-    mongoDbMock = {
+    transactionObjectMock = {
+      updates: dataToUpdate,
+      deletes: dataToDelete,
+    };
+
+    mongoDbRepositoryMock = {
       delete: this.sinon.stub(),
       store: this.sinon.stub(),
     };
 
-    getDocumentMongoDbDatabaseMock = this.sinon.stub().resolves(mongoDbMock);
+    createPreviousDocumentMongoDbRepositoryMock = this.sinon.stub().resolves(mongoDbRepositoryMock);
 
     dppMock = createDPPMock(this.sinon);
     dppMock.document.createFromBuffer.resolves(documentToCreate);
 
-    updateMongoDbFromStoreTransaction = updateMongoDbFromStoreTransactionFactory(
-      getDocumentMongoDbDatabaseMock,
+    populateMongoDbTransactionFromObject = populateMongoDbTransactionFromObjectFactory(
+      createPreviousDocumentMongoDbRepositoryMock,
       dppMock,
     );
   });
@@ -54,7 +56,7 @@ describe('updateMongoDbFromStoreTransactionFactory', () => {
     transactionMock.isStarted.returns(false);
 
     try {
-      await updateMongoDbFromStoreTransaction(transactionMock);
+      await populateMongoDbTransactionFromObject(transactionMock, transactionObjectMock);
 
       expect.fail('should throw DocumentsDBTransactionIsNotStartedError');
     } catch (e) {
@@ -65,7 +67,9 @@ describe('updateMongoDbFromStoreTransactionFactory', () => {
   it('should return updated transaction', async () => {
     transactionMock.isStarted.returns(true);
 
-    await updateMongoDbFromStoreTransaction(transactionMock);
+    dppMock.document.createFromBuffer.onCall(1).resolves(documentToDelete);
+
+    await populateMongoDbTransactionFromObject(transactionMock, transactionObjectMock);
 
     expect(dppMock.document.createFromBuffer).to.be.calledTwice();
     expect(dppMock.document.createFromBuffer.getCall(0)).to.be.calledWithExactly(
@@ -81,15 +85,23 @@ describe('updateMongoDbFromStoreTransactionFactory', () => {
       },
     );
 
-    expect(getDocumentMongoDbDatabaseMock).to.be.calledTwice();
-    expect(getDocumentMongoDbDatabaseMock.getCall(0)).to.be.calledWithExactly(
+    expect(createPreviousDocumentMongoDbRepositoryMock).to.be.calledTwice();
+    expect(createPreviousDocumentMongoDbRepositoryMock.getCall(0)).to.be.calledWithExactly(
       documentToCreate.getDataContractId(),
+      documentToCreate.getType(),
     );
-    expect(getDocumentMongoDbDatabaseMock.getCall(1)).to.be.calledWithExactly(
+    expect(createPreviousDocumentMongoDbRepositoryMock.getCall(1)).to.be.calledWithExactly(
       documentToDelete.getDataContractId(),
+      documentToDelete.getType(),
     );
 
-    expect(mongoDbMock.store).to.be.calledOnceWithExactly(documentToCreate);
-    expect(mongoDbMock.delete).to.be.calledOnceWithExactly('documentIdToDelete');
+    expect(mongoDbRepositoryMock.store).to.be.calledOnceWithExactly(
+      documentToCreate,
+      transactionMock,
+    );
+    expect(mongoDbRepositoryMock.delete).to.be.calledOnceWithExactly(
+      'documentIdToDelete',
+      transactionMock,
+    );
   });
 });
