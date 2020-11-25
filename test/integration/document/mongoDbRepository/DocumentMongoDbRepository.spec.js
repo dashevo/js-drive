@@ -124,9 +124,13 @@ describe('DocumentMongoDbRepository', function main() {
     ]);
 
     createDocumentMongoDbRepository = container.resolve('createDocumentMongoDbRepository');
-    documentMongoDBTransaction = container.resolve('documentMongoDBTransaction');
+
     const dataContractRepository = container.resolve('dataContractRepository');
     const documentDatabaseManager = container.resolve('documentDatabaseManager');
+    const blockExecutionStoreTransactions = container.resolve('blockExecutionStoreTransactions');
+
+    documentMongoDBTransaction = blockExecutionStoreTransactions.getTransaction('documents')
+      .getMongoDbTransaction();
 
     await dataContractRepository.store(dataContract);
     await documentDatabaseManager.create(dataContract);

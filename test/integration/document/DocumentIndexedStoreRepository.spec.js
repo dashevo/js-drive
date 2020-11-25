@@ -26,11 +26,14 @@ describe('DocumentIndexedStoreRepository', () => {
     container = await createTestDIContainer(mongoDb);
 
     documentIndexedStoreRepository = container.resolve('documentRepository');
-    documentsDbTransaction = container.resolve('documentsDbTransaction');
     documentStoreRepository = container.resolve('documentStoreRepository');
     createDocumentMongoDbRepository = container.resolve('createDocumentMongoDbRepository');
     dataContractRepository = container.resolve('dataContractRepository');
     documentDatabaseManager = container.resolve('documentDatabaseManager');
+
+    const blockExecutionStoreTransactions = container.resolve('blockExecutionStoreTransactions');
+
+    documentsDbTransaction = blockExecutionStoreTransactions.getTransaction('documents');
 
     dataContract = getDataContractFixture();
 
