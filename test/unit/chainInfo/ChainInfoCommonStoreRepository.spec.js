@@ -68,7 +68,7 @@ describe('ChainInfoCommonStoreRepository', () => {
 
       expect(commonStoreMock.get).to.be.calledOnceWithExactly(
         ChainInfoCommonStoreRepository.COMMON_STORE_KEY_NAME,
-        transactionMock
+        transactionMock,
       );
     });
   });

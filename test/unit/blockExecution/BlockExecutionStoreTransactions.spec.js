@@ -1,27 +1,16 @@
 const BlockExecutionStoreTransactions = require('../../../lib/blockExecution/BlockExecutionStoreTransactions');
 const BlockExecutionStoreTransactionIsAlreadyStartedError = require('../../../lib/blockExecution/errors/BlockExecutionStoreTransactionIsAlreadyStartedError');
-const BlockExecutionStoreTransactionIsNotStartedError = require("../../../lib/blockExecution/errors/BlockExecutionStoreTransactionIsNotStartedError");
-const BlockExecutionStoreTransactionIsNotDefinedError = require("../../../lib/blockExecution/errors/BlockExecutionStoreTransactionIsNotDefinedError");
+const BlockExecutionStoreTransactionIsNotStartedError = require('../../../lib/blockExecution/errors/BlockExecutionStoreTransactionIsNotStartedError');
+const BlockExecutionStoreTransactionIsNotDefinedError = require('../../../lib/blockExecution/errors/BlockExecutionStoreTransactionIsNotDefinedError');
 
 describe('BlockExecutionStoreTransactions', () => {
   let blockExecutionStoreTransactions;
-  let identitiesTransactionMock;
-  let documentsTransactionMock;
-  let dataContractsTransactionMock;
-  let publicKeyToIdentityIdTransactionMock;
-  let previousIdentitiesTransactionMock;
-  let previousDocumentsTransactionMock;
-  let previousDataContractsTransactionMock;
-  let previousPublicKeyToIdentityIdTransactionMock;
-  let blockExecutionTransactionStoreMock;
-
   let commonStoreMock;
   let identitiesStoreMock;
   let documentsStoreMock;
   let dataContractsStoreMock;
   let publicKeyToIdentityIdStoreMock;
   let connectToDocumentMongoDBMock;
-  let populateMongoDbTransactionFromObject;
   let transaction;
 
   beforeEach(function beforeEach() {
@@ -59,7 +48,6 @@ describe('BlockExecutionStoreTransactions', () => {
       dataContractsStoreMock,
       publicKeyToIdentityIdStoreMock,
       connectToDocumentMongoDBMock,
-      populateMongoDbTransactionFromObject,
     );
 
     blockExecutionStoreTransactions.transactions.documents = transaction;

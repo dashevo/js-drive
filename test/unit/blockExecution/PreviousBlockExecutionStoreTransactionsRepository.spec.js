@@ -15,7 +15,6 @@ describe('PreviousBlockExecutionStoreTransactionsRepository', () => {
   let previousDataContractsStore;
   let previousPublicKeyToIdentityIdStore;
   let previousConnectToDocumentMongoDB;
-  let populateMongoDbTransactionFromObject;
 
   beforeEach(function beforeEach() {
     previousBlockExecutionTransactionDBMock = {
@@ -30,7 +29,6 @@ describe('PreviousBlockExecutionStoreTransactionsRepository', () => {
     previousDataContractsStore = 'previousDataContractsStore';
     previousPublicKeyToIdentityIdStore = 'previousPublicKeyToIdentityIdStore';
     previousConnectToDocumentMongoDB = 'previousConnectToDocumentMongoDB';
-    populateMongoDbTransactionFromObject = 'populateMongoDbTransactionFromObject';
 
     previousBlockExecutionStoreTransactionsRepository = new
     PreviousBlockExecutionStoreTransactionsRepository(
@@ -41,7 +39,6 @@ describe('PreviousBlockExecutionStoreTransactionsRepository', () => {
       previousDataContractsStore,
       previousPublicKeyToIdentityIdStore,
       previousConnectToDocumentMongoDB,
-      populateMongoDbTransactionFromObject,
     );
 
     identity = 'identity';
