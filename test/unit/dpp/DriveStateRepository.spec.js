@@ -12,6 +12,7 @@ describe('DriveStateRepository', () => {
   let dataContractRepositoryMock;
   let fetchDocumentsMock;
   let documentsRepositoryMock;
+  let spentAssetLockTransactionsRepositoryMock;
   let coreRpcClientMock;
   let blockExecutionDBTransactionsMock;
   let id;
@@ -58,6 +59,12 @@ describe('DriveStateRepository', () => {
       delete: this.sinon.stub(),
     };
 
+    spentAssetLockTransactionsRepositoryMock = {
+      store: this.sinon.stub(),
+      find: this.sinon.stub(),
+      delete: this.sinon.stub(),
+    };
+
     blockExecutionContextMock = {
       getHeader: this.sinon.stub(),
     };
@@ -68,6 +75,7 @@ describe('DriveStateRepository', () => {
       dataContractRepositoryMock,
       fetchDocumentsMock,
       documentsRepositoryMock,
+      spentAssetLockTransactionsRepositoryMock,
       coreRpcClientMock,
       blockExecutionContextMock,
       blockExecutionDBTransactionsMock,

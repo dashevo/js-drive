@@ -73,7 +73,7 @@ describe('BlockExecutionStoreTransactions', () => {
 
       expect(blockExecutionStoreTransactions.isTransactionsStarted).to.be.true();
 
-      expect(transaction.start.callCount).equals(5);
+      expect(transaction.start.callCount).equals(6);
     });
   });
 
@@ -97,9 +97,9 @@ describe('BlockExecutionStoreTransactions', () => {
 
       await blockExecutionStoreTransactions.commit();
 
-      expect(blockExecutionStoreTransactions.isTransactionsStarted).to.be.true();
+      expect(blockExecutionStoreTransactions.isTransactionsStarted).to.be.false();
 
-      expect(transaction.commit.callCount).equals(5);
+      expect(transaction.commit.callCount).equals(6);
     });
   });
 
@@ -123,9 +123,9 @@ describe('BlockExecutionStoreTransactions', () => {
 
       await blockExecutionStoreTransactions.abort();
 
-      expect(blockExecutionStoreTransactions.isTransactionsStarted).to.be.true();
+      expect(blockExecutionStoreTransactions.isTransactionsStarted).to.be.false();
 
-      expect(transaction.abort.callCount).equals(5);
+      expect(transaction.abort.callCount).equals(6);
     });
   });
 
@@ -171,6 +171,7 @@ describe('BlockExecutionStoreTransactions', () => {
         documents: 'object',
         dataContracts: 'object',
         publicKeyToIdentityId: 'object',
+        assetLockTransactions: 'object',
       });
     });
   });

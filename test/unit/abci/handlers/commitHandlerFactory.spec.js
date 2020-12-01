@@ -38,6 +38,7 @@ describe('commitHandlerFactory', () => {
   let updates;
   let populateMongoDbTransactionFromObjectMock;
   let mongoDbTransactionMock;
+  let cloneToPreviousStoreTransactionsMock;
 
   beforeEach(function beforeEach() {
     nextPreviousBlockExecutionStoreTransactionsMock = 'nextPreviousBlockExecutionStoreTransactionsMock';
@@ -97,10 +98,6 @@ describe('commitHandlerFactory', () => {
       commit: this.sinon.stub(),
     };
 
-    blockExecutionStoreTransactionsMock.clone.returns(
-      nextPreviousBlockExecutionStoreTransactionsMock,
-    );
-
     updates = {
       dataContract: dataContract.toBuffer(),
     };
@@ -119,6 +116,11 @@ describe('commitHandlerFactory', () => {
     };
 
     populateMongoDbTransactionFromObjectMock = this.sinon.stub();
+    cloneToPreviousStoreTransactionsMock = this.sinon.stub();
+
+    cloneToPreviousStoreTransactionsMock.returns(
+      nextPreviousBlockExecutionStoreTransactionsMock,
+    );
 
     commitHandler = commitHandlerFactory(
       chainInfoMock,
@@ -133,6 +135,7 @@ describe('commitHandlerFactory', () => {
       populateMongoDbTransactionFromObjectMock,
       containerMock,
       loggerMock,
+      cloneToPreviousStoreTransactionsMock,
     );
   });
 
@@ -156,7 +159,7 @@ describe('commitHandlerFactory', () => {
 
     expect(chainInfoRepositoryMock.store).to.be.calledOnceWith(chainInfoMock);
 
-    expect(blockExecutionStoreTransactionsMock.clone).to.be.calledOnce();
+    expect(cloneToPreviousStoreTransactionsMock).to.be.calledOnce();
 
     expect(blockExecutionStoreTransactionsMock.commit).to.be.calledOnce();
 
@@ -206,7 +209,7 @@ describe('commitHandlerFactory', () => {
     expect(blockExecutionStoreTransactionsMock.getTransaction).to.be.calledOnceWithExactly('common');
     expect(chainInfoRepositoryMock.store).to.be.calledOnceWith(chainInfoMock);
 
-    expect(blockExecutionStoreTransactionsMock.clone).to.be.calledOnce();
+    expect(cloneToPreviousStoreTransactionsMock).to.be.calledOnce();
     expect(blockExecutionStoreTransactionsMock.commit).to.be.calledOnce();
 
     expect(previousBlockExecutionStoreTransactionsMock.getTransaction).to.be.calledTwice();
