@@ -1,10 +1,12 @@
 const Long = require('long');
 
 const {
-  abci: {
-    ResponseBeginBlock,
+  tendermint: {
+    abci: {
+      ResponseBeginBlock,
+    },
   },
-} = require('abci/types');
+} = require('@dashevo/abci/types');
 
 const beginBlockHandlerFactory = require('../../../../lib/abci/handlers/beginBlockHandlerFactory');
 

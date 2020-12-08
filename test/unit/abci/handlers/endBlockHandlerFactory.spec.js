@@ -1,8 +1,10 @@
 const {
-  abci: {
-    ResponseEndBlock,
+  tendermint: {
+    abci: {
+      ResponseEndBlock,
+    },
   },
-} = require('abci/types');
+} = require('@dashevo/abci/types');
 
 const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
 
@@ -39,7 +41,9 @@ describe('endBlockHandlerFactory', () => {
     );
 
     request = {
-      height: dpnsContractBlockHeight,
+      header: {
+        height: dpnsContractBlockHeight,
+      },
     };
   });
 
