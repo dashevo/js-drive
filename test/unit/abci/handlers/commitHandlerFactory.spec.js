@@ -58,6 +58,7 @@ describe('commitHandlerFactory', () => {
 
     chainInfoRepositoryMock = {
       store: this.sinon.stub(),
+      createTransaction: this.sinon.stub(),
     };
 
     blockExecutionStoreTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
@@ -65,7 +66,6 @@ describe('commitHandlerFactory', () => {
       store: this.sinon.stub(),
     };
 
-    blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
     blockExecutionContextMock.getDataContracts.returns([dataContract]);
@@ -134,10 +134,9 @@ describe('commitHandlerFactory', () => {
     commitHandler = commitHandlerFactory(
       chainInfoMock,
       chainInfoRepositoryMock,
-      blockExecutionStoreTransactionsMock,
       creditsDistributionPoolMock,
       creditsDistributionPoolRepositoryMock,
-      blockExecutionDBTransactionsMock,
+      blockExecutionStoreTransactionsMock,
       blockExecutionContextMock,
       documentsDatabaseManagerMock,
       previousDocumentDatabaseManagerMock,
@@ -163,12 +162,11 @@ describe('commitHandlerFactory', () => {
 
     expect(documentsDatabaseManagerMock.create).to.be.calledOnceWith(dataContract);
 
-    expect(blockExecutionDBTransactionsMock.commit).to.be.calledOnce();
+    expect(blockExecutionStoreTransactionsMock.commit).to.be.calledOnce();
 
     expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(
       accumulativeFees,
     );
-    expect(chainInfoMock.setCreditsDistributionPool).to.be.calledOnceWith(accumulativeFees);
 
     expect(blockExecutionContextMock.getAccumulativeFees).to.be.calledOnce();
 
@@ -223,11 +221,14 @@ describe('commitHandlerFactory', () => {
     expect(containerMock.resolve).to.be.calledOnceWithExactly('previousBlockExecutionStoreTransactions');
     expect(blockExecutionContextMock.getDataContracts).to.be.calledOnce();
     expect(documentsDatabaseManagerMock.create).to.be.calledOnceWithExactly(dataContract);
-    expect(chainInfoMock.setCreditsDistributionPool).to.be.calledOnceWith(accumulativeFees);
+    expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(accumulativeFees);
     expect(blockExecutionContextMock.getAccumulativeFees).to.be.calledOnce();
 
     expect(blockExecutionStoreTransactionsMock.getTransaction).to.be.calledOnceWithExactly('common');
     expect(chainInfoRepositoryMock.store).to.be.calledOnceWith(chainInfoMock);
+    expect(creditsDistributionPoolRepositoryMock.store).to.be.calledOnceWith(
+      creditsDistributionPoolMock,
+    );
 
     expect(cloneToPreviousStoreTransactionsMock).to.be.calledOnce();
     expect(blockExecutionStoreTransactionsMock.commit).to.be.calledOnce();
@@ -326,7 +327,7 @@ describe('commitHandlerFactory', () => {
       expect(e).to.be.an.instanceOf(DataCorruptedError);
 
       expect(chainInfoMock.setLastBlockHeight).to.be.calledOnceWithExactly(Long.fromInt(0));
-      expect(chainInfoRepositoryMock.store).to.be.calledThrice();
+      expect(chainInfoRepositoryMock.store).to.be.calledTwice();
     }
   });
 });

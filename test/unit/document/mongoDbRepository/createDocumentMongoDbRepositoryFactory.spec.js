@@ -13,6 +13,7 @@ describe('createDocumentMongoDbRepositoryFactory', () => {
   let getDocumentsDatabaseMock;
   let dataContractRepositoryMock;
   let dataContract;
+  let containerMock;
 
   beforeEach(function beforeEach() {
     dataContract = getDataContractFixture();
@@ -31,11 +32,18 @@ describe('createDocumentMongoDbRepositoryFactory', () => {
       fetch: this.sinon.stub().resolves(dataContract),
     };
 
+    containerMock = {
+      resolve: this.sinon.stub().returns({
+        getTransaction: this.sinon.stub(),
+      }),
+    };
+
     createDocumentMongoDbRepository = createDocumentMongoDbRepositoryFactory(
       convertWhereToMongoDbQuery,
       validateQuery,
       getDocumentsDatabaseMock,
       dataContractRepositoryMock,
+      containerMock,
     );
   });
 
