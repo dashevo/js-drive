@@ -41,8 +41,8 @@ describe('ChainInfoExternalStoreRepository', () => {
       const result = await repository.fetch();
 
       expect(result).to.be.instanceOf(CreditsDistributionPool);
-      expect(result.getCreditsDistributionPool()).to.be.a('number');
-      expect(result.getCreditsDistributionPool()).to.equal(0);
+      expect(result.getAmount()).to.be.a('number');
+      expect(result.getAmount()).to.equal(0);
 
       expect(externalStoreMock.get).to.be.calledOnceWithExactly(
         CreditsDistributionPoolCommonStoreRepository.COMMON_STORE_KEY_NAME,
@@ -57,8 +57,8 @@ describe('ChainInfoExternalStoreRepository', () => {
       const result = await repository.fetch();
 
       expect(result).to.be.instanceOf(CreditsDistributionPool);
-      expect(result.getCreditsDistributionPool()).to.be.a('number');
-      expect(result.getCreditsDistributionPool()).to.equal(initialCreditsDistributionPool);
+      expect(result.getAmount()).to.be.a('number');
+      expect(result.getAmount()).to.equal(initialCreditsDistributionPool);
 
       expect(externalStoreMock.get).to.be.calledOnceWithExactly(
         CreditsDistributionPoolCommonStoreRepository.COMMON_STORE_KEY_NAME,

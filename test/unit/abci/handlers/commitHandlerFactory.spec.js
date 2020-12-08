@@ -35,7 +35,7 @@ describe('commitHandlerFactory', () => {
     };
 
     creditsDistributionPoolMock = {
-      setCreditsDistributionPool: this.sinon.stub(),
+      setAmount: this.sinon.stub(),
     };
 
     dataContract = getDataContractFixture();
@@ -95,7 +95,7 @@ describe('commitHandlerFactory', () => {
 
     expect(blockExecutionDBTransactionsMock.commit).to.be.calledOnce();
 
-    expect(creditsDistributionPoolMock.setCreditsDistributionPool).to.be.calledOnceWith(
+    expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(
       accumulativeFees,
     );
 
