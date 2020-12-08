@@ -20,12 +20,14 @@ const DataCorruptedError = require('../../../../lib/abci/handlers/errors/DataCor
 describe('commitHandlerFactory', () => {
   let commitHandler;
   let appHash;
+  let chainInfoMock;
   let chainInfoRepositoryMock;
+  let creditsDistributionPoolMock;
+  let creditsDistributionPoolRepositoryMock;
   let blockExecutionStoreTransactionsMock;
   let blockExecutionContextMock;
   let documentsDatabaseManagerMock;
   let dataContract;
-  let chainInfoMock;
   let accumulativeFees;
   let rootTreeMock;
   let dppMock;
@@ -45,9 +47,11 @@ describe('commitHandlerFactory', () => {
     appHash = Buffer.alloc(0);
 
     chainInfoMock = {
-      setLastBlockAppHash: this.sinon.stub(),
-      setCreditsDistributionPool: this.sinon.stub(),
       setLastBlockHeight: this.sinon.stub(),
+    };
+
+    creditsDistributionPoolMock = {
+      setAmount: this.sinon.stub(),
     };
 
     dataContract = getDataContractFixture();
@@ -57,6 +61,11 @@ describe('commitHandlerFactory', () => {
     };
 
     blockExecutionStoreTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
+    creditsDistributionPoolRepositoryMock = {
+      store: this.sinon.stub(),
+    };
+
+    blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
     blockExecutionContextMock.getDataContracts.returns([dataContract]);
@@ -126,6 +135,9 @@ describe('commitHandlerFactory', () => {
       chainInfoMock,
       chainInfoRepositoryMock,
       blockExecutionStoreTransactionsMock,
+      creditsDistributionPoolMock,
+      creditsDistributionPoolRepositoryMock,
+      blockExecutionDBTransactionsMock,
       blockExecutionContextMock,
       documentsDatabaseManagerMock,
       previousDocumentDatabaseManagerMock,
@@ -151,6 +163,11 @@ describe('commitHandlerFactory', () => {
 
     expect(documentsDatabaseManagerMock.create).to.be.calledOnceWith(dataContract);
 
+    expect(blockExecutionDBTransactionsMock.commit).to.be.calledOnce();
+
+    expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(
+      accumulativeFees,
+    );
     expect(chainInfoMock.setCreditsDistributionPool).to.be.calledOnceWith(accumulativeFees);
 
     expect(blockExecutionContextMock.getAccumulativeFees).to.be.calledOnce();
@@ -158,6 +175,9 @@ describe('commitHandlerFactory', () => {
     expect(blockExecutionStoreTransactionsMock.getTransaction).to.be.calledOnceWithExactly('common');
 
     expect(chainInfoRepositoryMock.store).to.be.calledOnceWith(chainInfoMock);
+    expect(creditsDistributionPoolRepositoryMock.store).to.be.calledOnceWith(
+      creditsDistributionPoolMock,
+    );
 
     expect(cloneToPreviousStoreTransactionsMock).to.be.calledOnce();
 
