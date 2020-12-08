@@ -58,6 +58,10 @@ const errorHandlerFactory = require('../lib/errorHandlerFactory');
     await waitForCoreChainLockSyncFallback();
   }
 
+  logger.info('Waining for initial Core ChainLocked height...');
+  const waitForChainlockedHeight = container.resolve('waitForChainlockedHeight');
+  await waitForChainlockedHeight(process.env.INITIAL_CORE_CHAINLOCKED_HEIGHT);
+
   const server = createServer(
     container.resolve('abciHandlers'),
   );
