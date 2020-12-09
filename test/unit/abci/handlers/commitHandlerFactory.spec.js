@@ -18,12 +18,14 @@ const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecut
 describe('commitHandlerFactory', () => {
   let commitHandler;
   let appHash;
+  let chainInfoMock;
   let chainInfoRepositoryMock;
+  let creditsDistributionPoolMock;
+  let creditsDistributionPoolRepositoryMock;
   let blockExecutionDBTransactionsMock;
   let blockExecutionContextMock;
   let documentsDatabaseManagerMock;
   let dataContract;
-  let chainInfoMock;
   let accumulativeFees;
   let rootTreeMock;
 
@@ -31,13 +33,20 @@ describe('commitHandlerFactory', () => {
     appHash = Buffer.alloc(0);
 
     chainInfoMock = {
-      setLastBlockAppHash: this.sinon.stub(),
-      setCreditsDistributionPool: this.sinon.stub(),
+      setLastBlockHeight: this.sinon.stub(),
+    };
+
+    creditsDistributionPoolMock = {
+      setAmount: this.sinon.stub(),
     };
 
     dataContract = getDataContractFixture();
 
     chainInfoRepositoryMock = {
+      store: this.sinon.stub(),
+    };
+
+    creditsDistributionPoolRepositoryMock = {
       store: this.sinon.stub(),
     };
 
@@ -66,6 +75,8 @@ describe('commitHandlerFactory', () => {
     commitHandler = commitHandlerFactory(
       chainInfoMock,
       chainInfoRepositoryMock,
+      creditsDistributionPoolMock,
+      creditsDistributionPoolRepositoryMock,
       blockExecutionDBTransactionsMock,
       blockExecutionContextMock,
       documentsDatabaseManagerMock,
@@ -86,11 +97,16 @@ describe('commitHandlerFactory', () => {
 
     expect(blockExecutionDBTransactionsMock.commit).to.be.calledOnce();
 
-    expect(chainInfoMock.setCreditsDistributionPool).to.be.calledOnceWith(accumulativeFees);
+    expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(
+      accumulativeFees,
+    );
 
     expect(blockExecutionContextMock.getAccumulativeFees).to.be.calledOnce();
 
     expect(chainInfoRepositoryMock.store).to.be.calledOnceWith(chainInfoMock);
+    expect(creditsDistributionPoolRepositoryMock.store).to.be.calledOnceWith(
+      creditsDistributionPoolMock,
+    );
 
     expect(rootTreeMock.rebuild).to.be.calledOnce();
 
