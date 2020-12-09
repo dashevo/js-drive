@@ -1,6 +1,6 @@
 require('dotenv-expand')(require('dotenv-safe').config());
 
-const createServer = require('abci');
+const createServer = require('@dashevo/abci');
 const { onShutdown } = require('node-graceful-shutdown');
 
 const createDIContainer = require('../lib/createDIContainer');
