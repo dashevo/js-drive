@@ -132,6 +132,10 @@ describe('DocumentMongoDbRepository', function main() {
     documentMongoDBTransaction = blockExecutionStoreTransactions.getTransaction('documents')
       .getMongoDbTransaction();
 
+    const dataContractsTransaction = blockExecutionStoreTransactions.getTransaction('dataContracts');
+
+    await dataContractsTransaction.start();
+
     await dataContractRepository.store(dataContract);
     await documentDatabaseManager.create(dataContract);
 

@@ -34,10 +34,13 @@ describe('DocumentIndexedStoreRepository', () => {
     const blockExecutionStoreTransactions = container.resolve('blockExecutionStoreTransactions');
 
     documentsDbTransaction = blockExecutionStoreTransactions.getTransaction('documents');
+    const dataContractsTransaction = blockExecutionStoreTransactions.getTransaction('dataContracts');
 
     dataContract = getDataContractFixture();
 
     [document] = getDocumentsFixture(dataContract);
+
+    await dataContractsTransaction.start();
 
     await dataContractRepository.store(dataContract);
     await documentDatabaseManager.create(dataContract);
