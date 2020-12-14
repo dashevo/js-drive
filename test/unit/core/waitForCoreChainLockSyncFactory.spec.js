@@ -38,9 +38,12 @@ describe('waitForCoreChainLockSyncFactory', () => {
       error: this.sinon.stub(),
     };
 
+    const coreZMQConnectionRetries = 16;
+
     waitForCoreChainLockHandler = waitForCoreChainLockSyncFactory(
       coreZMQClientMock,
       coreRpcClientMock,
+      coreZMQConnectionRetries,
       latestCoreChainLock,
       loggerMock,
       errorHandlerMock,
