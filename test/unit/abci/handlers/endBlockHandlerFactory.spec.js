@@ -2,9 +2,12 @@ const {
   tendermint: {
     abci: {
       ResponseEndBlock,
+      CoreChainLock,
     },
   },
 } = require('@dashevo/abci/types');
+
+const { ChainLock } = require('@dashevo/dashcore-lib');
 
 const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
 
@@ -94,5 +97,18 @@ describe('endBlockHandlerFactory', () => {
         dpnsContractId,
       );
     }
+  });
+
+  it('should return nextCoreChainLockUpdate if latestCoreChainLock above header height', async () => {
+    const response = await endBlockHandlerFactory(request);
+
+    const coreChainLock = new ChainLock(latestCoreChainLock);
+
+    const expectedCoreChainLock = new CoreChainLock({
+      coreBlockHeight: coreChainLock.height,
+      coreBlockHash: coreChainLock.blockHash,
+      signature: coreChainLock.signature,
+    });
+    expect(response.nextCoreChainLockUpdate).to.deep.equal(expectedCoreChainLock);
   });
 });
