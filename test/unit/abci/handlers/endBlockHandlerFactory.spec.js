@@ -41,9 +41,7 @@ describe('endBlockHandlerFactory', () => {
     );
 
     request = {
-      header: {
-        height: dpnsContractBlockHeight,
-      },
+      height: dpnsContractBlockHeight,
     };
   });
 

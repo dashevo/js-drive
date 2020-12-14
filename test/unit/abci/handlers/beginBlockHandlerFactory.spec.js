@@ -59,7 +59,7 @@ describe('beginBlockHandlerFactory', () => {
 
     header = {
       version: {
-        App: protocolVersion,
+        app: protocolVersion,
       },
       height: blockHeight,
       time: {
@@ -87,7 +87,7 @@ describe('beginBlockHandlerFactory', () => {
   });
 
   it('should reject not supported protocol version', async () => {
-    request.header.version.App = Long.fromInt(42);
+    request.header.version.app = Long.fromInt(42);
 
     try {
       await beginBlockHandler(request);
