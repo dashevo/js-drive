@@ -59,17 +59,6 @@ const createDIContainer = require('../lib/createDIContainer');
   const coreZMQClient = container.resolve('coreZMQClient');
   const coreZMQConnectionRetries = container.resolve('coreZMQConnectionRetries');
 
-  try {
-    await coreZMQClient.connect({
-      maxRetries: coreZMQConnectionRetries,
-    });
-  } catch (e) {
-    const error = new Error(`Can't connect to Core ZMQ socket: ${e.message}`);
-
-    await errorHandler(error);
-  }
-
-  // By default will try to reconnect so we just log when this happen
   coreZMQClient.on('connect', () => {
     logger.trace('Connected to Core ZMQ socket');
   });
@@ -83,6 +72,16 @@ const createDIContainer = require('../lib/createDIContainer');
 
     await errorHandler(error);
   });
+
+  try {
+    await coreZMQClient.connect({
+      maxRetries: coreZMQConnectionRetries,
+    });
+  } catch (e) {
+    const error = new Error(`Can't connect to Core ZMQ socket: ${e.message}`);
+
+    await errorHandler(error);
+  }
 
   if (!isStandaloneRegtestMode) {
     logger.info('Obtaining the latest Core ChainLock...');
