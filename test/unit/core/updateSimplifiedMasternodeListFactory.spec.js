@@ -71,12 +71,12 @@ describe('updateSimplifiedMasternodeListFactory', () => {
 
   it('should throw error if not enough blocks for valid SML', async () => {
     try {
-      await updateSimplifiedMasternodeList(16);
+      await updateSimplifiedMasternodeList(smlMaxListsLimit);
 
       expect.fail('should throw NotEnoughBlocksForValidSMLError');
     } catch (e) {
       expect(e).to.be.instanceOf(NotEnoughBlocksForValidSMLError);
-      expect(e.getBlockHeight()).to.be.equal(16);
+      expect(e.getBlockHeight()).to.be.equal(smlMaxListsLimit);
     }
   });
 
