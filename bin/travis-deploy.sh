@@ -43,7 +43,7 @@ if [[ -z "$PRERELEASE" ]]; then
   TAG_POSTFIX=""
 fi
 
-# Build an image with multiple events
+# Build an image with multiple tags
 docker build --build-arg NODE_ENV=development \
   -t "${IMAGE_NAME}:${MAJOR}${TAG_POSTFIX}" \
   -t "${IMAGE_NAME}:${MAJOR}.${MINOR}${TAG_POSTFIX}" \
@@ -54,7 +54,7 @@ docker build --build-arg NODE_ENV=development \
 # Login to Docker Hub
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-# Push an image and all the events
+# Push an image and all the tags
 docker push "${IMAGE_NAME}:${MAJOR}${TAG_POSTFIX}"
 docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}${TAG_POSTFIX}"
 docker push "${IMAGE_NAME}:${MAJOR}.${MINOR}.${PATCH}${TAG_POSTFIX}"
