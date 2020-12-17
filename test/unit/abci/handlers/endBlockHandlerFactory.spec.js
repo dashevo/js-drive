@@ -19,7 +19,8 @@ const NoDPNSContractFoundError = require('../../../../lib/abci/handlers/errors/N
 
 describe('endBlockHandlerFactory', () => {
   let endBlockHandler;
-  let request;
+  let requestMock;
+  let headerMock;
   let blockExecutionContextMock;
   let dpnsContractId;
   let dpnsContractBlockHeight;
@@ -28,9 +29,14 @@ describe('endBlockHandlerFactory', () => {
   let chainLockMock;
 
   beforeEach(function beforeEach() {
+    headerMock = {
+      coreChainLockedHeight: 2,
+    };
+
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
     blockExecutionContextMock.hasDataContract.returns(true);
+    blockExecutionContextMock.getHeader.returns(headerMock);
 
     chainLockMock = {
       height: 1,
@@ -59,11 +65,8 @@ describe('endBlockHandlerFactory', () => {
       loggerMock,
     );
 
-    request = {
-      header: {
-        height: dpnsContractBlockHeight,
-        coreChainLockedHeight: 2,
-      },
+    requestMock = {
+      height: dpnsContractBlockHeight,
     };
   });
 
@@ -76,7 +79,7 @@ describe('endBlockHandlerFactory', () => {
       loggerMock,
     );
 
-    const response = await endBlockHandler(request);
+    const response = await endBlockHandler(requestMock);
 
     expect(response).to.be.an.instanceOf(ResponseEndBlock);
     expect(response.toJSON()).to.be.empty();
@@ -85,7 +88,7 @@ describe('endBlockHandlerFactory', () => {
   });
 
   it('should return a response if DPNS contract is present at specified height', async () => {
-    const response = await endBlockHandler(request);
+    const response = await endBlockHandler(requestMock);
 
     expect(response).to.be.an.instanceOf(ResponseEndBlock);
 
@@ -100,7 +103,7 @@ describe('endBlockHandlerFactory', () => {
     blockExecutionContextMock.hasDataContract.returns(false);
 
     try {
-      await endBlockHandler(request);
+      await endBlockHandler(requestMock);
 
       expect.fail('Error was not thrown');
     } catch (e) {
@@ -119,7 +122,7 @@ describe('endBlockHandlerFactory', () => {
   it('should return nextCoreChainLockUpdate if latestCoreChainLock above header height', async () => {
     chainLockMock.height = 3;
 
-    const response = await endBlockHandler(request);
+    const response = await endBlockHandler(requestMock);
 
     expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnceWithExactly();
 
