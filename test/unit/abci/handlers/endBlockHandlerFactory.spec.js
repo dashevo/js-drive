@@ -2,12 +2,12 @@ const {
   tendermint: {
     abci: {
       ResponseEndBlock,
+    },
+    types: {
       CoreChainLock,
     },
   },
 } = require('@dashevo/abci/types');
-
-const { ChainLock } = require('@dashevo/dashcore-lib');
 
 const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
 
@@ -23,16 +23,29 @@ describe('endBlockHandlerFactory', () => {
   let blockExecutionContextMock;
   let dpnsContractId;
   let dpnsContractBlockHeight;
-  let latestCoreChainLock;
+  let latestCoreChainLockMock;
   let loggerMock;
+  let chainLockMock;
 
   beforeEach(function beforeEach() {
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
-    latestCoreChainLock = 'ea480100f4a5708c82f589e19dfe9e9cd1dbab57f74f27b24f0a3c765ba6e007000000000a43f1c3e5b3e8dbd670bca8d437dc25572f72d8e1e9be673e9ebbb606570307c3e5f5d073f7beb209dd7e0b8f96c751060ab3a7fb69a71d5ccab697b8cfa5a91038a6fecf76b7a827d75d17f01496302942aa5e2c7f4a48246efc8d3941bf6c';
+
+    blockExecutionContextMock.hasDataContract.returns(true);
+
+    chainLockMock = {
+      height: 1,
+      blockHash: Buffer.alloc(0),
+      signature: Buffer.alloc(0),
+    };
+
+    latestCoreChainLockMock = {
+      getChainLock: this.sinon.stub().returns(chainLockMock),
+    };
 
     loggerMock = {
       debug: this.sinon.stub(),
       info: this.sinon.stub(),
+      trace: this.sinon.stub(),
     };
 
     dpnsContractId = generateRandomIdentifier();
@@ -42,13 +55,14 @@ describe('endBlockHandlerFactory', () => {
       blockExecutionContextMock,
       dpnsContractBlockHeight,
       dpnsContractId,
-      latestCoreChainLock,
+      latestCoreChainLockMock,
       loggerMock,
     );
 
     request = {
       header: {
         height: dpnsContractBlockHeight,
+        coreChainLockedHeight: 2,
       },
     };
   });
@@ -58,23 +72,24 @@ describe('endBlockHandlerFactory', () => {
       blockExecutionContextMock,
       undefined,
       undefined,
-      latestCoreChainLock,
+      latestCoreChainLockMock,
       loggerMock,
     );
 
     const response = await endBlockHandler(request);
 
     expect(response).to.be.an.instanceOf(ResponseEndBlock);
+    expect(response.toJSON()).to.be.empty();
 
     expect(blockExecutionContextMock.hasDataContract).to.not.have.been.called();
   });
 
   it('should return a response if DPNS contract is present at specified height', async () => {
-    blockExecutionContextMock.hasDataContract.returns(true);
-
     const response = await endBlockHandler(request);
 
     expect(response).to.be.an.instanceOf(ResponseEndBlock);
+
+    expect(response.toJSON()).to.be.empty();
 
     expect(blockExecutionContextMock.hasDataContract).to.have.been.calledOnceWithExactly(
       dpnsContractId,
@@ -96,19 +111,24 @@ describe('endBlockHandlerFactory', () => {
       expect(blockExecutionContextMock.hasDataContract).to.have.been.calledOnceWithExactly(
         dpnsContractId,
       );
+
+      expect(latestCoreChainLockMock.getChainLock).to.have.not.been.called();
     }
   });
 
   it('should return nextCoreChainLockUpdate if latestCoreChainLock above header height', async () => {
-    const response = await endBlockHandlerFactory(request);
+    chainLockMock.height = 3;
 
-    const coreChainLock = new ChainLock(latestCoreChainLock);
+    const response = await endBlockHandler(request);
+
+    expect(latestCoreChainLockMock.getChainLock).to.have.been.calledOnceWithExactly();
 
     const expectedCoreChainLock = new CoreChainLock({
-      coreBlockHeight: coreChainLock.height,
-      coreBlockHash: coreChainLock.blockHash,
-      signature: coreChainLock.signature,
+      coreBlockHeight: chainLockMock.height,
+      coreBlockHash: chainLockMock.blockHash,
+      signature: chainLockMock.signature,
     });
+
     expect(response.nextCoreChainLockUpdate).to.deep.equal(expectedCoreChainLock);
   });
 });

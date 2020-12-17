@@ -1,6 +1,7 @@
 const SimplifiedMNListDiff = require('@dashevo/dashcore-lib/lib/deterministicmnlist/SimplifiedMNListDiff');
 const { expect } = require('chai');
 const updateSimplifiedMasternodeListFactory = require('../../../lib/core/updateSimplifiedMasternodeListFactory');
+const NotEnoughBlocksForValidSMLError = require('../../../lib/core/errors/NotEnoughBlocksForValidSMLError');
 
 describe('updateSimplifiedMasternodeListFactory', () => {
   let updateSimplifiedMasternodeList;
@@ -68,7 +69,18 @@ describe('updateSimplifiedMasternodeListFactory', () => {
     );
   });
 
-  it('should obtain diff from core rpc', async () => {
+  it('should throw error if not enough blocks for valid SML', async () => {
+    try {
+      await updateSimplifiedMasternodeList(smlMaxListsLimit);
+
+      expect.fail('should throw NotEnoughBlocksForValidSMLError');
+    } catch (e) {
+      expect(e).to.be.instanceOf(NotEnoughBlocksForValidSMLError);
+      expect(e.getBlockHeight()).to.be.equal(smlMaxListsLimit);
+    }
+  });
+
+  it('should obtain 16 latest diffs according to core height on first call', async () => {
     await updateSimplifiedMasternodeList(coreHeight);
 
     const proTxCallCount = coreHeight - (coreHeight - smlMaxListsLimit) + 1;
@@ -107,7 +119,7 @@ describe('updateSimplifiedMasternodeListFactory', () => {
     expect(argsDiffBuffers).to.deep.equal(smlDiffBuffers);
   });
 
-  it('should update diff on chainLock update', async () => {
+  it('should update diffs since last call and up to passed core height', async () => {
     await updateSimplifiedMasternodeList(coreHeight);
     await updateSimplifiedMasternodeList(coreHeight + 1);
 
@@ -146,5 +158,14 @@ describe('updateSimplifiedMasternodeListFactory', () => {
     const smlDiffBuffers = simplifiedMNListDiffArray.map((item) => item.toBuffer());
 
     expect(argsDiffsBuffers).to.deep.equal(smlDiffBuffers);
+  });
+
+  it('should not update more than 16 diffs', async () => {
+    await updateSimplifiedMasternodeList(coreHeight); // 3
+    await updateSimplifiedMasternodeList(coreHeight + 10); // 2
+
+    const proTxCallCount = 3 + 2;
+
+    expect(coreRpcClientMock.protx.callCount).to.equal(proTxCallCount);
   });
 });

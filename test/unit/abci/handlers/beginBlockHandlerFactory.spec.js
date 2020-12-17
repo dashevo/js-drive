@@ -25,7 +25,7 @@ describe('beginBlockHandlerFactory', () => {
   let blockExecutionContextMock;
   let header;
   let updateSimplifiedMasternodeListMock;
-  let waitForChainlockedHeightMock;
+  let waitForChainLockedHeightMock;
 
   beforeEach(function beforeEach() {
     chainInfo = new ChainInfo();
@@ -42,7 +42,7 @@ describe('beginBlockHandlerFactory', () => {
     };
 
     updateSimplifiedMasternodeListMock = this.sinon.stub();
-    waitForChainlockedHeightMock = this.sinon.stub();
+    waitForChainLockedHeightMock = this.sinon.stub();
 
     beginBlockHandler = beginBlockHandlerFactory(
       chainInfo,
@@ -50,7 +50,7 @@ describe('beginBlockHandlerFactory', () => {
       blockExecutionContextMock,
       protocolVersion,
       updateSimplifiedMasternodeListMock,
-      waitForChainlockedHeightMock,
+      waitForChainLockedHeightMock,
       loggerMock,
     );
 
@@ -59,7 +59,7 @@ describe('beginBlockHandlerFactory', () => {
 
     header = {
       version: {
-        App: protocolVersion,
+        app: protocolVersion,
       },
       height: blockHeight,
       time: {
@@ -83,11 +83,11 @@ describe('beginBlockHandlerFactory', () => {
     expect(blockExecutionContextMock.reset).to.be.calledOnce();
     expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
     expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(coreHeight);
-    expect(waitForChainlockedHeightMock).to.be.calledOnceWithExactly(coreHeight);
+    expect(waitForChainLockedHeightMock).to.be.calledOnceWithExactly(coreHeight);
   });
 
   it('should reject not supported protocol version', async () => {
-    request.header.version.App = Long.fromInt(42);
+    request.header.version.app = Long.fromInt(42);
 
     try {
       await beginBlockHandler(request);

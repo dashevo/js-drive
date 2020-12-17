@@ -40,9 +40,6 @@ describe('updateSimplifiedMasternodeListFactory', function main() {
 
     await dashCore.getApi().generateToAddress(1000, randomAddress);
 
-    const waitForCoreChainLockSyncFallback = container.resolve('waitForCoreChainLockSyncFallback');
-    await waitForCoreChainLockSyncFallback();
-
     const updateSimplifiedMasternodeList = container.resolve('updateSimplifiedMasternodeList');
 
     await updateSimplifiedMasternodeList(1000);
