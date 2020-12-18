@@ -19,6 +19,7 @@ describe('verifyChainLockQueryHandlerFactory', () => {
   let decodeChainLockMock;
   let encodedChainLock;
   let chainLockMock;
+  let detectStandaloneRegtestModeMock;
 
   beforeEach(function beforeEach() {
     params = {};
@@ -33,15 +34,18 @@ describe('verifyChainLockQueryHandlerFactory', () => {
     };
 
     decodeChainLockMock = this.sinon.stub().returns(chainLockMock);
+    detectStandaloneRegtestModeMock = this.sinon.stub().returns(false);
 
     encodedChainLock = Buffer.alloc(0);
   });
 
-  it('should validate a valid chainlock', async () => {
+  it('should validate a valid chainLock', async () => {
     chainLockMock.verify.returns(true);
 
     verifyChainLockQueryHandler = verifyChainLockQueryHandlerFactory(
-      simplifiedMasternodeListMock, decodeChainLockMock,
+      simplifiedMasternodeListMock,
+      decodeChainLockMock,
+      detectStandaloneRegtestModeMock,
     );
 
     const result = await verifyChainLockQueryHandler(params, { chainLock: encodedChainLock });
@@ -52,11 +56,11 @@ describe('verifyChainLockQueryHandlerFactory', () => {
     expect(decodeChainLockMock).to.be.calledOnceWithExactly(encodedChainLock);
   });
 
-  it('should throw InvalidArgumentAbciError if chainlock is not valid', async () => {
+  it('should throw InvalidArgumentAbciError if chainLock is not valid', async () => {
     chainLockMock.verify.returns(false);
 
     verifyChainLockQueryHandler = verifyChainLockQueryHandlerFactory(
-      simplifiedMasternodeListMock, decodeChainLockMock,
+      simplifiedMasternodeListMock, decodeChainLockMock, detectStandaloneRegtestModeMock,
     );
 
     try {
@@ -68,5 +72,19 @@ describe('verifyChainLockQueryHandlerFactory', () => {
       expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
       expect(e.message).to.equal('Signature invalid for chainlock');
     }
+  });
+
+  it('should not validate chainLock in standalone regtest mode', async () => {
+    detectStandaloneRegtestModeMock.returns(true);
+    chainLockMock.verify.returns(false);
+
+    verifyChainLockQueryHandler = verifyChainLockQueryHandlerFactory(
+      simplifiedMasternodeListMock, decodeChainLockMock, detectStandaloneRegtestModeMock,
+    );
+
+    const result = await verifyChainLockQueryHandler(params, { chainLock: encodedChainLock });
+
+    expect(result).to.be.an.instanceof(ResponseQuery);
+    expect(result.code).to.equal(0);
   });
 });

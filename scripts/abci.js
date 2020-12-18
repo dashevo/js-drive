@@ -95,7 +95,8 @@ const createDIContainer = require('../lib/createDIContainer');
 
   logger.info('Waining for initial Core ChainLocked height...');
   const waitForChainLockedHeight = container.resolve('waitForChainLockedHeight');
-  await waitForChainLockedHeight(process.env.INITIAL_CORE_CHAINLOCKED_HEIGHT);
+  const initialCoreChainLockedHeight = container.resolve('initialCoreChainLockedHeight');
+  await waitForChainLockedHeight(initialCoreChainLockedHeight);
 
   const server = createServer(
     container.resolve('abciHandlers'),
