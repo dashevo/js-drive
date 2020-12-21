@@ -26,6 +26,8 @@ describe('infoHandlerFactory', () => {
   let lastCoreChainLockedHeight;
   let loggerMock;
   let chainInfo;
+  let chainInfoRepositoryMock;
+  let containerMock;
 
   beforeEach(function beforeEach() {
     lastBlockHeight = Long.fromInt(0);
@@ -33,10 +35,17 @@ describe('infoHandlerFactory', () => {
     protocolVersion = Long.fromInt(0);
     lastCoreChainLockedHeight = 0;
 
+    chainInfoRepositoryMock = {
+      store: this.sinon.stub(),
+      fetch: this.sinon.stub(),
+    };
+
     chainInfo = new ChainInfo(
       lastBlockHeight,
       lastCoreChainLockedHeight,
     );
+
+    chainInfoRepositoryMock.fetch.resolves(chainInfo);
 
     rootTreeMock = new RootTreeMock(this.sinon);
     rootTreeMock.getRootHash.returns(lastBlockAppHash);
@@ -47,12 +56,17 @@ describe('infoHandlerFactory', () => {
       debug: this.sinon.stub(),
     };
 
+    containerMock = {
+      register: this.sinon.stub(),
+    };
+
     infoHandler = infoHandlerFactory(
-      chainInfo,
+      chainInfoRepositoryMock,
       protocolVersion,
       rootTreeMock,
       updateSimplifiedMasternodeListMock,
       loggerMock,
+      containerMock,
     );
   });
 

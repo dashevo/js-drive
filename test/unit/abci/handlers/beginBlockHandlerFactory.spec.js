@@ -84,6 +84,7 @@ describe('beginBlockHandlerFactory', () => {
     expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
     expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(coreHeight);
     expect(waitForChainLockedHeightMock).to.be.calledOnceWithExactly(coreHeight);
+    expect(blockExecutionDBTransactionsMock.abort).to.be.not.called();
   });
 
   it('should reject not supported protocol version', async () => {
@@ -98,5 +99,21 @@ describe('beginBlockHandlerFactory', () => {
       expect(err.message).to.equal('Block protocol version 42 not supported. Expected to be less or equal to 0.');
       expect(err.name).to.equal('NotSupportedProtocolVersionError');
     }
+  });
+
+  it('should abort already started transactions', async () => {
+    blockExecutionDBTransactionsMock.isStarted.returns(true);
+
+    const response = await beginBlockHandler(request);
+
+    expect(response).to.be.an.instanceOf(ResponseBeginBlock);
+
+    expect(chainInfo.getLastBlockHeight()).to.equal(blockHeight);
+    expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
+    expect(blockExecutionContextMock.reset).to.be.calledOnce();
+    expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
+    expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(coreHeight);
+    expect(waitForChainLockedHeightMock).to.be.calledOnceWithExactly(coreHeight);
+    expect(blockExecutionDBTransactionsMock.abort).to.be.calledOnce();
   });
 });
