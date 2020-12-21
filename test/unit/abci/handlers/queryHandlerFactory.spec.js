@@ -21,6 +21,7 @@ describe('queryHandlerFactory', () => {
 
     loggerMock = {
       trace: this.sinon.stub(),
+      debug: this.sinon.stub(),
     };
 
     sanitizeUrlMock = this.sinon.stub();
