@@ -22,21 +22,61 @@ describe('infoHandlerFactory', () => {
   let lastBlockAppHash;
   let infoHandler;
   let rootTreeMock;
+  let updateSimplifiedMasternodeListMock;
+  let lastCoreChainLockedHeight;
+  let loggerMock;
+  let chainInfo;
 
   beforeEach(function beforeEach() {
-    lastBlockHeight = 1;
+    lastBlockHeight = Long.fromInt(0);
     lastBlockAppHash = Buffer.alloc(0);
     protocolVersion = Long.fromInt(0);
+    lastCoreChainLockedHeight = 0;
 
-    const chainInfo = new ChainInfo(lastBlockHeight);
+    chainInfo = new ChainInfo(
+      lastBlockHeight,
+      lastCoreChainLockedHeight,
+    );
 
     rootTreeMock = new RootTreeMock(this.sinon);
+    rootTreeMock.getRootHash.returns(lastBlockAppHash);
 
-    infoHandler = infoHandlerFactory(chainInfo, protocolVersion, rootTreeMock);
+    updateSimplifiedMasternodeListMock = this.sinon.stub();
+
+    loggerMock = {
+      debug: this.sinon.stub(),
+    };
+
+    infoHandler = infoHandlerFactory(
+      chainInfo,
+      protocolVersion,
+      rootTreeMock,
+      updateSimplifiedMasternodeListMock,
+      loggerMock,
+    );
   });
 
-  it('should return ResponseInfo', async () => {
-    rootTreeMock.getRootHash.returns(lastBlockAppHash);
+  it('should return empty info', async () => {
+    const response = await infoHandler();
+
+    expect(response).to.be.an.instanceOf(ResponseInfo);
+
+    expect(response).to.deep.include({
+      version: packageJson.version,
+      appVersion: protocolVersion,
+      lastBlockHeight,
+      lastBlockAppHash,
+    });
+
+    expect(updateSimplifiedMasternodeListMock).to.not.be.called();
+  });
+
+  it('should update SML to latest core chain locked height and return stored info', async () => {
+    lastBlockHeight = Long.fromInt(1);
+    lastCoreChainLockedHeight = 2;
+
+    chainInfo.setLastBlockHeight(lastBlockHeight);
+    chainInfo.setLastCoreChainLockedHeight(lastCoreChainLockedHeight);
 
     const response = await infoHandler();
 
@@ -48,5 +88,9 @@ describe('infoHandlerFactory', () => {
       lastBlockHeight,
       lastBlockAppHash,
     });
+
+    expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
+      lastCoreChainLockedHeight,
+    );
   });
 });
