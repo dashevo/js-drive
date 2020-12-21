@@ -102,6 +102,10 @@ const createDIContainer = require('../lib/createDIContainer');
     container.resolve('abciHandlers'),
   );
 
+  server.on('error', async (e) => {
+    await errorHandler(e);
+  });
+
   server.listen(
     container.resolve('abciPort'),
     container.resolve('abciHost'),
