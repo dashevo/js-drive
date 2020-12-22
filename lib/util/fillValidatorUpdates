@@ -1,0 +1,28 @@
+const {
+  tendermint: {
+    abci: {
+      ValidatorUpdate,
+    },
+  },
+} = require('@dashevo/abci/types');
+
+/**
+ * Fill up the validatorUpdates array
+ *
+ * @param {Object[]} validators
+ * @returns {Array}
+ */
+module.exports = function fillValidatorUpdates(validators) {
+  let validatorUpdates = [];
+  validators.forEach((member) => {
+    const validatorUpdate = new ValidatorUpdate();
+    validatorUpdate.proTxHash = member.proTxHash;
+    if (member.pubKeyShare) {
+      // hey, this is must be me!
+      validatorUpdate.pubKeyShare = member.pubKeyShare;
+    }
+    validatorUpdate.power = 100;
+    validatorUpdates.push(validatorUpdate);
+  });
+  return validatorUpdates;
+};
