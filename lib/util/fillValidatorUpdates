@@ -19,7 +19,7 @@ module.exports = function fillValidatorUpdates(validators) {
     validatorUpdate.proTxHash = member.proTxHash;
     if (member.pubKeyShare) {
       // hey, this is must be me!
-      validatorUpdate.pubKeyShare = member.pubKeyShare;
+      validatorUpdate.pubKey = member.pubKeyShare;
     }
     validatorUpdate.power = 100;
     validatorUpdates.push(validatorUpdate);
