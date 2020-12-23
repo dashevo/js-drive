@@ -3,7 +3,7 @@ require('dotenv-expand')(require('dotenv-safe').config());
 const createServer = require('@dashevo/abci');
 const { onShutdown } = require('node-graceful-shutdown');
 
-const OldZMQClient = require('../lib/core/ZmqClient');
+const ZMQClient = require('../lib/core/ZmqClient');
 
 const createDIContainer = require('../lib/createDIContainer');
 
@@ -60,15 +60,15 @@ const createDIContainer = require('../lib/createDIContainer');
 
   const coreZMQClient = container.resolve('coreZMQClient');
 
-  coreZMQClient.on(OldZMQClient.events.CONNECTED, () => {
+  coreZMQClient.on(ZMQClient.events.CONNECTED, () => {
     logger.trace('Connected to Core ZMQ socket');
   });
 
-  coreZMQClient.on(OldZMQClient.events.DISCONNECTED, () => {
+  coreZMQClient.on(ZMQClient.events.DISCONNECTED, () => {
     logger.trace('Disconnected from Core ZMQ socket');
   });
 
-  coreZMQClient.on(OldZMQClient.events.MAX_RETRIES_REACHED, async () => {
+  coreZMQClient.on(ZMQClient.events.MAX_RETRIES_REACHED, async () => {
     const error = new Error('Can\'t connect to Core ZMQ');
 
     await errorHandler(error);
