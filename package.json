@@ -70,7 +70,6 @@
     "@dashevo/dashd-rpc": "github:dashevo/dashd-rpc#quorumInfo",
     "@dashevo/dashd-zmq": "^1.2.0",
     "@dashevo/dpp": "~0.17.0-dev.4",
-    "@dashevo/js-drive-light-client": "^0.0.1",
     "@dashevo/merk": "github:dashevo/node-merk",
     "ajv": "^6.10.0",
     "ajv-keywords": "^3.5.2",
