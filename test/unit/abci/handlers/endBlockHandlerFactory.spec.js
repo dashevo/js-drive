@@ -28,6 +28,9 @@ describe('endBlockHandlerFactory', () => {
   let dashpayContractId;
   let dashpayContractBlockHeight;
   let latestCoreChainLockMock;
+  let simplifiedMasternodeListMock;
+  let smlStoreMock;
+  let getValidatorSetInfo;
   let loggerMock;
   let chainLockMock;
 
@@ -47,8 +50,14 @@ describe('endBlockHandlerFactory', () => {
       signature: Buffer.alloc(0),
     };
 
+    smlStoreMock = {};
+
     latestCoreChainLockMock = {
       getChainLock: this.sinon.stub().returns(chainLockMock),
+    };
+
+    simplifiedMasternodeListMock = {
+      getStore: this.sinon.stub().returns(smlStoreMock),
     };
 
     loggerMock = {
@@ -69,6 +78,8 @@ describe('endBlockHandlerFactory', () => {
       dpnsContractId,
       dashpayContractBlockHeight,
       dashpayContractId,
+      simplifiedMasternodeListMock,
+      getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
     );
@@ -85,6 +96,8 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       undefined,
       undefined,
+      simplifiedMasternodeListMock,
+      getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
     );
@@ -104,6 +117,8 @@ describe('endBlockHandlerFactory', () => {
       dpnsContractId,
       undefined,
       undefined,
+      simplifiedMasternodeListMock,
+      getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
     );
@@ -126,6 +141,8 @@ describe('endBlockHandlerFactory', () => {
       dpnsContractId,
       undefined,
       undefined,
+      simplifiedMasternodeListMock,
+      getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
     );
@@ -172,6 +189,8 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       undefined,
       undefined,
+      simplifiedMasternodeListMock,
+      getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
     );
@@ -191,6 +210,8 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       dashpayContractBlockHeight,
       dashpayContractId,
+      simplifiedMasternodeListMock,
+      getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
     );
@@ -213,6 +234,8 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       dashpayContractBlockHeight,
       dashpayContractId,
+      simplifiedMasternodeListMock,
+      getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
     );
