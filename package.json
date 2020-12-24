@@ -67,7 +67,7 @@
   "dependencies": {
     "@dashevo/abci": "^0.17.0-dev.3",
     "@dashevo/dashcore-lib": "~0.19.13",
-    "@dashevo/dashd-rpc": "^2.1.2",
+    "@dashevo/dashd-rpc": "github:dashevo/dashd-rpc#quorumInfo",
     "@dashevo/dashd-zmq": "^1.2.0",
     "@dashevo/dpp": "~0.17.0-dev.4",
     "@dashevo/js-drive-light-client": "^0.0.1",
