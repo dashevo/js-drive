@@ -2,7 +2,7 @@ const {
   tendermint: {
     abci: {
       ResponseEndBlock,
-      // ValidatorSetUpdate, TODO: test once available in new version of js-abci
+      ValidatorSetUpdate
     },
     crypto: {
       PublicKey,
@@ -347,7 +347,6 @@ describe('endBlockHandlerFactory', () => {
       expect(latestCoreChainLockMock.getChainLock).to.have.not.been.called();
     }
   });
-  /* TODO: activate tests when js-abci is ready
   it('should rotate the validator set and return ValidatorSetUpdate if height is dividable by ROTATION_BLOCK_INTERVAL', async () => {
     requestMock = {
       height: 15,
@@ -396,6 +395,7 @@ describe('endBlockHandlerFactory', () => {
       thresholdPublicKey: new PublicKey({
         bls12381: Uint8Array.from(Buffer.from(quorumListFixture[0].quorumPublicKey, 'hex')),
       })
+    });
     expect(response.nextCoreChainLockUpdate).to.deep.equal(expectedCoreChainLock);
 
     expect(response.validatorSetUpdate).to.deep.equal(expectedValidatorUpdate);
@@ -408,5 +408,4 @@ describe('endBlockHandlerFactory', () => {
 
     expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
   });
-  */
 });
