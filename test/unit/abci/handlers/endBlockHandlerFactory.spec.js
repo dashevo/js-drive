@@ -19,6 +19,8 @@ const endBlockHandlerFactory = require('../../../../lib/abci/handlers/endBlockHa
 
 const getValidatorSetInfoFactory = require('../../../../lib/core/getValidatorSetInfoFactory');
 
+const fillValidatorUpdates = require('../../../../lib/util/fillValidatorUpdates');
+
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 
 const NoDPNSContractFoundError = require('../../../../lib/abci/handlers/errors/NoDPNSContractFoundError');
@@ -111,7 +113,9 @@ describe('endBlockHandlerFactory', () => {
     smlMock = {
       getValidatorLLMQType: this.sinon.stub().returns(4),
       getQuorums: this.sinon.stub().returns(quorumListFixture),
+      getQuorum: this.sinon.stub().returns(quorumListFixture[0]),
       getVerifiedQuorums: this.sinon.stub().returns(quorumListFixture),
+      getQuorumsOfType: this.sinon.stub().returns([quorumListFixture[0]]),
     };
 
     smlStoreMock = {
@@ -132,10 +136,7 @@ describe('endBlockHandlerFactory', () => {
         valid: true },
     ];
 
-    validatorsUpdateFixture = [
-      { proTxHash: 'c286807d463b06c7aba3b9a60acf64c1fc03da8c1422005cd9b4293f08cf0562', power: 100 },
-      { proTxHash: 'a3e1edc6bd352eeaf0ae58e30781ef4b127854241a3fe7fddf36d5b7e1dc2b3f', power: 100 },
-    ];
+    validatorsUpdateFixture = fillValidatorUpdates(validatorsFixture);
 
     coreRpcClientMock = {
       quorum: this.sinon.stub().resolves({
@@ -347,7 +348,7 @@ describe('endBlockHandlerFactory', () => {
       expect(latestCoreChainLockMock.getChainLock).to.have.not.been.called();
     }
   });
-  it('should rotate the validator set and return ValidatorSetUpdate if height is dividable by ROTATION_BLOCK_INTERVAL', async () => {
+  it('should rotate validator set and return ValidatorSetUpdate if height is dividable by ROTATION_BLOCK_INTERVAL', async () => {
     requestMock = {
       height: 15,
     };
@@ -366,16 +367,16 @@ describe('endBlockHandlerFactory', () => {
 
     const response = await endBlockHandler(requestMock);
 
-    expect(headerMock.lastCommitHash).to.have.been.calledOnce();
+    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
 
     expect(response).to.be.an.instanceOf(ResponseEndBlock);
 
-    expect(response.toJSON()).to.be.empty();
+    expect(response.validatorSetUpdate).to.be.an.instanceOf(ValidatorSetUpdate);
 
-    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
+    expect(response.validatorSetUpdate.thresholdPublicKey).to.be.an.instanceOf(PublicKey);
   });
 
-  it('should rotate the validator set and return ValidatorSetUpdate and nextCoreChainLockUpdate if height is dividable by ROTATION_BLOCK_INTERVAL and if latestCoreChainLock above header height', async () => {
+  it('should rotate validator set and return ValidatorSetUpdate and nextCoreChainLockUpdate', async () => {
     chainLockMock.height = 3;
     requestMock = {
       height: 15,
@@ -396,16 +397,20 @@ describe('endBlockHandlerFactory', () => {
         bls12381: Uint8Array.from(Buffer.from(quorumListFixture[0].quorumPublicKey, 'hex')),
       })
     });
-    expect(response.nextCoreChainLockUpdate).to.deep.equal(expectedCoreChainLock);
 
-    expect(response.validatorSetUpdate).to.deep.equal(expectedValidatorUpdate);
-
-    expect(headerMock.lastCommitHash).to.have.been.calledOnce();
+    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
 
     expect(response).to.be.an.instanceOf(ResponseEndBlock);
 
-    expect(response.toJSON()).to.be.empty();
+    expect(response.nextCoreChainLockUpdate).to.be.an.instanceOf(CoreChainLock);
 
-    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
+    expect(response.validatorSetUpdate).to.be.an.instanceOf(ValidatorSetUpdate);
+
+    expect(response.validatorSetUpdate.thresholdPublicKey).to.be.an.instanceOf(PublicKey);
+
+    expect(response.nextCoreChainLockUpdate).to.deep.equal(expectedCoreChainLock);
+
+    expect(response.validatorSetUpdate).to.deep.equal(expectedValidatorUpdate);
   });
+
 });
