@@ -45,7 +45,6 @@ describe('getValidatorSetInfo', () => {
 
   it('should get quorum info ', async () => {
     const validatorSetInfo = await getValidatorSetInfo(llmqType, quorumHash);
-    console.log('validatorSetInfo', validatorSetInfo)
     expect(coreRpcClientMock.quorum).to.be.calledOnce();
     expect(validatorSetInfo).to.be.an('array');
   });
