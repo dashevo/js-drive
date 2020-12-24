@@ -65,7 +65,7 @@
     "sinon-chai": "^3.5.0"
   },
   "dependencies": {
-    "@dashevo/abci": "^0.17.0-dev.3",
+    "@dashevo/abci": "github:dashevo/js-abci#signing",
     "@dashevo/dashcore-lib": "~0.19.13",
     "@dashevo/dashd-rpc": "github:dashevo/dashd-rpc#quorumInfo",
     "@dashevo/dashd-zmq": "^1.2.0",
