@@ -1,6 +1,6 @@
 {
   "name": "@dashevo/drive",
-  "version": "0.17.0-dev.6",
+  "version": "0.17.0-dev.8",
   "description": "Replicated state machine for Dash Platform",
   "engines": {
     "node": ">=12"
@@ -66,10 +66,10 @@
   },
   "dependencies": {
     "@dashevo/abci": "github:dashevo/js-abci#signing",
-    "@dashevo/dashcore-lib": "~0.19.15",
+    "@dashevo/dashcore-lib": "~0.19.16",
     "@dashevo/dashd-rpc": "github:dashevo/dashd-rpc#quorumInfo",
     "@dashevo/dashd-zmq": "^1.2.0",
-    "@dashevo/dpp": "~0.17.0-dev.4",
+    "@dashevo/dpp": "~0.17.0-dev.8",
     "@dashevo/merk": "github:dashevo/node-merk",
     "ajv": "^6.10.0",
     "ajv-keywords": "^3.5.2",
