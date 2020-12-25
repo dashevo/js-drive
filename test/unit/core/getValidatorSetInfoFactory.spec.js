@@ -3,10 +3,14 @@ const getValidatorSetInfoFactory = require('../../../lib/core/getValidatorSetInf
 
 describe('getValidatorSetInfo', () => {
   let coreRpcClientMock;
+  let coreRpcClientMockQuorumDoesntExistError;
+  let coreRpcClientMockUnkownError;
   let validatorsFixture;
   let llmqType;
   let quorumHash;
-  let getValidatorSetInfo;
+  let noSuchQuorumError;
+  let unknownError;
+  let loggerMock;
 
   beforeEach(() => {
     if (!this.sinon) {
@@ -34,7 +38,23 @@ describe('getValidatorSetInfo', () => {
       })
     };
 
-    getValidatorSetInfo = getValidatorSetInfoFactory(coreRpcClientMock);
+    noSuchQuorumError = new Error({ code: -8 });
+    coreRpcClientMockQuorumDoesntExistError = {
+      quorum: this.sinon.stub().throws(noSuchQuorumError)
+    };
+
+    unknownError = new Error({ code: -928374 });
+    coreRpcClientMockUnkownError = {
+      quorum: this.sinon.stub().throws(unknownError)
+    };
+
+    loggerMock = {
+      debug: this.sinon.stub(),
+      info: this.sinon.stub(),
+      trace: this.sinon.stub(),
+      error: this.sinon.stub(),
+    };
+
     llmqType = 4;
     quorumHash = '36252dfdf79b1b8a95141d32a4c66353a88e439506f036867d7949a5ca7d8a37';
   });
@@ -43,9 +63,26 @@ describe('getValidatorSetInfo', () => {
     this.sinon.restore();
   });
 
-  it('should get quorum info ', async () => {
+  it('should get quorum info', async () => {
+    const getValidatorSetInfo = getValidatorSetInfoFactory(coreRpcClientMock, loggerMock);
     const validatorSetInfo = await getValidatorSetInfo(llmqType, quorumHash);
     expect(coreRpcClientMock.quorum).to.be.calledOnce();
     expect(validatorSetInfo).to.be.an('array');
+  });
+  it('should throw an error', async () => {
+    const getValidatorSetInfo = getValidatorSetInfoFactory(coreRpcClientMockQuorumDoesntExistError, loggerMock);
+    try {
+      await getValidatorSetInfo(llmqType, quorumHash);
+    } catch (e) {
+      expect(e).to.equal(noSuchQuorumError);
+    }
+  });
+  it('should throw an error', async () => {
+    const getValidatorSetInfo = getValidatorSetInfoFactory(coreRpcClientMockUnkownError, loggerMock);
+    try {
+      await getValidatorSetInfo(llmqType, quorumHash);
+    } catch (e) {
+      expect(e).to.equal(unknownError);
+    }
   });
 });
