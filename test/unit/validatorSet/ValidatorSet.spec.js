@@ -5,11 +5,11 @@ const {
     },
   },
 } = require('@dashevo/abci/types');
-const fillValidatorUpdates = require('../../../lib/util/fillValidatorUpdates');
+const ValidatorSet = require('../../../lib/validatorSet/ValidatorSet');
 
-describe('fillValidatorUpdates', () => {
-let validatorsFixture;
-let validatorsFixtureMember;
+describe('ValidatorSet', () => {
+  let validatorsFixture;
+  let validatorsFixtureMember;
 
   beforeEach(() => {
     validatorsFixture = [
@@ -35,13 +35,13 @@ let validatorsFixtureMember;
   });
 
   it('should fill validator updates', () => {
-    const validatorUpdates = fillValidatorUpdates(validatorsFixture);
+    const validatorUpdates = ValidatorSet.fillValidatorUpdates(validatorsFixture);
     expect(validatorUpdates).to.be.an('array');
     expect(validatorUpdates).to.not.have.property('pubKey');
     expect(validatorUpdates[0]).to.be.an.instanceOf(ValidatorUpdate);
   });
   it('should fill validator updates if this node is a validator quorum member', () => {
-    const validatorUpdates = fillValidatorUpdates(validatorsFixtureMember);
+    const validatorUpdates = ValidatorSet.fillValidatorUpdates(validatorsFixtureMember);
     expect(validatorUpdates).to.be.an('array');
     expect(validatorUpdates[0]).to.have.property('pubKey');
     expect(validatorUpdates[0]).to.be.an.instanceOf(ValidatorUpdate);
