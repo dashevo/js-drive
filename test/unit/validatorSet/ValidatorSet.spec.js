@@ -13,8 +13,8 @@ const getSmlFixture = require('../../../lib/test/fixtures/getSmlFixture');
 describe('ValidatorSet', () => {
   let smlMock;
   let smlStoreMock;
-  let validatorsFixture;
-  let validatorsFixtureMember;
+  let quorumInfoFixture;
+  let quorumInfoMemberFixture;
   let rotationEntropy;
   let rotationEntropyBuffer;
   let coreBlockHeight;
@@ -42,7 +42,7 @@ describe('ValidatorSet', () => {
 
     coreBlockHeight = 1111;
 
-    validatorsFixture = [
+    quorumInfoFixture = [
       { proTxHash: 'c286807d463b06c7aba3b9a60acf64c1fc03da8c1422005cd9b4293f08cf0562',
         pubKeyOperator: '06abc1c890c9da4e513d52f20da1882228bfa2db4bb29cbd064e1b2a61d9dcdadcf0784fd1371338c8ad1bf323d87ae6',
         valid: true,},
@@ -50,7 +50,7 @@ describe('ValidatorSet', () => {
         pubKeyOperator: '04d748ba0efeb7a8f8548e0c22b4c188c293a19837a1c5440649279ba73ead0c62ac1e840050a10a35e0ae05659d2a8d',
         valid: true,},
     ];
-    validatorsFixtureMember = [
+    quorumInfoMemberFixture = [
       { proTxHash: 'c286807d463b06c7aba3b9a60acf64c1fc03da8c1422005cd9b4293f08cf0562',
         pubKeyOperator: '06abc1c890c9da4e513d52f20da1882228bfa2db4bb29cbd064e1b2a61d9dcdadcf0784fd1371338c8ad1bf323d87ae6',
         valid: true,
@@ -80,13 +80,13 @@ describe('ValidatorSet', () => {
     expect(validatorSetHash).to.be.equal('0000008d3d35c02fab8cc631d85d968c1e09cff14c78d517821851956805b7ad');
   });
   it('should fill validator updates', () => {
-    const validatorUpdates = ValidatorSet.fillValidatorUpdates(validatorsFixture);
+    const validatorUpdates = ValidatorSet.fillValidatorUpdates(quorumInfoFixture);
     expect(validatorUpdates).to.be.an('array');
     expect(validatorUpdates).to.not.have.property('pubKey');
     expect(validatorUpdates[0]).to.be.an.instanceOf(ValidatorUpdate);
   });
   it('should fill validator updates if this node is a validator quorum member', () => {
-    const validatorUpdates = ValidatorSet.fillValidatorUpdates(validatorsFixtureMember);
+    const validatorUpdates = ValidatorSet.fillValidatorUpdates(quorumInfoMemberFixture);
     expect(validatorUpdates).to.be.an('array');
     expect(validatorUpdates[0]).to.have.property('pubKey');
     expect(validatorUpdates[0]).to.be.an.instanceOf(ValidatorUpdate);
