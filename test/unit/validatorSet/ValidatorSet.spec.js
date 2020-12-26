@@ -1,3 +1,4 @@
+const sinon = require('sinon');
 const {
   tendermint: {
     abci: {
@@ -5,13 +6,42 @@ const {
     },
   },
 } = require('@dashevo/abci/types');
+
 const ValidatorSet = require('../../../lib/validatorSet/ValidatorSet');
+const getSmlFixture = require('../../../lib/test/fixtures/getSmlFixture');
 
 describe('ValidatorSet', () => {
+  let smlMock;
+  let smlStoreMock;
   let validatorsFixture;
   let validatorsFixtureMember;
+  let rotationEntropy;
+  let rotationEntropyBuffer;
+  let coreBlockHeight;
 
   beforeEach(() => {
+    if (!this.sinon) {
+      this.sinon = sinon.createSandbox();
+    } else {
+      this.sinon.restore();
+    }
+
+    smlMock = {
+      getValidatorLLMQType: this.sinon.stub().returns(1),
+      getQuorumsOfType: this.sinon.stub().returns(getSmlFixture()[0].newQuorums.filter(quorum => quorum.llmqType === 1)),
+    };
+
+    smlStoreMock = {
+      getSMLbyHeight: this.sinon.stub().returns(smlMock),
+      getCurrentSML: this.sinon.stub().returns(smlMock),
+    };
+
+    rotationEntropy = '00000ac05a06682172d8b49be7c9ddc4189126d7200ebf0fc074c433ae74b596';
+
+    rotationEntropyBuffer = Buffer.from(rotationEntropy, 'hex');
+
+    coreBlockHeight = 1111;
+
     validatorsFixture = [
       { proTxHash: 'c286807d463b06c7aba3b9a60acf64c1fc03da8c1422005cd9b4293f08cf0562',
         pubKeyOperator: '06abc1c890c9da4e513d52f20da1882228bfa2db4bb29cbd064e1b2a61d9dcdadcf0784fd1371338c8ad1bf323d87ae6',
@@ -34,6 +64,21 @@ describe('ValidatorSet', () => {
     ];
   });
 
+  afterEach(function afterEach() {
+    this.sinon.restore();
+  });
+
+  it('constructor', () => {
+    const validatorSet = new ValidatorSet(smlStoreMock);
+    expect(validatorSet.smlStore).to.be.equal(smlStoreMock);
+    expect(validatorSet).to.be.an.instanceOf(ValidatorSet);
+  });
+  it('getHashForCoreHeight', async () => {
+    const validatorSet = new ValidatorSet(smlStoreMock);
+    const validatorSetHash = await validatorSet.getHashForCoreHeight(rotationEntropyBuffer, coreBlockHeight);
+    expect(validatorSetHash).to.be.a('string');
+    expect(validatorSetHash).to.be.equal('0000008d3d35c02fab8cc631d85d968c1e09cff14c78d517821851956805b7ad');
+  });
   it('should fill validator updates', () => {
     const validatorUpdates = ValidatorSet.fillValidatorUpdates(validatorsFixture);
     expect(validatorUpdates).to.be.an('array');
