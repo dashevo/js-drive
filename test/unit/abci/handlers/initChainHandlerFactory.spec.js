@@ -2,6 +2,10 @@ const {
   tendermint: {
     abci: {
       ResponseInitChain,
+      ValidatorSetUpdate,
+    },
+    crypto: {
+      PublicKey,
     },
   },
 } = require('@dashevo/abci/types');
@@ -98,12 +102,15 @@ describe('initChainHandlerFactory', () => {
     );
   });
 
-  it('should update height, start transactions return ResponseBeginBlock', async () => {
+  it('should update height, start transactions return ResponseBeginBlock and ValidatorSetUpdate', async () => {
     const response = await initChainHandler();
 
     expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
       initialCoreChainLockedHeight,
     );
+    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
     expect(response).to.be.an.instanceOf(ResponseInitChain);
+    expect(response.validatorSetUpdate).to.be.an.instanceOf(ValidatorSetUpdate);
+    expect(response.validatorSetUpdate.thresholdPublicKey).to.be.an.instanceOf(PublicKey);
   });
 });
