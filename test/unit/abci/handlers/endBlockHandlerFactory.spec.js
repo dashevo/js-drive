@@ -19,12 +19,12 @@ const endBlockHandlerFactory = require('../../../../lib/abci/handlers/endBlockHa
 
 const getValidatorSetInfoFactory = require('../../../../lib/core/getValidatorSetInfoFactory');
 
-const fillValidatorUpdates = require('../../../../lib/util/fillValidatorUpdates');
-
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 
 const NoDPNSContractFoundError = require('../../../../lib/abci/handlers/errors/NoDPNSContractFoundError');
 const NoDashpayContractFoundError = require('../../../../lib/abci/handlers/errors/NoDashpayContractFoundError');
+
+const ValidatorSet = require('../../../../lib/validatorSet/ValidatorSet');
 
 describe('endBlockHandlerFactory', () => {
   let endBlockHandler;
@@ -46,6 +46,7 @@ describe('endBlockHandlerFactory', () => {
   let validatorsUpdateFixture;
   let coreRpcClientMock;
   let quorumListFixture;
+  let constainerMock;
 
   beforeEach(function beforeEach() {
     headerMock = {
@@ -57,6 +58,10 @@ describe('endBlockHandlerFactory', () => {
 
     blockExecutionContextMock.hasDataContract.returns(true);
     blockExecutionContextMock.getHeader.returns(headerMock);
+
+    constainerMock = {
+      register: this.sinon.stub(),
+    };
 
     chainLockMock = {
       height: 1,
@@ -136,7 +141,7 @@ describe('endBlockHandlerFactory', () => {
         valid: true },
     ];
 
-    validatorsUpdateFixture = fillValidatorUpdates(validatorsFixture);
+    validatorsUpdateFixture = ValidatorSet.fillValidatorUpdates(validatorsFixture);
 
     coreRpcClientMock = {
       quorum: this.sinon.stub().resolves({
@@ -172,6 +177,7 @@ describe('endBlockHandlerFactory', () => {
       getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
+      constainerMock,
     );
 
     requestMock = {
@@ -190,6 +196,7 @@ describe('endBlockHandlerFactory', () => {
       getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
+      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -211,6 +218,7 @@ describe('endBlockHandlerFactory', () => {
       getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
+      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -235,6 +243,7 @@ describe('endBlockHandlerFactory', () => {
       getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
+      constainerMock,
     );
 
     blockExecutionContextMock.hasDataContract.returns(false);
@@ -283,6 +292,7 @@ describe('endBlockHandlerFactory', () => {
       getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
+      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -304,6 +314,7 @@ describe('endBlockHandlerFactory', () => {
       getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
+      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -328,6 +339,7 @@ describe('endBlockHandlerFactory', () => {
       getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
+      constainerMock,
     );
 
     blockExecutionContextMock.hasDataContract.returns(false);
@@ -348,7 +360,7 @@ describe('endBlockHandlerFactory', () => {
       expect(latestCoreChainLockMock.getChainLock).to.have.not.been.called();
     }
   });
-  it('should rotate validator set and return ValidatorSetUpdate if height is dividable by ROTATION_BLOCK_INTERVAL', async () => {
+  it('should rotate validator set and return ValidatorSetUpdate if height is divisible by ROTATION_BLOCK_INTERVAL', async () => {
     requestMock = {
       height: 15,
     };
@@ -363,6 +375,7 @@ describe('endBlockHandlerFactory', () => {
       getValidatorSetInfo,
       latestCoreChainLockMock,
       loggerMock,
+      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
