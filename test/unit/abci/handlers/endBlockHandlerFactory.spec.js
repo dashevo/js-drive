@@ -153,7 +153,7 @@ describe('endBlockHandlerFactory', () => {
       })
     };
 
-    getValidatorSetInfo = getValidatorSetInfoFactory(coreRpcClientMock);
+    getValidatorSetInfo = getValidatorSetInfoFactory(coreRpcClientMock, loggerMock);
 
     loggerMock = {
       debug: this.sinon.stub(),
