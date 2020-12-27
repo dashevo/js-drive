@@ -12,7 +12,6 @@ const getSmlFixture = require('../../../lib/test/fixtures/getSmlFixture');
 
 describe('ValidatorSet', () => {
   let smlMock;
-  let smlStoreMock;
   let quorumInfoFixture;
   let quorumInfoMemberFixture;
   let rotationEntropy;
@@ -29,11 +28,6 @@ describe('ValidatorSet', () => {
     smlMock = {
       getValidatorLLMQType: this.sinon.stub().returns(1),
       getQuorumsOfType: this.sinon.stub().returns(getSmlFixture()[0].newQuorums.filter(quorum => quorum.llmqType === 1)),
-    };
-
-    smlStoreMock = {
-      getSMLbyHeight: this.sinon.stub().returns(smlMock),
-      getCurrentSML: this.sinon.stub().returns(smlMock),
     };
 
     rotationEntropy = '00000ac05a06682172d8b49be7c9ddc4189126d7200ebf0fc074c433ae74b596';
@@ -69,12 +63,12 @@ describe('ValidatorSet', () => {
   });
 
   it('constructor', () => {
-    const validatorSet = new ValidatorSet(smlStoreMock);
-    expect(validatorSet.smlStore).to.be.equal(smlStoreMock);
+    const validatorSet = new ValidatorSet(smlMock);
+    expect(validatorSet.sml).to.be.equal(smlMock);
     expect(validatorSet).to.be.an.instanceOf(ValidatorSet);
   });
   it('getHashForCoreHeight', async () => {
-    const validatorSet = new ValidatorSet(smlStoreMock);
+    const validatorSet = new ValidatorSet(smlMock);
     const validatorSetHash = await validatorSet.getHashForCoreHeight(rotationEntropyBuffer, coreBlockHeight);
     expect(validatorSetHash).to.be.a('string');
     expect(validatorSetHash).to.be.equal('0000008d3d35c02fab8cc631d85d968c1e09cff14c78d517821851956805b7ad');
