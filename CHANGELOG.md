@@ -42,6 +42,7 @@
 
 * AppHash is not equal to nils anymore.
 * data created with 0.16 and lower versions of Drive is not compatible anymore
+* ABCI query responses are changed
 
 
 
