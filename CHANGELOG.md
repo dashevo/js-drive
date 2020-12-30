@@ -1,13 +1,13 @@
-# [0.17.0](https://github.com/dashevo/js-drive/compare/v0.16.0...v0.17.0) (2020-12-30)
+# [0.17.0](https://github.com/dashevo/js-drive/compare/v0.16.1...v0.17.0) (2020-12-30)
 
 
 ### Features
 
-* introduce `DriveStateRepository#fetchSMLStore` ([#444](https://github.com/dashevo/js-drive/issues/444))
+* introduce `DriveStateRepository#fetchSMLStore` ([#444](https://github.com/dashevo/js-drive/issues/444), [#445](https://github.com/dashevo/js-drive/issues/445))
 * update `dashcore-lib` ([#411](https://github.com/dashevo/js-drive/issues/411), [#442](https://github.com/dashevo/js-drive/issues/442), [#443](https://github.com/dashevo/js-drive/issues/443))
 * add old zmq client from DAPI ([#439](https://github.com/dashevo/js-drive/issues/439))
 * dashpay contract support ([#441](https://github.com/dashevo/js-drive/issues/441))
-* change merk to @dashevo/merk ([880c507](https://github.com/dashevo/js-drive/commit/880c507b8b6f51dda7d57b44ad8f195ec73807a2))
+* change merk to @dashevo/merk
 * gracefull shutdown on SIGINT, SIGTERM, SIGQUIT and unhandled errors ([#427](https://github.com/dashevo/js-drive/issues/427))
 * handle core chain locked height ([#428](https://github.com/dashevo/js-drive/issues/428))
 * implement verify chainlock query handler ([#402](https://github.com/dashevo/js-drive/issues/402))
@@ -25,14 +25,13 @@
 * store identities in merk tree ([#400](https://github.com/dashevo/js-drive/issues/400))
 * store Public Key to Identity ID in MerkDb ([#409](https://github.com/dashevo/js-drive/issues/409))
 * update `dpp` to include asset lock verification logic ([#432](https://github.com/dashevo/js-drive/issues/432))
-* feat!: introduce merkle forest ([#401](https://github.com/dashevo/js-drive/issues/401))
+* introduce merkle forest ([#401](https://github.com/dashevo/js-drive/issues/401))
 * move block execution context out of blockchain state ([#403](https://github.com/dashevo/js-drive/issues/403))
 * add abstraction for MerkDb ([#407](https://github.com/dashevo/js-drive/issues/407))
 
 
 ### Bug Fixes
 
-* implement fetchSMLStore method for LoggedStateRepositoryDecorator.js ([#445](https://github.com/dashevo/js-drive/issues/445))
 * hash was used as a Buffer where it should be hex string ([#440](https://github.com/dashevo/js-drive/issues/440))
 * documents DB transaction is already started error ([#417](https://github.com/dashevo/js-drive/issues/417))
 * e.getErrors is not a function error ([#418](https://github.com/dashevo/js-drive/issues/418))
@@ -42,6 +41,7 @@
 ### BREAKING CHANGES
 
 * AppHash is not equal to nils anymore.
+* data created with 0.16 and lower versions of Drive is not compatible anymore
 
 
 
