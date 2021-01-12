@@ -1,3 +1,12 @@
+## [0.17.1](https://github.com/dashevo/js-drive/compare/v0.17.0...v0.17.1) (2021-01-12)
+
+
+### Bug Fixes
+
+* duplicate MongoDB index name ([#453](https://github.com/dashevo/js-drive/issues/453))
+
+
+
 # [0.17.0](https://github.com/dashevo/js-drive/compare/v0.16.1...v0.17.0) (2020-12-30)
 
 
