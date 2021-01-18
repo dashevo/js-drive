@@ -187,7 +187,7 @@ describe('commitHandlerFactory', () => {
     expect(blockExecutionContextMock.reset).to.be.calledOnce();
 
     expect(rootTreeMock.rebuild).to.be.calledOnce();
-    expect(rootTreeMock.getRootHash).to.be.calledOnce();
+    expect(rootTreeMock.getRootHash.callCount).to.equal(4);
 
     expect(previousBlockExecutionStoreTransactionsRepositoryMock.store).to.be.calledOnceWithExactly(
       nextPreviousBlockExecutionStoreTransactionsMock,
@@ -255,7 +255,7 @@ describe('commitHandlerFactory', () => {
     expect(blockExecutionContextMock.reset).to.be.calledOnce();
 
     expect(rootTreeMock.rebuild).to.be.calledOnce();
-    expect(rootTreeMock.getRootHash).to.be.calledOnce();
+    expect(rootTreeMock.getRootHash.callCount).to.equal(4);
 
     expect(previousBlockExecutionStoreTransactionsRepositoryMock.store).to.be.calledOnceWithExactly(
       nextPreviousBlockExecutionStoreTransactionsMock,
