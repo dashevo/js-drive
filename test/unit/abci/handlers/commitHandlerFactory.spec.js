@@ -54,7 +54,7 @@ describe('commitHandlerFactory', () => {
     };
 
     creditsDistributionPoolMock = {
-      setAmount: this.sinon.stub(),
+      incrementAmount: this.sinon.stub(),
     };
 
     dataContract = getDataContractFixture();
@@ -72,7 +72,7 @@ describe('commitHandlerFactory', () => {
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
     blockExecutionContextMock.getDataContracts.returns([dataContract]);
-    blockExecutionContextMock.getAccumulativeFees.returns(accumulativeFees);
+    blockExecutionContextMock.getCumulativeFees.returns(accumulativeFees);
     blockExecutionContextMock.getHeader.returns({
       height: 1,
     });
@@ -167,11 +167,11 @@ describe('commitHandlerFactory', () => {
 
     expect(blockExecutionStoreTransactionsMock.commit).to.be.calledOnce();
 
-    expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(
+    expect(creditsDistributionPoolMock.incrementAmount).to.be.calledOnceWith(
       accumulativeFees,
     );
 
-    expect(blockExecutionContextMock.getAccumulativeFees).to.be.calledOnce();
+    expect(blockExecutionContextMock.getCumulativeFees).to.be.calledOnce();
 
     expect(blockExecutionStoreTransactionsMock.getTransaction).to.be.calledOnceWithExactly('common');
 
@@ -224,8 +224,8 @@ describe('commitHandlerFactory', () => {
     expect(containerMock.resolve).to.be.calledOnceWithExactly('previousBlockExecutionStoreTransactions');
     expect(blockExecutionContextMock.getDataContracts).to.be.calledOnce();
     expect(documentsDatabaseManagerMock.create).to.be.calledOnceWithExactly(dataContract);
-    expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(accumulativeFees);
-    expect(blockExecutionContextMock.getAccumulativeFees).to.be.calledOnce();
+    expect(creditsDistributionPoolMock.incrementAmount).to.be.calledOnceWith(accumulativeFees);
+    expect(blockExecutionContextMock.getCumulativeFees).to.be.calledOnce();
 
     expect(blockExecutionStoreTransactionsMock.getTransaction).to.be.calledOnceWithExactly('common');
     expect(chainInfoRepositoryMock.store).to.be.calledOnceWith(chainInfoMock);

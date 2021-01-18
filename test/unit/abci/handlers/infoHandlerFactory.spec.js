@@ -27,6 +27,7 @@ describe('infoHandlerFactory', () => {
   let loggerMock;
   let chainInfo;
   let chainInfoRepositoryMock;
+  let creditsDistributionPoolRepositoryMock;
   let containerMock;
 
   beforeEach(function beforeEach() {
@@ -37,6 +38,10 @@ describe('infoHandlerFactory', () => {
 
     chainInfoRepositoryMock = {
       store: this.sinon.stub(),
+      fetch: this.sinon.stub(),
+    };
+
+    creditsDistributionPoolRepositoryMock = {
       fetch: this.sinon.stub(),
     };
 
@@ -62,6 +67,7 @@ describe('infoHandlerFactory', () => {
 
     infoHandler = infoHandlerFactory(
       chainInfoRepositoryMock,
+      creditsDistributionPoolRepositoryMock,
       protocolVersion,
       rootTreeMock,
       updateSimplifiedMasternodeListMock,
@@ -83,6 +89,10 @@ describe('infoHandlerFactory', () => {
     });
 
     expect(updateSimplifiedMasternodeListMock).to.not.be.called();
+
+    expect(creditsDistributionPoolRepositoryMock.fetch).to.be.calledOnceWithExactly();
+
+    expect(containerMock.register).to.be.calledTwice();
   });
 
   it('should update SML to latest core chain locked height and return stored info', async () => {
@@ -106,5 +116,9 @@ describe('infoHandlerFactory', () => {
     expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
       lastCoreChainLockedHeight,
     );
+
+    expect(creditsDistributionPoolRepositoryMock.fetch).to.be.calledOnceWithExactly();
+
+    expect(containerMock.register).to.be.calledTwice();
   });
 });
