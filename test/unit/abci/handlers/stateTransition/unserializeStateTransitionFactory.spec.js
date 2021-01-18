@@ -9,8 +9,6 @@ const unserializeStateTransitionFactory = require('../../../../../lib/abci/handl
 
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
 const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
-const ExecutionTimedOutError = require('../../../../../lib/abci/errors/ExecutionTimedOutError');
-const MemoryLimitExceededError = require('../../../../../lib/abci/errors/MemoryLimitExceededError');
 const InsufficientFundsError = require('../../../../../lib/abci/errors/InsufficientFundsError');
 
 describe('unserializeStateTransitionFactory', () => {
