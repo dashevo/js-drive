@@ -44,6 +44,7 @@ describe('commitHandlerFactory', () => {
   let populateMongoDbTransactionFromObjectMock;
   let mongoDbTransactionMock;
   let cloneToPreviousStoreTransactionsMock;
+  let header;
 
   beforeEach(function beforeEach() {
     nextPreviousBlockExecutionStoreTransactionsMock = 'nextPreviousBlockExecutionStoreTransactionsMock';
@@ -73,9 +74,15 @@ describe('commitHandlerFactory', () => {
 
     blockExecutionContextMock.getDataContracts.returns([dataContract]);
     blockExecutionContextMock.getCumulativeFees.returns(accumulativeFees);
-    blockExecutionContextMock.getHeader.returns({
-      height: 1,
-    });
+
+    header = {
+      height: Long.fromInt(1),
+      version: {
+        app: Long.fromInt(1),
+      },
+    };
+
+    blockExecutionContextMock.getHeader.returns(header);
 
     documentsDatabaseManagerMock = {
       create: this.sinon.stub(),
@@ -195,9 +202,7 @@ describe('commitHandlerFactory', () => {
   });
 
   it('should commit db transactions, update chain info, create document dbs and return ResponseCommit ion height > 1', async () => {
-    blockExecutionContextMock.getHeader.returns({
-      height: 2,
-    });
+    header.height = Long.fromInt(2);
 
     containerMock.resolve.withArgs('previousBlockExecutionStoreTransactions').returns(
       previousBlockExecutionStoreTransactionsMock,
@@ -263,9 +268,7 @@ describe('commitHandlerFactory', () => {
   });
 
   it('should throw NoPreviousBlockExecutionStoreTransactionsFoundError', async () => {
-    blockExecutionContextMock.getHeader.returns({
-      height: 2,
-    });
+    header.height = Long.fromInt(2);
 
     containerMock.has.withArgs('previousBlockExecutionStoreTransactions').returns(false);
 
@@ -281,9 +284,7 @@ describe('commitHandlerFactory', () => {
   });
 
   it('should abort DB transactions', async () => {
-    blockExecutionContextMock.getHeader.returns({
-      height: 2,
-    });
+    header.height = Long.fromInt(2);
 
     containerMock.has.withArgs('previousBlockExecutionStoreTransactions').returns(false);
 
