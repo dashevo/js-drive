@@ -10,7 +10,6 @@ const unserializeStateTransitionFactory = require('../../../../../lib/abci/handl
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
 const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
 const InsufficientFundsError = require('../../../../../lib/abci/errors/InsufficientFundsError');
-const { expect } = require('chai');
 
 describe('unserializeStateTransitionFactory', () => {
   let unserializeStateTransition;

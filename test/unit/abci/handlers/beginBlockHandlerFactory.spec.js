@@ -84,7 +84,9 @@ describe('beginBlockHandlerFactory', () => {
     expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
     expect(blockExecutionContextMock.reset).to.be.calledOnce();
     expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
-    expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(coreHeight, { logger: loggerMock });
+    expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
+      coreHeight, { logger: loggerMock },
+    );
     expect(waitForChainLockedHeightMock).to.be.calledOnceWithExactly(coreHeight);
     expect(blockExecutionDBTransactionsMock.abort).to.be.not.called();
   });
