@@ -126,10 +126,7 @@ describe('unserializeStateTransitionFactory', () => {
   });
 
   it('should use provided logger', async function it() {
-    const loggerMock = {
-      info: this.sinon.stub(),
-      debug: this.sinon.stub(),
-    };
+    const loggerMock = new LoggerMock(this.sinon);
 
     const balance = 1000;
     const error = new BalanceNotEnoughError(balance);
