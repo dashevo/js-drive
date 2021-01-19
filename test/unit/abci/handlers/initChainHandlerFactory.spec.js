@@ -7,6 +7,7 @@ const {
 } = require('@dashevo/abci/types');
 
 const initChainHandlerFactory = require('../../../../lib/abci/handlers/initChainHandlerFactory');
+const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 
 describe('initChainHandlerFactory', () => {
   let initChainHandler;
@@ -18,10 +19,7 @@ describe('initChainHandlerFactory', () => {
 
     updateSimplifiedMasternodeListMock = this.sinon.stub();
 
-    const loggerMock = {
-      debug: this.sinon.stub(),
-      info: this.sinon.stub(),
-    };
+    const loggerMock = new LoggerMock(this.sinon);
 
     initChainHandler = initChainHandlerFactory(
       updateSimplifiedMasternodeListMock,

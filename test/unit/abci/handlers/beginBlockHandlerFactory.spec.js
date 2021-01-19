@@ -13,6 +13,7 @@ const beginBlockHandlerFactory = require('../../../../lib/abci/handlers/beginBlo
 const ChainInfo = require('../../../../lib/chainInfo/ChainInfo');
 const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionStoreTransactionsMock');
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
+const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 
 describe('beginBlockHandlerFactory', () => {
   let protocolVersion;
@@ -37,11 +38,7 @@ describe('beginBlockHandlerFactory', () => {
 
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
-    loggerMock = {
-      debug: this.sinon.stub(),
-      info: this.sinon.stub(),
-      child: () => loggerMock,
-    };
+    loggerMock = new LoggerMock(this.sinon);
 
     updateSimplifiedMasternodeListMock = this.sinon.stub();
     waitForChainLockedHeightMock = this.sinon.stub();

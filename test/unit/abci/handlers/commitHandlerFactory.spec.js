@@ -19,6 +19,7 @@ const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/Bloc
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 const NoPreviousBlockExecutionStoreTransactionsFoundError = require('../../../../lib/abci/handlers/errors/NoPreviousBlockExecutionStoreTransactionsFoundError');
 const DataCorruptedError = require('../../../../lib/abci/handlers/errors/DataCorruptedError');
+const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 
 describe('commitHandlerFactory', () => {
   let commitHandler;
@@ -99,12 +100,7 @@ describe('commitHandlerFactory', () => {
       has: this.sinon.stub(),
     };
 
-    const loggerMock = {
-      debug: this.sinon.stub(),
-      info: this.sinon.stub(),
-      error: this.sinon.stub(),
-      child: () => loggerMock,
-    };
+    const loggerMock = new LoggerMock(this.sinon);
 
     previousBlockExecutionStoreTransactionsMock = {
       getTransaction: this.sinon.stub(),

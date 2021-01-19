@@ -5,6 +5,7 @@ const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocuments
 const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
 
 const LoggedStateRepositoryDecorator = require('../../../lib/dpp/LoggedStateRepositoryDecorator');
+const LoggerMock = require('../../../lib/test/mock/LoggerMock');
 const BlockExecutionContextMock = require('../../../lib/test/mock/BlockExecutionContextMock');
 
 describe('LoggedStateRepositoryDecorator', () => {
@@ -15,9 +16,7 @@ describe('LoggedStateRepositoryDecorator', () => {
 
   beforeEach(function beforeEach() {
     stateRepositoryMock = createStateRepositoryMock(this.sinon);
-    loggerMock = {
-      trace: this.sinon.stub(),
-    };
+    loggerMock = new LoggerMock(this.sinon);
 
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
     blockExecutionContextMock.getConsensusLogger.returns(loggerMock);

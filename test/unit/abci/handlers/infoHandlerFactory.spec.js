@@ -15,6 +15,7 @@ const ChainInfo = require('../../../../lib/chainInfo/ChainInfo');
 const RootTreeMock = require('../../../../lib/test/mock/RootTreeMock');
 
 const packageJson = require('../../../../package');
+const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 
 describe('infoHandlerFactory', () => {
   let protocolVersion;
@@ -52,10 +53,7 @@ describe('infoHandlerFactory', () => {
 
     updateSimplifiedMasternodeListMock = this.sinon.stub();
 
-    loggerMock = {
-      debug: this.sinon.stub(),
-      info: this.sinon.stub(),
-    };
+    loggerMock = new LoggerMock(this.sinon);
 
     containerMock = {
       register: this.sinon.stub(),
