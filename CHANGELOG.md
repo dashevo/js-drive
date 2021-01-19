@@ -1,3 +1,14 @@
+## [0.17.2](https://github.com/dashevo/js-drive/compare/v0.17.1...v0.17.2) (2021-01-19)
+
+
+### Bug Fixes
+
+* could not resolve 'previousBlockExecutionStoreTransactions' ([5a9dbff](https://github.com/dashevo/js-drive/commit/5a9dbffb05cfb85e6e394ed79538d979eb4a73a7))
+* ST isolation leads to non-deterministic results ([#455](https://github.com/dashevo/js-drive/issues/455))
+* handle rawChainLockMessage parsing errors ([#454](https://github.com/dashevo/js-drive/issues/454))
+
+
+
 ## [0.17.1](https://github.com/dashevo/js-drive/compare/v0.17.0...v0.17.1) (2021-01-12)
 
 
