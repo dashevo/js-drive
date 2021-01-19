@@ -83,6 +83,7 @@ describe('deliverTxHandlerFactory', () => {
     const loggerMock = {
       debug: this.sinon.stub(),
       info: this.sinon.stub(),
+      child: () => loggerMock,
     };
 
     deliverTxHandler = deliverTxHandlerFactory(

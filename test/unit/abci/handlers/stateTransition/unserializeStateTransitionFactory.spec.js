@@ -10,11 +10,13 @@ const unserializeStateTransitionFactory = require('../../../../../lib/abci/handl
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
 const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
 const InsufficientFundsError = require('../../../../../lib/abci/errors/InsufficientFundsError');
+const { expect } = require('chai');
 
 describe('unserializeStateTransitionFactory', () => {
   let unserializeStateTransition;
   let stateTransitionFixture;
   let dppMock;
+  let noopLoggerMock;
 
   beforeEach(function beforeEach() {
     stateTransitionFixture = getIdentityCreateTransitionFixture().toBuffer();
@@ -27,7 +29,12 @@ describe('unserializeStateTransitionFactory', () => {
       },
     };
 
-    unserializeStateTransition = unserializeStateTransitionFactory(dppMock);
+    noopLoggerMock = {
+      info: this.sinon.stub(),
+      debug: this.sinon.stub(),
+    };
+
+    unserializeStateTransition = unserializeStateTransitionFactory(dppMock, noopLoggerMock);
   });
 
   it('should throw InvalidArgumentAbciError if State Transition is not specified', async () => {
@@ -119,5 +126,41 @@ describe('unserializeStateTransitionFactory', () => {
     expect(result).to.deep.equal(stateTransition);
 
     expect(dppMock.stateTransition.validateFee).to.be.calledOnceWith(stateTransition);
+  });
+
+  it('should use provided logger', async function it() {
+    const loggerMock = {
+      info: this.sinon.stub(),
+      debug: this.sinon.stub(),
+    };
+
+    const balance = 1000;
+    const error = new BalanceNotEnoughError(balance);
+
+    dppMock.stateTransition.validateFee.resolves(
+      new ValidatorResult([error]),
+    );
+
+    try {
+      await unserializeStateTransition(stateTransitionFixture, { logger: loggerMock });
+
+      expect.fail('should throw an InsufficientFundsError');
+    } catch (e) {
+      expect(e).to.be.instanceOf(InsufficientFundsError);
+      expect(e.getData().balance).to.equal(balance);
+
+      expect(dppMock.stateTransition.createFromBuffer).to.be.calledOnce();
+      expect(dppMock.stateTransition.validateFee).to.be.calledOnce();
+
+      expect(noopLoggerMock.info).to.not.have.been.called();
+      expect(noopLoggerMock.debug).to.not.have.been.called();
+
+      expect(loggerMock.info).to.have.been.calledOnceWithExactly(
+        'Insufficient funds to process state transition',
+      );
+      expect(loggerMock.debug).to.have.been.calledOnceWithExactly(
+        e,
+      );
+    }
   });
 });

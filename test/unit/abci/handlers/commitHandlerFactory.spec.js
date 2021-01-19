@@ -103,6 +103,7 @@ describe('commitHandlerFactory', () => {
       debug: this.sinon.stub(),
       info: this.sinon.stub(),
       error: this.sinon.stub(),
+      child: () => loggerMock,
     };
 
     previousBlockExecutionStoreTransactionsMock = {
@@ -187,7 +188,7 @@ describe('commitHandlerFactory', () => {
     expect(blockExecutionContextMock.reset).to.be.calledOnce();
 
     expect(rootTreeMock.rebuild).to.be.calledOnce();
-    expect(rootTreeMock.getRootHash.callCount).to.equal(4);
+    expect(rootTreeMock.getRootHash.callCount).to.equal(1);
 
     expect(previousBlockExecutionStoreTransactionsRepositoryMock.store).to.be.calledOnceWithExactly(
       nextPreviousBlockExecutionStoreTransactionsMock,
@@ -255,7 +256,7 @@ describe('commitHandlerFactory', () => {
     expect(blockExecutionContextMock.reset).to.be.calledOnce();
 
     expect(rootTreeMock.rebuild).to.be.calledOnce();
-    expect(rootTreeMock.getRootHash.callCount).to.equal(4);
+    expect(rootTreeMock.getRootHash.callCount).to.equal(1);
 
     expect(previousBlockExecutionStoreTransactionsRepositoryMock.store).to.be.calledOnceWithExactly(
       nextPreviousBlockExecutionStoreTransactionsMock,

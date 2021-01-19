@@ -55,6 +55,7 @@ describe('endBlockHandlerFactory', () => {
       debug: this.sinon.stub(),
       info: this.sinon.stub(),
       trace: this.sinon.stub(),
+      child: () => loggerMock,
     };
 
     dpnsContractId = generateRandomIdentifier();

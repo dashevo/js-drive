@@ -54,6 +54,7 @@ describe('infoHandlerFactory', () => {
 
     loggerMock = {
       debug: this.sinon.stub(),
+      info: this.sinon.stub(),
     };
 
     containerMock = {
