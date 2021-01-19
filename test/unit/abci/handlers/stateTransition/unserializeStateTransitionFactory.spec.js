@@ -10,6 +10,7 @@ const unserializeStateTransitionFactory = require('../../../../../lib/abci/handl
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
 const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
 const InsufficientFundsError = require('../../../../../lib/abci/errors/InsufficientFundsError');
+const LoggerMock = require('../../../../../lib/test/mock/LoggerMock');
 
 describe('unserializeStateTransitionFactory', () => {
   let unserializeStateTransition;
@@ -28,10 +29,7 @@ describe('unserializeStateTransitionFactory', () => {
       },
     };
 
-    noopLoggerMock = {
-      info: this.sinon.stub(),
-      debug: this.sinon.stub(),
-    };
+    noopLoggerMock = new LoggerMock(this.sinon);
 
     unserializeStateTransition = unserializeStateTransitionFactory(dppMock, noopLoggerMock);
   });
