@@ -104,6 +104,9 @@ describe('infoHandlerFactory', () => {
 
     expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
       lastCoreChainLockedHeight,
+      {
+        logger: loggerMock,
+      },
     );
   });
 });
