@@ -7,6 +7,7 @@ describe('errorHandlerFactory', () => {
   let loggerMock;
 
   beforeEach(function beforeEach() {
+    this.sinon.stub(console, 'log');
     this.sinon.stub(process, 'exit');
 
     containerMock = {
@@ -31,6 +32,9 @@ describe('errorHandlerFactory', () => {
     expect(containerMock.dispose).to.be.calledOnceWithExactly();
 
     expect(process.exit).to.be.calledOnceWithExactly(1);
+
+    // eslint-disable-next-line no-console
+    expect(console.log).to.be.calledOnce();
   });
 
   it('should use consensus logger if it\'s present', async function it() {
@@ -46,5 +50,8 @@ describe('errorHandlerFactory', () => {
     expect(containerMock.dispose).to.be.calledOnceWithExactly();
 
     expect(process.exit).to.be.calledOnceWithExactly(1);
+
+    // eslint-disable-next-line no-console
+    expect(console.log).to.be.calledOnce();
   });
 });

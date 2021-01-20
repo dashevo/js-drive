@@ -3,11 +3,24 @@ require('dotenv-expand')(require('dotenv-safe').config());
 const createServer = require('@dashevo/abci');
 const { onShutdown } = require('node-graceful-shutdown');
 
+const chalk = require('chalk');
+
 const ZMQClient = require('../lib/core/ZmqClient');
 
 const createDIContainer = require('../lib/createDIContainer');
 
 const { version: driveVersion } = require('../package');
+
+const banner = '\n ____       ______      ____        __  __                 ____       ____        ______      __  __     ____      \n'
++ '/\\  _`\\    /\\  _  \\    /\\  _`\\     /\\ \\/\\ \\               /\\  _`\\    /\\  _`\\     /\\__  _\\    /\\ \\/\\ \\   /\\  _`\\    \n'
++ '\\ \\ \\/\\ \\  \\ \\ \\L\\ \\   \\ \\,\\L\\_\\   \\ \\ \\_\\ \\              \\ \\ \\/\\ \\  \\ \\ \\L\\ \\   \\/_/\\ \\/    \\ \\ \\ \\ \\  \\ \\ \\L\\_\\  \n'
++ ' \\ \\ \\ \\ \\  \\ \\  __ \\   \\/_\\__ \\    \\ \\  _  \\              \\ \\ \\ \\ \\  \\ \\ ,  /      \\ \\ \\     \\ \\ \\ \\ \\  \\ \\  _\\L  \n'
++ '  \\ \\ \\_\\ \\  \\ \\ \\/\\ \\    /\\ \\L\\ \\   \\ \\ \\ \\ \\              \\ \\ \\_\\ \\  \\ \\ \\\\ \\      \\_\\ \\__   \\ \\ \\_/ \\  \\ \\ \\L\\ \\\n'
++ '   \\ \\____/   \\ \\_\\ \\_\\   \\ `\\____\\   \\ \\_\\ \\_\\              \\ \\____/   \\ \\_\\ \\_\\    /\\_____\\   \\ `\\___/   \\ \\____/\n'
++ '    \\/___/     \\/_/\\/_/    \\/_____/    \\/_/\\/_/               \\/___/     \\/_/\\/ /    \\/_____/    `\\/__/     \\/___/\n\n\n'
+
+// eslint-disable-next-line no-console
+console.log(chalk.hex('#008de4')(banner));
 
 (async function main() {
   const container = await createDIContainer(process.env);
