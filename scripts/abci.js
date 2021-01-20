@@ -7,10 +7,15 @@ const ZMQClient = require('../lib/core/ZmqClient');
 
 const createDIContainer = require('../lib/createDIContainer');
 
+const { version: driveVersion } = require('../package');
+
 (async function main() {
   const container = await createDIContainer(process.env);
   const logger = container.resolve('logger');
   const errorHandler = container.resolve('errorHandler');
+  const protocolVersion = container.resolve('protocolVersion');
+
+  logger.info(`Starting Drive ABCI application v${driveVersion} (protocol v${protocolVersion})`);
 
   /**
    * Ensure graceful shutdown
@@ -48,9 +53,13 @@ const createDIContainer = require('../lib/createDIContainer');
   if (!isStandaloneRegtestMode) {
     const waitForCoreSync = container.resolve('waitForCoreSync');
     await waitForCoreSync((currentBlockHeight, currentHeaderNumber) => {
-      logger.info(
-        `waiting for Core to finish sync ${currentBlockHeight}/${currentHeaderNumber}...`,
-      );
+      let message = `waiting for core to finish sync ${currentBlockHeight}/${currentHeaderNumber}...`;
+
+      if (currentBlockHeight === 0 && currentHeaderNumber === 0) {
+        message = 'waiting for core to connect to peers...';
+      }
+
+      logger.info(message);
     });
   }
 
@@ -61,15 +70,15 @@ const createDIContainer = require('../lib/createDIContainer');
   const coreZMQClient = container.resolve('coreZMQClient');
 
   coreZMQClient.on(ZMQClient.events.CONNECTED, () => {
-    logger.trace('Connected to Core ZMQ socket');
+    logger.debug('Connected to core ZMQ socket');
   });
 
   coreZMQClient.on(ZMQClient.events.DISCONNECTED, () => {
-    logger.trace('Disconnected from Core ZMQ socket');
+    logger.debug('Disconnected from core ZMQ socket');
   });
 
   coreZMQClient.on(ZMQClient.events.MAX_RETRIES_REACHED, async () => {
-    const error = new Error('Can\'t connect to Core ZMQ');
+    const error = new Error('Can\'t connect to core ZMQ');
 
     await errorHandler(error);
   });
@@ -77,13 +86,13 @@ const createDIContainer = require('../lib/createDIContainer');
   try {
     await coreZMQClient.start();
   } catch (e) {
-    const error = new Error(`Can't connect to Core ZMQ socket: ${e.message}`);
+    const error = new Error(`Can't connect to core ZMQ socket: ${e.message}`);
 
     await errorHandler(error);
   }
 
   if (!isStandaloneRegtestMode) {
-    logger.info('Obtaining the latest Core ChainLock...');
+    logger.info('Obtaining the latest chain lock...');
     const waitForCoreChainLockSync = container.resolve('waitForCoreChainLockSync');
     await waitForCoreChainLockSync();
   } else {
@@ -92,7 +101,7 @@ const createDIContainer = require('../lib/createDIContainer');
     await waitForCoreChainLockSyncFallback();
   }
 
-  logger.info('Waining for initial Core ChainLocked height...');
+  logger.info('Waiting for initial core chain locked height...');
   const waitForChainLockedHeight = container.resolve('waitForChainLockedHeight');
   const initialCoreChainLockedHeight = container.resolve('initialCoreChainLockedHeight');
   await waitForChainLockedHeight(initialCoreChainLockedHeight);
@@ -110,5 +119,5 @@ const createDIContainer = require('../lib/createDIContainer');
     container.resolve('abciHost'),
   );
 
-  logger.info(`Drive ABCI is listening on port ${container.resolve('abciPort')}`);
+  logger.info(`ABCI server is waiting for connection on port ${container.resolve('abciPort')}`);
 }());
