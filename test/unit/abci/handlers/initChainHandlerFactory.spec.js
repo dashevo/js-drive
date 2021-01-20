@@ -15,13 +15,14 @@ describe('initChainHandlerFactory', () => {
   let initChainHandler;
   let updateSimplifiedMasternodeListMock;
   let initialCoreChainLockedHeight;
+  let loggerMock;
 
   beforeEach(function beforeEach() {
     initialCoreChainLockedHeight = 1;
 
     updateSimplifiedMasternodeListMock = this.sinon.stub();
 
-    const loggerMock = new LoggerMock(this.sinon);
+    loggerMock = new LoggerMock(this.sinon);
 
     initChainHandler = initChainHandlerFactory(
       updateSimplifiedMasternodeListMock,
@@ -40,7 +41,11 @@ describe('initChainHandlerFactory', () => {
 
     expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
       initialCoreChainLockedHeight,
+      {
+        logger: loggerMock,
+      },
     );
+
     expect(response).to.be.an.instanceOf(ResponseInitChain);
   });
 });
