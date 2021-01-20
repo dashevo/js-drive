@@ -1,3 +1,12 @@
+## [0.17.3](https://github.com/dashevo/js-drive/compare/v0.17.2...v0.17.3) (2021-01-20)
+
+
+### Features
+
+* better logging ([#456](https://github.com/dashevo/js-drive/issues/456))
+
+
+
 ## [0.17.2](https://github.com/dashevo/js-drive/compare/v0.17.1...v0.17.2) (2021-01-19)
 
 
