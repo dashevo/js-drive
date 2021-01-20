@@ -48,10 +48,6 @@ console.log(chalk.hex('#008de4')(banner));
 
   logger.info('Connecting to MongoDB');
 
-  if (1) {
-    throw new Error('some error happened');
-  }
-
   const waitReplicaSetInitialize = container.resolve('waitReplicaSetInitialize');
   await waitReplicaSetInitialize((retry, maxRetries) => {
     logger.info(
