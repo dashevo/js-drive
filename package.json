@@ -93,6 +93,7 @@
     "mongodb": "^3.5.5",
     "node-graceful-shutdown": "^1.1.0",
     "pino": "^6.4.0",
+    "pino-multi-stream": "^5.2.0",
     "pino-pretty": "^4.0.3",
     "rimraf": "^3.0.2",
     "setimmediate": "^1.0.5",
