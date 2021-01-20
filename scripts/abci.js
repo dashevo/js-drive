@@ -47,6 +47,7 @@ console.log(chalk.hex('#008de4')(banner));
    */
 
   logger.info('Connecting to MongoDB');
+
   const waitReplicaSetInitialize = container.resolve('waitReplicaSetInitialize');
   await waitReplicaSetInitialize((retry, maxRetries) => {
     logger.info(
