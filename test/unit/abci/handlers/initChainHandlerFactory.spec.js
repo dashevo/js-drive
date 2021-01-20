@@ -1,3 +1,5 @@
+const Long = require('long');
+
 const {
   tendermint: {
     abci: {
@@ -29,7 +31,12 @@ describe('initChainHandlerFactory', () => {
   });
 
   it('should update height, start transactions return ResponseBeginBlock', async () => {
-    const response = await initChainHandler();
+    const request = {
+      initialHeight: Long.fromInt(1),
+      chainId: 'test',
+    };
+
+    const response = await initChainHandler(request);
 
     expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
       initialCoreChainLockedHeight,
