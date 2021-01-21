@@ -43,16 +43,5 @@ describe('createDIContainer', function describeContainer() {
       expect(abciHandlers).to.have.property('commit');
       expect(abciHandlers).to.have.property('query');
     });
-
-    it('should resolve logger streams', () => {
-      container.register({
-        logPrettyFilePath: asValue('/tmp/somePath'),
-        logJsonFilePath: asValue('/tmp/someOtherPath'),
-      });
-
-      const streams = container.resolve('loggerStreams');
-
-      expect(streams.length).to.equal(3);
-    });
   });
 });
