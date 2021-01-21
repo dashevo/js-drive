@@ -1,5 +1,4 @@
 const { startMongoDb } = require('@dashevo/dp-services-ctl');
-const { asValue } = require('awilix');
 
 const createTestDIContainer = require('../../lib/test/createTestDIContainer');
 
