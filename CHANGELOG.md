@@ -1,3 +1,26 @@
+## [0.17.6](https://github.com/dashevo/js-drive/compare/v0.17.5...v0.17.6) (2021-01-26)
+
+
+### Bug Fixes
+
+* only info log level is present in log streams ([#463](https://github.com/dashevo/js-drive/issues/463))
+
+
+
+## [0.17.5](https://github.com/dashevo/js-drive/compare/v0.17.4...v0.17.5) (2021-01-21)
+
+
+### Features
+
+* different logging levels ([#461](https://github.com/dashevo/js-drive/issues/461))
+
+
+### BREAKING CHANGES
+
+* `LOGGING_LEVEL` is ignored. Use `LOG_STDOUT_LEVEL`.
+
+
+
 ## [0.17.4](https://github.com/dashevo/js-drive/compare/v0.17.3...v0.17.4) (2021-01-20)
 
 
