@@ -19,6 +19,7 @@ const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/Bloc
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 const NoPreviousBlockExecutionStoreTransactionsFoundError = require('../../../../lib/abci/handlers/errors/NoPreviousBlockExecutionStoreTransactionsFoundError');
 const DataCorruptedError = require('../../../../lib/abci/handlers/errors/DataCorruptedError');
+const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 
 describe('commitHandlerFactory', () => {
   let commitHandler;
@@ -106,11 +107,7 @@ describe('commitHandlerFactory', () => {
       has: this.sinon.stub(),
     };
 
-    const loggerMock = {
-      debug: this.sinon.stub(),
-      info: this.sinon.stub(),
-      error: this.sinon.stub(),
-    };
+    const loggerMock = new LoggerMock(this.sinon);
 
     previousBlockExecutionStoreTransactionsMock = {
       getTransaction: this.sinon.stub(),
@@ -191,10 +188,8 @@ describe('commitHandlerFactory', () => {
 
     expect(blockExecutionStoreTransactionsMock.commit).to.be.calledOnce();
 
-    expect(blockExecutionContextMock.reset).to.be.calledOnce();
-
     expect(rootTreeMock.rebuild).to.be.calledOnce();
-    expect(rootTreeMock.getRootHash).to.be.calledOnce();
+    expect(rootTreeMock.getRootHash.callCount).to.equal(1);
 
     expect(previousBlockExecutionStoreTransactionsRepositoryMock.store).to.be.calledOnceWithExactly(
       nextPreviousBlockExecutionStoreTransactionsMock,
@@ -257,10 +252,8 @@ describe('commitHandlerFactory', () => {
 
     expect(previousBlockExecutionStoreTransactionsMock.commit).to.be.calledOnce();
 
-    expect(blockExecutionContextMock.reset).to.be.calledOnce();
-
     expect(rootTreeMock.rebuild).to.be.calledOnce();
-    expect(rootTreeMock.getRootHash).to.be.calledOnce();
+    expect(rootTreeMock.getRootHash.callCount).to.equal(1);
 
     expect(previousBlockExecutionStoreTransactionsRepositoryMock.store).to.be.calledOnceWithExactly(
       nextPreviousBlockExecutionStoreTransactionsMock,
@@ -312,7 +305,6 @@ describe('commitHandlerFactory', () => {
       expect(previousBlockExecutionStoreTransactionsRepositoryMock.fetch).to.be.calledOnce();
       expect(blockExecutionStoreTransactionsMock.abort).to.be.calledOnce();
       expect(documentsDatabaseManagerMock.drop).to.be.calledOnce();
-      expect(blockExecutionContextMock.reset).to.be.calledOnce();
 
       expect(e).to.deep.equal(error);
     }

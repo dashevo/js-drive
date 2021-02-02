@@ -15,6 +15,7 @@ const ChainInfo = require('../../../../lib/chainInfo/ChainInfo');
 const RootTreeMock = require('../../../../lib/test/mock/RootTreeMock');
 
 const packageJson = require('../../../../package');
+const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 
 const CreditsDistributionPool = require('../../../../lib/creditsDistributionPool/CreditsDistributionPool');
 
@@ -59,9 +60,7 @@ describe('infoHandlerFactory', () => {
 
     updateSimplifiedMasternodeListMock = this.sinon.stub();
 
-    loggerMock = {
-      debug: this.sinon.stub(),
-    };
+    loggerMock = new LoggerMock(this.sinon);
 
     infoHandler = infoHandlerFactory(
       chainInfo,
@@ -113,6 +112,9 @@ describe('infoHandlerFactory', () => {
 
     expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
       lastCoreChainLockedHeight,
+      {
+        logger: loggerMock,
+      },
     );
 
     expect(chainInfoRepositoryMock.fetch).to.be.calledOnceWithExactly();
