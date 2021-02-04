@@ -129,7 +129,7 @@ console.log(chalk.hex('#008de4')(banner));
   });
 
   server.on('connectionError', async (e) => {
-    logger.error(e);
+    logger.error({ error: e }, 'ABCI connection error');
   });
 
   server.listen(
