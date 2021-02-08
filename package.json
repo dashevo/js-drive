@@ -31,7 +31,7 @@
     "abci": "node scripts/abci",
     "lint": "eslint .",
     "test": "npm run test:coverage",
-    "test:coverage": "nyc --check-coverage --stmts=93 --branch=85 --funcs=90 --lines=93 mocha './test/unit/**/*.spec.js' './test/integration/**/*.spec.js'",
+    "test:coverage": "nyc --check-coverage --stmts=93 --branch=85 --funcs=90 --lines=92 mocha './test/unit/**/*.spec.js' './test/integration/**/*.spec.js'",
     "test:unit": "mocha './test/unit/**/*.spec.js'",
     "test:integration": "mocha './test/integration/**/*.spec.js'",
     "check-package": "npm run check-package:name && npm run check-package:version",
@@ -65,7 +65,7 @@
     "sinon-chai": "^3.5.0"
   },
   "dependencies": {
-    "@dashevo/abci": "^0.17.0",
+    "@dashevo/abci": "~0.18.0",
     "@dashevo/dashcore-lib": "~0.19.21",
     "@dashevo/dashd-rpc": "^2.0.2",
     "@dashevo/dashd-zmq": "^1.2.0",
