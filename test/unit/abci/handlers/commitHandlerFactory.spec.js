@@ -96,6 +96,7 @@ describe('commitHandlerFactory', () => {
     containerMock = {
       register: this.sinon.stub(),
       resolve: this.sinon.stub(),
+      has: this.sinon.stub(),
     };
 
     const loggerMock = new LoggerMock(this.sinon);
@@ -149,6 +150,8 @@ describe('commitHandlerFactory', () => {
   });
 
   it('should commit db transactions, update chain info, create document dbs and return ResponseCommit', async () => {
+    containerMock.has.withArgs('previousBlockExecutionStoreTransactions').returns(false);
+
     const response = await commitHandler();
 
     expect(response).to.be.an.instanceOf(ResponseCommit);
@@ -187,10 +190,12 @@ describe('commitHandlerFactory', () => {
     );
   });
 
-  it('should commit db transactions, update chain info, create document dbs and return ResponseCommit ion height > 1', async () => {
+  it('should commit db transactions, update chain info, create document dbs and return ResponseCommit on height > 1', async () => {
     blockExecutionContextMock.getHeader.returns({
       height: 2,
     });
+
+    containerMock.has.withArgs('previousBlockExecutionStoreTransactions').returns(true);
 
     containerMock.resolve.withArgs('previousBlockExecutionStoreTransactions').returns(
       previousBlockExecutionStoreTransactionsMock,
@@ -254,9 +259,7 @@ describe('commitHandlerFactory', () => {
       height: 2,
     });
 
-    previousBlockExecutionStoreTransactionsRepositoryMock.fetch.resolves(
-      previousBlockExecutionStoreTransactionsMock,
-    );
+    containerMock.has.withArgs('previousBlockExecutionStoreTransactionsMock').returns(true);
 
     previousBlockExecutionStoreTransactionsMock.getTransaction.withArgs('dataContracts').returns(
       previousDataContractTransactionMock,
