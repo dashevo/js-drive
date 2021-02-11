@@ -1,7 +1,7 @@
 require('dotenv-expand')(require('dotenv-safe').config());
 
 const createServer = require('@dashevo/abci');
-const { onShutdown } = require('node-graceful-shutdown');
+const graceful = require('node-graceful');
 
 const chalk = require('chalk');
 
@@ -38,7 +38,11 @@ console.log(chalk.hex('#008de4')(banner));
     .on('unhandledRejection', errorHandler)
     .on('uncaughtException', errorHandler);
 
-  onShutdown('abci', async () => {
+  graceful.DEADLY_SIGNALS.push('SIGQUIT');
+
+  graceful.on('exit', async (signal) => {
+    logger.info({ signal }, `Received ${signal}. Stopping Drive ABCI application`);
+
     await container.dispose();
   });
 

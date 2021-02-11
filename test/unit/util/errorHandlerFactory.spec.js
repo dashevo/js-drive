@@ -27,7 +27,7 @@ describe('errorHandlerFactory', () => {
 
     await errorHandler(error);
 
-    expect(loggerMock.fatal).to.be.calledOnceWithExactly(error);
+    expect(loggerMock.fatal).to.be.calledOnceWithExactly({ err: error }, error.message);
 
     expect(containerMock.dispose).to.be.calledOnceWithExactly();
 
@@ -45,7 +45,7 @@ describe('errorHandlerFactory', () => {
     await errorHandler(error);
 
     expect(loggerMock.fatal).to.not.be.called();
-    expect(error.consensusLogger.fatal).to.be.calledOnceWithExactly(error);
+    expect(error.consensusLogger.fatal).to.be.calledOnceWithExactly({ err: error }, error.message);
 
     expect(containerMock.dispose).to.be.calledOnceWithExactly();
 
