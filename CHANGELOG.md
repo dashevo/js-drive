@@ -1,3 +1,19 @@
+## [0.17.8](https://github.com/dashevo/js-drive/compare/v0.17.7...v0.17.8) (2021-02-11)
+
+
+### Bug Fixes
+
+* could not resolve `previousBlockExecutionStoreTransactions` on query ([#470](https://github.com/dashevo/js-drive/issues/470))
+
+
+### Features
+
+* add `driveVersion` to every log output ([#469](https://github.com/dashevo/js-drive/issues/469))
+* await Node logger stream to be ended ([#471](https://github.com/dashevo/js-drive/issues/471))
+* distinguishing log data ([#472](https://github.com/dashevo/js-drive/issues/472))
+
+
+
 ## [0.17.7](https://github.com/dashevo/js-drive/compare/v0.17.6...v0.17.7) (2021-02-04)
 
 
