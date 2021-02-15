@@ -5,6 +5,7 @@ const graceful = require('node-graceful');
 const chalk = require('chalk');
 
 const ZMQClient = require('../lib/core/ZmqClient');
+
 const createDIContainer = require('../lib/createDIContainer');
 
 const { version: driveVersion } = require('../package');
@@ -129,8 +130,12 @@ console.log(chalk.hex('#008de4')(banner));
 
   const abciServer = container.resolve('abciServer');
 
-  abciServer.on('error', async (e) => {
+  abciServer.on('handlerError', async (e) => {
     await errorHandler(e);
+  });
+
+  abciServer.on('connectionError', async (e) => {
+    logger.error({ err: e }, 'ABCI connection error');
   });
 
   abciServer.on('close', () => {
