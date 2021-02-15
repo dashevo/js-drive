@@ -1,12 +1,10 @@
 require('dotenv-expand')(require('dotenv-safe').config());
 
-const createServer = require('@dashevo/abci');
 const graceful = require('node-graceful');
 
 const chalk = require('chalk');
 
 const ZMQClient = require('../lib/core/ZmqClient');
-
 const createDIContainer = require('../lib/createDIContainer');
 
 const { version: driveVersion } = require('../package');
@@ -126,18 +124,19 @@ console.log(chalk.hex('#008de4')(banner));
 
   await waitForChainLockedHeight(initialCoreChainLockedHeight);
 
-  const server = createServer(
-    container.resolve('abciHandlers'),
-  );
+  const abciServer = container.resolve('abciServer');
 
-  server.on('error', async (e) => {
+  abciServer.on('error', async (e) => {
     await errorHandler(e);
   });
 
-  server.listen(
+  abciServer.on('close', () => {
+    logger.info('ABCI server is closed');
+  });
+
+  abciServer.listen(
     container.resolve('abciPort'),
     container.resolve('abciHost'),
+    () => logger.info(`ABCI server is waiting for connection on port ${container.resolve('abciPort')}`),
   );
-
-  logger.info(`ABCI server is waiting for connection on port ${container.resolve('abciPort')}`);
 }());
