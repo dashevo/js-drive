@@ -1,3 +1,13 @@
+## [0.17.9](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.9) (2021-02-15)
+
+
+### Features
+
+* robust error handling ([#473](https://github.com/dashevo/js-drive/issues/473))
+* use a different handler for ABCI connection error ([#465](https://github.com/dashevo/js-drive/issues/465), [b9d452a](https://github.com/dashevo/js-drive/commit/b9d452a20bdf75699fa532eb69af7500fc985045))
+
+
+
 ## [0.17.8](https://github.com/dashevo/js-drive/compare/v0.17.7...v0.17.8) (2021-02-11)
 
 
