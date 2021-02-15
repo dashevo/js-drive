@@ -1,6 +1,5 @@
 require('dotenv-expand')(require('dotenv-safe').config());
 
-const createServer = require('@dashevo/abci');
 const graceful = require('node-graceful');
 
 const chalk = require('chalk');
@@ -27,6 +26,7 @@ console.log(chalk.hex('#008de4')(banner));
   const logger = container.resolve('logger');
   const errorHandler = container.resolve('errorHandler');
   const protocolVersion = container.resolve('protocolVersion');
+  const closeAbciServer = container.resolve('closeAbciServer');
 
   logger.info(`Starting Drive ABCI application v${driveVersion} (protocol v${protocolVersion})`);
 
@@ -42,6 +42,8 @@ console.log(chalk.hex('#008de4')(banner));
 
   graceful.on('exit', async (signal) => {
     logger.info({ signal }, `Received ${signal}. Stopping Drive ABCI application`);
+
+    await closeAbciServer();
 
     await container.dispose();
   });
@@ -126,22 +128,23 @@ console.log(chalk.hex('#008de4')(banner));
 
   await waitForChainLockedHeight(initialCoreChainLockedHeight);
 
-  const server = createServer(
-    container.resolve('abciHandlers'),
-  );
+  const abciServer = container.resolve('abciServer');
 
-  server.on('handlerError', async (e) => {
+  abciServer.on('handlerError', async (e) => {
     await errorHandler(e);
   });
 
-  server.on('connectionError', async (e) => {
-    logger.error({ error: e }, 'ABCI connection error');
+  abciServer.on('connectionError', async (e) => {
+    logger.error({ err: e }, 'ABCI connection error');
   });
 
-  server.listen(
+  abciServer.on('close', () => {
+    logger.info('ABCI server is closed');
+  });
+
+  abciServer.listen(
     container.resolve('abciPort'),
     container.resolve('abciHost'),
+    () => logger.info(`ABCI server is waiting for connection on port ${container.resolve('abciPort')}`),
   );
-
-  logger.info(`ABCI server is waiting for connection on port ${container.resolve('abciPort')}`);
 }());
