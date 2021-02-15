@@ -5,63 +5,34 @@ describe('errorHandlerFactory', () => {
   let errorHandler;
   let containerMock;
   let loggerMock;
-  let abciServerMock;
+  let closeAbciServerMock;
 
   beforeEach(function beforeEach() {
     this.sinon.stub(console, 'log');
     this.sinon.stub(console, 'error');
     this.sinon.stub(process, 'exit');
 
-    abciServerMock = {
-      close: this.sinon.spy((resolve) => {
-        resolve();
-      }),
-      listening: false,
-    };
-
     containerMock = {
-      resolve: this.sinon.stub(),
       dispose: this.sinon.stub(),
     };
 
-    containerMock.resolve.withArgs('abciServer').returns(abciServerMock);
+    closeAbciServerMock = this.sinon.stub();
 
     loggerMock = new LoggerMock(this.sinon);
 
     errorHandler = errorHandlerFactory(
       loggerMock,
       containerMock,
+      closeAbciServerMock,
     );
   });
 
-  it('should log error, dispose container and exit process on first call', async () => {
+  it('should close server, log error, dispose container and exit process on first call', async () => {
     const error = new Error('message');
 
     await errorHandler(error);
 
-    expect(containerMock.resolve).to.be.calledOnceWithExactly('abciServer');
-    expect(abciServerMock.close).to.not.be.called();
-
-    // Error face is printed
-    // eslint-disable-next-line no-console
-    expect(console.log).to.be.calledOnce();
-
-    expect(loggerMock.fatal).to.be.calledOnceWithExactly({ err: error }, error.message);
-
-    expect(containerMock.dispose).to.be.calledOnceWithExactly();
-
-    expect(process.exit).to.be.calledOnceWithExactly(1);
-  });
-
-  it('should close server if it\'s listening', async () => {
-    abciServerMock.listening = true;
-
-    const error = new Error('message');
-
-    await errorHandler(error);
-
-    expect(containerMock.resolve).to.be.calledOnceWithExactly('abciServer');
-    expect(abciServerMock.close).to.be.calledOnce();
+    expect(closeAbciServerMock).to.be.calledOnceWithExactly();
 
     // Error face is printed
     // eslint-disable-next-line no-console
@@ -101,8 +72,7 @@ describe('errorHandlerFactory', () => {
       errorHandler(error2),
     ]);
 
-    expect(containerMock.resolve).to.be.calledOnceWithExactly('abciServer');
-    expect(abciServerMock.close).to.not.be.calledOnce();
+    expect(closeAbciServerMock).to.be.calledOnceWithExactly();
 
     // Error face is printed
     // eslint-disable-next-line no-console
@@ -118,19 +88,16 @@ describe('errorHandlerFactory', () => {
     expect(process.exit).to.be.calledOnceWithExactly(1);
   });
 
-  it('should dispose container and output error in console if it was thrown during error handling', async function it() {
-    abciServerMock.listening = true;
-
+  it('should dispose container and output error in console if it was thrown during error handling', async () => {
     const closeError = new Error('close server error');
 
-    abciServerMock.close = this.sinon.stub().throws(closeError);
+    closeAbciServerMock.throws(closeError);
 
     const error = new Error('message');
 
     await errorHandler(error);
 
-    expect(containerMock.resolve).to.be.calledOnceWithExactly('abciServer');
-    expect(abciServerMock.close).to.be.calledOnce();
+    expect(closeAbciServerMock).to.be.calledOnceWithExactly();
 
     // Error face is printed
     // eslint-disable-next-line no-console
@@ -155,8 +122,7 @@ describe('errorHandlerFactory', () => {
 
     await errorHandler(error);
 
-    expect(containerMock.resolve).to.be.calledOnceWithExactly('abciServer');
-    expect(abciServerMock.close).to.not.be.called();
+    expect(closeAbciServerMock).to.be.calledOnceWithExactly();
 
     // Error face is printed
     // eslint-disable-next-line no-console

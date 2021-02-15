@@ -25,6 +25,7 @@ console.log(chalk.hex('#008de4')(banner));
   const logger = container.resolve('logger');
   const errorHandler = container.resolve('errorHandler');
   const protocolVersion = container.resolve('protocolVersion');
+  const closeAbciServer = container.resolve('closeAbciServer');
 
   logger.info(`Starting Drive ABCI application v${driveVersion} (protocol v${protocolVersion})`);
 
@@ -40,6 +41,8 @@ console.log(chalk.hex('#008de4')(banner));
 
   graceful.on('exit', async (signal) => {
     logger.info({ signal }, `Received ${signal}. Stopping Drive ABCI application`);
+
+    await closeAbciServer();
 
     await container.dispose();
   });
