@@ -16,6 +16,7 @@ describe('errorHandlerFactory', () => {
       close: this.sinon.spy((resolve) => {
         resolve();
       }),
+      listening: false,
     };
 
     containerMock = {
@@ -33,7 +34,28 @@ describe('errorHandlerFactory', () => {
     );
   });
 
-  it('should close server, log error, dispose container and exit process on first call', async () => {
+  it('should log error, dispose container and exit process on first call', async () => {
+    const error = new Error('message');
+
+    await errorHandler(error);
+
+    expect(containerMock.resolve).to.be.calledOnceWithExactly('abciServer');
+    expect(abciServerMock.close).to.not.be.called();
+
+    // Error face is printed
+    // eslint-disable-next-line no-console
+    expect(console.log).to.be.calledOnce();
+
+    expect(loggerMock.fatal).to.be.calledOnceWithExactly({ err: error }, error.message);
+
+    expect(containerMock.dispose).to.be.calledOnceWithExactly();
+
+    expect(process.exit).to.be.calledOnceWithExactly(1);
+  });
+
+  it('should close server if it\'s listening', async () => {
+    abciServerMock.listening = true;
+
     const error = new Error('message');
 
     await errorHandler(error);
@@ -80,7 +102,7 @@ describe('errorHandlerFactory', () => {
     ]);
 
     expect(containerMock.resolve).to.be.calledOnceWithExactly('abciServer');
-    expect(abciServerMock.close).to.be.calledOnce();
+    expect(abciServerMock.close).to.not.be.calledOnce();
 
     // Error face is printed
     // eslint-disable-next-line no-console
@@ -97,6 +119,8 @@ describe('errorHandlerFactory', () => {
   });
 
   it('should dispose container and output error in console if it was thrown during error handling', async function it() {
+    abciServerMock.listening = true;
+
     const closeError = new Error('close server error');
 
     abciServerMock.close = this.sinon.stub().throws(closeError);
@@ -132,7 +156,7 @@ describe('errorHandlerFactory', () => {
     await errorHandler(error);
 
     expect(containerMock.resolve).to.be.calledOnceWithExactly('abciServer');
-    expect(abciServerMock.close).to.be.calledOnce();
+    expect(abciServerMock.close).to.not.be.called();
 
     // Error face is printed
     // eslint-disable-next-line no-console
