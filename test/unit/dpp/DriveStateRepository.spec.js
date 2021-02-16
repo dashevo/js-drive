@@ -4,6 +4,7 @@ const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataCo
 const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
 
 const DriveStateRepository = require('../../../lib/dpp/DriveStateRepository');
+const { expect } = require('chai');
 
 describe('DriveStateRepository', () => {
   let stateRepository;
@@ -22,6 +23,7 @@ describe('DriveStateRepository', () => {
   let transactionMock;
   let blockExecutionContextMock;
   let simplifiedMasternodeListMock;
+  let instantLockMock;
 
   beforeEach(function beforeEach() {
     identity = getIdentityFixture();
@@ -31,6 +33,7 @@ describe('DriveStateRepository', () => {
 
     coreRpcClientMock = {
       getRawTransaction: this.sinon.stub(),
+      verifyInstantLock: this.sinon.stub(),
     };
 
     dataContractRepositoryMock = {
@@ -88,6 +91,12 @@ describe('DriveStateRepository', () => {
     );
 
     transactionMock = {};
+
+    instantLockMock = {
+      getRequestId: () => 'someRequestId',
+      txid: 'someTxId',
+      signature: 'signature',
+    };
 
     blockExecutionDBTransactionsMock.getTransaction.returns(transactionMock);
   });
@@ -316,15 +325,22 @@ describe('DriveStateRepository', () => {
     });
   });
 
-  describe('#fetchSMLStore', () => {
-    it('should fetch SML store', async () => {
-      const smlStore = {};
+  describe('#verifyInstantLock', () => {
+    it('should verify instant lock', async () => {
+      blockExecutionContextMock.getHeader.returns({
+        coreChainLockedHeight: 42,
+      });
+      coreRpcClientMock.verifyInstantLock.resolves({ result: true });
 
-      simplifiedMasternodeListMock.getStore.resolves(smlStore);
+      const result = await stateRepository.verifyInstantLock(instantLockMock);
 
-      const result = await stateRepository.fetchSMLStore();
-
-      expect(result).to.equal(smlStore);
+      expect(result).to.equal(true);
+      expect(coreRpcClientMock.verifyInstantLock).to.have.been.calledOnceWithExactly(
+        'someRequestId',
+        'someTxId',
+        'signature',
+        42,
+      );
     });
   });
 });
