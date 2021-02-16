@@ -1,3 +1,12 @@
+## [0.17.10](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.10) (2021-02-16)
+
+
+### Bug Fixes
+
+* abci connection error writes to closed stream ([41a891a](https://github.com/dashevo/js-drive/commit/41a891a922bf2f924c543410dd6d19b3a3ba03d0))
+
+
+
 ## [0.17.9](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.9) (2021-02-15)
 
 
