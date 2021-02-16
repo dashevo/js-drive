@@ -4,7 +4,6 @@ const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataCo
 const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
 
 const DriveStateRepository = require('../../../lib/dpp/DriveStateRepository');
-const { expect } = require('chai');
 
 describe('DriveStateRepository', () => {
   let stateRepository;
