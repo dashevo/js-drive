@@ -32,7 +32,7 @@ describe('DriveStateRepository', () => {
 
     coreRpcClientMock = {
       getRawTransaction: this.sinon.stub(),
-      verifyInstantLock: this.sinon.stub(),
+      verifyIsLock: this.sinon.stub(),
     };
 
     dataContractRepositoryMock = {
@@ -329,12 +329,54 @@ describe('DriveStateRepository', () => {
       blockExecutionContextMock.getHeader.returns({
         coreChainLockedHeight: 42,
       });
-      coreRpcClientMock.verifyInstantLock.resolves({ result: true });
+      coreRpcClientMock.verifyIsLock.resolves({ result: true });
 
       const result = await stateRepository.verifyInstantLock(instantLockMock);
 
       expect(result).to.equal(true);
-      expect(coreRpcClientMock.verifyInstantLock).to.have.been.calledOnceWithExactly(
+      expect(coreRpcClientMock.verifyIsLock).to.have.been.calledOnceWithExactly(
+        'someRequestId',
+        'someTxId',
+        'signature',
+        42,
+      );
+    });
+
+    it('should return false if core throws Invalid address or key error', async () => {
+      blockExecutionContextMock.getHeader.returns({
+        coreChainLockedHeight: 42,
+      });
+
+      const error = new Error('Some error');
+      error.code = -5;
+
+      coreRpcClientMock.verifyIsLock.throws(error);
+
+      const result = await stateRepository.verifyInstantLock(instantLockMock);
+
+      expect(result).to.equal(false);
+      expect(coreRpcClientMock.verifyIsLock).to.have.been.calledOnceWithExactly(
+        'someRequestId',
+        'someTxId',
+        'signature',
+        42,
+      );
+    });
+
+    it('should return false if core throws Invalid parameter', async () => {
+      blockExecutionContextMock.getHeader.returns({
+        coreChainLockedHeight: 42,
+      });
+
+      const error = new Error('Some error');
+      error.code = -8;
+
+      coreRpcClientMock.verifyIsLock.throws(error);
+
+      const result = await stateRepository.verifyInstantLock(instantLockMock);
+
+      expect(result).to.equal(false);
+      expect(coreRpcClientMock.verifyIsLock).to.have.been.calledOnceWithExactly(
         'someRequestId',
         'someTxId',
         'signature',
