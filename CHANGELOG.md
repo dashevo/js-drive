@@ -1,3 +1,12 @@
+## [0.17.12](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.12) (2021-02-16)
+
+
+### Features
+
+* better handle abci connection errors ([f4348e9](https://github.com/dashevo/js-drive/commit/f4348e944825dc9b554eec8dcf7752e972081b2a))
+
+
+
 ## [0.17.11](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.11) (2021-02-16)
 
 
