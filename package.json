@@ -67,7 +67,7 @@
   "dependencies": {
     "@dashevo/abci": "^0.17.0",
     "@dashevo/dashcore-lib": "~0.19.19",
-    "@dashevo/dashd-rpc": "^2.0.2",
+    "@dashevo/dashd-rpc": "^2.1.0",
     "@dashevo/dashd-zmq": "^1.2.0",
     "@dashevo/dpp": "~0.19.0-dev.1",
     "@dashevo/merk": "github:dashevo/node-merk",
