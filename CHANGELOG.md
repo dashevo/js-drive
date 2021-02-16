@@ -1,3 +1,12 @@
+## [0.17.11](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.11) (2021-02-16)
+
+
+### Bug Fixes
+
+* stack overflow due to write on write error ([cb3e0ac](https://github.com/dashevo/js-drive/commit/cb3e0ac4212d95372c2b402496125afdf5e69cea))
+
+
+
 ## [0.17.10](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.10) (2021-02-16)
 
 
