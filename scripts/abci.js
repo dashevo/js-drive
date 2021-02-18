@@ -130,21 +130,53 @@ console.log(chalk.hex('#008de4')(banner));
 
   const abciServer = container.resolve('abciServer');
 
-  abciServer.on('handlerError', async (e) => {
+  abciServer.on('connection', (socket) => {
+    logger.debug(
+      {
+        abciConnectionId: socket.connection.id,
+      },
+      `Accepted new ABCI connection #${socket.connection.id} from ${socket.remoteAddress}:${socket.remotePort}`,
+    );
+
+    socket.on('error', (e) => {
+      logger.error(
+        {
+          err: e,
+          abciConnectionId: socket.connection.id,
+        },
+        `ABCI connection #${socket.connection.id} error`,
+      );
+    });
+
+    socket.once('close', (hasError) => {
+      let message = `ABCI connection #${socket.connection.id} is closed`;
+      if (hasError) {
+        message += ' with error';
+      }
+
+      logger.debug(
+        {
+          abciConnectionId: socket.connection.id,
+        },
+        message,
+      );
+    });
+  });
+
+  abciServer.once('close', () => {
+    logger.info('ABCI server is closed');
+  });
+
+  abciServer.on('error', async (e) => {
     await errorHandler(e);
   });
 
-  abciServer.on('connectionError', async (e) => {
-    logger.error({ err: e }, 'ABCI connection error');
-  });
-
-  abciServer.on('close', () => {
-    logger.info('ABCI server is closed');
+  abciServer.on('listening', () => {
+    logger.info(`ABCI server is waiting for connection on port ${container.resolve('abciPort')}`);
   });
 
   abciServer.listen(
     container.resolve('abciPort'),
     container.resolve('abciHost'),
-    () => logger.info(`ABCI server is waiting for connection on port ${container.resolve('abciPort')}`),
   );
 }());
