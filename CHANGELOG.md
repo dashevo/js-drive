@@ -1,3 +1,30 @@
+## [0.17.13](https://github.com/dashevo/js-drive/compare/v0.17.12...v0.17.13) (2021-02-19)
+
+
+### Features
+
+* reimplemented ABCI server for better reliability ([#475](https://github.com/dashevo/js-drive/issues/475))
+
+
+
+## [0.17.12](https://github.com/dashevo/js-drive/compare/v0.17.11...v0.17.12) (2021-02-16)
+
+
+### Features
+
+* better handle abci connection errors ([f4348e9](https://github.com/dashevo/js-drive/commit/f4348e944825dc9b554eec8dcf7752e972081b2a))
+
+
+
+## [0.17.11](https://github.com/dashevo/js-drive/compare/v0.17.10...v0.17.11) (2021-02-16)
+
+
+### Bug Fixes
+
+* stack overflow due to write on write error ([cb3e0ac](https://github.com/dashevo/js-drive/commit/cb3e0ac4212d95372c2b402496125afdf5e69cea))
+
+
+
 ## [0.17.12](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.12) (2021-02-16)
 
 
