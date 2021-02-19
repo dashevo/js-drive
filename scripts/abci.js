@@ -41,7 +41,7 @@ console.log(chalk.hex('#008de4')(banner));
   graceful.DEADLY_SIGNALS.push('SIGQUIT');
 
   graceful.on('exit', async (signal) => {
-    logger.info({ signal }, `Received ${signal}. Stopping Drive ABCI application`);
+    logger.info({ signal }, `Received ${signal}. Stopping Drive ABCI application...`);
 
     await closeAbciServer();
 
@@ -52,7 +52,7 @@ console.log(chalk.hex('#008de4')(banner));
    * Make sure MongoDB is running
    */
 
-  logger.info('Connecting to MongoDB');
+  logger.info('Connecting to MongoDB...');
 
   const waitReplicaSetInitialize = container.resolve('waitReplicaSetInitialize');
   await waitReplicaSetInitialize((retry, maxRetries) => {
@@ -61,7 +61,7 @@ console.log(chalk.hex('#008de4')(banner));
     );
   });
 
-  logger.info('Connecting to Core');
+  logger.info('Connecting to Core...');
 
   const detectStandaloneRegtestMode = container.resolve('detectStandaloneRegtestMode');
   const isStandaloneRegtestMode = await detectStandaloneRegtestMode();
@@ -164,7 +164,7 @@ console.log(chalk.hex('#008de4')(banner));
   });
 
   abciServer.once('close', () => {
-    logger.info('ABCI server is closed');
+    logger.info('ABCI server and all connections are closed');
   });
 
   abciServer.on('error', async (e) => {
