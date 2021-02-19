@@ -41,7 +41,7 @@ console.log(chalk.hex('#008de4')(banner));
   graceful.DEADLY_SIGNALS.push('SIGQUIT');
 
   graceful.on('exit', async (signal) => {
-    logger.info({ signal }, `Received ${signal}. Stopping Drive ABCI application`);
+    logger.info({ signal }, `Received ${signal}. Stopping Drive ABCI application...`);
 
     await closeAbciServer();
 
@@ -52,7 +52,7 @@ console.log(chalk.hex('#008de4')(banner));
    * Make sure MongoDB is running
    */
 
-  logger.info('Connecting to MongoDB');
+  logger.info('Connecting to MongoDB...');
 
   const waitReplicaSetInitialize = container.resolve('waitReplicaSetInitialize');
   await waitReplicaSetInitialize((retry, maxRetries) => {
@@ -61,7 +61,7 @@ console.log(chalk.hex('#008de4')(banner));
     );
   });
 
-  logger.info('Connecting to Core');
+  logger.info('Connecting to Core...');
 
   const detectStandaloneRegtestMode = container.resolve('detectStandaloneRegtestMode');
   const isStandaloneRegtestMode = await detectStandaloneRegtestMode();
@@ -130,21 +130,53 @@ console.log(chalk.hex('#008de4')(banner));
 
   const abciServer = container.resolve('abciServer');
 
-  abciServer.on('handlerError', async (e) => {
+  abciServer.on('connection', (socket) => {
+    logger.debug(
+      {
+        abciConnectionId: socket.connection.id,
+      },
+      `Accepted new ABCI connection #${socket.connection.id} from ${socket.remoteAddress}:${socket.remotePort}`,
+    );
+
+    socket.on('error', (e) => {
+      logger.error(
+        {
+          err: e,
+          abciConnectionId: socket.connection.id,
+        },
+        `ABCI connection #${socket.connection.id} error`,
+      );
+    });
+
+    socket.once('close', (hasError) => {
+      let message = `ABCI connection #${socket.connection.id} is closed`;
+      if (hasError) {
+        message += ' with error';
+      }
+
+      logger.debug(
+        {
+          abciConnectionId: socket.connection.id,
+        },
+        message,
+      );
+    });
+  });
+
+  abciServer.once('close', () => {
+    logger.info('ABCI server and all connections are closed');
+  });
+
+  abciServer.on('error', async (e) => {
     await errorHandler(e);
   });
 
-  abciServer.on('connectionError', async (e) => {
-    logger.error({ err: e }, 'ABCI connection error');
-  });
-
-  abciServer.on('close', () => {
-    logger.info('ABCI server is closed');
+  abciServer.on('listening', () => {
+    logger.info(`ABCI server is waiting for connection on port ${container.resolve('abciPort')}`);
   });
 
   abciServer.listen(
     container.resolve('abciPort'),
     container.resolve('abciHost'),
-    () => logger.info(`ABCI server is waiting for connection on port ${container.resolve('abciPort')}`),
   );
 }());
