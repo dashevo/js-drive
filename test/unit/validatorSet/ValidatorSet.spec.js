@@ -67,9 +67,9 @@ describe('ValidatorSet', () => {
     expect(validatorSet.sml).to.be.equal(smlMock);
     expect(validatorSet).to.be.an.instanceOf(ValidatorSet);
   });
-  it('getHashForCoreHeight', async () => {
+  it('getHash', async () => {
     const validatorSet = new ValidatorSet(smlMock);
-    const validatorSetHash = await validatorSet.getHashForCoreHeight(rotationEntropyBuffer, coreBlockHeight);
+    const validatorSetHash = await validatorSet.getHash(rotationEntropyBuffer);
     expect(validatorSetHash).to.be.a('string');
     expect(validatorSetHash).to.be.equal('0000008d3d35c02fab8cc631d85d968c1e09cff14c78d517821851956805b7ad');
   });
