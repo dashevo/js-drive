@@ -1,3 +1,234 @@
+## [0.17.14](https://github.com/dashevo/js-drive/compare/v0.17.13...v0.17.14) (2021-02-20)
+
+
+### Bug Fixes
+
+* catching ABCI request varint decode error ([f55fac7](https://github.com/dashevo/js-drive/commit/f55fac7aced9334cf26e930cfaf23258cec66a9d))
+
+
+
+## [0.17.13](https://github.com/dashevo/js-drive/compare/v0.17.12...v0.17.13) (2021-02-19)
+
+
+### Features
+
+* reimplemented ABCI server for better reliability ([#475](https://github.com/dashevo/js-drive/issues/475)) ([4dc087b](https://github.com/dashevo/js-drive/commit/4dc087bcbda18b89116df2cc370d394c3ae13780))
+
+
+
+## [0.17.12](https://github.com/dashevo/js-drive/compare/v0.17.11...v0.17.12) (2021-02-16)
+
+
+### Features
+
+* better handle abci connection errors ([f4348e9](https://github.com/dashevo/js-drive/commit/f4348e944825dc9b554eec8dcf7752e972081b2a))
+
+
+
+## [0.17.13](https://github.com/dashevo/js-drive/compare/v0.17.12...v0.17.13) (2021-02-19)
+
+
+### Features
+
+* reimplemented ABCI server for better reliability ([#475](https://github.com/dashevo/js-drive/issues/475))
+
+
+
+## [0.17.12](https://github.com/dashevo/js-drive/compare/v0.17.11...v0.17.12) (2021-02-16)
+
+
+### Features
+
+* better handle abci connection errors ([f4348e9](https://github.com/dashevo/js-drive/commit/f4348e944825dc9b554eec8dcf7752e972081b2a))
+
+
+
+## [0.17.11](https://github.com/dashevo/js-drive/compare/v0.17.10...v0.17.11) (2021-02-16)
+
+
+### Bug Fixes
+
+* stack overflow due to write on write error ([cb3e0ac](https://github.com/dashevo/js-drive/commit/cb3e0ac4212d95372c2b402496125afdf5e69cea))
+
+
+
+## [0.17.12](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.12) (2021-02-16)
+
+
+### Features
+
+* better handle abci connection errors ([f4348e9](https://github.com/dashevo/js-drive/commit/f4348e944825dc9b554eec8dcf7752e972081b2a))
+
+
+
+## [0.17.11](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.11) (2021-02-16)
+
+
+### Bug Fixes
+
+* stack overflow due to write on write error ([cb3e0ac](https://github.com/dashevo/js-drive/commit/cb3e0ac4212d95372c2b402496125afdf5e69cea))
+
+
+
+## [0.17.10](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.10) (2021-02-16)
+
+
+### Bug Fixes
+
+* abci connection error writes to closed stream ([41a891a](https://github.com/dashevo/js-drive/commit/41a891a922bf2f924c543410dd6d19b3a3ba03d0))
+
+
+
+## [0.17.9](https://github.com/dashevo/js-drive/compare/v0.17.8...v0.17.9) (2021-02-15)
+
+
+### Features
+
+* robust error handling ([#473](https://github.com/dashevo/js-drive/issues/473))
+* use a different handler for ABCI connection error ([#465](https://github.com/dashevo/js-drive/issues/465), [b9d452a](https://github.com/dashevo/js-drive/commit/b9d452a20bdf75699fa532eb69af7500fc985045))
+
+
+
+## [0.17.8](https://github.com/dashevo/js-drive/compare/v0.17.7...v0.17.8) (2021-02-11)
+
+
+### Bug Fixes
+
+* could not resolve `previousBlockExecutionStoreTransactions` on query ([#470](https://github.com/dashevo/js-drive/issues/470))
+
+
+### Features
+
+* add `driveVersion` to every log output ([#469](https://github.com/dashevo/js-drive/issues/469))
+* await Node logger stream to be ended ([#471](https://github.com/dashevo/js-drive/issues/471))
+* distinguishing log data ([#472](https://github.com/dashevo/js-drive/issues/472))
+
+
+
+## [0.17.7](https://github.com/dashevo/js-drive/compare/v0.17.6...v0.17.7) (2021-02-04)
+
+
+### Features
+
+* disable state repository and merk logging by default ([#467](https://github.com/dashevo/js-drive/issues/467))
+
+
+
+## [0.17.6](https://github.com/dashevo/js-drive/compare/v0.17.5...v0.17.6) (2021-01-26)
+
+
+### Bug Fixes
+
+* only info log level is present in log streams ([#463](https://github.com/dashevo/js-drive/issues/463))
+
+
+
+## [0.17.5](https://github.com/dashevo/js-drive/compare/v0.17.4...v0.17.5) (2021-01-21)
+
+
+### Features
+
+* different logging levels ([#461](https://github.com/dashevo/js-drive/issues/461))
+
+
+### BREAKING CHANGES
+
+* `LOGGING_LEVEL` is ignored. Use `LOG_STDOUT_LEVEL`.
+
+
+
+## [0.17.4](https://github.com/dashevo/js-drive/compare/v0.17.3...v0.17.4) (2021-01-20)
+
+
+### Bug Fixes
+
+* logger with context is not used in some cases ([#458](https://github.com/dashevo/js-drive/issues/458))
+* tx counters and logger were not reset ([#460](https://github.com/dashevo/js-drive/issues/460))
+
+
+### Features
+
+* log to human-readable and json files ([#459](https://github.com/dashevo/js-drive/issues/459))
+
+
+
+## [0.17.3](https://github.com/dashevo/js-drive/compare/v0.17.2...v0.17.3) (2021-01-20)
+
+
+### Features
+
+* better logging ([#456](https://github.com/dashevo/js-drive/issues/456))
+
+
+
+## [0.17.2](https://github.com/dashevo/js-drive/compare/v0.17.1...v0.17.2) (2021-01-19)
+
+
+### Bug Fixes
+
+* could not resolve 'previousBlockExecutionStoreTransactions' ([5a9dbff](https://github.com/dashevo/js-drive/commit/5a9dbffb05cfb85e6e394ed79538d979eb4a73a7))
+* ST isolation leads to non-deterministic results ([#455](https://github.com/dashevo/js-drive/issues/455))
+* handle rawChainLockMessage parsing errors ([#454](https://github.com/dashevo/js-drive/issues/454))
+
+
+
+## [0.17.1](https://github.com/dashevo/js-drive/compare/v0.17.0...v0.17.1) (2021-01-12)
+
+
+### Bug Fixes
+
+* duplicate MongoDB index name ([#453](https://github.com/dashevo/js-drive/issues/453))
+
+
+
+# [0.17.0](https://github.com/dashevo/js-drive/compare/v0.16.1...v0.17.0) (2020-12-30)
+
+
+### Features
+
+* introduce `DriveStateRepository#fetchSMLStore` ([#444](https://github.com/dashevo/js-drive/issues/444), [#445](https://github.com/dashevo/js-drive/issues/445))
+* update `dashcore-lib` ([#411](https://github.com/dashevo/js-drive/issues/411), [#442](https://github.com/dashevo/js-drive/issues/442), [#443](https://github.com/dashevo/js-drive/issues/443))
+* add old zmq client from DAPI ([#439](https://github.com/dashevo/js-drive/issues/439))
+* dashpay contract support ([#441](https://github.com/dashevo/js-drive/issues/441))
+* change merk to @dashevo/merk
+* gracefull shutdown on SIGINT, SIGTERM, SIGQUIT and unhandled errors ([#427](https://github.com/dashevo/js-drive/issues/427))
+* handle core chain locked height ([#428](https://github.com/dashevo/js-drive/issues/428))
+* implement verify chainlock query handler ([#402](https://github.com/dashevo/js-drive/issues/402))
+* intermediate merk tree for the current block ([#429](https://github.com/dashevo/js-drive/issues/429))
+* pass latestCoreChainLock on block end ([#434](https://github.com/dashevo/js-drive/issues/434))
+* provide proofs for getIdentitiesByPublicKeyHashes endpoint ([#422](https://github.com/dashevo/js-drive/issues/422))
+* provide proofs for getIdentitiyIdsByPublicKeyHashes endpoint ([#419](https://github.com/dashevo/js-drive/issues/419))
+* provide proofs in ABCI query and DAPI getIdentity ([#415](https://github.com/dashevo/js-drive/issues/415))
+* set IDENTITY_SKIP_ASSET_LOCK_CONFIRMATION_VALIDATION to false ([#437](https://github.com/dashevo/js-drive/issues/437))
+* sort keys for MerkDB ([#413](https://github.com/dashevo/js-drive/issues/413))
+* store ChainInfo in MerkDb ([#404](https://github.com/dashevo/js-drive/issues/404))
+* store Data Contracts in merk tree ([#405](https://github.com/dashevo/js-drive/issues/405))
+* store documents in MerkDb ([#410](https://github.com/dashevo/js-drive/issues/410))
+* store height in externalStorage instead of merkDB ([#433](https://github.com/dashevo/js-drive/issues/433))
+* store identities in merk tree ([#400](https://github.com/dashevo/js-drive/issues/400))
+* store Public Key to Identity ID in MerkDb ([#409](https://github.com/dashevo/js-drive/issues/409))
+* update `dpp` to include asset lock verification logic ([#432](https://github.com/dashevo/js-drive/issues/432))
+* introduce merkle forest ([#401](https://github.com/dashevo/js-drive/issues/401))
+* move block execution context out of blockchain state ([#403](https://github.com/dashevo/js-drive/issues/403))
+* add abstraction for MerkDb ([#407](https://github.com/dashevo/js-drive/issues/407))
+
+
+### Bug Fixes
+
+* hash was used as a Buffer where it should be hex string ([#440](https://github.com/dashevo/js-drive/issues/440))
+* documents DB transaction is already started error ([#417](https://github.com/dashevo/js-drive/issues/417))
+* e.getErrors is not a function error ([#418](https://github.com/dashevo/js-drive/issues/418))
+* missing nested indexed fields and transaction ([#426](https://github.com/dashevo/js-drive/issues/426))
+
+
+### BREAKING CHANGES
+
+* AppHash is not equal to nils anymore.
+* data created with 0.16 and lower versions of Drive is not compatible anymore
+* ABCI query responses are changed
+
+
+
 ## [0.16.1](https://github.com/dashevo/js-drive/compare/v0.16.0...v0.16.1) (2020-10-29)
 
 

@@ -23,6 +23,7 @@ const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecut
 
 const NoDPNSContractFoundError = require('../../../../lib/abci/handlers/errors/NoDPNSContractFoundError');
 const NoDashpayContractFoundError = require('../../../../lib/abci/handlers/errors/NoDashpayContractFoundError');
+const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 
 const ValidatorSet = require('../../../../lib/validatorSet/ValidatorSet');
 
