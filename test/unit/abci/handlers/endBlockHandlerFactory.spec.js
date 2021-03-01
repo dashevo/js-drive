@@ -3,6 +3,7 @@ const {
     abci: {
       ResponseEndBlock,
       ValidatorSetUpdate,
+      QuorumHashUpdate,
     },
     crypto: {
       PublicKey,
@@ -413,7 +414,8 @@ describe('endBlockHandlerFactory', () => {
       validatorUpdates: validatorsUpdateFixture,
       thresholdPublicKey: new PublicKey({
         bls12381: Uint8Array.from(Buffer.from(quorumListFixture[0].quorumPublicKey, 'hex')),
-      })
+      }),
+      quorumHash: new QuorumHashUpdate({ quorumHash: quorumListFixture[0].quorumHash }),
     });
 
     expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
