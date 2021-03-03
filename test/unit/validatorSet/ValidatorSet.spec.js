@@ -60,6 +60,11 @@ describe('ValidatorSet', () => {
         valid: true,
         pubKeyShare: '86d0992f5c73b8f57101c34a0c4ebb17d962bb935a738c1ef1e2bb1c25034d8e4a0a2cc96e0ebc69a7bf3b8b67b2de5f',
       },
+      {
+        proTxHash: 'a3e1edc6bd352eeaf0ae58e30781ef4b127854241a3fe7fddf36d5b7e1dc2b3f',
+        pubKeyOperator: '04d748ba0efeb7a8f8548e0c22b4c188c293a19837a1c5440649279ba73ead0c62ac1e840050a10a35e0ae05659d2a8d',
+        valid: false,
+      },
     ];
   });
 
@@ -80,13 +85,17 @@ describe('ValidatorSet', () => {
   });
   it('should fill validator updates', () => {
     const validatorUpdates = ValidatorSet.fillValidatorUpdates(quorumInfoFixture);
+    const pubKeyNullFilledString = '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
+    const pubKeyNullFilled = Uint8Array.from(Buffer.from(pubKeyNullFilledString, 'hex'));
     expect(validatorUpdates).to.be.an('array');
-    expect(validatorUpdates).to.not.have.property('pubKey');
+    expect(validatorUpdates[0]).to.have.property('pubKey');
+    expect(validatorUpdates[0].pubKey.bls12381).to.be.deep.equal(pubKeyNullFilled);
     expect(validatorUpdates[0]).to.be.an.instanceOf(ValidatorUpdate);
   });
   it('should fill validator updates if this node is a validator quorum member', () => {
     const validatorUpdates = ValidatorSet.fillValidatorUpdates(quorumInfoMemberFixture);
     expect(validatorUpdates).to.be.an('array');
+    expect(validatorUpdates.length).to.be.equal(2);
     expect(validatorUpdates[0]).to.have.property('pubKey');
     expect(validatorUpdates[0]).to.be.an.instanceOf(ValidatorUpdate);
   });
