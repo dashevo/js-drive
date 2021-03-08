@@ -92,7 +92,7 @@ describe('ValidatorSet', () => {
     expect(validatorUpdates[0].pubKey.bls12381).to.be.deep.equal(pubKeyNullFilled);
     expect(validatorUpdates[0]).to.be.an.instanceOf(ValidatorUpdate);
   });
-  it('should fill validator updates if this node is a validator quorum member', () => {
+  it('should fill validator updates if this node is a member of one of the active validator quorums', () => {
     const validatorUpdates = ValidatorSet.fillValidatorUpdates(quorumInfoMemberFixture);
     expect(validatorUpdates).to.be.an('array');
     expect(validatorUpdates.length).to.be.equal(2);
