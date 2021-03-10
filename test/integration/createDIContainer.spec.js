@@ -17,8 +17,8 @@ describe('createDIContainer', function describeContainer() {
     await mongoDB.remove();
   });
 
-  beforeEach(async () => {
-    container = await createTestDIContainer(mongoDB);
+  beforeEach(() => {
+    container = createTestDIContainer(mongoDB);
   });
 
   afterEach(async () => {
