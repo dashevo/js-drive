@@ -13,8 +13,6 @@ RUN apk update && \
 RUN npm install -g node-gyp-cache@0.2.1 && \
     npm config set node_gyp node-gyp-cache
 
-ENV npm_config_zmq_external=true
-
 # Copy node gyp cache
 COPY docker/cache/.cache /root/.cache
 
@@ -22,6 +20,8 @@ COPY docker/cache/.cache /root/.cache
 COPY docker/cache/.npm /root/.npm
 
 # Install npm modules
+ENV npm_config_zmq_external=true
+
 COPY package.json package-lock.json /
 
 RUN npm ci --production
@@ -33,8 +33,6 @@ ENV NODE_ENV ${NODE_ENV}
 
 LABEL maintainer="Dash Developers <dev@dash.org>"
 LABEL description="Drive Node.JS"
-
-RUN apk update && apk add --no-cache zeromq-dev
 
 # Copy NPM modules
 COPY --from=node_modules /node_modules/ /node_modules
