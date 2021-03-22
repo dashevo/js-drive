@@ -8,7 +8,7 @@ const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocuments
 const createTestDIContainer = require('../../../lib/test/createTestDIContainer');
 
 describe('PreviousBlockExecutionStoreTransactionsRepository', function main() {
-  this.timeout(60000);
+  this.timeout(70000);
 
   let container;
   let mongoDB;
