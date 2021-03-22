@@ -15,7 +15,7 @@ const createTestDIContainer = require('../../../../lib/test/createTestDIContaine
 const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
 
 describe('queryHandlerFactory', function main() {
-  this.timeout(50000);
+  this.timeout(60000);
 
   let container;
   let mongoDB;
