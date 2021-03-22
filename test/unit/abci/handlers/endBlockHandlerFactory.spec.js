@@ -401,7 +401,7 @@ describe('endBlockHandlerFactory', () => {
     expect(response.validatorSetUpdate.thresholdPublicKey).to.be.an.instanceOf(PublicKey);
   });
 
-  it('should rotate validator set and return ValidatorSetUpdate and nextCoreChainLockUpdate', async () => {
+  it('should rotate validator set and return both ValidatorSetUpdate and nextCoreChainLockUpdate', async () => {
     chainLockMock.height = 3;
     requestMock = {
       height: 15,
