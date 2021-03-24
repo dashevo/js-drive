@@ -3,9 +3,6 @@ name: tests
 on:
   workflow_dispatch:
   push:
-    branches:
-      - master
-      - v[0-9]+.[0-9]+-dev
     tags:
       - v[0-9]+.[0-9]+.[0-9]+
   pull_request:
@@ -64,24 +61,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-#      - uses: docker/setup-buildx-action@v1
-#        id: buildx
-#        with:
-#          install: true
-
       - name: Cache Docker layers
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
         with:
           concurrency: 8
 
-      - uses: strophy/gh-action-runtime-vars@v0.1.20
+      - uses: dashevo/gh-action-runtime-vars@master
         if: ${{ contains(github.event.pull_request.body, '/set-var')}}
+
+      - name: Get current branch name
+        id: tag_name
+        run: |
+          if [ -z $GITHUB_HEAD_REF ]; then
+            echo ::set-output name=name::${GITHUB_REF#refs/tags/}
+          else
+            echo ::set-output name=name::$GITHUB_HEAD_REF
+          fi
 
       - uses: dashevo/gh-action-start-local-network@master
         id: local_node
         with:
-          drive-branch: $GITHUB_HEAD_REF
+          drive-branch: ${{ steps.branch_name.outputs.name }}
           dapi-branch: ${{ env.dapi-branch }}
           dashmate-branch: ${{ env.dashmate-branch }}
           install-sdk-version: ${{ env.install-sdk-version }}
