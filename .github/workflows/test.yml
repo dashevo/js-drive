@@ -84,7 +84,7 @@ jobs:
           drive-branch: $GITHUB_HEAD_REF
           dapi-branch: ${{ env.dapi-branch }}
           dashmate-branch: ${{ env.dashmate-branch }}
-          install-sdk-version: ${{ env.install-sdk-version }}
+#          install-sdk-version: ${{ env.install-sdk-version }}
 
       - uses: dashevo/gh-action-run-platform-test-suite@v0.1.1
         id: test_suite
