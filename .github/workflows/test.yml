@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: '12'
 
-      - name: Cache NPM dependencies
+      - name: Enable NPM cache
         uses: actions/cache@v2
         with:
           path: '~/.npm'
@@ -31,11 +31,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - run: npm run check-package # TODO: does this exist as an action already?
-      - run: npm ci
-      - run: npm run lint
-      - run: cp .env.example .env
-      - run: npm run test:coverage
+      - name: Check NPM package lock version is updated
+        run: npm run check-package # TODO: does this exist as an action already?
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Run ESlinter
+        run: npm run lint
+
+      - name: Create dotenv file
+        run: cp .env.example .env
+
+      - name: Run tests
+        run: npm run test:coverage
 
   test_suite:
     name: Run platform test suite
@@ -47,7 +56,7 @@ jobs:
         with:
           node-version: '12'
 
-      - name: Cache NPM dependencies
+      - name: Enable NPM cache
         uses: actions/cache@v2
         with:
           path: '~/.npm'
