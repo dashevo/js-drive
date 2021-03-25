@@ -71,6 +71,7 @@ jobs:
         if: ${{ contains(github.event.pull_request.body, '/set-var')}}
 
       - name: Get current branch name
+        uses: actions/cache@v2
         id: branch_name
         run: |
           if [ -z "$GITHUB_HEAD_REF" ]; then
