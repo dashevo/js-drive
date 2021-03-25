@@ -28,6 +28,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      - uses: shuplenkov/action-docker-layer-caching@master
+        id: test
+
       - name: Check NPM package lock version is updated
         run: npm run check-package # TODO: does this exist as an action already?
 
@@ -78,9 +81,6 @@ jobs:
           else
             echo "::set-output name=name::${GITHUB_HEAD_REF}"
           fi
-
-      - uses: shuplenkov/action-docker-layer-caching@master
-        id: test
 
       - uses: dashevo/gh-action-start-local-network@master
         id: local_node
