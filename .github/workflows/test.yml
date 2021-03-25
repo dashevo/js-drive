@@ -80,6 +80,7 @@ jobs:
           fi
 
       - uses: shuplenkov/action-docker-layer-caching@master
+        id: test
 
       - uses: dashevo/gh-action-start-local-network@master
         id: local_node
