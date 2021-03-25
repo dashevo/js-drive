@@ -78,8 +78,6 @@ jobs:
           else
             echo "::set-output name=name::${GITHUB_HEAD_REF}"
           fi
-          echo "AAA"
-          echo ${{ steps.branch_name.outputs.name }}
       - uses: dashevo/gh-action-start-local-network@master
         id: local_node
         with:
