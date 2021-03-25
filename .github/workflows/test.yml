@@ -73,6 +73,7 @@ jobs:
       - name: Get current branch name
         id: tag_name
         run: |
+          echo "!!!"
           echo $GITHUB_HEAD_REF
           echo $GITHUB_REF
           echo ${GITHUB_REF#refs/tags/}
@@ -81,7 +82,8 @@ jobs:
           else
             echo ::set-output name=name::$GITHUB_HEAD_REF
           fi
-
+          echo "AAA"
+          echo ${{ steps.branch_name.outputs.name }}
       - uses: dashevo/gh-action-start-local-network@master
         id: local_node
         with:
