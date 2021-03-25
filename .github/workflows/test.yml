@@ -71,7 +71,7 @@ jobs:
         if: ${{ contains(github.event.pull_request.body, '/set-var')}}
 
       - name: Get current branch name
-        id: tag_name
+        id: branch_name
         run: |
           if [ -z "$GITHUB_HEAD_REF" ]; then
             echo "::set-output name=name::${GITHUB_REF#refs/tags/}"
