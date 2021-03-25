@@ -79,23 +79,6 @@ jobs:
             echo "::set-output name=name::${GITHUB_HEAD_REF}"
           fi
 
-      - name: Enable DOCKERDRIVE cache
-        uses: actions/cache@v2
-        with:
-          path: '/tmp/drive/docker/cache'
-          key: ${{ runner.os }}-node-drive-${{ hashFiles('/tmp/drive/docker/cache/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-drive-
-
-      - name: Enable DOCKERDAPI cache
-        if: ${{ env.dapi-branch }}
-        uses: actions/cache@v2
-        with:
-          path: '/tmp/dapi/docker/cache'
-          key: ${{ runner.os }}-node-drive-${{ hashFiles('/tmp/dapi/docker/cache/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-dapi-
-
       - uses: dashevo/gh-action-start-local-network@master
         id: local_node
         with:
