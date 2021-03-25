@@ -28,7 +28,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - uses: shuplenkov/action-docker-layer-caching@master
+      - uses: shuplenkov/action-docker-layer-caching1@master
         id: test
 
       - name: Check NPM package lock version is updated
