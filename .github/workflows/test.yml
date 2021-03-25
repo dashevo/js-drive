@@ -73,7 +73,10 @@ jobs:
       - name: Get current branch name
         id: tag_name
         run: |
-          if [ -z $GITHUB_HEAD_REF ]; then
+          echo $GITHUB_HEAD_REF
+          echo $GITHUB_REF
+          echo ${GITHUB_REF#refs/tags/}
+          if [ -z "$GITHUB_HEAD_REF" ]; then
             echo ::set-output name=name::${GITHUB_REF#refs/tags/}
           else
             echo ::set-output name=name::$GITHUB_HEAD_REF
