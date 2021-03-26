@@ -80,7 +80,6 @@ jobs:
           fi
 
       - uses: dashevo/gh-action-start-local-network@master
-        id: local_node
         with:
           drive-branch: ${{ steps.branch_name.outputs.name }}
           dapi-branch: ${{ env.dapi-branch }}
@@ -88,7 +87,6 @@ jobs:
           install-sdk-version: ${{ env.install-sdk-version }}
 
       - uses: dashevo/gh-action-run-platform-test-suite@v0.1.1
-        id: test_suite
         with:
           sdk-install: ${{ env.install-sdk-version }}
           faucet-private-key: ${{ env.faucet-private-key }}
