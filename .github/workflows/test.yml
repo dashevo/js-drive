@@ -11,41 +11,41 @@ on:
       - v[0-9]+.[0-9]+-dev
 
 jobs:
-  test:
-    name: Run drive tests
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '12'
-
-      - name: Enable NPM cache
-        uses: actions/cache@v2
-        with:
-          path: '~/.npm'
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Check NPM package lock version is updated
-        run: npm run check-package # TODO: does this exist as an action already?
-
-      - name: Install NPM dependencies
-        run: npm ci
-
-      - name: Run ESlinter
-        run: npm run lint
-
-      - name: Create dotenv file
-        run: cp .env.example .env
-
-      - name: Run tests
-        run: npm run test:coverage
+#  test:
+#    name: Run drive tests
+#    runs-on: ubuntu-20.04
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions/setup-node@v2
+#        with:
+#          node-version: '12'
+#
+#      - name: Enable NPM cache
+#        uses: actions/cache@v2
+#        with:
+#          path: '~/.npm'
+#          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+#          restore-keys: |
+#            ${{ runner.os }}-node-
+#
+#      - name: Check NPM package lock version is updated
+#        run: npm run check-package # TODO: does this exist as an action already?
+#
+#      - name: Install NPM dependencies
+#        run: npm ci
+#
+#      - name: Run ESlinter
+#        run: npm run lint
+#
+#      - name: Create dotenv file
+#        run: cp .env.example .env
+#
+#      - name: Run tests
+#        run: npm run test:coverage
 
   test_suite:
     name: Run platform test suite
-    needs: test
+#    needs: test
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -61,11 +61,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Cache Docker layers
-        uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
-        with:
-          concurrency: 8
+#      - name: Cache Docker layers
+#        uses: satackey/action-docker-layer-caching@v0.0.11
+#        continue-on-error: true
+#        with:
+#          concurrency: 8
 
       - uses: dashevo/gh-action-runtime-vars@master
         if: ${{ contains(github.event.pull_request.body, '/set-var')}}
