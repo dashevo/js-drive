@@ -77,6 +77,7 @@ jobs:
           echo "123456"
           echo "url1 $ACTIONS_CACHE_URL"
           echo "url2 $ACTIONS_RUNTIME_URL"
+          echo "url3 ${{ env.ACTIONS_CACHE_URL }}"
 
       - name: Get current branch name
         id: branch_name
@@ -89,6 +90,7 @@ jobs:
 
       - uses: dashevo/gh-action-start-local-network@master
         with:
+          cache-url: ${{ env.ACTIONS_CACHE_URL }}
           drive-branch: ${{ steps.branch_name.outputs.name }}
           dapi-branch: ${{ env.dapi-branch }}
           dashmate-branch: ${{ env.dashmate-branch }}
