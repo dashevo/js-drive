@@ -70,6 +70,14 @@ jobs:
       - uses: dashevo/gh-action-runtime-vars@master
         if: ${{ contains(github.event.pull_request.body, '/set-var')}}
 
+      - name: Print vars
+        shell: bash
+        working-directory: ${{ github.action_path }}
+        run: |
+          echo "123456"
+          echo "url1 $ACTIONS_CACHE_URL"
+          echo "url2 $ACTIONS_RUNTIME_URL"
+
       - name: Get current branch name
         id: branch_name
         run: |
