@@ -29,7 +29,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Check NPM package lock version is updated
-        run: npm run check-package # TODO: does this exist as an action already?
+        run: npm run check-package # TODO: does this exist as an action already ?
 
       - name: Install NPM dependencies
         run: npm ci
