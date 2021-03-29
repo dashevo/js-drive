@@ -78,9 +78,8 @@ jobs:
           else
             echo "::set-output name=name::${GITHUB_HEAD_REF}"
           fi
-          echo "::set-output name=actionscache::${ACTIONS_CACHE_URL}"
 
-      - uses: actions/get-vars
+      - uses: ./.github/actions/get-vars
         id: myvars
 
       - uses: dashevo/gh-action-start-local-network@master
