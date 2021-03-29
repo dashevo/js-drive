@@ -1,0 +1,8 @@
+name: 'Test'
+description: 'Test desc'
+outputs:
+  cache-url:
+    description: 'Cache url'
+runs:
+  using: 'node12'
+  main: 'get-vars.js'
