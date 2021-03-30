@@ -87,8 +87,8 @@ jobs:
 
       - uses: dashevo/gh-action-start-local-network@master
         with:
-          actions-cache-url: ${{ steps.get-vars.outputs.cache-url }}
-          actions-cache-token: ${{ steps.get-vars.outputs.cache-token }}
+          actions-cache-url: ${{ steps.platform-branches.outputs.cache-url }}
+          actions-cache-token: ${{ steps.platform-branches.outputs.cache-token }}
           drive-branch: ${{ steps.branch_name.outputs.name }}
           dapi-branch: ${{ steps.runtime-vars.outputs.dapi-branch }}
           dashmate-branch: ${{ steps.runtime-vars.outputs.dashmate-branch || steps.platform-branches.outputs.platform-branch }}
