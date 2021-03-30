@@ -68,6 +68,7 @@ jobs:
 #          concurrency: 8
 
       - uses: dashevo/gh-action-runtime-vars@master
+        id: runtime-vars
         if: ${{ contains(github.event.pull_request.body, '/set-var')}}
 
       - name: Get current branch name
@@ -79,21 +80,18 @@ jobs:
             echo "::set-output name=name::${GITHUB_HEAD_REF}"
           fi
 
-      - uses: ./.github/actions/get-vars
-        id: myvars
-
       - uses: dashevo/gh-action-start-local-network@master
         with:
-          actions-cache-url: ${{ steps.myvars.outputs.cache-url }}
-          actions-cache-token: ${{ steps.myvars.outputs.cache-token }}
+          actions-cache-url: ${{ steps.runtime-vars.outputs.cache-url }}
+          actions-cache-token: ${{ steps.runtime-vars.outputs.cache-token }}
           drive-branch: ${{ steps.branch_name.outputs.name }}
-          dapi-branch: ${{ env.dapi-branch }}
-          dashmate-branch: ${{ env.dashmate-branch }}
-          install-sdk-version: ${{ env.install-sdk-version }}
+          dapi-branch: ${{ steps.runtime-vars.outputs.dapi-branch }}
+          dashmate-branch: ${{ steps.runtime-vars.outputs.dashmate-branch }}
+          install-sdk-version: ${{ steps.runtime-vars.outputs.install-sdk-version }}
 
       - uses: dashevo/gh-action-run-platform-test-suite@v0.1.1
         with:
-          sdk-install: ${{ env.install-sdk-version }}
+          sdk-install: ${{ steps.runtime-vars.outputs.install-sdk-version }}
           faucet-private-key: ${{ env.faucet-private-key }}
           dpns-contract-id: ${{ env.dpns-contract-id }}
           dpns-top-level-identity-id: ${{ env.dpns-top-level-identity-id }}
