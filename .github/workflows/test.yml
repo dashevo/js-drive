@@ -89,7 +89,7 @@ jobs:
           actions-cache-token: ${{ steps.get-vars.outputs.cache-token }}
           drive-branch: ${{ steps.branch_name.outputs.name }}
           dapi-branch: ${{ steps.runtime-vars.outputs.dapi-branch }}
-          dashmate-branch: ${{ steps.runtime-vars.outputs.dashmate-branch || steps.platform-branches.outputs.platform-branch }}
+          dashmate-branch: ${{ steps.runtime-vars.outputs.dashmate-branch }}
           install-sdk-version: ${{ steps.runtime-vars.outputs.install-sdk-version }}
 
       - uses: dashevo/gh-action-run-platform-test-suite@v0.1.1
