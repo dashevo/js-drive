@@ -71,6 +71,9 @@ jobs:
         id: runtime-vars
         if: ${{ contains(github.event.pull_request.body, '/set-var')}}
 
+      - uses: ./.github/actions/get-vars
+        id: get-vars
+
       - name: Get current branch name
         id: branch_name
         run: |
@@ -82,8 +85,8 @@ jobs:
 
       - uses: dashevo/gh-action-start-local-network@master
         with:
-          actions-cache-url: ${{ steps.runtime-vars.outputs.cache-url }}
-          actions-cache-token: ${{ steps.runtime-vars.outputs.cache-token }}
+          actions-cache-url: ${{ steps.get-vars.outputs.cache-url }}
+          actions-cache-token: ${{ steps.get-vars.outputs.cache-token }}
           drive-branch: ${{ steps.branch_name.outputs.name }}
           dapi-branch: ${{ steps.runtime-vars.outputs.dapi-branch }}
           dashmate-branch: ${{ steps.runtime-vars.outputs.dashmate-branch }}
