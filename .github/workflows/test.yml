@@ -94,7 +94,7 @@ jobs:
           dashmate-branch: ${{ steps.runtime-vars.outputs.dashmate-branch || steps.platform-branches.outputs.platform-branch }}
           install-sdk-version: ${{ steps.runtime-vars.outputs.install-sdk-version }}
 
-      - uses: dashevo/gh-action-run-platform-test-suite@v0.1.1
+      - uses: dashevo/gh-action-run-platform-test-suite@master
         with:
           sdk-install: ${{ steps.runtime-vars.outputs.install-sdk-version }}
           faucet-private-key: ${{ env.faucet-private-key }}
