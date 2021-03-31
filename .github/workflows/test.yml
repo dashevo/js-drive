@@ -101,7 +101,7 @@ jobs:
           dpns-contract-id: ${{ env.dpns-contract-id }}
           dpns-top-level-identity-id: ${{ env.dpns-top-level-identity-id }}
           dpns-top-level-identity-private-key: ${{ env.dpns-top-level-identity-private-key }}
-          branch: ${{ steps.runtime-vars.outputs.platform-test-suite-branch || steps.platform-branches.outputs.platform-branch }}
+          platform-test-suite-branch: ${{ steps.runtime-vars.outputs.platform-test-suite-branch || steps.platform-branches.outputs.platform-branch }}
 
       - name: Show Docker logs
         if: ${{ failure() }}
