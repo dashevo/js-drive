@@ -85,14 +85,14 @@ jobs:
             echo "::set-output name=name::${GITHUB_HEAD_REF}"
           fi
 
-      - uses: dashevo/gh-action-start-local-network@master
-        with:
-          actions-cache-url: ${{ steps.platform-branches.outputs.cache-url }}
-          actions-cache-token: ${{ steps.platform-branches.outputs.cache-token }}
-          drive-branch: ${{ steps.branch_name.outputs.name }}
-          dapi-branch: ${{ steps.runtime-vars.outputs.dapi-branch }}
-          dashmate-branch: ${{ steps.runtime-vars.outputs.dashmate-branch || steps.platform-branches.outputs.platform-branch }}
-          install-sdk-version: ${{ steps.runtime-vars.outputs.install-sdk-version }}
+#      - uses: dashevo/gh-action-start-local-network@master
+#        with:
+#          actions-cache-url: ${{ steps.platform-branches.outputs.cache-url }}
+#          actions-cache-token: ${{ steps.platform-branches.outputs.cache-token }}
+#          drive-branch: ${{ steps.branch_name.outputs.name }}
+#          dapi-branch: ${{ steps.runtime-vars.outputs.dapi-branch }}
+#          dashmate-branch: ${{ steps.runtime-vars.outputs.dashmate-branch || steps.platform-branches.outputs.platform-branch }}
+#          install-sdk-version: ${{ steps.runtime-vars.outputs.install-sdk-version }}
 
       - uses: dashevo/gh-action-run-platform-test-suite@master
         with:
