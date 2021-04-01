@@ -14,6 +14,7 @@ jobs:
 #  test:
 #    name: Run drive tests
 #    runs-on: ubuntu-20.04
+#    timeout-minutes: 10
 #    steps:
 #      - uses: actions/checkout@v2
 #      - uses: actions/setup-node@v2
@@ -47,6 +48,7 @@ jobs:
     name: Run platform test suite
 #    needs: test
     runs-on: ubuntu-20.04
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
