@@ -84,7 +84,6 @@ jobs:
           else
             echo "::set-output name=name::${GITHUB_HEAD_REF}"
           fi
-
 #      - uses: dashevo/gh-action-start-local-network@master
 #        with:
 #          actions-cache-url: ${{ steps.platform-branches.outputs.cache-url }}
