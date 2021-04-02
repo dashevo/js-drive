@@ -81,20 +81,11 @@ jobs:
           override-dashmate-branch: ${{ steps.runtime-vars.outputs.dashmate-branch }}
           override-testsuite-branch: ${{ steps.runtime-vars.outputs.platform-test-suite-branch }}
 
-      - name: Get current branch name
-        id: branch_name
-        run: |
-          if [ -z "$GITHUB_HEAD_REF" ]; then
-            echo "::set-output name=name::${GITHUB_REF#refs/tags/}"
-          else
-            echo "::set-output name=name::${GITHUB_HEAD_REF}"
-          fi
-
       - uses: dashevo/gh-action-start-local-network@master
         with:
           actions-cache-url: ${{ steps.platform-branches.outputs.cache-url }}
           actions-cache-token: ${{ steps.platform-branches.outputs.cache-token }}
-          drive-branch: ${{ steps.branch_name.outputs.name }}
+          drive-branch: ${{ steps.platform-branches.outputs.current-branch }}
           dapi-branch: ${{ steps.runtime-vars.outputs.dapi-branch }}
           dashmate-branch: ${{ steps.platform-branches.outputs.dashmate-branch }}
           install-sdk-version: ${{ steps.runtime-vars.outputs.install-sdk-version }}
