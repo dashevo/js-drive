@@ -5,6 +5,7 @@ on:
   push:
     tags:
       - v[0-9]+.[0-9]+.[0-9]+
+      - v[0-9]+.[0-9]+.[0-9]+-dev
   pull_request:
     branches:
       - master
@@ -46,7 +47,7 @@ jobs:
 
   test_suite:
     name: Run platform test suite
-#    needs: test
+    needs: test
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
