@@ -421,7 +421,7 @@ describe('endBlockHandlerFactory', () => {
       thresholdPublicKey: new PublicKey({
         bls12381: Uint8Array.from(Buffer.from(quorumListFixture[0].quorumPublicKey, 'hex')),
       }),
-      quorumHash: new QuorumHashUpdate({ quorumHash: quorumListFixture[0].quorumHash }),
+      quorumHash: Buffer.from(quorumListFixture[0].quorumHash, 'hex'),
     });
 
     expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
@@ -435,6 +435,8 @@ describe('endBlockHandlerFactory', () => {
     expect(response.validatorSetUpdate.thresholdPublicKey).to.be.an.instanceOf(PublicKey);
 
     expect(response.nextCoreChainLockUpdate).to.deep.equal(expectedCoreChainLock);
+
+    expect(response.validatorSetUpdate.quorumHash).to.be.not.empty;
 
     expect(response.validatorSetUpdate).to.deep.equal(expectedValidatorUpdate);
   });
