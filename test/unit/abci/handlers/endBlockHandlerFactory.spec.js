@@ -3,7 +3,6 @@ const {
     abci: {
       ResponseEndBlock,
       ValidatorSetUpdate,
-      QuorumHashUpdate,
     },
     crypto: {
       PublicKey,
@@ -436,6 +435,7 @@ describe('endBlockHandlerFactory', () => {
 
     expect(response.nextCoreChainLockUpdate).to.deep.equal(expectedCoreChainLock);
 
+    // eslint-disable-next-line no-unused-expressions
     expect(response.validatorSetUpdate.quorumHash).to.be.not.empty;
 
     expect(response.validatorSetUpdate).to.deep.equal(expectedValidatorUpdate);
