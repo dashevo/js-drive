@@ -5,7 +5,6 @@ const {
     abci: {
       ResponseInitChain,
       ValidatorSetUpdate,
-      QuorumHashUpdate,
     },
     crypto: {
       PublicKey,
@@ -125,6 +124,6 @@ describe('initChainHandlerFactory', () => {
     expect(response).to.be.an.instanceOf(ResponseInitChain);
     expect(response.validatorSetUpdate).to.be.an.instanceOf(ValidatorSetUpdate);
     expect(response.validatorSetUpdate.thresholdPublicKey).to.be.an.instanceOf(PublicKey);
-    expect(response.validatorSetUpdate.quorumHash).to.be.an.instanceOf(QuorumHashUpdate);
+    expect(response.validatorSetUpdate.quorumHash).to.be.an.instanceOf(Buffer);
   });
 });
