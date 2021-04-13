@@ -3,4 +3,3 @@
 node_modules
 .env
 .nyc_output
-!.github/actions/get-vars/node_modules
