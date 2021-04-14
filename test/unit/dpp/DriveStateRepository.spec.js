@@ -329,10 +329,6 @@ describe('DriveStateRepository', () => {
     it('should verify instant lock', async () => {
       instantLockMock.verify.resolves(true);
 
-      simplifiedMasternodeListMock.getStore.returns({
-        networks: {},
-      });
-
       const result = await stateRepository.verifyInstantLock(instantLockMock);
 
       expect(result).to.be.true();
