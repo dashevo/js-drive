@@ -12,7 +12,7 @@ on:
 
 jobs:
   test:
-    name: Run Drive's tests
+    name: Run Drive tests
     runs-on: ubuntu-20.04
     timeout-minutes: 10
     steps:
@@ -176,7 +176,7 @@ jobs:
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new # <---
           # platforms: linux/amd64,linux/arm64,linux/arm/v7
 
-      - name: Temprary fix for Docker cache action
+      - name: Temporary fix for Docker cache action
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
