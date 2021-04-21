@@ -17,14 +17,12 @@ const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRa
 
 const endBlockHandlerFactory = require('../../../../lib/abci/handlers/endBlockHandlerFactory');
 
-const getValidatorSetInfoFactory = require('../../../../lib/core/getValidatorSetInfoFactory');
-
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 
 const NoDPNSContractFoundError = require('../../../../lib/abci/handlers/errors/NoDPNSContractFoundError');
 const NoDashpayContractFoundError = require('../../../../lib/abci/handlers/errors/NoDashpayContractFoundError');
 
-const ValidatorSet = require('../../../../lib/validatorSet/ValidatorSet');
+const ValidatorQuorums = require('../../../../lib/validatorQuorums/ValidatorQuorums');
 
 describe('endBlockHandlerFactory', () => {
   let endBlockHandler;
@@ -39,15 +37,13 @@ describe('endBlockHandlerFactory', () => {
   let simplifiedMasternodeListMock;
   let smlStoreMock;
   let smlMock;
-  let getValidatorSetInfo;
   let loggerMock;
   let loggerChildMock;
   let chainLockMock;
   let validatorsFixture;
-  let validatorsUpdateFixture;
   let coreRpcClientMock;
   let quorumListFixture;
-  let constainerMock;
+  let validatorQuorums;
 
   beforeEach(function beforeEach() {
     headerMock = {
@@ -59,10 +55,6 @@ describe('endBlockHandlerFactory', () => {
 
     blockExecutionContextMock.hasDataContract.returns(true);
     blockExecutionContextMock.getHeader.returns(headerMock);
-
-    constainerMock = {
-      register: this.sinon.stub(),
-    };
 
     chainLockMock = {
       height: 1,
@@ -148,8 +140,6 @@ describe('endBlockHandlerFactory', () => {
       },
     ];
 
-    validatorsUpdateFixture = ValidatorSet.fillValidatorUpdates(validatorsFixture);
-
     coreRpcClientMock = {
       quorum: this.sinon.stub().resolves({
         result: {
@@ -159,8 +149,6 @@ describe('endBlockHandlerFactory', () => {
         id: 5,
       }),
     };
-
-    getValidatorSetInfo = getValidatorSetInfoFactory(coreRpcClientMock, loggerMock);
 
     loggerChildMock = {
       debug: this.sinon.stub(),
@@ -178,17 +166,17 @@ describe('endBlockHandlerFactory', () => {
     dashpayContractId = generateRandomIdentifier();
     dashpayContractBlockHeight = 2;
 
+    validatorQuorums = new ValidatorQuorums(simplifiedMasternodeListMock, coreRpcClientMock);
+
     endBlockHandler = endBlockHandlerFactory(
       blockExecutionContextMock,
       dpnsContractBlockHeight,
       dpnsContractId,
       dashpayContractBlockHeight,
       dashpayContractId,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     requestMock = {
@@ -203,11 +191,9 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       undefined,
       undefined,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -225,11 +211,9 @@ describe('endBlockHandlerFactory', () => {
       dpnsContractId,
       undefined,
       undefined,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -250,11 +234,9 @@ describe('endBlockHandlerFactory', () => {
       dpnsContractId,
       undefined,
       undefined,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     blockExecutionContextMock.hasDataContract.returns(false);
@@ -299,11 +281,9 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       undefined,
       undefined,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -321,11 +301,9 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       dashpayContractBlockHeight,
       dashpayContractId,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -346,11 +324,9 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       dashpayContractBlockHeight,
       dashpayContractId,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     blockExecutionContextMock.hasDataContract.returns(false);
@@ -378,15 +354,13 @@ describe('endBlockHandlerFactory', () => {
 
     endBlockHandler = endBlockHandlerFactory(
       blockExecutionContextMock,
-      dpnsContractBlockHeight,
-      dpnsContractId,
-      dashpayContractBlockHeight,
-      dashpayContractId,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -416,7 +390,7 @@ describe('endBlockHandlerFactory', () => {
       signature: chainLockMock.signature,
     });
     const expectedValidatorUpdate = new ValidatorSetUpdate({
-      validatorUpdates: validatorsUpdateFixture,
+      validatorUpdates: await validatorQuorums.toABCIValidatorUpdates(),
       thresholdPublicKey: new PublicKey({
         bls12381: Uint8Array.from(Buffer.from(quorumListFixture[0].quorumPublicKey, 'hex')),
       }),
@@ -437,7 +411,6 @@ describe('endBlockHandlerFactory', () => {
 
     // eslint-disable-next-line no-unused-expressions
     expect(response.validatorSetUpdate.quorumHash).to.be.not.empty;
-
     expect(response.validatorSetUpdate).to.deep.equal(expectedValidatorUpdate);
   });
 });
