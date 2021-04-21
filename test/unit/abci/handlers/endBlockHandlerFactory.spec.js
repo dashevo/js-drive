@@ -272,6 +272,7 @@ describe('endBlockHandlerFactory', () => {
     });
 
     expect(response.nextCoreChainLockUpdate).to.deep.equal(expectedCoreChainLock);
+    expect(response.validatorSetUpdate).to.be.equal(null);
   });
 
   it('should simply return a response if Dashpay contract was not set', async () => {
