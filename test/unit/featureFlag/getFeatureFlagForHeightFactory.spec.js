@@ -1,3 +1,5 @@
+const Long = require('long');
+
 const Identifier = require('@dashevo/dpp/lib/Identifier');
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 
@@ -26,7 +28,7 @@ describe('getFeatureFlagForHeightFactory', () => {
   });
 
   it('should call `fetchDocuments` and return first item from the result', async () => {
-    const result = await getFeatureFlagForHeight('someType', 42);
+    const result = await getFeatureFlagForHeight('someType', new Long(42));
 
     const query = {
       where: [

@@ -1,17 +1,16 @@
 const Identifier = require('@dashevo/dpp/lib/Identifier');
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
+const { expect } = require('chai');
 
 const Long = require('long');
-
-const BlockExecutionContextMock = require('../../../lib/test/mock/BlockExecutionContextMock');
 
 const getLatestFeatureFlagFactory = require('../../../lib/featureFlag/getLatestFeatureFlagFactory');
 
 describe('getLatestFeatureFlagFactory', () => {
   let featureFlagDataContractId;
   let fetchDocumentsMock;
-  let blockExecutionContextMock;
   let getLatestFeatureFlag;
+  let featureFlagDataContractBlockHeight;
   let document;
 
   beforeEach(function beforeEach() {
@@ -24,20 +23,17 @@ describe('getLatestFeatureFlagFactory', () => {
       document,
     ]);
 
-    blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
-    blockExecutionContextMock.getHeader.returns({
-      height: new Long(42),
-    });
+    featureFlagDataContractBlockHeight = new Long(12);
 
     getLatestFeatureFlag = getLatestFeatureFlagFactory(
       featureFlagDataContractId,
+      featureFlagDataContractBlockHeight,
       fetchDocumentsMock,
-      blockExecutionContextMock,
     );
   });
 
   it('should call `fetchDocuments` and return first item from the result', async () => {
-    const result = await getLatestFeatureFlag('someType');
+    const result = await getLatestFeatureFlag('someType', new Long(42));
 
     const query = {
       where: [
@@ -55,5 +51,11 @@ describe('getLatestFeatureFlagFactory', () => {
       query,
     );
     expect(result).to.deep.equal(document);
+  });
+
+  it('should return null if height specified is lower then height of activation', async () => {
+    const result = await getLatestFeatureFlag('someType', new Long(1));
+
+    expect(result).to.equal(null);
   });
 });
