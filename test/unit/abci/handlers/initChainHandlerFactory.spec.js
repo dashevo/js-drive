@@ -14,31 +14,26 @@ const {
 
 const initChainHandlerFactory = require('../../../../lib/abci/handlers/initChainHandlerFactory');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
-const getValidatorSetInfoFactory = require('../../../../lib/core/getValidatorSetInfoFactory');
 const getSmlFixture = require('../../../../lib/test/fixtures/getSmlFixture');
+const ValidatorQuorums = require('../../../../lib/validatorQuorums/ValidatorQuorums');
 
 describe('initChainHandlerFactory', () => {
   let simplifiedMasternodeListMock;
   let initChainHandler;
   let updateSimplifiedMasternodeListMock;
   let initialCoreChainLockedHeight;
-  let getValidatorSetInfo;
-  let containerMock;
   let smlStoreMock;
   let smlMock;
   let simplifiedMNListDiffMock;
   let coreRpcClientMock;
   let validatorsFixture;
+  let validatorQuorums;
   let loggerMock;
 
   beforeEach(function beforeEach() {
     initialCoreChainLockedHeight = 1;
 
     updateSimplifiedMasternodeListMock = this.sinon.stub();
-
-    containerMock = {
-      register: this.sinon.stub(),
-    };
 
     simplifiedMNListDiffMock = {
       blockHash: '000002df62636a47af1046c0f5ece8e1d5fde9b18d572059fe00621668727a26',
@@ -92,16 +87,14 @@ describe('initChainHandlerFactory', () => {
       }),
     };
 
-    getValidatorSetInfo = getValidatorSetInfoFactory(coreRpcClientMock, loggerMock);
+    validatorQuorums = new ValidatorQuorums(simplifiedMasternodeListMock, coreRpcClientMock);
     loggerMock = new LoggerMock(this.sinon);
 
     initChainHandler = initChainHandlerFactory(
-      simplifiedMasternodeListMock,
       updateSimplifiedMasternodeListMock,
       initialCoreChainLockedHeight,
-      getValidatorSetInfo,
+      validatorQuorums,
       loggerMock,
-      containerMock,
     );
   });
 
@@ -120,7 +113,7 @@ describe('initChainHandlerFactory', () => {
       },
     );
 
-    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
+    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledTwice();
     expect(response).to.be.an.instanceOf(ResponseInitChain);
     expect(response.validatorSetUpdate).to.be.an.instanceOf(ValidatorSetUpdate);
     expect(response.validatorSetUpdate.thresholdPublicKey).to.be.an.instanceOf(PublicKey);
