@@ -366,7 +366,7 @@ describe('endBlockHandlerFactory', () => {
 
     const response = await endBlockHandler(requestMock);
 
-    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
+    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledTwice();
 
     expect(response).to.be.an.instanceOf(ResponseEndBlock);
 
@@ -398,7 +398,7 @@ describe('endBlockHandlerFactory', () => {
       quorumHash: Buffer.from(quorumListFixture[0].quorumHash, 'hex'),
     });
 
-    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
+    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledTwice();
 
     expect(response).to.be.an.instanceOf(ResponseEndBlock);
 
