@@ -277,7 +277,7 @@ describe('DriveStateRepository', () => {
       const result = await stateRepository.fetchTransaction(id);
 
       expect(result).to.deep.equal({
-        data: rawTransaction.hex,
+        data: Buffer.from(rawTransaction.hex, 'hex'),
         height: rawTransaction.height,
       });
       expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWithExactly(id, 1);
