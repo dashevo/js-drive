@@ -15,6 +15,7 @@ const getSmlFixture = require('../../../lib/test/fixtures/getSmlFixture');
 describe('ValidatorQuorums', () => {
   let smlStoreMock;
   let simplifiedMasternodeListMock;
+  let smlDiffMock;
   let smlMock;
   let validatorsFixture;
   let validatorsNonMemberFixture;
@@ -37,9 +38,14 @@ describe('ValidatorQuorums', () => {
 
     validatorQuorumEntry = new QuorumEntry(getSmlFixture()[0].newQuorums[0]);
 
+    smlDiffMock = {
+      blockHash: 'some block hash',
+    };
+
     smlMock = {
       getQuorum: this.sinon.stub().returns(validatorQuorumEntry),
       getValidatorLLMQType: this.sinon.stub().returns(1),
+      toSimplifiedMNListDiff: this.sinon.stub().returns(smlDiffMock),
       getQuorumsOfType: this.sinon.stub().returns(
         getSmlFixture()[0].newQuorums.filter((quorum) => quorum.llmqType === 1),
       ),
@@ -128,35 +134,41 @@ describe('ValidatorQuorums', () => {
 
   it('constructor', () => {
     const validatorQuorums = new ValidatorQuorums(simplifiedMasternodeListMock, coreRpcClientMock);
-    expect(validatorQuorums.sml).to.be.equal(smlMock);
+    expect(validatorQuorums.sml).to.be.equal(null);
     expect(validatorQuorums.coreRpcClient).to.be.equal(coreRpcClientMock);
+    expect(validatorQuorums.validatorQuorumHash).to.be.equal('');
     expect(validatorQuorums).to.be.an.instanceOf(ValidatorQuorums);
   });
   it('should rotate if height divisible by ROTATION_BLOCK_INTERVAL', async () => {
     const validatorQuorums = new ValidatorQuorums(simplifiedMasternodeListMock, coreRpcClientMock);
-    const isRotated = await validatorQuorums.rotate(15, 'anyEntropyWillDo');
+    await validatorQuorums.init(1);
+    const isRotated = await validatorQuorums.rotate(15, 1, 'anyEntropyWillDo');
     expect(isRotated).to.be.equal(true);
     expect(validatorQuorums.validatorQuorumHash).to.be.equal('0000055cc3271edb256ae4f8bf1837b7accef516aca3e450546fb0598efef7e2');
   });
   it('should not rotate if height not divisible by ROTATION_BLOCK_INTERVAL', async () => {
     const validatorQuorums = new ValidatorQuorums(simplifiedMasternodeListMock, coreRpcClientMock);
-    const isRotated = await validatorQuorums.rotate(1, 'anyEntropyWillDo');
+    await validatorQuorums.init(1);
+    const isRotated = await validatorQuorums.rotate(1, 1, 'anyEntropyWillDo');
     expect(isRotated).to.be.equal(false);
-    expect(validatorQuorums.validatorQuorumHash).to.be.equal('');
+    expect(validatorQuorums.validatorQuorumHash).to.be.equal('00000fc816bc9ab8c7ae3107501bbf71c23c4fccd58ecb2ba185ccbb8ff6d863');
   });
   it('getHash', async () => {
     const validatorQuorums = new ValidatorQuorums(simplifiedMasternodeListMock, coreRpcClientMock);
+    await validatorQuorums.init(1);
     const validatorSetHash = await validatorQuorums.getHash(rotationEntropyBuffer);
     expect(validatorSetHash).to.be.a('string');
     expect(validatorSetHash).to.be.equal('0000008d3d35c02fab8cc631d85d968c1e09cff14c78d517821851956805b7ad');
   });
-  it('should get the current validator set', () => {
+  it('should get the current validator set', async () => {
     const validatorQuorums = new ValidatorQuorums(simplifiedMasternodeListMock, coreRpcClientMock);
+    await validatorQuorums.init(1);
     const validatorSet = validatorQuorums.getValidatorSet();
     expect(validatorSet).to.be.an.instanceOf(QuorumEntry);
   });
   it('should get the abci validator update if node is a member of one of the active validator quorums', async () => {
     const validatorQuorums = new ValidatorQuorums(simplifiedMasternodeListMock, coreRpcClientMock);
+    await validatorQuorums.init(1);
     const validatorUpdates = await validatorQuorums.toABCIValidatorUpdates();
     expect(validatorUpdates).to.be.an('array');
     expect(validatorUpdates.length).to.be.equal(2);
@@ -167,6 +179,7 @@ describe('ValidatorQuorums', () => {
     const validatorQuorums = new ValidatorQuorums(
       simplifiedMasternodeListMock, coreRpcClientMockNonMember,
     );
+    await validatorQuorums.init(1);
     const validatorUpdates = await validatorQuorums.toABCIValidatorUpdates();
     const pubKeyNullFilledString = '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
     const pubKeyNullFilled = Uint8Array.from(Buffer.from(pubKeyNullFilledString, 'hex'));
@@ -179,6 +192,7 @@ describe('ValidatorQuorums', () => {
     const validatorQuorums = new ValidatorQuorums(
       simplifiedMasternodeListMock, coreRpcClientMockQuorumDoesntExistError,
     );
+    await validatorQuorums.init(1);
     try {
       await validatorQuorums.toABCIValidatorUpdates();
     } catch (e) {
@@ -189,6 +203,7 @@ describe('ValidatorQuorums', () => {
     const validatorQuorums = new ValidatorQuorums(
       simplifiedMasternodeListMock, coreRpcClientMockUnkownError,
     );
+    await validatorQuorums.init(1);
     try {
       await validatorQuorums.toABCIValidatorUpdates();
     } catch (e) {
