@@ -192,9 +192,8 @@ describe('ValidatorQuorums', () => {
     const validatorQuorums = new ValidatorQuorums(
       simplifiedMasternodeListMock, coreRpcClientMockQuorumDoesntExistError,
     );
-    await validatorQuorums.init(1);
     try {
-      await validatorQuorums.toABCIValidatorUpdates();
+      await validatorQuorums.init(1);
     } catch (e) {
       expect(e).to.be.an.instanceOf(NotFoundAbciError);
     }
@@ -203,9 +202,8 @@ describe('ValidatorQuorums', () => {
     const validatorQuorums = new ValidatorQuorums(
       simplifiedMasternodeListMock, coreRpcClientMockUnkownError,
     );
-    await validatorQuorums.init(1);
     try {
-      await validatorQuorums.toABCIValidatorUpdates();
+      await validatorQuorums.init(1);
     } catch (e) {
       expect(e).to.be.an.instanceOf(NotFoundAbciError);
     }
