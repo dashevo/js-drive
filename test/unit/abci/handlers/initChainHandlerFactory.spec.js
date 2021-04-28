@@ -113,7 +113,7 @@ describe('initChainHandlerFactory', () => {
       },
     );
 
-    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledTwice();
+    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
     expect(response).to.be.an.instanceOf(ResponseInitChain);
     expect(response.validatorSetUpdate).to.be.an.instanceOf(ValidatorSetUpdate);
     expect(response.validatorSetUpdate.thresholdPublicKey).to.be.an.instanceOf(PublicKey);

@@ -28,6 +28,7 @@ describe('endBlockHandlerFactory', () => {
   let endBlockHandler;
   let requestMock;
   let headerMock;
+  let lastCommitInfoMock;
   let blockExecutionContextMock;
   let dpnsContractId;
   let dpnsContractBlockHeight;
@@ -51,10 +52,15 @@ describe('endBlockHandlerFactory', () => {
       lastCommitHash: Uint8Array.from('c5ac594a4d00199db59c178104effff54bcd082d9be4e7625196817719730426'),
     };
 
+    lastCommitInfoMock = {
+      stateSignature: Uint8Array.from('003657bb44d74c371d14485117de43313ca5c2848f3622d691c2b1bf3576a64bdc2538efab24854eb82ae7db38482dbd15a1cb3bc98e55173817c9d05c86e47a5d67614a501414aae6dd1565e59422d1d77c41ae9b38de34ecf1e9f778b2a97b'),
+    };
+
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
     blockExecutionContextMock.hasDataContract.returns(true);
     blockExecutionContextMock.getHeader.returns(headerMock);
+    blockExecutionContextMock.getLastCommitInfo.returns(lastCommitInfoMock);
 
     chainLockMock = {
       height: 1,
@@ -366,7 +372,7 @@ describe('endBlockHandlerFactory', () => {
 
     const response = await endBlockHandler(requestMock);
 
-    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledTwice();
+    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
 
     expect(response).to.be.an.instanceOf(ResponseEndBlock);
 
@@ -398,7 +404,7 @@ describe('endBlockHandlerFactory', () => {
       quorumHash: Buffer.from(quorumListFixture[0].quorumHash, 'hex'),
     });
 
-    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledTwice();
+    expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
 
     expect(response).to.be.an.instanceOf(ResponseEndBlock);
 
