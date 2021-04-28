@@ -10,8 +10,11 @@ const verifyChainLockQueryHandlerFactory = require('../../../../../lib/abci/hand
 
 const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
 
+const featureFlagTypes = require('../../../../../lib/featureFlag/featureFlagTypes');
+
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
 const LoggerMock = require('../../../../../lib/test/mock/LoggerMock');
+const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
 
 describe('verifyChainLockQueryHandlerFactory', () => {
   let simplifiedMasternodeListMock;
@@ -21,6 +24,9 @@ describe('verifyChainLockQueryHandlerFactory', () => {
   let encodedChainLock;
   let chainLockMock;
   let loggerMock;
+  let getLatestFeatureFlagMock;
+  let blockExecutionContextMock;
+  let coreRpcClientMock;
 
   beforeEach(function beforeEach() {
     params = {};
@@ -44,9 +50,27 @@ describe('verifyChainLockQueryHandlerFactory', () => {
 
     encodedChainLock = Buffer.alloc(0);
 
+    getLatestFeatureFlagMock = this.sinon.stub();
+    getLatestFeatureFlagMock.resolves(null);
+
+    blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
+    blockExecutionContextMock.getHeader.returns({
+      height: 42,
+      coreChainLockedHeight: 43,
+    });
+
+    coreRpcClientMock = {
+      verifyChainLock: this.sinon.stub(),
+    };
+    coreRpcClientMock.verifyChainLock.resolves({ result: undefined });
+
     verifyChainLockQueryHandler = verifyChainLockQueryHandlerFactory(
       simplifiedMasternodeListMock,
       decodeChainLockMock,
+      getLatestFeatureFlagMock,
+      blockExecutionContextMock,
+      featureFlagTypes,
+      coreRpcClientMock,
       loggerMock,
     );
   });
