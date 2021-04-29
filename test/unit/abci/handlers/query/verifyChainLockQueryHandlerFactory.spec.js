@@ -15,7 +15,6 @@ const featureFlagTypes = require('../../../../../lib/featureFlag/featureFlagType
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
 const LoggerMock = require('../../../../../lib/test/mock/LoggerMock');
 const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
-const { expect } = require('chai');
 
 describe('verifyChainLockQueryHandlerFactory', () => {
   let simplifiedMasternodeListMock;
