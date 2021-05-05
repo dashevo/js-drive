@@ -1,4 +1,4 @@
-FROM node:12-alpine as node_modules
+FROM node:14-alpine as node_modules
 
 RUN apk update && \
     apk --no-cache upgrade && \
@@ -26,7 +26,7 @@ COPY package.json package-lock.json /
 
 RUN npm ci --production
 
-FROM node:12-alpine
+FROM node:14-alpine
 
 ARG NODE_ENV=production
 ENV NODE_ENV ${NODE_ENV}
