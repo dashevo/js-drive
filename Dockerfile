@@ -1,4 +1,4 @@
-FROM node:14-alpine as node_modules
+FROM node:12-alpine as node_modules
 
 RUN apk update && \
     apk --no-cache upgrade && \
@@ -10,8 +10,10 @@ RUN apk update && \
                        zeromq-dev
 
 # Enable node-gyp cache
+# and replacing github url https://github.com/actions/setup-node/issues/214
 RUN npm install -g node-gyp-cache@0.2.1 && \
-    npm config set node_gyp node-gyp-cache
+    npm config set node_gyp node-gyp-cache && \
+    git config --global url."https://github.com/".insteadOf ssh://git@github.com/
 
 # Copy node gyp cache
 COPY docker/cache/.cache /root/.cache
@@ -26,7 +28,7 @@ COPY package.json package-lock.json /
 
 RUN npm ci --production
 
-FROM node:14-alpine
+FROM node:12-alpine
 
 ARG NODE_ENV=production
 ENV NODE_ENV ${NODE_ENV}
