@@ -1,29 +1,30 @@
 # [0.19.0](https://github.com/dashevo/js-drive/compare/v0.18.1...v0.19.0) (2021-05-05)
 
-### Bug Fixes
-
-* cannot destructure property 'height' of ...getHeader() ([#506](https://github.com/dashevo/js-drive/issues/506)) ([2b846a2](https://github.com/dashevo/js-drive/commit/2b846a26b4870ee1361d6a84b9dde4d146aa6c0b))
-* invalid lock file ([#505](https://github.com/dashevo/js-drive/issues/505)) ([9c0a80a](https://github.com/dashevo/js-drive/commit/9c0a80a8e5642132f8dd1c326b6d9402ae2d622e))
-* topLevelIdentity.getId is not a function ([#504](https://github.com/dashevo/js-drive/issues/504)) ([3c0cf0d](https://github.com/dashevo/js-drive/commit/3c0cf0d4a8cf0714f90381edf81f38ae63c51dc8))
-* cannot read property 'quorum' of undefined ([#492](https://github.com/dashevo/js-drive/issues/492)) ([ff7d1a6](https://github.com/dashevo/js-drive/commit/ff7d1a63de29f9b176783645e36381b0d463a692))
-* keys were not sirted before calling `getProof` ([#501](https://github.com/dashevo/js-drive/issues/501)) ([c87ea70](https://github.com/dashevo/js-drive/commit/c87ea700e46856c7f80f141dc41137c3632e749d))
-* no patched version of ProtobufJS is used ([#498](https://github.com/dashevo/js-drive/issues/498)) ([20ce169](https://github.com/dashevo/js-drive/commit/20ce16910c510ce337fb3c437a0a900fad8a2c2b))
-* cannot read property 'getSync' of null error ([#485](https://github.com/dashevo/js-drive/issues/485)) ([a969285](https://github.com/dashevo/js-drive/commit/a969285f98397fd1a4268ae622886d967c823076))
-* error loading shared library libzmq.so.5 ([#483](https://github.com/dashevo/js-drive/issues/483)) ([d7e5cb7](https://github.com/dashevo/js-drive/commit/d7e5cb7d6b5f6abd03e720dd75e095497ea25106))
-* error loading shared library libzmq.so.5 ([6a63aa2](https://github.com/dashevo/js-drive/commit/6a63aa23453e1ac5993da75194c323eefceaae80))
-* blockExecutionContext header might be null ([#481](https://github.com/dashevo/js-drive/issues/481)) ([ff38ad5](https://github.com/dashevo/js-drive/commit/ff38ad528556e38706b5f9fcedc07580e4643021))
-
 
 ### Features
 
-* use Dash Core to verify chain locks ([#503](https://github.com/dashevo/js-drive/issues/503)) ([aa38d19](https://github.com/dashevo/js-drive/commit/aa38d19a0b4f59987d1de0b9f588cc0b453032c5))
-* verify instant locks using Dash Core ([#499](https://github.com/dashevo/js-drive/issues/499)) ([e2306cc](https://github.com/dashevo/js-drive/commit/e2306cc74b56313938cd7ddfcebf5925ebf32e0f))
-* feature flags ([#491](https://github.com/dashevo/js-drive/issues/491)) ([9ac1c2e](https://github.com/dashevo/js-drive/commit/9ac1c2efd763fb075bcf2c7573f6fbeaebf2f891))
-* output Core network on start ([#490](https://github.com/dashevo/js-drive/issues/490)) ([3c1591d](https://github.com/dashevo/js-drive/commit/3c1591d03f0ff885161bd7732302c8cb5b46535b))
-* update js-dp-services-ctl to 0.19-dev ([#486](https://github.com/dashevo/js-drive/issues/486)) ([f2f4bc4](https://github.com/dashevo/js-drive/commit/f2f4bc4eed787e5e5ca8c00c084060bcfecc50e8))
-* enable docker build npm cache ([#478](https://github.com/dashevo/js-drive/issues/478)) ([ce5adac](https://github.com/dashevo/js-drive/commit/ce5adac55e6aab3d9d50bb552cd606a97bcaa61c))
-* do not setup node if SKIP_TEST_SUITE option is set ([#480](https://github.com/dashevo/js-drive/issues/480)) ([1d3023d](https://github.com/dashevo/js-drive/commit/1d3023dcb41064b0eee92c6d7a9b133a09fadbd0))
+* use Dash Core to verify chain locks ([#503](https://github.com/dashevo/js-drive/issues/503), [#505](https://github.com/dashevo/js-drive/issues/505), [#506](https://github.com/dashevo/js-drive/issues/506))
+* verify instant locks using Dash Core ([#499](https://github.com/dashevo/js-drive/issues/499), [#501](https://github.com/dashevo/js-drive/issues/501), [#492](https://github.com/dashevo/js-drive/issues/492), [#498](https://github.com/dashevo/js-drive/issues/498))
+* feature flags ([#491](https://github.com/dashevo/js-drive/issues/491), [#504](https://github.com/dashevo/js-drive/issues/504), [#485](https://github.com/dashevo/js-drive/issues/485))
+* output Core network on start ([#490](https://github.com/dashevo/js-drive/issues/490))
+* update js-dp-services-ctl to 0.19-dev ([#486](https://github.com/dashevo/js-drive/issues/486))
+* enable docker build npm cache ([#478](https://github.com/dashevo/js-drive/issues/478))
+* do not setup node if SKIP_TEST_SUITE option is set ([#480](https://github.com/dashevo/js-drive/issues/480))
+* remove regtest fallbacks ([#477](https://github.com/dashevo/js-drive/issues/477))
+* add `verifyInstantLock` in favor of `getSMLStore` method ([#474](https://github.com/dashevo/js-drive/issues/474))
 
+
+### Bug Fixes
+
+* error loading shared library libzmq.so.5 ([#483](https://github.com/dashevo/js-drive/issues/483))
+* blockExecutionContext header might be null ([#481](https://github.com/dashevo/js-drive/issues/481))
+
+
+### BREAKING CHANGES
+
+* running in standalone regtest mode is not supported anymore
+* `fetchSMLStore` method has been removed
+* `js-dpp` versions prior to `0.19.0` are not supported anymore
 
 
 # [0.18.1](https://github.com/dashevo/js-drive/compare/v0.18.0...v0.18.1) (2021-03-08)
