@@ -24,7 +24,7 @@
 
 * running in standalone regtest mode is not supported anymore
 * `fetchSMLStore` method has been removed
-* `js-dpp` versions prior to `0.19.0` are not supported anymore
+* See [DPP v0.19 breaking changes](https://github.com/dashevo/js-dpp/releases/tag/v0.19.0)
 
 
 # [0.18.1](https://github.com/dashevo/js-drive/compare/v0.18.0...v0.18.1) (2021-03-08)
