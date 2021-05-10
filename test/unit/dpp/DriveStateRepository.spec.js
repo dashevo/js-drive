@@ -23,6 +23,7 @@ describe('DriveStateRepository', () => {
   let blockExecutionContextMock;
   let simplifiedMasternodeListMock;
   let instantLockMock;
+  let getLatestFeatureFlagMock;
 
   beforeEach(function beforeEach() {
     identity = getIdentityFixture();
@@ -76,6 +77,8 @@ describe('DriveStateRepository', () => {
       getStore: this.sinon.stub(),
     };
 
+    getLatestFeatureFlagMock = this.sinon.stub().resolves(null);
+
     stateRepository = new DriveStateRepository(
       identityRepositoryMock,
       publicKeyIdentityIdRepositoryMock,
@@ -86,6 +89,7 @@ describe('DriveStateRepository', () => {
       coreRpcClientMock,
       blockExecutionContextMock,
       simplifiedMasternodeListMock,
+      getLatestFeatureFlagMock,
       blockExecutionDBTransactionsMock,
     );
 
@@ -268,14 +272,18 @@ describe('DriveStateRepository', () => {
   describe('#fetchTransaction', () => {
     it('should fetch transaction from core', async () => {
       const rawTransaction = {
-        data: 'some result',
+        hex: 'some result',
+        height: 1,
       };
 
       coreRpcClientMock.getRawTransaction.resolves({ result: rawTransaction });
 
       const result = await stateRepository.fetchTransaction(id);
 
-      expect(result).to.deep.equal(rawTransaction);
+      expect(result).to.deep.equal({
+        data: Buffer.from(rawTransaction.hex, 'hex'),
+        height: rawTransaction.height,
+      });
       expect(coreRpcClientMock.getRawTransaction).to.be.calledOnceWithExactly(id, 1);
     });
 
@@ -326,33 +334,42 @@ describe('DriveStateRepository', () => {
   });
 
   describe('#verifyInstantLock', () => {
+    beforeEach(() => {
+      blockExecutionContextMock.getHeader.returns({
+        header: 41,
+        coreChainLockedHeight: 42,
+      });
+    });
+
     it('should verify instant lock', async () => {
       instantLockMock.verify.resolves(true);
 
       const result = await stateRepository.verifyInstantLock(instantLockMock);
 
       expect(result).to.be.true();
-
-      // TODO: Enable logic with feature flags
-      // blockExecutionContextMock.getHeader.returns({
-      //   coreChainLockedHeight: 42,
-      // });
-      // coreRpcClientMock.verifyIsLock.resolves({ result: true });
-      //
-      // const result = await stateRepository.verifyInstantLock(instantLockMock);
-      //
-      // expect(result).to.equal(true);
-      // expect(coreRpcClientMock.verifyIsLock).to.have.been.calledOnceWithExactly(
-      //   'someRequestId',
-      //   'someTxId',
-      //   'signature',
-      //   42,
-      // );
     });
 
-    it.skip('should return false if core throws Invalid address or key error', async () => {
-      blockExecutionContextMock.getHeader.returns({
-        coreChainLockedHeight: 42,
+    it('it should verify instant lock using core if feature flag is enabled', async () => {
+      getLatestFeatureFlagMock.resolves({
+        get: () => true,
+      });
+
+      coreRpcClientMock.verifyIsLock.resolves({ result: true });
+
+      const result = await stateRepository.verifyInstantLock(instantLockMock);
+
+      expect(result).to.equal(true);
+      expect(coreRpcClientMock.verifyIsLock).to.have.been.calledOnceWithExactly(
+        'someRequestId',
+        'someTxId',
+        'signature',
+        42,
+      );
+    });
+
+    it('should return false if core throws Invalid address or key error', async () => {
+      getLatestFeatureFlagMock.resolves({
+        get: () => true,
       });
 
       const error = new Error('Some error');
@@ -371,9 +388,9 @@ describe('DriveStateRepository', () => {
       );
     });
 
-    it.skip('should return false if core throws Invalid parameter', async () => {
-      blockExecutionContextMock.getHeader.returns({
-        coreChainLockedHeight: 42,
+    it('should return false if core throws Invalid parameter', async () => {
+      getLatestFeatureFlagMock.resolves({
+        get: () => true,
       });
 
       const error = new Error('Some error');
@@ -392,7 +409,7 @@ describe('DriveStateRepository', () => {
       );
     });
 
-    it.skip('should return false if header is null', async () => {
+    it('should return false if header is null', async () => {
       blockExecutionContextMock.getHeader.resolves(null);
 
       const error = new Error('Some error');
@@ -402,12 +419,7 @@ describe('DriveStateRepository', () => {
 
       const result = await stateRepository.verifyInstantLock(instantLockMock);
       expect(result).to.equal(false);
-      expect(coreRpcClientMock.verifyIsLock).to.have.been.calledOnceWithExactly(
-        'someRequestId',
-        'someTxId',
-        'signature',
-        undefined,
-      );
+      expect(coreRpcClientMock.verifyIsLock).to.have.not.been.called();
     });
   });
 });
