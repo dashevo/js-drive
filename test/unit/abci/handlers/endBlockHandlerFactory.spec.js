@@ -3,7 +3,6 @@ const {
     abci: {
       ResponseEndBlock,
       ValidatorSetUpdate,
-      QuorumHashUpdate,
     },
     crypto: {
       PublicKey,
@@ -18,19 +17,18 @@ const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRa
 
 const endBlockHandlerFactory = require('../../../../lib/abci/handlers/endBlockHandlerFactory');
 
-const getValidatorSetInfoFactory = require('../../../../lib/core/getValidatorSetInfoFactory');
-
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 
 const NoDPNSContractFoundError = require('../../../../lib/abci/handlers/errors/NoDPNSContractFoundError');
 const NoDashpayContractFoundError = require('../../../../lib/abci/handlers/errors/NoDashpayContractFoundError');
 
-const ValidatorSet = require('../../../../lib/validatorSet/ValidatorSet');
+const ValidatorQuorums = require('../../../../lib/validatorQuorums/ValidatorQuorums');
 
 describe('endBlockHandlerFactory', () => {
   let endBlockHandler;
   let requestMock;
   let headerMock;
+  let lastCommitInfoMock;
   let blockExecutionContextMock;
   let dpnsContractId;
   let dpnsContractBlockHeight;
@@ -40,15 +38,13 @@ describe('endBlockHandlerFactory', () => {
   let simplifiedMasternodeListMock;
   let smlStoreMock;
   let smlMock;
-  let getValidatorSetInfo;
   let loggerMock;
   let loggerChildMock;
   let chainLockMock;
   let validatorsFixture;
-  let validatorsUpdateFixture;
   let coreRpcClientMock;
   let quorumListFixture;
-  let constainerMock;
+  let validatorQuorums;
 
   beforeEach(function beforeEach() {
     headerMock = {
@@ -56,14 +52,15 @@ describe('endBlockHandlerFactory', () => {
       lastCommitHash: Uint8Array.from('c5ac594a4d00199db59c178104effff54bcd082d9be4e7625196817719730426'),
     };
 
+    lastCommitInfoMock = {
+      stateSignature: Uint8Array.from('003657bb44d74c371d14485117de43313ca5c2848f3622d691c2b1bf3576a64bdc2538efab24854eb82ae7db38482dbd15a1cb3bc98e55173817c9d05c86e47a5d67614a501414aae6dd1565e59422d1d77c41ae9b38de34ecf1e9f778b2a97b'),
+    };
+
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
     blockExecutionContextMock.hasDataContract.returns(true);
     blockExecutionContextMock.getHeader.returns(headerMock);
-
-    constainerMock = {
-      register: this.sinon.stub(),
-    };
+    blockExecutionContextMock.getLastCommitInfo.returns(lastCommitInfoMock);
 
     chainLockMock = {
       height: 1,
@@ -149,8 +146,6 @@ describe('endBlockHandlerFactory', () => {
       },
     ];
 
-    validatorsUpdateFixture = ValidatorSet.fillValidatorUpdates(validatorsFixture);
-
     coreRpcClientMock = {
       quorum: this.sinon.stub().resolves({
         result: {
@@ -160,8 +155,6 @@ describe('endBlockHandlerFactory', () => {
         id: 5,
       }),
     };
-
-    getValidatorSetInfo = getValidatorSetInfoFactory(coreRpcClientMock, loggerMock);
 
     loggerChildMock = {
       debug: this.sinon.stub(),
@@ -179,17 +172,17 @@ describe('endBlockHandlerFactory', () => {
     dashpayContractId = generateRandomIdentifier();
     dashpayContractBlockHeight = 2;
 
+    validatorQuorums = new ValidatorQuorums(simplifiedMasternodeListMock, coreRpcClientMock);
+
     endBlockHandler = endBlockHandlerFactory(
       blockExecutionContextMock,
       dpnsContractBlockHeight,
       dpnsContractId,
       dashpayContractBlockHeight,
       dashpayContractId,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     requestMock = {
@@ -204,11 +197,9 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       undefined,
       undefined,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -226,11 +217,9 @@ describe('endBlockHandlerFactory', () => {
       dpnsContractId,
       undefined,
       undefined,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -251,11 +240,9 @@ describe('endBlockHandlerFactory', () => {
       dpnsContractId,
       undefined,
       undefined,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     blockExecutionContextMock.hasDataContract.returns(false);
@@ -291,6 +278,7 @@ describe('endBlockHandlerFactory', () => {
     });
 
     expect(response.nextCoreChainLockUpdate).to.deep.equal(expectedCoreChainLock);
+    expect(response.validatorSetUpdate).to.be.equal(null);
   });
 
   it('should simply return a response if Dashpay contract was not set', async () => {
@@ -300,11 +288,9 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       undefined,
       undefined,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -322,11 +308,9 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       dashpayContractBlockHeight,
       dashpayContractId,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -347,11 +331,9 @@ describe('endBlockHandlerFactory', () => {
       undefined,
       dashpayContractBlockHeight,
       dashpayContractId,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     blockExecutionContextMock.hasDataContract.returns(false);
@@ -379,15 +361,13 @@ describe('endBlockHandlerFactory', () => {
 
     endBlockHandler = endBlockHandlerFactory(
       blockExecutionContextMock,
-      dpnsContractBlockHeight,
-      dpnsContractId,
-      dashpayContractBlockHeight,
-      dashpayContractId,
-      simplifiedMasternodeListMock,
-      getValidatorSetInfo,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
       latestCoreChainLockMock,
+      validatorQuorums,
       loggerMock,
-      constainerMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -417,11 +397,11 @@ describe('endBlockHandlerFactory', () => {
       signature: chainLockMock.signature,
     });
     const expectedValidatorUpdate = new ValidatorSetUpdate({
-      validatorUpdates: validatorsUpdateFixture,
+      validatorUpdates: await validatorQuorums.toABCIValidatorUpdates(),
       thresholdPublicKey: new PublicKey({
         bls12381: Uint8Array.from(Buffer.from(quorumListFixture[0].quorumPublicKey, 'hex')),
       }),
-      quorumHash: new QuorumHashUpdate({ quorumHash: quorumListFixture[0].quorumHash }),
+      quorumHash: Buffer.from(quorumListFixture[0].quorumHash, 'hex'),
     });
 
     expect(simplifiedMasternodeListMock.getStore).to.have.been.calledOnce();
@@ -436,6 +416,8 @@ describe('endBlockHandlerFactory', () => {
 
     expect(response.nextCoreChainLockUpdate).to.deep.equal(expectedCoreChainLock);
 
+    // eslint-disable-next-line no-unused-expressions
+    expect(response.validatorSetUpdate.quorumHash).to.be.not.empty;
     expect(response.validatorSetUpdate).to.deep.equal(expectedValidatorUpdate);
   });
 });
