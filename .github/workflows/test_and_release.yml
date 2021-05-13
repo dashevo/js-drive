@@ -115,7 +115,9 @@ jobs:
           sdk-branch: ${{ env.SDK_BRANCH }}
 
       - name: Test vars
-        run: echo ${{ steps.start-local-network.outputs.test-output }}
+        run: |
+          echo 'In CI test step'
+          echo ${{ steps.start-local-network.outputs.test-output }}
 
       - name: Run Platform Test Suite
         uses: dashevo/gh-action-run-platform-test-suite@master
