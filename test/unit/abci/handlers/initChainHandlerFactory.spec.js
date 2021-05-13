@@ -15,7 +15,7 @@ const {
 const initChainHandlerFactory = require('../../../../lib/abci/handlers/initChainHandlerFactory');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 const getSmlFixture = require('../../../../lib/test/fixtures/getSmlFixture');
-const ValidatorQuorums = require('../../../../lib/validatorQuorums/ValidatorQuorums');
+const ValidatorQuorums = require('../../../../lib/validator/ValidatorQuorums');
 
 describe('initChainHandlerFactory', () => {
   let simplifiedMasternodeListMock;

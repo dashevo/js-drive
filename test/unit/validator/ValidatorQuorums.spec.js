@@ -9,7 +9,7 @@ const {
 
 const QuorumEntry = require('@dashevo/dashcore-lib/lib/deterministicmnlist/QuorumEntry');
 const NotFoundAbciError = require('../../../lib/abci/errors/NotFoundAbciError');
-const ValidatorQuorums = require('../../../lib/validatorQuorums/ValidatorQuorums');
+const ValidatorQuorums = require('../../../lib/validator/ValidatorQuorums');
 const getSmlFixture = require('../../../lib/test/fixtures/getSmlFixture');
 
 describe('ValidatorQuorums', () => {

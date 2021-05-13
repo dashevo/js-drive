@@ -22,7 +22,7 @@ const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecut
 const NoDPNSContractFoundError = require('../../../../lib/abci/handlers/errors/NoDPNSContractFoundError');
 const NoDashpayContractFoundError = require('../../../../lib/abci/handlers/errors/NoDashpayContractFoundError');
 
-const ValidatorQuorums = require('../../../../lib/validatorQuorums/ValidatorQuorums');
+const ValidatorQuorums = require('../../../../lib/validator/ValidatorQuorums');
 
 describe('endBlockHandlerFactory', () => {
   let endBlockHandler;
