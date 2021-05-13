@@ -104,7 +104,8 @@ jobs:
           override-testsuite-branch: ${{ env.TEST_SUITE_BRANCH }}
 
       - name: Start Dash local network
-        uses: dashevo/gh-action-start-local-network@master
+        uses: dashevo/gh-action-start-local-network@use-outputs
+        id: start-local-network
         with:
           actions-cache-url: ${{ steps.platform-branches.outputs.cache-url }}
           actions-cache-token: ${{ steps.platform-branches.outputs.cache-token }}
@@ -112,6 +113,9 @@ jobs:
           dapi-branch: ${{ env.DAPI_BRANCH }}
           dashmate-branch: ${{ steps.platform-branches.outputs.dashmate-branch }}
           sdk-branch: ${{ env.SDK_BRANCH }}
+
+      - name: Test vars
+        run: echo ${{ steps.start-local-network.outputs.test-output }}
 
       - name: Run Platform Test Suite
         uses: dashevo/gh-action-run-platform-test-suite@master
