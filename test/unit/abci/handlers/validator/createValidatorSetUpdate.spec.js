@@ -1,7 +1,6 @@
 const {
   tendermint: {
     abci: {
-      ValidatorUpdate,
       ValidatorSetUpdate,
     },
   },
