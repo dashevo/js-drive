@@ -57,8 +57,8 @@ jobs:
       - name: Create dotenv file
         run: cp .env.example .env
 
-      - name: Run tests
-        run: npm run test:coverage
+      # - name: Run tests
+      #   run: npm run test:coverage
 
   test_suite:
     name: Run Platform Test Suite
