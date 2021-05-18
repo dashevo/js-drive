@@ -1,7 +1,26 @@
+const ValidatorSet = require('../../../lib/validator/ValidatorSet');
+
 describe('ValidatorSet', () => {
+  let validatorSet;
+  let simplifiedMasternodeListMock;
+  let getRandomQuorumMock;
+  let fetchQuorumMembersMock;
+
+  beforeEach(function beforeEach() {
+    simplifiedMasternodeListMock = this.sinon.stub();
+    getRandomQuorumMock = this.sinon.stub();
+    fetchQuorumMembersMock = this.sinon.stub();
+
+    validatorSet = new ValidatorSet(
+      simplifiedMasternodeListMock,
+      getRandomQuorumMock,
+      fetchQuorumMembersMock,
+    );
+  });
+
   describe('initialize', () => {
-    it('should initialize with specified core height', () => {
-      throw new Error('implement');
+    it('should initialize with specified core height', async () => {
+      await validatorSet.initialize(42);
     });
   });
 
