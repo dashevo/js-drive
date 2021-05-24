@@ -5,6 +5,7 @@ const getRandomQuorum = require('../../../lib/core/getRandomQuorum');
 describe('getRandomQuorum', () => {
   let smlMock;
   let quorumType;
+  let randomQuorum;
 
   beforeEach(function beforeEach() {
     smlMock = {
@@ -20,7 +21,9 @@ describe('getRandomQuorum', () => {
       },
     ]);
 
-    smlMock.getQuorum.returns(new QuorumEntry());
+    randomQuorum = new QuorumEntry();
+
+    smlMock.getQuorum.returns(randomQuorum);
   });
 
   it('should return random quorum based on entropy', () => {
@@ -30,8 +33,6 @@ describe('getRandomQuorum', () => {
     expect(smlMock.getQuorum).to.have.been.calledOnceWithExactly(
       quorumType, '20',
     );
-    expect(result).to.be.an.instanceOf(QuorumEntry);
+    expect(result).to.equals(randomQuorum);
   });
-
-  // TODO: Probably there are more cases
 });
