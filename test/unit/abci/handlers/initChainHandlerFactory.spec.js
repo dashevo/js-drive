@@ -58,7 +58,7 @@ describe('initChainHandlerFactory', () => {
     const response = await initChainHandler(request);
 
     expect(response).to.be.an.instanceOf(ResponseInitChain);
-    expect(response.validatorSet).to.be.equal(validatorSetUpdate);
+    expect(response.validatorSetUpdate).to.be.equal(validatorSetUpdate);
 
     expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
       initialCoreChainLockedHeight,
