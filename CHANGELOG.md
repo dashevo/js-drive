@@ -1,3 +1,30 @@
+## [0.19.3](https://github.com/dashevo/js-drive/compare/v0.19.2...v0.19.3) (2021-06-04)
+
+
+### Bug Fixes
+
+* documents were deleted using wrong id ([#514](https://github.com/dashevo/js-drive/issues/514))
+
+
+
+## [0.19.2](https://github.com/dashevo/js-drive/compare/v0.19.1...v0.19.2) (2021-05-25)
+
+
+### Bug Fixes
+
+* InvalidQuery error due to feature flags ([#512](https://github.com/dashevo/js-drive/issues/512))
+
+
+
+## [0.19.1](https://github.com/dashevo/js-drive/compare/v0.19.0...v0.19.1) (2021-05-13)
+
+
+### Bug Fixes
+
+* feature flags contract height variable has had an invalid name ([#509](https://github.com/dashevo/js-drive/issues/509))
+
+
+
 # [0.19.0](https://github.com/dashevo/js-drive/compare/v0.18.1...v0.19.0) (2021-05-05)
 
 
