@@ -13,6 +13,7 @@ const dataContractQueryHandlerFactory = require('../../../../../lib/abci/handler
 
 const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
+const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
 
 describe('dataContractQueryHandlerFactory', () => {
   let dataContractQueryHandler;
@@ -22,6 +23,8 @@ describe('dataContractQueryHandlerFactory', () => {
   let data;
   let previousRootTreeMock;
   let previousDataContractsStoreRootTreeLeafMock;
+  let blockExecutionContextMock;
+  let previousBlockExecutionContextMock;
 
   beforeEach(function beforeEach() {
     dataContract = getDataContractFixture();
@@ -36,10 +39,14 @@ describe('dataContractQueryHandlerFactory', () => {
 
     previousDataContractsStoreRootTreeLeafMock = this.sinon.stub();
 
+    blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
+
     dataContractQueryHandler = dataContractQueryHandlerFactory(
       previousDataContractRepositoryMock,
       previousRootTreeMock,
       previousDataContractsStoreRootTreeLeafMock,
+      blockExecutionContextMock,
+      previousBlockExecutionContextMock,
     );
 
     params = { };
@@ -48,7 +55,7 @@ describe('dataContractQueryHandlerFactory', () => {
     };
   });
 
-  it('should return serialized data contract', async () => {
+  it('should return data contract', async () => {
     previousDataContractRepositoryMock.fetch.resolves(dataContract);
 
     const result = await dataContractQueryHandler(params, data, {});
@@ -64,7 +71,7 @@ describe('dataContractQueryHandlerFactory', () => {
     expect(previousRootTreeMock.getFullProof).not.to.be.called();
   });
 
-  it('should return serialized data contract with proof', async () => {
+  it('should return proof', async () => {
     const proof = {
       rootTreeProof: Buffer.from('0100000001f0faf5f55674905a68eba1be2f946e667c1cb5010101', 'hex'),
       storeTreeProof: Buffer.from('03046b657931060076616c75653103046b657932060076616c75653210', 'hex'),
