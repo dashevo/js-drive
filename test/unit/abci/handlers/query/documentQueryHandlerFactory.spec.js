@@ -169,6 +169,23 @@ describe('documentQueryHandlerFactory', () => {
     }
   });
 
+  it('should not proceed forward if createQueryResponse throws UnavailableAbciError', async () => {
+    createQueryResponseMock.throws(new UnavailableAbciError());
+
+    try {
+      await documentQueryHandler(params, data, {});
+
+      expect.fail('should throw UnavailableAbciError');
+    } catch (e) {
+      expect(e).to.be.an.instanceof(UnavailableAbciError);
+      expect(e.getCode()).to.equal(AbciError.CODES.UNAVAILABLE);
+      expect(fetchPreviousDocumentsMock).to.not.be.called();
+      expect(containerMock.resolve).to.be.calledOnceWithExactly('previousBlockExecutionStoreTransactions');
+      expect(previousBlockExecutionTransactionsMock.getTransaction).to.be.calledOnceWithExactly('dataContracts');
+      expect(transactionMock.isStarted).to.be.calledOnce();
+    }
+  });
+
   it('should throw InvalidArgumentAbciError on invalid query', async () => {
     const error = new ValidationError('Some error');
     const queryError = new InvalidQueryError([error]);

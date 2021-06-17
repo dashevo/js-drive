@@ -19,6 +19,7 @@ const identityQueryHandlerFactory = require('../../../../../lib/abci/handlers/qu
 
 const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
+const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
 
 describe('identityQueryHandlerFactory', () => {
   let identityQueryHandler;
@@ -107,5 +108,18 @@ describe('identityQueryHandlerFactory', () => {
       previousIdentitiesStoreRootTreeLeafMock,
       [identity.getId()],
     );
+  });
+
+  it('should not proceed forward if createQueryResponse throws UnavailableAbciError', async () => {
+    createQueryResponseMock.throws(new UnavailableAbciError());
+
+    try {
+      await identityQueryHandler(params, data, {});
+
+      expect.fail('should throw UnavailableAbciError');
+    } catch (e) {
+      expect(e).to.be.an.instanceof(UnavailableAbciError);
+      expect(previousIdentityRepositoryMock.fetch).to.have.not.been.called();
+    }
   });
 });

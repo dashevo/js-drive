@@ -19,6 +19,7 @@ const dataContractQueryHandlerFactory = require('../../../../../lib/abci/handler
 
 const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
+const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
 
 describe('dataContractQueryHandlerFactory', () => {
   let dataContractQueryHandler;
@@ -107,6 +108,19 @@ describe('dataContractQueryHandlerFactory', () => {
       expect(e.getCode()).to.equal(AbciError.CODES.NOT_FOUND);
       expect(e.message).to.equal('Data Contract not found');
       expect(previousDataContractRepositoryMock.fetch).to.be.calledOnceWith(data.id);
+    }
+  });
+
+  it('should not proceed forward if createQueryResponse throws UnavailableAbciError', async () => {
+    createQueryResponseMock.throws(new UnavailableAbciError());
+
+    try {
+      await dataContractQueryHandler(params, data, {});
+
+      expect.fail('should throw UnavailableAbciError');
+    } catch (e) {
+      expect(e).to.be.an.instanceof(UnavailableAbciError);
+      expect(previousDataContractRepositoryMock.fetch).to.have.not.been.called();
     }
   });
 });

@@ -21,6 +21,7 @@ const identitiesByPublicKeyHashesQueryHandlerFactory = require(
 const InvalidArgumentAbciError = require(
   '../../../../../lib/abci/errors/InvalidArgumentAbciError',
 );
+const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
 
 describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
   let identitiesByPublicKeyHashesQueryHandler;
@@ -209,5 +210,18 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       previousIdentitiesStoreRootTreeLeafMock,
       identityIds,
     ]);
+  });
+
+  it('should not proceed forward if createQueryResponse throws UnavailableAbciError', async () => {
+    createQueryResponseMock.throws(new UnavailableAbciError());
+
+    try {
+      await identitiesByPublicKeyHashesQueryHandler({}, {}, {});
+
+      expect.fail('should throw UnavailableAbciError');
+    } catch (e) {
+      expect(e).to.be.an.instanceof(UnavailableAbciError);
+      expect(previousIdentityRepositoryMock.fetch).to.have.not.been.called();
+    }
   });
 });
