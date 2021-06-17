@@ -95,12 +95,6 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
     previousIdentityRepositoryMock.fetch
       .withArgs(identities[0].getId())
       .resolves(identities[1]);
-
-    identitiesByPublicKeyHashes = [
-      identities[0].toBuffer(),
-      identities[1].toBuffer(),
-      Buffer.alloc(0),
-    ];
   });
 
   it('should throw an error if maximum requested items exceeded', async () => {
