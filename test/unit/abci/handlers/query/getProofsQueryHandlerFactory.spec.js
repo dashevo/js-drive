@@ -13,7 +13,6 @@ const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocuments
 
 const getProofsQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/getProofsQueryHandlerFactory');
 const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
-const { expect } = require('chai');
 const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
 
 describe('getProofsQueryHandlerFactory', () => {
