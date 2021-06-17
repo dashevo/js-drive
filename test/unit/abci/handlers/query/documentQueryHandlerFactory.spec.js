@@ -6,7 +6,12 @@ const {
   },
 } = require('@dashevo/abci/types');
 
-const cbor = require('cbor');
+const {
+  v0: {
+    GetDocumentsResponse,
+    Proof,
+  },
+} = require('@dashevo/dapi-grpc');
 
 const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
 
@@ -31,6 +36,8 @@ describe('documentQueryHandlerFactory', () => {
   let containerMock;
   let previousBlockExecutionTransactionsMock;
   let transactionMock;
+  let createQueryResponseMock;
+  let responseMock;
 
   beforeEach(function beforeEach() {
     documents = getDocumentsFixture();
@@ -56,11 +63,19 @@ describe('documentQueryHandlerFactory', () => {
       resolve: this.sinon.stub().returns(previousBlockExecutionTransactionsMock),
     };
 
+    createQueryResponseMock = this.sinon.stub();
+
+    responseMock = new GetDocumentsResponse();
+    responseMock.setProof(new Proof());
+
+    createQueryResponseMock.returns(responseMock);
+
     documentQueryHandler = documentQueryHandlerFactory(
       fetchPreviousDocumentsMock,
       previousRootTreeMock,
       previousDocumentsStoreRootTreeLeafMock,
       containerMock,
+      createQueryResponseMock,
     );
 
     params = {};
@@ -91,11 +106,7 @@ describe('documentQueryHandlerFactory', () => {
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
 
-    const value = {
-      data: documents.map((document) => document.toBuffer()),
-    };
-
-    expect(result.value).to.deep.equal(cbor.encode(value));
+    expect(result.value).to.deep.equal(responseMock.serializeBinary());
     expect(previousRootTreeMock.getFullProof).to.be.not.called();
     expect(containerMock.has).to.be.calledOnceWithExactly('previousBlockExecutionStoreTransactions');
   });
@@ -115,14 +126,9 @@ describe('documentQueryHandlerFactory', () => {
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
 
-    const value = {
-      data: documents.map((document) => document.toBuffer()),
-      proof,
-    };
-
     const documentIds = documents.map((document) => document.getId());
 
-    expect(result.value).to.deep.equal(cbor.encode(value));
+    expect(result.value).to.deep.equal(responseMock.serializeBinary());
     expect(previousRootTreeMock.getFullProof).to.be.calledOnce();
     expect(previousRootTreeMock.getFullProof.getCall(0).args).to.deep.equal([
       previousDocumentsStoreRootTreeLeafMock,

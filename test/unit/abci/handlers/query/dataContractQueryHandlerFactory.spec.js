@@ -5,7 +5,13 @@ const {
     },
   },
 } = require('@dashevo/abci/types');
-const cbor = require('cbor');
+
+const {
+  v0: {
+    GetDataContractResponse,
+    Proof,
+  },
+} = require('@dashevo/dapi-grpc');
 
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 
@@ -13,7 +19,6 @@ const dataContractQueryHandlerFactory = require('../../../../../lib/abci/handler
 
 const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
 const AbciError = require('../../../../../lib/abci/errors/AbciError');
-const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
 
 describe('dataContractQueryHandlerFactory', () => {
   let dataContractQueryHandler;
@@ -23,8 +28,8 @@ describe('dataContractQueryHandlerFactory', () => {
   let data;
   let previousRootTreeMock;
   let previousDataContractsStoreRootTreeLeafMock;
-  let blockExecutionContextMock;
-  let previousBlockExecutionContextMock;
+  let createQueryResponseMock;
+  let responseMock;
 
   beforeEach(function beforeEach() {
     dataContract = getDataContractFixture();
@@ -38,15 +43,18 @@ describe('dataContractQueryHandlerFactory', () => {
     };
 
     previousDataContractsStoreRootTreeLeafMock = this.sinon.stub();
+    createQueryResponseMock = this.sinon.stub();
 
-    blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
+    responseMock = new GetDataContractResponse();
+    responseMock.setProof(new Proof());
+
+    createQueryResponseMock.returns(responseMock);
 
     dataContractQueryHandler = dataContractQueryHandlerFactory(
       previousDataContractRepositoryMock,
       previousRootTreeMock,
       previousDataContractsStoreRootTreeLeafMock,
-      blockExecutionContextMock,
-      previousBlockExecutionContextMock,
+      createQueryResponseMock,
     );
 
     params = { };
@@ -60,14 +68,10 @@ describe('dataContractQueryHandlerFactory', () => {
 
     const result = await dataContractQueryHandler(params, data, {});
 
-    const value = {
-      data: dataContract.toBuffer(),
-    };
-
     expect(previousDataContractRepositoryMock.fetch).to.be.calledOnceWith(data.id);
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(cbor.encode(value));
+    expect(result.value).to.deep.equal(responseMock.serializeBinary());
     expect(previousRootTreeMock.getFullProof).not.to.be.called();
   });
 
@@ -82,15 +86,10 @@ describe('dataContractQueryHandlerFactory', () => {
 
     const result = await dataContractQueryHandler(params, data, { prove: 'true' });
 
-    const value = {
-      data: dataContract.toBuffer(),
-      proof,
-    };
-
     expect(previousDataContractRepositoryMock.fetch).to.be.calledOnceWith(data.id);
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(cbor.encode(value));
+    expect(result.value).to.deep.equal(responseMock.serializeBinary());
     expect(previousRootTreeMock.getFullProof).to.be.calledOnce();
     expect(previousRootTreeMock.getFullProof.getCall(0).args).to.deep.equal([
       previousDataContractsStoreRootTreeLeafMock,

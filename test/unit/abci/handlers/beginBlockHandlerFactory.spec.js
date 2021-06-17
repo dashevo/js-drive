@@ -24,6 +24,7 @@ describe('beginBlockHandlerFactory', () => {
   let coreHeight;
   let blockExecutionDBTransactionsMock;
   let blockExecutionContextMock;
+  let previousBlockExecutionContextMock;
   let header;
   let updateSimplifiedMasternodeListMock;
   let waitForChainLockedHeightMock;
@@ -37,6 +38,7 @@ describe('beginBlockHandlerFactory', () => {
     blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
 
     blockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
+    previousBlockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
     loggerMock = new LoggerMock(this.sinon);
 
@@ -47,6 +49,7 @@ describe('beginBlockHandlerFactory', () => {
       chainInfo,
       blockExecutionDBTransactionsMock,
       blockExecutionContextMock,
+      previousBlockExecutionContextMock,
       protocolVersion,
       updateSimplifiedMasternodeListMock,
       waitForChainLockedHeightMock,

@@ -1,5 +1,3 @@
-const cbor = require('cbor');
-
 const {
   tendermint: {
     abci: {
@@ -7,6 +5,13 @@ const {
     },
   },
 } = require('@dashevo/abci/types');
+
+const {
+  v0: {
+    GetIdentitiesByPublicKeyHashesResponse,
+    Proof,
+  },
+} = require('@dashevo/dapi-grpc');
 
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
 
@@ -23,10 +28,11 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
   let previousIdentityRepositoryMock;
   let publicKeyHashes;
   let identities;
-  let identitiesByPublicKeyHashes;
   let maxIdentitiesPerRequest;
   let previousRootTreeMock;
   let previousIdentitiesStoreRootTreeLeafMock;
+  let createQueryResponseMock;
+  let responseMock;
 
   beforeEach(function beforeEach() {
     previousPublicKeyIdentityIdRepositoryMock = {
@@ -45,12 +51,20 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
 
     maxIdentitiesPerRequest = 5;
 
+    createQueryResponseMock = this.sinon.stub();
+
+    responseMock = new GetIdentitiesByPublicKeyHashesResponse();
+    responseMock.setProof(new Proof());
+
+    createQueryResponseMock.returns(responseMock);
+
     identitiesByPublicKeyHashesQueryHandler = identitiesByPublicKeyHashesQueryHandlerFactory(
       previousPublicKeyIdentityIdRepositoryMock,
       previousIdentityRepositoryMock,
       maxIdentitiesPerRequest,
       previousRootTreeMock,
       previousIdentitiesStoreRootTreeLeafMock,
+      createQueryResponseMock,
     );
 
     publicKeyHashes = [
@@ -146,11 +160,9 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       identities[1].getId(),
     ]);
 
-    const value = await cbor.encodeAsync({ data: identitiesByPublicKeyHashes });
-
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(value);
+    expect(result.value).to.deep.equal(responseMock.serializeBinary());
   });
 
   it('should return identity id map with proof', async () => {
@@ -193,16 +205,11 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       identities[1].getId(),
     ]);
 
-    const value = {
-      data: identitiesByPublicKeyHashes,
-      proof,
-    };
-
     const identityIds = identities.map((identity) => identity.getId());
 
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
-    expect(result.value).to.deep.equal(await cbor.encodeAsync(value));
+    expect(result.value).to.deep.equal(responseMock.serializeBinary());
     expect(previousRootTreeMock.getFullProof).to.be.calledOnce();
     expect(previousRootTreeMock.getFullProof.getCall(0).args).to.deep.equal([
       previousIdentitiesStoreRootTreeLeafMock,

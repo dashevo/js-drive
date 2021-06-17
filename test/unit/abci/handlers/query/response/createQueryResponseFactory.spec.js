@@ -70,22 +70,24 @@ describe('createQueryResponseFactory', () => {
 
     expect(response).to.be.instanceOf(GetDataContractResponse);
 
-    expect(response.getMetadata().toObject()).to.equal(metadata);
+    expect(response.getMetadata().toObject()).to.deep.equal(metadata);
     expect(response.getProof()).to.undefined();
   });
 
   it('should create a response with proof if requested', () => {
-    const response = createQueryResponse(GetDataContractResponse);
+    const response = createQueryResponse(GetDataContractResponse, true);
 
     response.serializeBinary();
 
     expect(response).to.be.instanceOf(GetDataContractResponse);
 
-    expect(response.getMetadata().toObject()).to.equal(metadata);
+    expect(response.getMetadata().toObject()).to.deep.equal(metadata);
 
-    expect(response.getProof().toObject()).to.equal({
-      signatureLlmqHash: lastCommitInfo.quorumHash,
-      signature: lastCommitInfo.signature,
+    expect(response.getProof().toObject()).to.deep.equal({
+      signatureLlmqHash: lastCommitInfo.quorumHash.toString('base64'),
+      signature: lastCommitInfo.signature.toString('base64'),
+      rootTreeProof: '',
+      storeTreeProof: '',
     });
   });
 });
