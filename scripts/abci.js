@@ -8,7 +8,7 @@ const ZMQClient = require('../lib/core/ZmqClient');
 
 const createDIContainer = require('../lib/createDIContainer');
 
-const { version: driveVersion } = require('../package');
+const { version: driveVersion } = require('../package.json');
 
 const banner = '\n ____       ______      ____        __  __                 ____       ____        ______      __  __     ____      \n'
 + '/\\  _`\\    /\\  _  \\    /\\  _`\\     /\\ \\/\\ \\               /\\  _`\\    /\\  _`\\     /\\__  _\\    /\\ \\/\\ \\   /\\  _`\\    \n'
