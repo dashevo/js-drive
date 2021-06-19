@@ -105,6 +105,7 @@ jobs:
       #     concurrency: 8
 
       - name: Load cache into buildkit
+        continue-on-error: true
         run: |
           docker buildx create --name cacheable --use
           docker buildx inspect --bootstrap
