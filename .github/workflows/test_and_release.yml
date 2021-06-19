@@ -90,11 +90,29 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      - name: Enable buildkit cache
+        uses: actions/cache@v2
+        with:
+          path: '~/buildkit-cache'
+          key: ${{ runner.os }}-buildkit-${{ hashFiles('**/buildkit-state.tar.gz') }}
+          restore-keys: |
+            ${{ runner.os }}-buildkit-
+
       # - name: Cache Docker layers
       #   uses: satackey/action-docker-layer-caching@v0.0.11
       #   continue-on-error: true
       #   with:
       #     concurrency: 8
+
+      - name: Load cache into buildkit
+        run: |
+          docker buildx create --name cacheable --use
+          docker buildx inspect --bootstrap
+          docker buildx stop
+          docker run --rm \
+            --volumes-from buildx_buildkit_cacheable0 \
+            -v $(pwd)/buildkit-cache:/cache \
+            alpine /bin/sh -c "cd / && tar xf /cache/buildkit-state.tar.gz"
 
       - name: Load workflow dotenv file
         uses: c-py/action-dotenv-to-setenv@v3
@@ -129,6 +147,13 @@ jobs:
           dpns-top-level-identity-private-key: ${{ steps.start-local-network.outputs.dpns-top-level-identity-private-key }}
           platform-test-suite-branch: ${{ steps.platform-branches.outputs.testsuite-branch }}
           scope: platform
+
+      - name: Save buildkit state
+        run: |
+          docker run --rm \
+            --volumes-from buildx_buildkit_cacheable0 \
+            -v $(pwd)/buildkit-cache:/cache \
+            alpine /bin/sh -c "cd / && tar cf /cache/buildkit-state.tar.gz /var/lib/buildkit"
 
       - name: Show Docker logs
         if: ${{ failure() }}
