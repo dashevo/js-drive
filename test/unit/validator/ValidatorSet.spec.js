@@ -6,6 +6,7 @@ const ValidatorSet = require('../../../lib/validator/ValidatorSet');
 const getSmlFixture = require('../../../lib/test/fixtures/getSmlFixture');
 const ValidatorSetIsNotInitializedError = require('../../../lib/validator/errors/ValidatorSetIsNotInitializedError');
 const Validator = require('../../../lib/validator/Validator');
+const PublicKeyShareIsNotPresentError = require('../../../lib/validator/errors/PublicKeyShareIsNotPresentError');
 
 describe('ValidatorSet', () => {
   let smlStoreMock;
@@ -16,6 +17,7 @@ describe('ValidatorSet', () => {
   let rotationEntropy;
   let quorumEntry;
   let coreHeight;
+  let masternodeProTxHash;
 
   let validatorSetLLMQType;
 
@@ -77,11 +79,14 @@ describe('ValidatorSet', () => {
 
     fetchQuorumMembersMock = this.sinon.stub().resolves(quorumMembers);
 
+    masternodeProTxHash = '123';
+
     validatorSet = new ValidatorSet(
       simplifiedMasternodeListMock,
       getRandomQuorumMock,
       fetchQuorumMembersMock,
       validatorSetLLMQType,
+      masternodeProTxHash,
     );
   });
 
@@ -101,6 +106,20 @@ describe('ValidatorSet', () => {
         validatorSetLLMQType,
         quorumEntry.quorumHash,
       );
+    });
+
+    it('should throw an error if the node is a quorum member and doesn\'t receive public key shares', async () => {
+      quorumMembers[0].proTxHash = masternodeProTxHash;
+      quorumMembers[2].valid = true;
+
+      try {
+        await validatorSet.initialize(coreHeight);
+
+        expect.fail('should throw PublicKeyShareIsNotPresentError');
+      } catch (e) {
+        expect(e).to.be.instanceOf(PublicKeyShareIsNotPresentError);
+        expect(e.getMember()).to.be.equal(quorumMembers[2]);
+      }
     });
   });
 
