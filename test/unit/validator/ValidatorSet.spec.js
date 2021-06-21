@@ -17,7 +17,7 @@ describe('ValidatorSet', () => {
   let rotationEntropy;
   let quorumEntry;
   let coreHeight;
-  let masternodeProTxHash;
+  let coreRpcClientMock;
 
   let validatorSetLLMQType;
 
@@ -79,14 +79,19 @@ describe('ValidatorSet', () => {
 
     fetchQuorumMembersMock = this.sinon.stub().resolves(quorumMembers);
 
-    masternodeProTxHash = '123';
+    const notMasternodeError = new Error();
+    notMasternodeError.code = -32603;
+
+    coreRpcClientMock = {
+      masternode: this.sinon.stub().throws(notMasternodeError),
+    };
 
     validatorSet = new ValidatorSet(
       simplifiedMasternodeListMock,
       getRandomQuorumMock,
       fetchQuorumMembersMock,
       validatorSetLLMQType,
-      masternodeProTxHash,
+      coreRpcClientMock,
     );
   });
 
@@ -109,7 +114,12 @@ describe('ValidatorSet', () => {
     });
 
     it('should throw an error if the node is a quorum member and doesn\'t receive public key shares', async () => {
-      quorumMembers[0].proTxHash = masternodeProTxHash;
+      coreRpcClientMock.masternode.resolves({
+        result: {
+          proTxHash: quorumMembers[0].proTxHash,
+        },
+      });
+
       quorumMembers[2].valid = true;
 
       try {
