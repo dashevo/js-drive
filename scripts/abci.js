@@ -4,9 +4,12 @@ const graceful = require('node-graceful');
 
 const chalk = require('chalk');
 
+const { asValue } = require('awilix');
+
 const ZMQClient = require('../lib/core/ZmqClient');
 
 const createDIContainer = require('../lib/createDIContainer');
+const BlockExecutionContextRepository = require('../lib/blockExecution/BlockExecutionContextRepository');
 
 const { version: driveVersion } = require('../package.json');
 
@@ -56,6 +59,24 @@ console.log(chalk.hex('#008de4')(banner));
 
   await dpp.initialize();
   await transactionalDpp.initialize();
+
+  /**
+   * Initialize Block Execution Contexts
+   */
+  const blockExecutionContextRepository = container.resolve('blockExecutionContextRepository');
+
+  const blockExecutionContext = await blockExecutionContextRepository.fetch(
+    BlockExecutionContextRepository.KEY_PREFIX_CURRENT,
+  );
+
+  const previousBlockExecutionContext = await blockExecutionContextRepository.fetch(
+    BlockExecutionContextRepository.KEY_PREFIX_PREVIOUS,
+  );
+
+  container.register({
+    blockExecutionContext: asValue(blockExecutionContext),
+    previousBlockExecutionContext: asValue(previousBlockExecutionContext),
+  });
 
   /**
    * Make sure MongoDB is running
