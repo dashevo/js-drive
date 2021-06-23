@@ -158,16 +158,16 @@ jobs:
           dashmate-branch: ${{ steps.platform-branches.outputs.dashmate-branch }}
           sdk-branch: ${{ env.SDK_BRANCH }}
 
-      - name: Run Platform Test Suite
-        uses: dashevo/gh-action-run-platform-test-suite@v1
-        with:
-          sdk-branch: ${{ env.SDK_BRANCH }}
-          faucet-private-key: ${{ steps.start-local-network.outputs.faucet-private-key }}
-          dpns-contract-id: ${{ steps.start-local-network.outputs.dpns-contract-id }}
-          dpns-top-level-identity-id: ${{ steps.start-local-network.outputs.dpns-top-level-identity-id }}
-          dpns-top-level-identity-private-key: ${{ steps.start-local-network.outputs.dpns-top-level-identity-private-key }}
-          platform-test-suite-branch: ${{ steps.platform-branches.outputs.testsuite-branch }}
-          scope: platform
+      # - name: Run Platform Test Suite
+      #   uses: dashevo/gh-action-run-platform-test-suite@v1
+      #   with:
+      #     sdk-branch: ${{ env.SDK_BRANCH }}
+      #     faucet-private-key: ${{ steps.start-local-network.outputs.faucet-private-key }}
+      #     dpns-contract-id: ${{ steps.start-local-network.outputs.dpns-contract-id }}
+      #     dpns-top-level-identity-id: ${{ steps.start-local-network.outputs.dpns-top-level-identity-id }}
+      #     dpns-top-level-identity-private-key: ${{ steps.start-local-network.outputs.dpns-top-level-identity-private-key }}
+      #     platform-test-suite-branch: ${{ steps.platform-branches.outputs.testsuite-branch }}
+      #     scope: platform
 
       - name: Save buildkit state
         run: |
