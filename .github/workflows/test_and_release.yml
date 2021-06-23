@@ -98,15 +98,9 @@ jobs:
           cliplugindir=$HOME/.docker/cli-plugins
           mkdir -p $cliplugindir
           cd $cliplugindir
-          docker
-          ls -lha
           wget -O docker-compose https://github.com/docker/compose-cli/releases/download/v2.0.0-beta.4/docker-compose-linux-amd64
           chmod +x docker-compose
-          uname -a
-          pwd
-          ls -lha
           docker
-          docker  2>&1 | grep compose
 
       - name: Enable NPM cache
         uses: actions/cache@v2
