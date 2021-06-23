@@ -5,6 +5,8 @@ const {
     },
   },
 } = require('@dashevo/abci/types');
+
+const Long = require('long');
 const cbor = require('cbor');
 
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
@@ -55,7 +57,7 @@ describe('getProofsQueryHandlerFactory', () => {
     previousBlockExecutionContextMock.isEmpty.returns(false);
 
     previousBlockExecutionContextMock.getHeader.returns({
-      height: 42,
+      height: new Long(42),
       coreChainLockedHeight: 41,
     });
 
