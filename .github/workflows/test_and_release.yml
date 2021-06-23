@@ -100,7 +100,8 @@ jobs:
           cd $cliplugindir
           wget -O docker-compose https://github.com/docker/compose-cli/releases/download/v2.0.0-beta.4/docker-compose-linux-amd64
           chmod +x docker-compose
-          docker
+          docker version
+          docker info
 
       - name: Enable NPM cache
         uses: actions/cache@v2
@@ -175,6 +176,9 @@ jobs:
             --volumes-from buildx_buildkit_cacheable0 \
             -v $(pwd)/buildkit-cache:/cache \
             alpine /bin/sh -c "cd / && tar cf /cache/buildkit-state.tar.gz /var/lib/buildkit"
+          pwd
+          ls -lha
+          ls -lha buildkit-cache
 
       - name: Show Docker logs
         if: ${{ failure() }}
