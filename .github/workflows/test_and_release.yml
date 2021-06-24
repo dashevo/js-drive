@@ -116,7 +116,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: '~/buildkit-cache'
-          key: ${{ runner.os }}-buildkit
+          key: ${{ runner.os }}-buildkit-${{ hashFiles('**/buildkit-state.tar.gz') }}
 
       # - name: Cache Docker layers
       #   uses: satackey/action-docker-layer-caching@v0.0.11
