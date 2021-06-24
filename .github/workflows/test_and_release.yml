@@ -116,7 +116,7 @@ jobs:
       - name: Enable buildkit cache
         uses: actions/cache@v2
         with:
-          path: '~/buildkit-cache'
+          path: buildkit-cache/buildkit-state.tar.gz
           key: ${{ runner.os }}-buildkit-${{ hashFiles('package-lock.json') }}
 
       # - name: Cache Docker layers
