@@ -124,6 +124,10 @@ jobs:
       #   with:
       #     concurrency: 8
 
+      - name: Show containers debug
+        run: |
+          docker ps -a
+
       - name: Load cache into buildkit
         continue-on-error: true
         run: |
