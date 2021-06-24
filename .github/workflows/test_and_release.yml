@@ -83,6 +83,7 @@ jobs:
           node-version: '12'
       
       - name: Set up Docker BuildX
+        id: buildx
         uses: docker/setup-buildx-action@v1
         with:
           install: true
@@ -127,11 +128,11 @@ jobs:
         continue-on-error: true
         run: |
           mkdir $(pwd)/buildkit-cache
-          docker buildx create --name cacheable --use
-          docker buildx inspect --bootstrap
+          # docker buildx create --name cacheable --use
+          # docker buildx inspect --bootstrap
           docker buildx stop
           docker run --rm \
-            --volumes-from buildx_buildkit_cacheable0 \
+            --volumes-from ${{ steps.buildx.outputs.name }} \
             -v $(pwd)/buildkit-cache:/cache \
             alpine /bin/sh -c "cd / && tar xf /cache/buildkit-state.tar.gz"
 
@@ -172,7 +173,7 @@ jobs:
       - name: Save buildkit state
         run: |
           docker run --rm \
-            --volumes-from buildx_buildkit_cacheable0 \
+            --volumes-from ${{ steps.buildx.outputs.name }} \
             -v $(pwd)/buildkit-cache:/cache \
             alpine /bin/sh -c "cd / && tar cf /cache/buildkit-state.tar.gz /var/lib/buildkit"
       
@@ -205,7 +206,7 @@ jobs:
         with:
           install: true
           driver-opts: image=moby/buildkit:buildx-stable-1
-      
+
       - name: Debug output
         run: |
           docker buildx inspect
