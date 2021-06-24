@@ -112,11 +112,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      # key off package-lock because cache mount target is npm ci command
       - name: Enable buildkit cache
         uses: actions/cache@v2
         with:
           path: '~/buildkit-cache'
-          key: ${{ runner.os }}-buildkit-${{ hashFiles('**/buildkit-state.tar.gz') }}
+          key: ${{ runner.os }}-buildkit-${{ hashFiles('package-lock.json') }}
 
       # - name: Cache Docker layers
       #   uses: satackey/action-docker-layer-caching@v0.0.11
