@@ -93,7 +93,7 @@ jobs:
       - name: Set up Docker Compose V2
         run: |
           curl https://github.com/docker/compose-cli/releases/download/v2.0.0-beta.4/docker-compose-linux-amd64 --location --create-dirs -o $HOME/.docker/cli-plugins/docker-compose
-          chmod +x docker-compose
+          chmod +x $HOME/.docker/cli-plugins/docker-compose
           docker version
           docker info
 
