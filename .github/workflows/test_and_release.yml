@@ -88,10 +88,6 @@ jobs:
         with:
           install: true
           driver-opts: image=moby/buildkit:buildx-stable-1
-      
-      # - name: Inspect builder instance
-      #   run: |
-      #     docker buildx inspect
 
       # Temporary fix until Docker Compose V2 is GA
       - name: Set up Docker Compose V2
@@ -112,12 +108,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      # key off package-lock because cache mount target is npm ci command
       - name: Enable buildkit cache
         uses: actions/cache@v2
         with:
           path: buildkit-cache/buildkit-state.tar.gz
-          key: ${{ runner.os }}-buildkit-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-buildkit-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildkit-
 
       # - name: Cache Docker layers
       #   uses: satackey/action-docker-layer-caching@v0.0.11
