@@ -79,6 +79,16 @@ console.log(chalk.hex('#008de4')(banner));
   });
 
   /**
+   * Initialize Credits Distribution Pool
+   */
+
+  const creditsDistributionPoolRepository = container.resolve('creditsDistributionPoolRepository');
+  const creditsDistributionPool = container.resolve('creditsDistributionPool');
+
+  const fetchedCreditsDistributionPool = await creditsDistributionPoolRepository.fetch();
+  creditsDistributionPool.populate(fetchedCreditsDistributionPool.toJSON());
+
+  /**
    * Make sure MongoDB is running
    */
 

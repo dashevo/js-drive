@@ -19,12 +19,11 @@ const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/Bloc
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 const DataCorruptedError = require('../../../../lib/abci/handlers/errors/DataCorruptedError');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
+const BlockExecutionContextRepository = require('../../../../lib/blockExecution/BlockExecutionContextRepository');
 
 describe('commitHandlerFactory', () => {
   let commitHandler;
   let appHash;
-  let chainInfoMock;
-  let chainInfoRepositoryMock;
   let creditsDistributionPoolMock;
   let creditsDistributionPoolRepositoryMock;
   let blockExecutionStoreTransactionsMock;
@@ -46,14 +45,12 @@ describe('commitHandlerFactory', () => {
   let cloneToPreviousStoreTransactionsMock;
   let header;
   let getLatestFeatureFlagMock;
+  let previousBlockExecutionContextMock;
+  let blockExecutionContextRepositoryMock;
 
   beforeEach(function beforeEach() {
     nextPreviousBlockExecutionStoreTransactionsMock = 'nextPreviousBlockExecutionStoreTransactionsMock';
     appHash = Buffer.alloc(0);
-
-    chainInfoMock = {
-      setLastBlockHeight: this.sinon.stub(),
-    };
 
     creditsDistributionPoolMock = {
       incrementAmount: this.sinon.stub(),
@@ -61,11 +58,6 @@ describe('commitHandlerFactory', () => {
     };
 
     dataContract = getDataContractFixture();
-
-    chainInfoRepositoryMock = {
-      store: this.sinon.stub(),
-      createTransaction: this.sinon.stub(),
-    };
 
     blockExecutionStoreTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
     creditsDistributionPoolRepositoryMock = {
@@ -82,6 +74,13 @@ describe('commitHandlerFactory', () => {
     };
 
     blockExecutionContextMock.getHeader.returns(header);
+
+    previousBlockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
+
+    blockExecutionContextRepositoryMock = {
+      fetch: this.sinon.stub(),
+      store: this.sinon.stub(),
+    };
 
     documentsDatabaseManagerMock = {
       create: this.sinon.stub(),
@@ -142,12 +141,12 @@ describe('commitHandlerFactory', () => {
     });
 
     commitHandler = commitHandlerFactory(
-      chainInfoMock,
-      chainInfoRepositoryMock,
       creditsDistributionPoolMock,
       creditsDistributionPoolRepositoryMock,
       blockExecutionStoreTransactionsMock,
       blockExecutionContextMock,
+      previousBlockExecutionContextMock,
+      blockExecutionContextRepositoryMock,
       documentsDatabaseManagerMock,
       previousDocumentDatabaseManagerMock,
       dppMock,
@@ -161,30 +160,32 @@ describe('commitHandlerFactory', () => {
     );
   });
 
-  it('should call setAmount instead of incrementAmount if feature flag was not set', async () => {
-    containerMock.has.withArgs('previousBlockExecutionStoreTransactions').returns(false);
+  describe('Cumulative fees', () => {
+    it('should call setAmount instead of incrementAmount if feature flag was not set', async () => {
+      containerMock.has.withArgs('previousBlockExecutionStoreTransactions').returns(false);
 
-    getLatestFeatureFlagMock.resolves(null);
+      getLatestFeatureFlagMock.resolves(null);
 
-    await commitHandler();
+      await commitHandler();
 
-    expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(
-      accumulativeFees,
-    );
-  });
-
-  it('should call setAmount instead of incrementAmount if feature flag was set to false', async () => {
-    containerMock.has.withArgs('previousBlockExecutionStoreTransactions').returns(false);
-
-    getLatestFeatureFlagMock.resolves({
-      get: () => false,
+      expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(
+        accumulativeFees,
+      );
     });
 
-    await commitHandler();
+    it('should call setAmount instead of incrementAmount if feature flag was set to false', async () => {
+      containerMock.has.withArgs('previousBlockExecutionStoreTransactions').returns(false);
 
-    expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(
-      accumulativeFees,
-    );
+      getLatestFeatureFlagMock.resolves({
+        get: () => false,
+      });
+
+      await commitHandler();
+
+      expect(creditsDistributionPoolMock.setAmount).to.be.calledOnceWith(
+        accumulativeFees,
+      );
+    });
   });
 
   it('should commit db transactions, update chain info, create document dbs and return ResponseCommit', async () => {
@@ -213,9 +214,14 @@ describe('commitHandlerFactory', () => {
     expect(blockExecutionStoreTransactionsMock.getTransaction.getCall(0).args).to.deep.equal(['documents']);
     expect(blockExecutionStoreTransactionsMock.getTransaction.getCall(1).args).to.deep.equal(['common']);
 
-    expect(chainInfoRepositoryMock.store).to.be.calledOnceWith(chainInfoMock);
-    expect(creditsDistributionPoolRepositoryMock.store).to.be.calledOnceWith(
-      creditsDistributionPoolMock,
+    expect(blockExecutionContextRepositoryMock.store).to.be.calledTwice();
+    expect(blockExecutionContextRepositoryMock.store.getCall(0)).to.be.calledWithExactly(
+      BlockExecutionContextRepository.KEY_PREFIX_CURRENT,
+      blockExecutionContextMock,
+    );
+    expect(blockExecutionContextRepositoryMock.store.getCall(1)).to.be.calledWithExactly(
+      BlockExecutionContextRepository.KEY_PREFIX_PREVIOUS,
+      previousBlockExecutionContextMock,
     );
 
     expect(cloneToPreviousStoreTransactionsMock).to.be.calledOnce();
@@ -263,9 +269,14 @@ describe('commitHandlerFactory', () => {
     expect(blockExecutionStoreTransactionsMock.getTransaction.getCall(0).args).to.deep.equal(['documents']);
     expect(blockExecutionStoreTransactionsMock.getTransaction.getCall(1).args).to.deep.equal(['common']);
 
-    expect(chainInfoRepositoryMock.store).to.be.calledOnceWith(chainInfoMock);
-    expect(creditsDistributionPoolRepositoryMock.store).to.be.calledOnceWith(
-      creditsDistributionPoolMock,
+    expect(blockExecutionContextRepositoryMock.store).to.be.calledTwice();
+    expect(blockExecutionContextRepositoryMock.store.getCall(0)).to.be.calledWithExactly(
+      BlockExecutionContextRepository.KEY_PREFIX_CURRENT,
+      blockExecutionContextMock,
+    );
+    expect(blockExecutionContextRepositoryMock.store.getCall(1)).to.be.calledWithExactly(
+      BlockExecutionContextRepository.KEY_PREFIX_PREVIOUS,
+      previousBlockExecutionContextMock,
     );
 
     expect(cloneToPreviousStoreTransactionsMock).to.be.calledOnce();
@@ -335,9 +346,6 @@ describe('commitHandlerFactory', () => {
       expect.fail('should throw DataCorruptedError');
     } catch (e) {
       expect(e).to.be.an.instanceOf(DataCorruptedError);
-
-      expect(chainInfoMock.setLastBlockHeight).to.be.calledOnceWithExactly(Long.fromInt(0));
-      expect(chainInfoRepositoryMock.store).to.be.calledTwice();
     }
   });
 });

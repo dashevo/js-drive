@@ -10,7 +10,6 @@ const {
 
 const beginBlockHandlerFactory = require('../../../../lib/abci/handlers/beginBlockHandlerFactory');
 
-const ChainInfo = require('../../../../lib/chainInfo/ChainInfo');
 const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionStoreTransactionsMock');
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
@@ -19,9 +18,8 @@ describe('beginBlockHandlerFactory', () => {
   let protocolVersion;
   let beginBlockHandler;
   let request;
-  let chainInfo;
   let blockHeight;
-  let coreHeight;
+  let coreChainLockedHeight;
   let blockExecutionDBTransactionsMock;
   let blockExecutionContextMock;
   let previousBlockExecutionContextMock;
@@ -29,10 +27,9 @@ describe('beginBlockHandlerFactory', () => {
   let updateSimplifiedMasternodeListMock;
   let waitForChainLockedHeightMock;
   let loggerMock;
+  let lastCommitInfo;
 
   beforeEach(function beforeEach() {
-    chainInfo = new ChainInfo();
-
     protocolVersion = Long.fromInt(0);
 
     blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
@@ -46,7 +43,6 @@ describe('beginBlockHandlerFactory', () => {
     waitForChainLockedHeightMock = this.sinon.stub();
 
     beginBlockHandler = beginBlockHandlerFactory(
-      chainInfo,
       blockExecutionDBTransactionsMock,
       blockExecutionContextMock,
       previousBlockExecutionContextMock,
@@ -67,11 +63,14 @@ describe('beginBlockHandlerFactory', () => {
       time: {
         seconds: Math.ceil(new Date().getTime() / 1000),
       },
-      coreHeight,
+      coreChainLockedHeight,
     };
+
+    lastCommitInfo = {};
 
     request = {
       header,
+      lastCommitInfo,
     };
   });
 
@@ -80,14 +79,21 @@ describe('beginBlockHandlerFactory', () => {
 
     expect(response).to.be.an.instanceOf(ResponseBeginBlock);
 
-    expect(chainInfo.getLastBlockHeight()).to.equal(blockHeight);
-    expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
-    expect(blockExecutionContextMock.reset).to.be.calledOnce();
-    expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
-    expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
-      coreHeight, { logger: loggerMock },
+    expect(blockExecutionDBTransactionsMock.start).to.be.calledOnceWithExactly();
+
+    expect(previousBlockExecutionContextMock.reset).to.be.calledOnceWithExactly();
+    expect(previousBlockExecutionContextMock.populate).to.be.calledOnceWithExactly(
+      blockExecutionContextMock,
     );
-    expect(waitForChainLockedHeightMock).to.be.calledOnceWithExactly(coreHeight);
+
+    expect(blockExecutionContextMock.reset).to.be.calledOnceWithExactly();
+    expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
+    expect(blockExecutionContextMock.setLastCommitInfo).to.be.calledOnceWithExactly(lastCommitInfo);
+
+    expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
+      coreChainLockedHeight, { logger: loggerMock },
+    );
+    expect(waitForChainLockedHeightMock).to.be.calledOnceWithExactly(coreChainLockedHeight);
     expect(blockExecutionDBTransactionsMock.abort).to.be.not.called();
   });
 
@@ -112,14 +118,22 @@ describe('beginBlockHandlerFactory', () => {
 
     expect(response).to.be.an.instanceOf(ResponseBeginBlock);
 
-    expect(chainInfo.getLastBlockHeight()).to.equal(blockHeight);
-    expect(blockExecutionDBTransactionsMock.start).to.be.calledOnce();
-    expect(blockExecutionContextMock.reset).to.be.calledOnce();
-    expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
-    expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
-      coreHeight, { logger: loggerMock },
+    expect(blockExecutionDBTransactionsMock.start).to.be.calledOnceWithExactly();
+
+    expect(previousBlockExecutionContextMock.reset).to.be.calledOnceWithExactly();
+    expect(previousBlockExecutionContextMock.populate).to.be.calledOnceWithExactly(
+      blockExecutionContextMock,
     );
-    expect(waitForChainLockedHeightMock).to.be.calledOnceWithExactly(coreHeight);
+
+    expect(blockExecutionContextMock.reset).to.be.calledOnceWithExactly();
+    expect(blockExecutionContextMock.setHeader).to.be.calledOnceWithExactly(header);
+    expect(blockExecutionContextMock.setLastCommitInfo).to.be.calledOnceWithExactly(lastCommitInfo);
+
+    expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(
+      coreChainLockedHeight, { logger: loggerMock },
+    );
+
+    expect(waitForChainLockedHeightMock).to.be.calledOnceWithExactly(coreChainLockedHeight);
     expect(blockExecutionDBTransactionsMock.abort).to.be.calledOnce();
   });
 });
