@@ -169,7 +169,7 @@ jobs:
         run: |
           docker buildx prune --force --keep-storage 2g
           docker create --volumes-from buildx_buildkit_${{ steps.buildx.outputs.name }}0 --name cache_export alpine
-          docker cp -a cache_export:/var/lib/buildkit $(pwd)/buildkit-cache
+          sudo docker cp -a cache_export:/var/lib/buildkit $(pwd)/buildkit-cache
 
       - name: Print debug
         run: |
