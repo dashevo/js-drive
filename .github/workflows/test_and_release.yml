@@ -167,7 +167,7 @@ jobs:
 
       - name: Save buildkit state
         run: |
-          docker buildx prune --keep-storage 2g
+          docker buildx prune --force --keep-storage 2g
           docker create --volumes-from buildx_buildkit_${{ steps.buildx.outputs.name }}0 --name cache_export alpine
           docker cp -a cache_export:/var/lib/buildkit $(pwd)/buildkit-cache
 
