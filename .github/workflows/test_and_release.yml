@@ -29,7 +29,7 @@ jobs:
       # using `persist-credentials: false` and replacing github url solves
       # https://github.com/actions/setup-node/issues/214
 
-      - name: Reconfigure git to use HTTP authentication
+      - name: Reconfigure git to use HTTPS authentication
         run: >
           git config --global url."https://github.com/".insteadOf ssh://git@github.com/
 
