@@ -110,7 +110,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: buildkit-cache
-          key: ${{ runner.os }}-buildkit
+          key: ${{ runner.os }}-buildkit-cache
 
       # - name: Cache Docker layers
       #   uses: satackey/action-docker-layer-caching@v0.0.11
