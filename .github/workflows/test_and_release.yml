@@ -129,7 +129,7 @@ jobs:
         continue-on-error: true
         run: |
           docker buildx stop
-          docker cp -a $(pwd)/buildkit-cache buildx_buildkit_${{ steps.buildx.outputs.name }}0:/var/lib/buildkit
+          docker cp $(pwd)/buildkit-cache buildx_buildkit_${{ steps.buildx.outputs.name }}0:/var/lib/buildkit
 
       - name: Load workflow dotenv file
         uses: c-py/action-dotenv-to-setenv@v3
