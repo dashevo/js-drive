@@ -119,6 +119,7 @@ jobs:
       #     concurrency: 8
 
       - name: Show containers debug
+        continue-on-error: true
         run: |
           docker ps -a
           docker buildx inspect
