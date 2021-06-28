@@ -132,7 +132,7 @@ jobs:
           docker run --rm \
             --volumes-from buildx_buildkit_${{ steps.buildx.outputs.name }}0 \
             -v $(pwd)/buildkit-cache:/cache \
-            alpine /bin/sh -c "cd / && tar cf /cache/buildkit-state.tar.gz /var/lib/buildkit"
+            alpine /bin/sh -c "cd / && tar xf /cache/buildkit-state.tar.gz && echo Cache restored successfully"
 
       - name: Load workflow dotenv file
         uses: c-py/action-dotenv-to-setenv@v3
