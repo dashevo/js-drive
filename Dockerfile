@@ -1,4 +1,7 @@
 # syntax = docker/dockerfile:1.2
+#FROM scratch as cachebase
+#ADD cache.tar.gz /
+
 FROM node:12-alpine as node_modules
 
 RUN apk update && \
@@ -24,6 +27,11 @@ COPY package.json package-lock.json /
 #RUN npm ci --production
 RUN --mount=type=cache,target=/root/.npm --mount=type=cache,target=/root/.cache npm ci --production
 
+#FROM alpine as cache_export
+#RUN --mount=type=cache,target=/root/.npm,from=node_modules cp -r /root/.npm /npmmount
+#RUN --mount=type=cache,target=/root/.cache,from=node_modules cp -r /root/.cache /cachemount
+#COPY --from=node_modules /root/.npm /root/.npm
+#COPY --from=node_modules /root/.cache /root/.cache
 
 FROM node:12-alpine
 
