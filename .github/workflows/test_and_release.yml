@@ -109,7 +109,7 @@ jobs:
       - name: Enable buildkit cache
         uses: actions/cache@v2
         with:
-          path: buildkit-cache/buildkit-state.tar.gz
+          path: buildkit-cache
           key: ${{ runner.os }}-buildkit
 
       # - name: Cache Docker layers
@@ -127,7 +127,6 @@ jobs:
       - name: Load cache into buildkit
         continue-on-error: true
         run: |
-          mkdir -p $(pwd)/buildkit-cache
           docker buildx stop
           docker cp -a $(pwd)/buildkit-cache buildx_buildkit_${{ steps.buildx.outputs.name }}0:/var/lib/buildkit
 
