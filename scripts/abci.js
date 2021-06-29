@@ -63,20 +63,20 @@ console.log(chalk.hex('#008de4')(banner));
   /**
    * Initialize Block Execution Contexts
    */
+  const blockExecutionContext = container.resolve('blockExecutionContext');
+  const previousBlockExecutionContext = container.resolve('previousBlockExecutionContext');
   const blockExecutionContextRepository = container.resolve('blockExecutionContextRepository');
 
-  const blockExecutionContext = await blockExecutionContextRepository.fetch(
+  const persistedBlockExecutionContext = await blockExecutionContextRepository.fetch(
     BlockExecutionContextRepository.KEY_PREFIX_CURRENT,
   );
 
-  const previousBlockExecutionContext = await blockExecutionContextRepository.fetch(
+  const persistedPreviousBlockExecutionContext = await blockExecutionContextRepository.fetch(
     BlockExecutionContextRepository.KEY_PREFIX_PREVIOUS,
   );
 
-  container.register({
-    blockExecutionContext: asValue(blockExecutionContext),
-    previousBlockExecutionContext: asValue(previousBlockExecutionContext),
-  });
+  blockExecutionContext.populate(persistedBlockExecutionContext);
+  previousBlockExecutionContext.populate(persistedPreviousBlockExecutionContext);
 
   /**
    * Initialize Credits Distribution Pool
