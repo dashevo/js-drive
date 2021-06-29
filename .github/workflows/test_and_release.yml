@@ -112,11 +112,11 @@ jobs:
           path: buildkit-cache/buildkit-state.tar
           key: ${{ runner.os }}-buildkit-state
 
-      # - name: Cache Docker layers
-      #   uses: satackey/action-docker-layer-caching@v0.0.11
-      #   continue-on-error: true
-      #   with:
-      #     concurrency: 8
+      - name: Cache Docker layers
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+        with:
+          concurrency: 8
 
       - name: Show containers debug
         continue-on-error: true
