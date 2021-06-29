@@ -110,13 +110,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: buildkit-cache/buildkit-state.tar
-          key: ${{ runner.os }}-buildkit-state
-
-      - name: Cache Docker layers
-        uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
-        with:
-          concurrency: 8
+          key: ${{ runner.os }}-buildkit-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildkit-
 
       - name: Show containers debug
         continue-on-error: true
@@ -212,12 +208,6 @@ jobs:
         with:
           path: buildkit-cache/buildkit-state.tar
           key: ${{ runner.os }}-buildkit-state
-
-      # - name: Cache Docker layers
-      #   uses: satackey/action-docker-layer-caching@v0.0.11
-      #   continue-on-error: true
-      #   with:
-      #     concurrency: 8
 
       - name: Show containers debug
         run: |
