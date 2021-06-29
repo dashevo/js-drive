@@ -100,11 +100,12 @@ describe('infoHandlerFactory', () => {
 
     expect(response).to.be.an.instanceOf(ResponseInfo);
 
-    expect(response).to.deep.include({
+    expect(ResponseInfo.toObject(response)).to.deep.equal({
       version: packageJson.version,
       appVersion: protocolVersion,
       lastBlockHeight,
       lastBlockAppHash,
+      lastCoreChainLockedHeight,
     });
 
     expect(updateSimplifiedMasternodeListMock).to.be.calledOnceWithExactly(

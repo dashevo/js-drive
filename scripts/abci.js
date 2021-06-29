@@ -4,8 +4,6 @@ const graceful = require('node-graceful');
 
 const chalk = require('chalk');
 
-const { asValue } = require('awilix');
-
 const ZMQClient = require('../lib/core/ZmqClient');
 
 const createDIContainer = require('../lib/createDIContainer');
