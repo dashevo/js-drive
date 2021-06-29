@@ -57,8 +57,8 @@ jobs:
       - name: Create dotenv file
         run: cp .env.example .env
 
-      # - name: Run tests
-      #   run: npm run test:coverage
+      - name: Run tests
+        run: npm run test:coverage
 
   test_suite:
     name: Run Platform Test Suite
@@ -153,16 +153,16 @@ jobs:
           dashmate-branch: ${{ steps.platform-branches.outputs.dashmate-branch }}
           sdk-branch: ${{ env.SDK_BRANCH }}
 
-      # - name: Run Platform Test Suite
-      #   uses: dashevo/gh-action-run-platform-test-suite@v1
-      #   with:
-      #     sdk-branch: ${{ env.SDK_BRANCH }}
-      #     faucet-private-key: ${{ steps.start-local-network.outputs.faucet-private-key }}
-      #     dpns-contract-id: ${{ steps.start-local-network.outputs.dpns-contract-id }}
-      #     dpns-top-level-identity-id: ${{ steps.start-local-network.outputs.dpns-top-level-identity-id }}
-      #     dpns-top-level-identity-private-key: ${{ steps.start-local-network.outputs.dpns-top-level-identity-private-key }}
-      #     platform-test-suite-branch: ${{ steps.platform-branches.outputs.testsuite-branch }}
-      #     scope: platform
+      - name: Run Platform Test Suite
+        uses: dashevo/gh-action-run-platform-test-suite@v1
+        with:
+          sdk-branch: ${{ env.SDK_BRANCH }}
+          faucet-private-key: ${{ steps.start-local-network.outputs.faucet-private-key }}
+          dpns-contract-id: ${{ steps.start-local-network.outputs.dpns-contract-id }}
+          dpns-top-level-identity-id: ${{ steps.start-local-network.outputs.dpns-top-level-identity-id }}
+          dpns-top-level-identity-private-key: ${{ steps.start-local-network.outputs.dpns-top-level-identity-private-key }}
+          platform-test-suite-branch: ${{ steps.platform-branches.outputs.testsuite-branch }}
+          scope: platform
 
       - name: Save buildkit state
         run: |
@@ -225,14 +225,6 @@ jobs:
             -v $(pwd)/buildkit-cache:/cache \
             alpine /bin/sh -c "cd / && tar xf /cache/buildkit-state.tar && echo Cache restored successfully"
 
-      # - name: Cache Docker layers
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: /tmp/.buildx-cache
-      #     key: ${{ runner.os }}-buildx-${{ github.sha }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-buildx-
-
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -260,10 +252,6 @@ jobs:
             latest=${{ !contains(github.event.release.tag_name, '-dev') }}
             suffix=${{ steps.suffix.outputs.result }}
 
-      # BuildX cache temporary workaround
-      # https://github.com/docker/build-push-action/issues/252
-      # https://github.com/moby/buildkit/issues/1896
-
       - name: Build and push Docker image
         id: docker_build
         uses: docker/build-push-action@v2
@@ -273,8 +261,6 @@ jobs:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
-          # cache-from: type=local,src=/tmp/.buildx-cache # <---
-          # cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new # <---
           # platforms: linux/amd64,linux/arm64,linux/arm/v7
 
       - name: Save buildkit state
@@ -283,11 +269,6 @@ jobs:
             --volumes-from buildx_buildkit_${{ steps.buildx.outputs.name }}0 \
             -v $(pwd)/buildkit-cache:/cache \
             alpine /bin/sh -c "cd / && tar cf /cache/buildkit-state.tar /var/lib/buildkit"
-
-      # - name: Temporary fix for Docker cache action
-      #   run: |
-      #     rm -rf /tmp/.buildx-cache
-      #     mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Show Docker image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
