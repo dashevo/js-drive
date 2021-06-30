@@ -128,15 +128,6 @@ jobs:
           cache-path: $(pwd)/buildkit-cache
           cache-max-size: 2g
 
-      # - name: Load cache into buildkit
-      #   continue-on-error: true
-      #   run: |
-      #     docker buildx stop
-      #     docker run --rm \
-      #       --volumes-from buildx_buildkit_${{ steps.buildx.outputs.name }}0 \
-      #       -v $(pwd)/buildkit-cache:/cache \
-      #       alpine /bin/sh -c "cd / && tar xf /cache/buildkit-state.tar && echo Cache restored successfully"
-
       - name: Load workflow dotenv file
         uses: c-py/action-dotenv-to-setenv@v3
         with:
@@ -153,8 +144,6 @@ jobs:
         uses: dashevo/gh-action-start-local-network@buildkit-caching-support
         id: start-local-network
         with:
-          actions-cache-url: ${{ steps.platform-branches.outputs.cache-url }}
-          actions-cache-token: ${{ steps.platform-branches.outputs.cache-token }}
           drive-branch: ${{ steps.platform-branches.outputs.current-branch }}
           dapi-branch: ${{ env.DAPI_BRANCH }}
           dashmate-branch: ${{ steps.platform-branches.outputs.dashmate-branch }}
@@ -170,21 +159,6 @@ jobs:
       #     dpns-top-level-identity-private-key: ${{ steps.start-local-network.outputs.dpns-top-level-identity-private-key }}
       #     platform-test-suite-branch: ${{ steps.platform-branches.outputs.testsuite-branch }}
       #     scope: platform
-
-      # - name: Save buildkit state
-      #   run: |
-      #     docker buildx prune --force --keep-storage 2g
-      #     docker run --rm \
-      #       --volumes-from buildx_buildkit_${{ steps.buildx.outputs.name }}0 \
-      #       -v $(pwd)/buildkit-cache:/cache \
-      #       alpine /bin/sh -c "cd / && tar cf /cache/buildkit-state.tar /var/lib/buildkit && echo Cache archived successfully"
-
-      - name: Print debug
-        run: |
-          pwd
-          ls -lha buildkit-cache
-          docker system df -v
-          printenv
 
       - name: Show Docker logs
         if: ${{ failure() }}
@@ -222,15 +196,12 @@ jobs:
           docker buildx inspect
           ls -lha buildkit-cache
 
-      - name: Load cache into buildkit
-        continue-on-error: true
-        run: |
-          mkdir -p $(pwd)/buildkit-cache
-          docker buildx stop
-          docker run --rm \
-            --volumes-from buildx_buildkit_${{ steps.buildx.outputs.name }}0 \
-            -v $(pwd)/buildkit-cache:/cache \
-            alpine /bin/sh -c "cd / && tar xf /cache/buildkit-state.tar && echo Cache restored successfully"
+      - name: Load buildkit state from cache
+        uses: strophy/gh-action-cache-buildkit-state@master
+        with:
+          builder: buildx_buildkit_${{ steps.buildx.outputs.name }}0
+          cache-path: $(pwd)/buildkit-cache
+          cache-max-size: 2g
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -269,13 +240,6 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           # platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Save buildkit state
-        run: |
-          docker run --rm \
-            --volumes-from buildx_buildkit_${{ steps.buildx.outputs.name }}0 \
-            -v $(pwd)/buildkit-cache:/cache \
-            alpine /bin/sh -c "cd / && tar cf /cache/buildkit-state.tar /var/lib/buildkit"
 
       - name: Show Docker image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
