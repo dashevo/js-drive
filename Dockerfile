@@ -21,7 +21,6 @@ ENV npm_config_zmq_external=true
 
 COPY package.json package-lock.json /
 
-#RUN npm ci --production
 RUN --mount=type=cache,target=/root/.npm --mount=type=cache,target=/root/.cache npm ci --production
 
 FROM node:12-alpine
