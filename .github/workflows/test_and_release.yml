@@ -122,7 +122,6 @@ jobs:
           ls -lha buildkit-cache
 
       - name: Load buildkit state from cache
-        continue-on-error: true
         uses: strophy/gh-action-cache-buildkit-state@master
         with:
           builder: buildx_buildkit_${{ steps.buildx.outputs.name }}0
