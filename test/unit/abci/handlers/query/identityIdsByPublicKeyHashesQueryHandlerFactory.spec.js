@@ -121,6 +121,7 @@ describe('identityIdsByPublicKeyHashesQueryHandlerFactory', () => {
 
     responseMock = new GetIdentityIdsByPublicKeyHashesResponse();
     responseMock.setIdentityIdsList([Buffer.alloc(0), Buffer.alloc(0), Buffer.alloc(0)]);
+    responseMock.setMetadata(new ResponseMetadata());
 
     const result = await identityIdsByPublicKeyHashesQueryHandler(params, data, {});
 
