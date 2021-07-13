@@ -87,7 +87,7 @@ describe('verifyChainLockQueryHandlerFactory', () => {
   });
 
   it('should throw InvalidArgumentAbciError if chainLock is not valid', async () => {
-    chainLockMock.verify.returns(false);
+    coreRpcClientMock.verifyChainLock.returns(false);
 
     try {
       await verifyChainLockQueryHandler(params, encodedChainLock);
