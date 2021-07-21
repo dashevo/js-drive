@@ -13,7 +13,7 @@ describe('RootTree', () => {
   beforeEach(() => {
     const leafOneRootHash = Buffer.alloc(32).fill(1);
     const leafTwoRootHash = Buffer.alloc(32).fill(2);
-    rootHash = Buffer.from('2c7ea9e15ee141e37b39c026d874049ca171ff1126644f4f94b316f49acd5336', 'hex');
+    rootHash = Buffer.from('a9220603765eb43567e1ee316409e107e131c97daa7c488463998032458333aa', 'hex');
 
     leafOneMock = {
       getIndex() {
