@@ -1,3 +1,41 @@
+# [0.20.0](https://github.com/dashevo/js-drive/compare/v0.19.3...v0.20.0) (2021-07-22)
+
+
+### Features
+
+* use latest version of `node-merk` ([#546](https://github.com/dashevo/js-drive/issues/546))
+* remove chainlock SML verification ([#536](https://github.com/dashevo/js-drive/issues/536))
+* remove SML instant lock verification in favor of more robust core verification [#533](https://github.com/dashevo/js-drive/issues/533))
+* add `QuorumsNotFoundError` fot `getRandomQuorum.js` when no quorums were found ([#531](https://github.com/dashevo/js-drive/issues/531))
+* make compatible with Tenderdash v0.5 ([#527](https://github.com/dashevo/js-drive/issues/527))
+* add additional info to proofs ([#518](https://github.com/dashevo/js-drive/issues/518), [#540](https://github.com/dashevo/js-drive/issues/540), [#542](https://github.com/dashevo/js-drive/issues/542), [#525](https://github.com/dashevo/js-drive/issues/525))
+* ensure public key share for validator ([#515](https://github.com/dashevo/js-drive/issues/515))
+* configure validator set LLMQ type ([#517](https://github.com/dashevo/js-drive/issues/517))
+* validator set rotation ([#446](https://github.com/dashevo/js-drive/issues/446))
+
+
+### Bug Fixes
+
+* `getProofs` method was missing from `PublicKeyToIdentityIdStoreRootTreeLeaf` class ([#544](https://github.com/dashevo/js-drive/issues/544))
+* empty validator pubKey object sent ([#530](https://github.com/dashevo/js-drive/issues/530))
+* unavailable error until the second block committed ([#523](https://github.com/dashevo/js-drive/issues/523))
+* miscellaneous fixes (typos, CI etc.)  ([#516](https://github.com/dashevo/js-drive/issues/516), [#529](https://github.com/dashevo/js-drive/issues/529))
+* documents were deleted using wrong id ([#514](https://github.com/dashevo/js-drive/issues/514))
+* invalid instant lock if no blocks are produced ([#513](https://github.com/dashevo/js-drive/issues/513))
+
+
+### BREAKING CHANGES
+
+* `document`, `dataContract`, `identity`, `identityIdsByPublicKeyHashes` and `identitiesByPublicKeyHashes` query handlers now returns Protobuf messages instead of cbor'ed data. data is not sent if a proof is requested
+* `VALIDATOR_SET_LLMQ_TYPE` env is required
+* due to changes in hashing algorithm `appHash` is no longer same and not reproducible for old blocks hence new nodes would not be able to sync
+* removing SML IS lock verification make some previously invalid transactions valid
+* not compatible with Tenderdash v0.4
+* new abci messages and types not compatible with previous ones
+* updated `ResponseEndBlock` and `ResponseInitChain` abci messages are not compatible with previous versions
+
+
+
 ## [0.19.3](https://github.com/dashevo/js-drive/compare/v0.19.2...v0.19.3) (2021-06-04)
 
 
