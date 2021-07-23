@@ -4,6 +4,8 @@ const {
   },
 } = require('@dashevo/dapi-grpc');
 
+const Long = require('long');
+
 const BlockExecutionContextMock = require('../../../../../../lib/test/mock/BlockExecutionContextMock');
 const createQueryResponseFactory = require('../../../../../../lib/abci/handlers/query/response/createQueryResponseFactory');
 
@@ -19,7 +21,7 @@ describe('createQueryResponseFactory', () => {
     previousBlockExecutionContextMock = new BlockExecutionContextMock(this.sinon);
 
     metadata = {
-      height: 1,
+      height: new Long(1),
       coreChainLockedHeight: 1,
     };
 
@@ -45,7 +47,10 @@ describe('createQueryResponseFactory', () => {
 
     expect(response).to.be.instanceOf(GetDataContractResponse);
 
-    expect(response.getMetadata().toObject()).to.deep.equal(metadata);
+    expect(response.getMetadata().toObject()).to.deep.equal({
+      height: 1,
+      coreChainLockedHeight: 1,
+    });
     expect(response.getProof()).to.undefined();
   });
 
@@ -56,7 +61,10 @@ describe('createQueryResponseFactory', () => {
 
     expect(response).to.be.instanceOf(GetDataContractResponse);
 
-    expect(response.getMetadata().toObject()).to.deep.equal(metadata);
+    expect(response.getMetadata().toObject()).to.deep.equal({
+      height: 1,
+      coreChainLockedHeight: 1,
+    });
 
     expect(response.getProof().toObject()).to.deep.equal({
       signatureLlmqHash: lastCommitInfo.quorumHash.toString('base64'),
