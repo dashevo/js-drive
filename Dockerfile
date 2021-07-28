@@ -8,7 +8,8 @@ RUN apk update && \
                        openssh-client \
                        python \
                        alpine-sdk \
-                       zeromq-dev
+                       zeromq-dev \
+                       cmake
 
 # Enable node-gyp cache
 # and replacing github url https://github.com/actions/setup-node/issues/214
