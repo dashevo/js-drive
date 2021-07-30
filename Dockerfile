@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1.2
 FROM node:12-alpine as node_modules
 
-ARG TARGETPLATFORM
+ARG TARGETARCH
 
 RUN apk update && \
     apk --no-cache upgrade && \
@@ -24,7 +24,7 @@ ENV npm_config_zmq_external=true
 
 COPY package.json package-lock.json /
 
-RUN --mount=type=cache,id=npm-${TARGETPLATFORM},target=/root/.npm --mount=type=cache,id=gyp-${TARGETPLATFORM},target=/root/.cache npm ci --production
+RUN --mount=type=cache,id=npm-${TARGETARCH},target=/root/.npm --mount=type=cache,id=gyp-${TARGETARCH},target=/root/.cache npm ci --production
 
 FROM node:12-alpine
 
