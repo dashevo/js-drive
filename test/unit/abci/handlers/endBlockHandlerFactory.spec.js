@@ -36,7 +36,7 @@ describe('endBlockHandlerFactory', () => {
   let createValidatorSetUpdateMock;
   let chainLockMock;
   let validatorSetMock;
-  let getLatestFeatureFlagMock;
+  let getFeatureFlagForHeightMock;
   let blockExecutionStoreTransactionsMock;
 
   beforeEach(function beforeEach() {
@@ -81,7 +81,7 @@ describe('endBlockHandlerFactory', () => {
 
     blockExecutionStoreTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
 
-    getLatestFeatureFlagMock = this.sinon.stub().resolves(null);
+    getFeatureFlagForHeightMock = this.sinon.stub().resolves(null);
 
     endBlockHandler = endBlockHandlerFactory(
       blockExecutionContextMock,
@@ -93,7 +93,7 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
-      getLatestFeatureFlagMock,
+      getFeatureFlagForHeightMock,
       blockExecutionStoreTransactionsMock,
     );
 
@@ -113,7 +113,7 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
-      getLatestFeatureFlagMock,
+      getFeatureFlagForHeightMock,
       blockExecutionStoreTransactionsMock,
     );
 
@@ -136,7 +136,7 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
-      getLatestFeatureFlagMock,
+      getFeatureFlagForHeightMock,
       blockExecutionStoreTransactionsMock,
     );
 
@@ -162,7 +162,7 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
-      getLatestFeatureFlagMock,
+      getFeatureFlagForHeightMock,
       blockExecutionStoreTransactionsMock,
     );
 
@@ -196,7 +196,7 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
-      getLatestFeatureFlagMock,
+      getFeatureFlagForHeightMock,
       blockExecutionStoreTransactionsMock,
     );
 
@@ -222,7 +222,7 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
-      getLatestFeatureFlagMock,
+      getFeatureFlagForHeightMock,
       blockExecutionStoreTransactionsMock,
     );
 
@@ -308,7 +308,7 @@ describe('endBlockHandlerFactory', () => {
       appVersion: 1,
     });
 
-    getLatestFeatureFlagMock.resolves({
+    getFeatureFlagForHeightMock.resolves({
       get: getLatestFeatureFlagGetMock,
     });
 
@@ -333,6 +333,6 @@ describe('endBlockHandlerFactory', () => {
     });
 
     expect(blockExecutionStoreTransactionsMock.getTransaction).to.be.calledOnce();
-    expect(getLatestFeatureFlagMock).to.be.calledOnce();
+    expect(getFeatureFlagForHeightMock).to.be.calledOnce();
   });
 });
