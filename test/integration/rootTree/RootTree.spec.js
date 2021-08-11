@@ -1,6 +1,6 @@
 const RootTree = require('../../../lib/rootTree/RootTree');
 
-const hashFunction = require('../../../lib/rootTree/hashFunction');
+const { hashFunction } = require('../../../lib/rootTree/hashFunction');
 
 const InvalidLeafIndexError = require('../../../lib/rootTree/errors/InvalidLeafIndexError');
 
