@@ -6,7 +6,7 @@ const chalk = require('chalk');
 
 const ZMQClient = require('../lib/core/ZmqClient');
 
-const hashFunctionModule = require('../lib/rootTree/hashFunction');
+const { init: initHashFunction } = require('../lib/rootTree/hashFunction');
 
 const createDIContainer = require('../lib/createDIContainer');
 const BlockExecutionContextRepository = require('../lib/blockExecution/BlockExecutionContextRepository');
@@ -57,7 +57,7 @@ console.log(chalk.hex('#008de4')(banner));
    * Initialize hashFunction
    */
 
-  await hashFunctionModule.init();
+  await initHashFunction();
 
   /**
    * Initialize DPP
