@@ -18,6 +18,7 @@ const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataCo
 const dataContractQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/dataContractQueryHandlerFactory');
 
 const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
+const AbciError = require('../../../../../lib/abci/errors/AbciError');
 const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
 const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
 
@@ -129,14 +130,17 @@ describe('dataContractQueryHandlerFactory', () => {
     ]);
   });
 
-  it('should set empty data contract if data contract not found', async () => {
-    const result = await dataContractQueryHandler(params, data, {});
+  it('should throw NotFoundAbciError if data contract not found', async () => {
+    try {
+      await dataContractQueryHandler(params, data, {});
 
-    responseMock.setDataContract(Buffer.alloc(0));
-
-    expect(result).to.deep.equal(new ResponseQuery({
-      value: responseMock.serializeBinary(),
-    }));
+      expect.fail('should throw NotFoundAbciError');
+    } catch (e) {
+      expect(e).to.be.an.instanceof(NotFoundAbciError);
+      expect(e.getCode()).to.equal(AbciError.CODES.NOT_FOUND);
+      expect(e.message).to.equal('Data Contract not found');
+      expect(previousDataContractRepositoryMock.fetch).to.be.calledOnceWith(data.id);
+    }
   });
 
   it('should not proceed forward if createQueryResponse throws UnavailableAbciError', async () => {

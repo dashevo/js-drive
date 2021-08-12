@@ -18,6 +18,7 @@ const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFi
 const identityQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/identityQueryHandlerFactory');
 
 const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
+const AbciError = require('../../../../../lib/abci/errors/AbciError');
 const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
 const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
 
@@ -108,13 +109,16 @@ describe('identityQueryHandlerFactory', () => {
   });
 
   it('should throw NotFoundAbciError if identity not found', async () => {
-    const result = await identityQueryHandler(params, data, {});
+    try {
+      await identityQueryHandler(params, data, {});
 
-    responseMock.setIdentity(Buffer.alloc(0));
-
-    expect(result).to.deep.equal(new ResponseQuery({
-      value: responseMock.serializeBinary(),
-    }));
+      expect.fail('should throw NotFoundAbciError');
+    } catch (e) {
+      expect(e).to.be.an.instanceof(NotFoundAbciError);
+      expect(e.getCode()).to.equal(AbciError.CODES.NOT_FOUND);
+      expect(e.message).to.equal('Identity not found');
+      expect(previousIdentityRepositoryMock.fetch).to.be.calledOnceWith(data.id);
+    }
   });
 
   it('should return serialized identity with proof', async () => {
