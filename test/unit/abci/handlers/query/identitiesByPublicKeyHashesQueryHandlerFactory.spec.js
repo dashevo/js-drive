@@ -246,7 +246,8 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
     expect(previousRootTreeMock.getFullProof).to.be.calledTwice();
     expect(previousRootTreeMock.getFullProof.getCall(0).args).to.deep.equal([
       previousIdentitiesStoreRootTreeLeafMock,
-      [...identityIds, null].map((identityId) => {
+      // Fetch only found identity ids to optimize proof size
+      identityIds.map((identityId) => {
         if (identityId) {
           return identityId.toBuffer();
         }
@@ -254,9 +255,11 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
         return null;
       }),
     ]);
+
     expect(previousRootTreeMock.getFullProof.getCall(1).args).to.deep.equal([
       previousPublicKeyToIdentityIdStoreRootTreeLeafMock,
-      publicKeyHashes,
+      // Fetch proof only for not found identities to optimize proof size
+      [publicKeyHashes[2]],
     ]);
   });
 
