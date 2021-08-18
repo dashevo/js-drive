@@ -63,7 +63,7 @@ describe('deliverTxHandlerFactory', () => {
 
     dppMock
       .stateTransition
-      .validate
+      .validateState
       .resolves({
         isValid: this.sinon.stub().returns(true),
       });
