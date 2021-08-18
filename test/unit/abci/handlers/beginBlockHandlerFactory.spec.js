@@ -13,6 +13,7 @@ const beginBlockHandlerFactory = require('../../../../lib/abci/handlers/beginBlo
 const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionStoreTransactionsMock');
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
+const InternalAbciError = require('../../../../lib/abci/errors/InternalAbciError');
 
 describe('beginBlockHandlerFactory', () => {
   let protocolVersion;
@@ -28,6 +29,8 @@ describe('beginBlockHandlerFactory', () => {
   let waitForChainLockedHeightMock;
   let loggerMock;
   let lastCommitInfo;
+  let dppMock;
+  let transactionalDppMock;
 
   beforeEach(function beforeEach() {
     protocolVersion = Long.fromInt(0);
@@ -39,6 +42,13 @@ describe('beginBlockHandlerFactory', () => {
 
     loggerMock = new LoggerMock(this.sinon);
 
+    dppMock = {
+      setProtocolVersion: this.sinon.stub(),
+    };
+    transactionalDppMock = {
+      setProtocolVersion: this.sinon.stub(),
+    };
+
     updateSimplifiedMasternodeListMock = this.sinon.stub();
     waitForChainLockedHeightMock = this.sinon.stub();
 
@@ -47,6 +57,8 @@ describe('beginBlockHandlerFactory', () => {
       blockExecutionContextMock,
       previousBlockExecutionContextMock,
       protocolVersion,
+      dppMock,
+      transactionalDppMock,
       updateSimplifiedMasternodeListMock,
       waitForChainLockedHeightMock,
       loggerMock,
@@ -95,6 +107,12 @@ describe('beginBlockHandlerFactory', () => {
     );
     expect(waitForChainLockedHeightMock).to.be.calledOnceWithExactly(coreChainLockedHeight);
     expect(blockExecutionDBTransactionsMock.abort).to.be.not.called();
+    expect(dppMock.setProtocolVersion).to.have.been.calledOnceWithExactly(
+      protocolVersion.toNumber(),
+    );
+    expect(transactionalDppMock.setProtocolVersion).to.have.been.calledOnceWithExactly(
+      protocolVersion.toNumber(),
+    );
   });
 
   it('should reject not supported protocol version', async () => {
@@ -108,6 +126,19 @@ describe('beginBlockHandlerFactory', () => {
       expect(err).to.be.an('Error');
       expect(err.message).to.equal('Block protocol version 42 not supported. Expected to be less or equal to 0.');
       expect(err.name).to.equal('NotSupportedProtocolVersionError');
+    }
+  });
+
+  it('should throw an InternalABCIError in case version.app is not present', async () => {
+    delete request.header.version.app;
+
+    try {
+      await beginBlockHandler(request);
+
+      expect.fail('Expected exception to be thrown');
+    } catch (err) {
+      expect(err).to.be.an.instanceOf(InternalAbciError);
+      expect(err.getError().message).to.equal('app version was not present in consensus parameters');
     }
   });
 
