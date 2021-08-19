@@ -104,7 +104,7 @@ describe('deliverTxHandlerFactory', () => {
     expect(unserializeStateTransitionMock).to.be.calledOnceWith(
       documentsBatchTransitionFixture.toBuffer(),
     );
-    expect(dppMock.stateTransition.validate).to.be.calledOnceWith(
+    expect(dppMock.stateTransition.validateState).to.be.calledOnceWith(
       documentsBatchTransitionFixture,
     );
     expect(dppMock.stateTransition.apply).to.be.calledOnceWith(
@@ -138,7 +138,7 @@ describe('deliverTxHandlerFactory', () => {
     expect(unserializeStateTransitionMock).to.be.calledOnceWith(
       dataContractCreateTransitionFixture.toBuffer(),
     );
-    expect(dppMock.stateTransition.validate).to.be.calledOnceWith(
+    expect(dppMock.stateTransition.validateState).to.be.calledOnceWith(
       dataContractCreateTransitionFixture,
     );
     expect(dppMock.stateTransition.apply).to.be.calledOnceWith(
@@ -159,7 +159,7 @@ describe('deliverTxHandlerFactory', () => {
     const error = new ValidationError('Some error');
     const invalidResult = new ValidationResult([error]);
 
-    dppMock.stateTransition.validate.resolves(invalidResult);
+    dppMock.stateTransition.validateState.resolves(invalidResult);
 
     try {
       await deliverTxHandler(documentRequest);
