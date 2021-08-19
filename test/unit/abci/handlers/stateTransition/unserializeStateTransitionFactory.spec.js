@@ -127,10 +127,10 @@ describe('unserializeStateTransitionFactory', () => {
       expect.fail('should throw an InsufficientFundsError');
     } catch (e) {
       expect(e).to.be.instanceOf(InvalidArgumentAbciError);
-      expect(e.getErrors()[0]).to.equal(error);
+      expect(e.getData().errors[0]).to.equal(error);
 
       expect(dppMock.stateTransition.createFromBuffer).to.be.calledOnce();
-      expect(dppMock.stateTransition.validateFee).to.be.calledOnce();
+      expect(dppMock.stateTransition.validateFee).to.have.not.been.called();
     }
   });
 
