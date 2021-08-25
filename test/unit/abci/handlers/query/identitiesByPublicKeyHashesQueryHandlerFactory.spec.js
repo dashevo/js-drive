@@ -24,7 +24,6 @@ const InvalidArgumentAbciError = require(
 );
 const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
 const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
-const { expect } = require('chai');
 
 describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
   let identitiesByPublicKeyHashesQueryHandler;
