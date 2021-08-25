@@ -5,6 +5,7 @@ const { init: initHashFunction, hashFunction } = require('../../../lib/rootTree/
 const InvalidLeafIndexError = require('../../../lib/rootTree/errors/InvalidLeafIndexError');
 
 describe('RootTree', () => {
+  let leafMocks;
   let leafOneMock;
   let leafTwoMock;
   let rootTree;
@@ -15,32 +16,27 @@ describe('RootTree', () => {
   });
 
   beforeEach(() => {
-    const leafOneRootHash = Buffer.alloc(32).fill(1);
-    const leafTwoRootHash = Buffer.alloc(32).fill(2);
-    rootHash = Buffer.from('a9220603765eb43567e1ee316409e107e131c97daa7c488463998032458333aa', 'hex');
+    leafMocks = [];
+    for (let i = 0; i < 6; i++) {
+      const leafHash = Buffer.alloc(32, i);
+      leafMocks.push({
+        getIndex() {
+          return i;
+        },
+        getHash() {
+          return hashFunction(leafHash);
+        },
+        getProof() {
+          return Buffer.from('03046b657931060076616c75653103046b657932060076616c75653210', 'hex');
+        },
+      });
+    }
 
-    leafOneMock = {
-      getIndex() {
-        return 0;
-      },
-      getHash() {
-        return hashFunction(leafOneRootHash);
-      },
-      getProof() {
-        return Buffer.from('03046b657931060076616c75653103046b657932060076616c75653210', 'hex');
-      },
-    };
+    rootHash = Buffer.from('abef5054482ca01a1c7a1fb405038eac03d6d1e287798770639fec85830be4eb', 'hex');
 
-    leafTwoMock = {
-      getIndex() {
-        return 1;
-      },
-      getHash() {
-        return hashFunction(leafTwoRootHash);
-      },
-    };
+    [leafOneMock, leafTwoMock] = leafMocks;
 
-    rootTree = new RootTree([leafOneMock, leafTwoMock]);
+    rootTree = new RootTree(leafMocks);
   });
 
   describe('#constructor', () => {
@@ -73,18 +69,18 @@ describe('RootTree', () => {
 
   describe('#getProof', () => {
     it('should return a proof for the first leaf', () => {
-      const proof = rootTree.getProof(leafOneMock);
+      const proof = rootTree.getProof([leafOneMock]);
 
       expect(proof).to.deep.equal(
-        Buffer.from('0100000001e4d60b4531b114100aab5f9907d1718c613e603482a15bee8ccda17e5c9bb3ea0101', 'hex'),
+        Buffer.from('02ec85b4eec3cbbcb470d9435bc2ea6926aa8674d02155fb4c21948cbf484e513c78c5be627ff557725397092e314dfeb88d535d9b9d5d0f42df9df3079b5d8eac', 'hex'),
       );
     });
 
     it('should return a proof for the second leaf', () => {
-      const proof = rootTree.getProof(leafTwoMock);
+      const proof = rootTree.getProof([leafTwoMock]);
 
       expect(proof).to.deep.equal(
-        Buffer.from('01000000019515049071ed913149a80d3bb7891fcd4c6c1e3d14ad878939a80f9b9a91e08c0100', 'hex'),
+        Buffer.from('02032a842dcdaafd970f434e36e97ac2caf8a3cd0bc0df77568b7f8e44ef8a4e6578c5be627ff557725397092e314dfeb88d535d9b9d5d0f42df9df3079b5d8eac', 'hex'),
       );
     });
   });
@@ -98,7 +94,7 @@ describe('RootTree', () => {
       const fullProof = rootTree.getFullProof(leafOneMock, leafKeys);
 
       expect(fullProof).to.be.deep.equal({
-        rootTreeProof: Buffer.from('0100000001e4d60b4531b114100aab5f9907d1718c613e603482a15bee8ccda17e5c9bb3ea0101', 'hex'),
+        rootTreeProof: Buffer.from('02ec85b4eec3cbbcb470d9435bc2ea6926aa8674d02155fb4c21948cbf484e513c78c5be627ff557725397092e314dfeb88d535d9b9d5d0f42df9df3079b5d8eac', 'hex'),
         storeTreeProof: Buffer.from('03046b657931060076616c75653103046b657932060076616c75653210', 'hex'),
       });
     });
