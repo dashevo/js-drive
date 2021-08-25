@@ -3,11 +3,13 @@ const RootTree = require('../../../lib/rootTree/RootTree');
 const { init: initHashFunction, hashFunction } = require('../../../lib/rootTree/hashFunction');
 
 const InvalidLeafIndexError = require('../../../lib/rootTree/errors/InvalidLeafIndexError');
+const parseProof = require('../../../lib/test/util/parseProof');
 
 describe('RootTree', () => {
   let leafMocks;
   let leafOneMock;
   let leafTwoMock;
+  let leafHashes;
   let rootTree;
   let rootHash;
 
@@ -17,8 +19,10 @@ describe('RootTree', () => {
 
   beforeEach(() => {
     leafMocks = [];
+    leafHashes = [];
     for (let i = 0; i < 6; i++) {
       const leafHash = Buffer.alloc(32, i);
+      leafHashes.push(leafHash);
       leafMocks.push({
         getIndex() {
           return i;
@@ -113,6 +117,30 @@ describe('RootTree', () => {
       actualRootHash = rootTree.getRootHash();
 
       expect(actualRootHash).to.not.deep.equal(rootHash);
+    });
+  });
+
+  describe('#verification', () => {
+    it('should verify proof', () => {
+      const proofBuffer = rootTree.getProof([leafMocks[4], leafMocks[5]]);
+
+      const proof = parseProof(proofBuffer);
+
+      const result = rootTree.tree.verifyMultiProof(
+        rootTree.tree.getRoot(),
+        [
+          leafMocks[4].getIndex(),
+          leafMocks[5].getIndex(),
+        ],
+        [
+          leafMocks[4].getHash(),
+          leafMocks[5].getHash(),
+        ],
+        3,
+        proof,
+      );
+
+      expect(result).to.be.true();
     });
   });
 });
