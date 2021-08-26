@@ -14,13 +14,13 @@ const createDPPMock = require('@dashevo/dpp/lib/test/mocks/createDPPMock');
 const createStateRepositoryMock = require('@dashevo/dpp/lib/test/mocks/createStateRepositoryMock');
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 const getDocumentFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
+const InvalidArgumentGrpcError = require('@dashevo/grpc-common/lib/server/error/InvalidArgumentGrpcError');
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 const ValidationResult = require('../../../../lib/document/query/ValidationResult');
 
 const deliverTxHandlerFactory = require('../../../../lib/abci/handlers/deliverTxHandlerFactory');
 
-const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
-const AbciError = require('../../../../lib/abci/errors/AbciError');
 const ValidationError = require('../../../../lib/document/query/errors/ValidationError');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 
@@ -166,17 +166,17 @@ describe('deliverTxHandlerFactory', () => {
 
       expect.fail('should throw InvalidArgumentAbciError error');
     } catch (e) {
-      expect(e).to.be.instanceOf(InvalidArgumentAbciError);
+      expect(e).to.be.instanceOf(InvalidArgumentGrpcError);
       expect(e.getMessage()).to.equal('Invalid state transition');
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
-      expect(e.getData()).to.deep.equal({ errors: [error] });
+      expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
+      expect(e.getRawMetadata()).to.deep.equal({ errors: [error] });
       expect(blockExecutionContextMock.incrementCumulativeFees).to.not.be.called();
     }
   });
 
   it('should throw InvalidArgumentAbciError if a state transition structure is not valid', async () => {
     const errorMessage = 'Invalid structure';
-    const error = new InvalidArgumentAbciError(errorMessage);
+    const error = new InvalidArgumentGrpcError(errorMessage);
 
     unserializeStateTransitionMock.throws(error);
 
@@ -185,9 +185,9 @@ describe('deliverTxHandlerFactory', () => {
 
       expect.fail('should throw InvalidArgumentAbciError error');
     } catch (e) {
-      expect(e).to.be.instanceOf(InvalidArgumentAbciError);
+      expect(e).to.be.instanceOf(InvalidArgumentGrpcError);
       expect(e.getMessage()).to.equal(errorMessage);
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
       expect(blockExecutionContextMock.incrementCumulativeFees).to.not.be.called();
       expect(dppMock.stateTransition.validate).to.not.be.called();
     }

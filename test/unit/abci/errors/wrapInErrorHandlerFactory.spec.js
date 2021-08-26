@@ -1,7 +1,7 @@
+const InternalGrpcError = require('@dashevo/grpc-common/lib/server/error/InternalGrpcError');
+const InvalidArgumentGrpcError = require('@dashevo/grpc-common/lib/server/error/InvalidArgumentGrpcError');
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
 const wrapInErrorHandlerFactory = require('../../../../lib/abci/errors/wrapInErrorHandlerFactory');
-
-const InternalAbciError = require('../../../../lib/abci/errors/InternalAbciError');
-const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 
 describe('wrapInErrorHandlerFactory', () => {
@@ -43,7 +43,7 @@ describe('wrapInErrorHandlerFactory', () => {
   it('should throw en internal error if an InternalAbciError is thrown in handler', async () => {
     const originError = new Error();
     const data = { sample: 'data' };
-    const error = new InternalAbciError(originError, data);
+    const error = new InternalGrpcError(originError, data);
 
     methodMock.throws(error);
 
@@ -68,13 +68,12 @@ describe('wrapInErrorHandlerFactory', () => {
     const response = await handler(request);
 
     expect(response).to.deep.equal({
-      code: 1,
+      code: GrpcErrorCodes.INTERNAL,
       log: JSON.stringify({
         error: {
           message: 'Internal error',
         },
       }),
-      events: [],
     });
   });
 
@@ -84,7 +83,7 @@ describe('wrapInErrorHandlerFactory', () => {
     );
 
     const data = { sample: 'data' };
-    const error = new InternalAbciError(new Error(), data);
+    const error = new InternalGrpcError(new Error(), data);
 
     methodMock.throws(error);
 
@@ -95,16 +94,15 @@ describe('wrapInErrorHandlerFactory', () => {
       log: JSON.stringify({
         error: {
           message: error.getMessage(),
-          data: error.getData(),
+          data: error.getRawMetadata(),
         },
       }),
-      events: [],
     });
   });
 
   it('should respond with invalid argument error if it is thrown in handler', async () => {
     const data = { sample: 'data' };
-    const error = new InvalidArgumentAbciError('test', data);
+    const error = new InvalidArgumentGrpcError('test', data);
 
     methodMock.throws(error);
 
@@ -115,10 +113,9 @@ describe('wrapInErrorHandlerFactory', () => {
       log: JSON.stringify({
         error: {
           message: error.getMessage(),
-          data: error.getData(),
+          data: error.getRawMetadata(),
         },
       }),
-      events: [],
     });
   });
 
@@ -157,7 +154,7 @@ describe('wrapInErrorHandlerFactory', () => {
     const [, errorPath] = error.stack.toString().split(/\r\n|\n/);
 
     expect(response).to.deep.equal({
-      code: 1,
+      code: GrpcErrorCodes.INTERNAL,
       log: JSON.stringify({
         error: {
           message: `${error.message} ${errorPath.trim()}`,
@@ -167,7 +164,6 @@ describe('wrapInErrorHandlerFactory', () => {
           },
         },
       }),
-      events: [],
     });
   });
 });

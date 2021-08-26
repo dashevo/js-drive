@@ -5,11 +5,10 @@ const InvalidStateTransitionError = require('@dashevo/dpp/lib/stateTransition/er
 const BalanceNotEnoughError = require('@dashevo/dpp/lib/errors/BalanceIsNotEnoughError');
 const ValidatorResult = require('@dashevo/dpp/lib/validation/ValidationResult');
 
+const InvalidArgumentGrpcError = require('@dashevo/grpc-common/lib/server/error/InvalidArgumentGrpcError');
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
+const ResourceExhaustedGrpcError = require('@dashevo/grpc-common/lib/server/error/ResourceExhaustedGrpcError');
 const unserializeStateTransitionFactory = require('../../../../../lib/abci/handlers/stateTransition/unserializeStateTransitionFactory');
-
-const AbciError = require('../../../../../lib/abci/errors/AbciError');
-const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
-const InsufficientFundsError = require('../../../../../lib/abci/errors/InsufficientFundsError');
 const LoggerMock = require('../../../../../lib/test/mock/LoggerMock');
 
 describe('unserializeStateTransitionFactory', () => {
@@ -43,9 +42,9 @@ describe('unserializeStateTransitionFactory', () => {
 
       expect.fail('should throw InvalidArgumentAbciError error');
     } catch (e) {
-      expect(e).to.be.instanceOf(InvalidArgumentAbciError);
+      expect(e).to.be.instanceOf(InvalidArgumentGrpcError);
       expect(e.getMessage()).to.equal('State Transition is not specified');
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
 
       expect(dppMock.stateTransition.validateFee).to.not.be.called();
     }
@@ -65,10 +64,10 @@ describe('unserializeStateTransitionFactory', () => {
 
       expect.fail('should throw InvalidArgumentAbciError error');
     } catch (e) {
-      expect(e).to.be.instanceOf(InvalidArgumentAbciError);
+      expect(e).to.be.instanceOf(InvalidArgumentGrpcError);
       expect(e.getMessage()).to.equal('State Transition is invalid');
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
-      expect(e.getData()).to.deep.equal({
+      expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
+      expect(e.getRawMetadata()).to.deep.equal({
         errors: [consensusError],
       });
 
@@ -106,8 +105,8 @@ describe('unserializeStateTransitionFactory', () => {
 
       expect.fail('should throw an InsufficientFundsError');
     } catch (e) {
-      expect(e).to.be.instanceOf(InsufficientFundsError);
-      expect(e.getData().balance).to.equal(balance);
+      expect(e).to.be.instanceOf(ResourceExhaustedGrpcError);
+      expect(e.getRawMetadata().balance).to.equal(balance);
 
       expect(dppMock.stateTransition.createFromBuffer).to.be.calledOnce();
       expect(dppMock.stateTransition.validateFee).to.be.calledOnce();
@@ -126,8 +125,8 @@ describe('unserializeStateTransitionFactory', () => {
 
       expect.fail('should throw an InsufficientFundsError');
     } catch (e) {
-      expect(e).to.be.instanceOf(InvalidArgumentAbciError);
-      expect(e.getData().errors[0]).to.equal(error);
+      expect(e).to.be.instanceOf(InvalidArgumentGrpcError);
+      expect(e.getRawMetadata().errors[0]).to.equal(error);
 
       expect(dppMock.stateTransition.createFromBuffer).to.be.calledOnce();
       expect(dppMock.stateTransition.validateFee).to.have.not.been.called();
@@ -163,8 +162,8 @@ describe('unserializeStateTransitionFactory', () => {
 
       expect.fail('should throw an InsufficientFundsError');
     } catch (e) {
-      expect(e).to.be.instanceOf(InsufficientFundsError);
-      expect(e.getData().balance).to.equal(balance);
+      expect(e).to.be.instanceOf(ResourceExhaustedGrpcError);
+      expect(e.getRawMetadata().balance).to.equal(balance);
 
       expect(dppMock.stateTransition.createFromBuffer).to.be.calledOnce();
       expect(dppMock.stateTransition.validateFee).to.be.calledOnce();
