@@ -126,6 +126,7 @@ describe('RootTree', () => {
 
       const proof = parseProof(proofBuffer);
 
+
       const result = rootTree.tree.verifyMultiProof(
         rootTree.tree.getRoot(),
         [
