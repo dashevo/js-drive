@@ -1,8 +1,8 @@
 const getIdentityCreateTransitionFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityCreateTransitionFixture');
 
-const ConsensusError = require('@dashevo/dpp/lib/errors/ConsensusError');
+const InvalidStateTransitionTypeError = require('@dashevo/dpp/lib/errors/consensus/basic/stateTransition/InvalidStateTransitionTypeError');
 const InvalidStateTransitionError = require('@dashevo/dpp/lib/stateTransition/errors/InvalidStateTransitionError');
-const BalanceNotEnoughError = require('@dashevo/dpp/lib/errors/BalanceIsNotEnoughError');
+const BalanceNotEnoughError = require('@dashevo/dpp/lib/errors/consensus/fee/BalanceIsNotEnoughError');
 const ValidatorResult = require('@dashevo/dpp/lib/validation/ValidationResult');
 
 const InvalidArgumentGrpcError = require('@dashevo/grpc-common/lib/server/error/InvalidArgumentGrpcError');
@@ -51,9 +51,9 @@ describe('unserializeStateTransitionFactory', () => {
   });
 
   it('should throw InvalidArgumentAbciError if State Transition is invalid', async () => {
-    const consensusError = new ConsensusError('Invalid state transition');
+    const dppError = new InvalidStateTransitionTypeError(-1);
     const error = new InvalidStateTransitionError(
-      [consensusError],
+      [dppError],
       stateTransitionFixture,
     );
 
@@ -68,7 +68,7 @@ describe('unserializeStateTransitionFactory', () => {
       expect(e.getMessage()).to.equal('State Transition is invalid');
       expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
       expect(e.getRawMetadata()).to.deep.equal({
-        errors: [consensusError],
+        errors: [dppError],
       });
 
       expect(dppMock.stateTransition.createFromBuffer).to.be.calledOnce();
