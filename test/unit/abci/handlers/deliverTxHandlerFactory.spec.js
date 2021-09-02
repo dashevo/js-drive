@@ -174,7 +174,7 @@ describe('deliverTxHandlerFactory', () => {
     }
   });
 
-  it('should throw InvalidArgumentAbciError if a state transition structure is not valid', async () => {
+  it('should throw DPPValidationError if a state transition is not valid', async () => {
     const errorMessage = 'Invalid structure';
     const error = new InvalidArgumentGrpcError(errorMessage);
 
