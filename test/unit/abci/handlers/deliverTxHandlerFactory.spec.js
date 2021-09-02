@@ -154,7 +154,7 @@ describe('deliverTxHandlerFactory', () => {
     );
   });
 
-  it('should throw InvalidArgumentAbciError if a state transition is not valid', async () => {
+  it('should throw DPPValidationError if a state transition is invalid against state', async () => {
     unserializeStateTransitionMock.resolves(dataContractCreateTransitionFixture);
 
     const error = new InvalidStateTransitionTypeError(-1);
