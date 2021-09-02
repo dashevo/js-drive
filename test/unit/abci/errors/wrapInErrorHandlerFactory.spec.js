@@ -1,8 +1,12 @@
+const cbor = require('cbor');
 const InternalGrpcError = require('@dashevo/grpc-common/lib/server/error/InternalGrpcError');
 const InvalidArgumentGrpcError = require('@dashevo/grpc-common/lib/server/error/InvalidArgumentGrpcError');
 const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
+const InvalidStateTransitionTypeError = require('@dashevo/dpp/lib/errors/consensus/basic/stateTransition/InvalidStateTransitionTypeError');
+const ValidationResult = require('@dashevo/dpp/lib/validation/ValidationResult');
 const wrapInErrorHandlerFactory = require('../../../../lib/abci/errors/wrapInErrorHandlerFactory');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
+const DPPValidationError = require('../../../../lib/abci/handlers/errors/DPPValidationError');
 
 describe('wrapInErrorHandlerFactory', () => {
   let loggerMock;
@@ -69,11 +73,12 @@ describe('wrapInErrorHandlerFactory', () => {
 
     expect(response).to.deep.equal({
       code: GrpcErrorCodes.INTERNAL,
-      log: JSON.stringify({
+      info: cbor.encode({
         error: {
           message: 'Internal error',
+          data: undefined,
         },
-      }),
+      }).toString('base64'),
     });
   });
 
@@ -91,12 +96,12 @@ describe('wrapInErrorHandlerFactory', () => {
 
     expect(response).to.deep.equal({
       code: error.getCode(),
-      log: JSON.stringify({
+      info: cbor.encode({
         error: {
           message: error.getMessage(),
           data: error.getRawMetadata(),
         },
-      }),
+      }).toString('base64'),
     });
   });
 
@@ -110,12 +115,12 @@ describe('wrapInErrorHandlerFactory', () => {
 
     expect(response).to.deep.equal({
       code: error.getCode(),
-      log: JSON.stringify({
+      info: cbor.encode({
         error: {
           message: error.getMessage(),
           data: error.getRawMetadata(),
         },
-      }),
+      }).toString('base64'),
     });
   });
 
@@ -147,23 +152,39 @@ describe('wrapInErrorHandlerFactory', () => {
       methodMock, { respondWithInternalError: true },
     );
 
-    methodMock.throws(error);
-
     const response = await handler(request);
 
     const [, errorPath] = error.stack.toString().split(/\r\n|\n/);
 
     expect(response).to.deep.equal({
       code: GrpcErrorCodes.INTERNAL,
-      log: JSON.stringify({
+      info: cbor.encode({
         error: {
           message: `${error.message} ${errorPath.trim()}`,
           data: {
             stack: error.stack,
-            data: undefined,
           },
         },
-      }),
+      }).toString('base64'),
+    });
+  });
+
+  it('should respond with error if method throws DPPValidationError', async () => {
+    const error = new InvalidStateTransitionTypeError(-1);
+    const invalidResult = new ValidationResult([error]);
+    const dppValidationError = new DPPValidationError('Some error', invalidResult);
+
+    methodMock.throws(dppValidationError);
+
+    handler = wrapInErrorHandler(
+      methodMock, { respondWithInternalError: true },
+    );
+
+    const response = await handler(request);
+
+    expect(response).to.deep.equal({
+      code: dppValidationError.getCode(),
+      info: cbor.encode(dppValidationError.getInfo()).toString('base64'),
     });
   });
 });
