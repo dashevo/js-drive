@@ -66,12 +66,9 @@ describe('unserializeStateTransitionFactory', () => {
 
       expect.fail('should throw InvalidArgumentAbciError error');
     } catch (e) {
-      expect(e).to.be.instanceOf(InvalidArgumentGrpcError);
-      expect(e.getMessage()).to.equal('State Transition is invalid');
-      expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
-      expect(e.getRawMetadata()).to.deep.equal({
-        errors: [dppError],
-      });
+      expect(e).to.be.instanceOf(DPPValidationError);
+      expect(e.getCode()).to.equal(dppError.getCode());
+      expect(e.getInfo()).to.deep.equal([-1]);
 
       expect(dppMock.stateTransition.createFromBuffer).to.be.calledOnce();
       expect(dppMock.stateTransition.validateFee).to.not.be.called();
@@ -180,7 +177,7 @@ describe('unserializeStateTransitionFactory', () => {
       expect(noopLoggerMock.debug).to.not.have.been.called();
 
       expect(loggerMock.info).to.have.been.calledOnceWithExactly(
-        'State transition structure is invalid',
+        'Insufficient funds to process state transition',
       );
       expect(loggerMock.debug).to.have.been.calledOnceWithExactly({
         consensusErrors: [error],

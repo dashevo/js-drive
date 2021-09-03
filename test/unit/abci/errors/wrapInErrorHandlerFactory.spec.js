@@ -2,8 +2,8 @@ const cbor = require('cbor');
 const InternalGrpcError = require('@dashevo/grpc-common/lib/server/error/InternalGrpcError');
 const InvalidArgumentGrpcError = require('@dashevo/grpc-common/lib/server/error/InvalidArgumentGrpcError');
 const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
-const InvalidStateTransitionTypeError = require('@dashevo/dpp/lib/errors/consensus/basic/stateTransition/InvalidStateTransitionTypeError');
 const ValidationResult = require('@dashevo/dpp/lib/validation/ValidationResult');
+const SomeConsensusError = require('@dashevo/dpp/lib/test/mocks/SomeConsensusError');
 const wrapInErrorHandlerFactory = require('../../../../lib/abci/errors/wrapInErrorHandlerFactory');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 const DPPValidationError = require('../../../../lib/abci/handlers/errors/DPPValidationError');
@@ -74,10 +74,8 @@ describe('wrapInErrorHandlerFactory', () => {
     expect(response).to.deep.equal({
       code: GrpcErrorCodes.INTERNAL,
       info: cbor.encode({
-        error: {
-          message: 'Internal error',
-          data: undefined,
-        },
+        message: 'Internal error',
+        data: undefined,
       }).toString('base64'),
     });
   });
@@ -97,10 +95,8 @@ describe('wrapInErrorHandlerFactory', () => {
     expect(response).to.deep.equal({
       code: error.getCode(),
       info: cbor.encode({
-        error: {
-          message: error.getMessage(),
-          data: error.getRawMetadata(),
-        },
+        message: error.getMessage(),
+        data: error.getRawMetadata(),
       }).toString('base64'),
     });
   });
@@ -116,10 +112,8 @@ describe('wrapInErrorHandlerFactory', () => {
     expect(response).to.deep.equal({
       code: error.getCode(),
       info: cbor.encode({
-        error: {
-          message: error.getMessage(),
-          data: error.getRawMetadata(),
-        },
+        message: error.getMessage(),
+        data: error.getRawMetadata(),
       }).toString('base64'),
     });
   });
@@ -159,20 +153,18 @@ describe('wrapInErrorHandlerFactory', () => {
     expect(response).to.deep.equal({
       code: GrpcErrorCodes.INTERNAL,
       info: cbor.encode({
-        error: {
-          message: `${error.message} ${errorPath.trim()}`,
-          data: {
-            stack: error.stack,
-          },
+        message: `${error.message} ${errorPath.trim()}`,
+        data: {
+          stack: error.stack,
         },
       }).toString('base64'),
     });
   });
 
   it('should respond with error if method throws DPPValidationError', async () => {
-    const error = new InvalidStateTransitionTypeError(-1);
+    const error = new SomeConsensusError('Consensus error');
     const invalidResult = new ValidationResult([error]);
-    const dppValidationError = new DPPValidationError('Some error', invalidResult);
+    const dppValidationError = new DPPValidationError('Some error', invalidResult.getErrors());
 
     methodMock.throws(dppValidationError);
 

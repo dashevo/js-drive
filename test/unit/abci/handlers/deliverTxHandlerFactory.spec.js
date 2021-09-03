@@ -16,7 +16,7 @@ const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataCo
 const getDocumentFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 const InvalidArgumentGrpcError = require('@dashevo/grpc-common/lib/server/error/InvalidArgumentGrpcError');
 const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
-const InvalidStateTransitionTypeError = require('@dashevo/dpp/lib/errors/consensus/basic/stateTransition/InvalidStateTransitionTypeError');
+const SomeConsensusError = require('@dashevo/dpp/lib/test/mocks/SomeConsensusError');
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 const ValidationResult = require('../../../../lib/document/query/ValidationResult');
 
@@ -157,7 +157,7 @@ describe('deliverTxHandlerFactory', () => {
   it('should throw DPPValidationError if a state transition is invalid against state', async () => {
     unserializeStateTransitionMock.resolves(dataContractCreateTransitionFixture);
 
-    const error = new InvalidStateTransitionTypeError(-1);
+    const error = new SomeConsensusError('Consensus error');
     const invalidResult = new ValidationResult([error]);
 
     dppMock.stateTransition.validateState.resolves(invalidResult);
@@ -169,7 +169,7 @@ describe('deliverTxHandlerFactory', () => {
     } catch (e) {
       expect(e).to.be.instanceOf(DPPValidationError);
       expect(e.getCode()).to.equal(error.getCode());
-      expect(e.getInfo()).to.deep.equal([-1]);
+      expect(e.getInfo()).to.deep.equal(['Consensus error']);
       expect(blockExecutionContextMock.incrementCumulativeFees).to.not.be.called();
     }
   });
