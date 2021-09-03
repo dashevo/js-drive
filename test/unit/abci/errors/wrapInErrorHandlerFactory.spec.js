@@ -2,7 +2,6 @@ const cbor = require('cbor');
 const InternalGrpcError = require('@dashevo/grpc-common/lib/server/error/InternalGrpcError');
 const InvalidArgumentGrpcError = require('@dashevo/grpc-common/lib/server/error/InvalidArgumentGrpcError');
 const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
-const ValidationResult = require('@dashevo/dpp/lib/validation/ValidationResult');
 const SomeConsensusError = require('@dashevo/dpp/lib/test/mocks/SomeConsensusError');
 const wrapInErrorHandlerFactory = require('../../../../lib/abci/errors/wrapInErrorHandlerFactory');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
@@ -162,9 +161,7 @@ describe('wrapInErrorHandlerFactory', () => {
   });
 
   it('should respond with error if method throws DPPValidationError', async () => {
-    const error = new SomeConsensusError('Consensus error');
-    const invalidResult = new ValidationResult([error]);
-    const dppValidationError = new DPPValidationError('Some error', invalidResult.getErrors());
+    const dppValidationError = new DPPValidationError('Some error', [new SomeConsensusError('Consensus error')]);
 
     methodMock.throws(dppValidationError);
 
