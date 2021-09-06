@@ -45,8 +45,8 @@ describe('wrapInErrorHandlerFactory', () => {
 
   it('should throw en internal error if an InternalAbciError is thrown in handler', async () => {
     const originError = new Error();
-    const data = { sample: 'data' };
-    const error = new InternalGrpcError(originError, data);
+    const metadata = { sample: 'data' };
+    const error = new InternalGrpcError(originError, metadata);
 
     methodMock.throws(error);
 
@@ -74,7 +74,7 @@ describe('wrapInErrorHandlerFactory', () => {
       code: GrpcErrorCodes.INTERNAL,
       info: cbor.encode({
         message: 'Internal error',
-        data: undefined,
+        metadata: undefined,
       }).toString('base64'),
     });
   });
@@ -95,7 +95,7 @@ describe('wrapInErrorHandlerFactory', () => {
       code: error.getCode(),
       info: cbor.encode({
         message: error.getMessage(),
-        data: error.getRawMetadata(),
+        metadata: error.getRawMetadata(),
       }).toString('base64'),
     });
   });
@@ -112,7 +112,7 @@ describe('wrapInErrorHandlerFactory', () => {
       code: error.getCode(),
       info: cbor.encode({
         message: error.getMessage(),
-        data: error.getRawMetadata(),
+        metadata: error.getRawMetadata(),
       }).toString('base64'),
     });
   });
@@ -153,7 +153,7 @@ describe('wrapInErrorHandlerFactory', () => {
       code: GrpcErrorCodes.INTERNAL,
       info: cbor.encode({
         message: `${error.message} ${errorPath.trim()}`,
-        data: {
+        metadata: {
           stack: error.stack,
         },
       }).toString('base64'),
