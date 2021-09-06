@@ -4,7 +4,6 @@ const RootTree = require('../../../lib/rootTree/RootTree');
 const { init: initHashFunction, hashFunction } = require('../../../lib/rootTree/hashFunction');
 
 const InvalidLeafIndexError = require('../../../lib/rootTree/errors/InvalidLeafIndexError');
-const parseProof = require('../../../lib/test/util/parseProof');
 
 // TODO: Move that to root tree constants
 const ROOT_TREE_LEAVES_COUNT = 6;
