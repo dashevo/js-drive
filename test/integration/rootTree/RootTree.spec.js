@@ -1,9 +1,13 @@
+const { MerkleProof } = require('js-merkle');
 const RootTree = require('../../../lib/rootTree/RootTree');
 
 const { init: initHashFunction, hashFunction } = require('../../../lib/rootTree/hashFunction');
 
 const InvalidLeafIndexError = require('../../../lib/rootTree/errors/InvalidLeafIndexError');
 const parseProof = require('../../../lib/test/util/parseProof');
+
+// TODO: Move that to root tree constants
+const ROOT_TREE_LEAVES_COUNT = 6;
 
 describe('RootTree', () => {
   let leafMocks;
@@ -124,10 +128,9 @@ describe('RootTree', () => {
     it('should verify proof', () => {
       const proofBuffer = rootTree.getProof([leafMocks[4], leafMocks[5]]);
 
-      const proof = parseProof(proofBuffer);
+      const proof = new MerkleProof(parseProof(proofBuffer), hashFunction);
 
-
-      const result = rootTree.tree.verifyMultiProof(
+      const result = proof.verify(
         rootTree.tree.getRoot(),
         [
           leafMocks[4].getIndex(),
@@ -137,8 +140,7 @@ describe('RootTree', () => {
           leafMocks[4].getHash(),
           leafMocks[5].getHash(),
         ],
-        3,
-        proof,
+        ROOT_TREE_LEAVES_COUNT,
       );
 
       expect(result).to.be.true();
