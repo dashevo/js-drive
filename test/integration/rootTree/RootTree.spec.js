@@ -128,7 +128,7 @@ describe('RootTree', () => {
     it('should verify proof', () => {
       const proofBuffer = rootTree.getProof([leafMocks[4], leafMocks[5]]);
 
-      const proof = new MerkleProof(parseProof(proofBuffer), hashFunction);
+      const proof = MerkleProof.fromBuffer(proofBuffer, hashFunction);
 
       const result = proof.verify(
         rootTree.tree.getRoot(),
