@@ -93,7 +93,7 @@ describe('RootTree', () => {
     });
   });
 
-  describe('#getFullProof', () => {
+  describe('#getFullProofForOneLeaf', () => {
     it('should return a full proof', () => {
       const leafKeys = [
         Buffer.from([1]),

@@ -52,7 +52,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
     };
 
     previousRootTreeMock = {
-      getFullProof: this.sinon.stub(),
+      getFullProofForOneLeaf: this.sinon.stub(),
       getProof: this.sinon.stub(),
     };
 
@@ -135,7 +135,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
 
     expect(previousPublicKeyIdentityIdRepositoryMock.fetch).to.have.not.been.called();
-    expect(previousRootTreeMock.getFullProof).to.have.not.been.called();
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.have.not.been.called();
   });
 
   it('should return empty response if previousBlockExecutionContext is empty', async () => {
@@ -153,7 +153,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
 
     expect(previousPublicKeyIdentityIdRepositoryMock.fetch).to.have.not.been.called();
-    expect(previousRootTreeMock.getFullProof).to.have.not.been.called();
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.have.not.been.called();
   });
 
   it('should throw an error if maximum requested items exceeded', async () => {
@@ -223,7 +223,7 @@ describe('identitiesByPublicKeyHashesQueryHandlerFactory', () => {
       storeTreeProof: Buffer.from('03046b657931060076616c75653103046b657932060076616c75653210', 'hex'),
     };
 
-    previousRootTreeMock.getFullProof.returns(proof);
+    previousRootTreeMock.getFullProofForOneLeaf.returns(proof);
 
     const result = await identitiesByPublicKeyHashesQueryHandler(params, data, { prove: true });
 
