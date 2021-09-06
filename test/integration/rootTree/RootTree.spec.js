@@ -99,7 +99,7 @@ describe('RootTree', () => {
         Buffer.from([1]),
       ];
 
-      const fullProof = rootTree.getFullProof(leafOneMock, leafKeys);
+      const fullProof = rootTree.getFullProofForOneLeaf(leafOneMock, leafKeys);
 
       expect(fullProof).to.be.deep.equal({
         rootTreeProof: Buffer.from('9515049071ed913149a80d3bb7891fcd4c6c1e3d14ad878939a80f9b9a91e08c1c5ed0487eb404ff32745cf8f0ff6fc0c37c1b01ffaf21e7855accca7dd4cd0e057e710f2441e229de9240f2153266c8a892831d92b8ba3190adae06dddc39db', 'hex'),
