@@ -5,7 +5,6 @@ const { init: initHashFunction, hashFunction } = require('../../../lib/rootTree/
 
 const InvalidLeafIndexError = require('../../../lib/rootTree/errors/InvalidLeafIndexError');
 
-// TODO: Move that to root tree constants
 const ROOT_TREE_LEAVES_COUNT = 6;
 
 describe('RootTree', () => {
@@ -39,7 +38,7 @@ describe('RootTree', () => {
       });
     }
 
-    rootHash = Buffer.from('abef5054482ca01a1c7a1fb405038eac03d6d1e287798770639fec85830be4eb', 'hex');
+    rootHash = Buffer.from('b802d7671d81952e67ddb07401368103e2d3f7c9dbbbe6d3ec45dafda13d0d15', 'hex');
 
     [leafOneMock, leafTwoMock] = leafMocks;
 
@@ -78,16 +77,18 @@ describe('RootTree', () => {
     it('should return a proof for the first leaf', () => {
       const proof = rootTree.getProof([leafOneMock]);
 
+      expect(proof.length).to.be.equal(32 * 3);
       expect(proof).to.deep.equal(
-        Buffer.from('02ec85b4eec3cbbcb470d9435bc2ea6926aa8674d02155fb4c21948cbf484e513c78c5be627ff557725397092e314dfeb88d535d9b9d5d0f42df9df3079b5d8eac', 'hex'),
+        Buffer.from('9515049071ed913149a80d3bb7891fcd4c6c1e3d14ad878939a80f9b9a91e08c1c5ed0487eb404ff32745cf8f0ff6fc0c37c1b01ffaf21e7855accca7dd4cd0e057e710f2441e229de9240f2153266c8a892831d92b8ba3190adae06dddc39db', 'hex'),
       );
     });
 
     it('should return a proof for the second leaf', () => {
       const proof = rootTree.getProof([leafTwoMock]);
 
+      expect(proof.length).to.be.equal(32 * 3);
       expect(proof).to.deep.equal(
-        Buffer.from('02032a842dcdaafd970f434e36e97ac2caf8a3cd0bc0df77568b7f8e44ef8a4e6578c5be627ff557725397092e314dfeb88d535d9b9d5d0f42df9df3079b5d8eac', 'hex'),
+        Buffer.from('2ada83c1819a5372dae1238fc1ded123c8104fdaa15862aaee69428a1820fcda1c5ed0487eb404ff32745cf8f0ff6fc0c37c1b01ffaf21e7855accca7dd4cd0e057e710f2441e229de9240f2153266c8a892831d92b8ba3190adae06dddc39db', 'hex'),
       );
     });
   });
@@ -101,7 +102,7 @@ describe('RootTree', () => {
       const fullProof = rootTree.getFullProof(leafOneMock, leafKeys);
 
       expect(fullProof).to.be.deep.equal({
-        rootTreeProof: Buffer.from('02ec85b4eec3cbbcb470d9435bc2ea6926aa8674d02155fb4c21948cbf484e513c78c5be627ff557725397092e314dfeb88d535d9b9d5d0f42df9df3079b5d8eac', 'hex'),
+        rootTreeProof: Buffer.from('9515049071ed913149a80d3bb7891fcd4c6c1e3d14ad878939a80f9b9a91e08c1c5ed0487eb404ff32745cf8f0ff6fc0c37c1b01ffaf21e7855accca7dd4cd0e057e710f2441e229de9240f2153266c8a892831d92b8ba3190adae06dddc39db', 'hex'),
         storeTreeProof: Buffer.from('03046b657931060076616c75653103046b657932060076616c75653210', 'hex'),
       });
     });
