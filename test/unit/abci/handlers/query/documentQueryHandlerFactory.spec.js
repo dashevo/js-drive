@@ -50,7 +50,7 @@ describe('documentQueryHandlerFactory', () => {
     fetchPreviousDocumentsMock = this.sinon.stub();
 
     previousRootTreeMock = {
-      getFullProof: this.sinon.stub(),
+      getFullProofForOneLeaf: this.sinon.stub(),
     };
 
     previousDocumentsStoreRootTreeLeafMock = this.sinon.stub();
@@ -121,7 +121,7 @@ describe('documentQueryHandlerFactory', () => {
     expect(result.code).to.equal(0);
 
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).to.have.not.been.called();
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.have.not.been.called();
   });
 
   it('should return empty response if previousBlockExecutionContext is empty', async () => {
@@ -138,7 +138,7 @@ describe('documentQueryHandlerFactory', () => {
     expect(result.code).to.equal(0);
 
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).to.have.not.been.called();
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.have.not.been.called();
   });
 
   it('should return serialized documents', async () => {
@@ -151,7 +151,7 @@ describe('documentQueryHandlerFactory', () => {
     expect(result.code).to.equal(0);
 
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).to.be.not.called();
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.be.not.called();
     expect(containerMock.has).to.be.calledOnceWithExactly('previousBlockExecutionStoreTransactions');
   });
 
@@ -162,7 +162,7 @@ describe('documentQueryHandlerFactory', () => {
     };
 
     fetchPreviousDocumentsMock.resolves(documents);
-    previousRootTreeMock.getFullProof.returns(proof);
+    previousRootTreeMock.getFullProofForOneLeaf.returns(proof);
 
     const result = await documentQueryHandler(params, data, { prove: true });
 
@@ -173,8 +173,8 @@ describe('documentQueryHandlerFactory', () => {
     const documentIds = documents.map((document) => document.getId());
 
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).to.be.calledOnce();
-    expect(previousRootTreeMock.getFullProof.getCall(0).args).to.deep.equal([
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.be.calledOnce();
+    expect(previousRootTreeMock.getFullProofForOneLeaf.getCall(0).args).to.deep.equal([
       previousDocumentsStoreRootTreeLeafMock,
       documentIds,
     ]);

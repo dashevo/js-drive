@@ -1,6 +1,6 @@
 {
   "name": "@dashevo/drive",
-  "version": "0.21.0-dev.1",
+  "version": "0.21.0-dev.2",
   "description": "Replicated state machine for Dash Platform",
   "engines": {
     "node": ">=12"
@@ -82,6 +82,7 @@
     "dotenv-expand": "^5.1.0",
     "dotenv-safe": "^8.2.0",
     "find-my-way": "^2.2.2",
+    "js-merkle": "^0.1.4",
     "level-rocksdb": "^4.0.0",
     "level-transactions": "^2.1.4",
     "lodash.escaperegexp": "^4.1.2",
@@ -89,7 +90,6 @@
     "lodash.set": "^4.3.2",
     "long": "^4.0.0",
     "lru-cache": "^5.1.1",
-    "merkletreejs": "^0.2.10",
     "mongodb": "^3.5.5",
     "node-graceful": "^3.0.1",
     "pino": "^6.4.0",
