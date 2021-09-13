@@ -160,7 +160,7 @@ describe('commitHandlerFactory', () => {
       loggerMock,
       cloneToPreviousStoreTransactionsMock,
       getLatestFeatureFlagMock,
-      previousRootTreeMock
+      previousRootTreeMock,
     );
   });
 
