@@ -8,12 +8,12 @@ const {
   },
 } = require('@dashevo/abci/types');
 
+const InternalGrpcError = require('@dashevo/grpc-common/lib/server/error/InternalGrpcError');
 const beginBlockHandlerFactory = require('../../../../lib/abci/handlers/beginBlockHandlerFactory');
 
 const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionStoreTransactionsMock');
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
-const InternalAbciError = require('../../../../lib/abci/errors/InternalAbciError');
 
 describe('beginBlockHandlerFactory', () => {
   let protocolVersion;
@@ -137,7 +137,7 @@ describe('beginBlockHandlerFactory', () => {
 
       expect.fail('Expected exception to be thrown');
     } catch (err) {
-      expect(err).to.be.an.instanceOf(InternalAbciError);
+      expect(err).to.be.an.instanceOf(InternalGrpcError);
       expect(err.getError().message).to.equal('app version was not present in consensus parameters');
     }
   });
