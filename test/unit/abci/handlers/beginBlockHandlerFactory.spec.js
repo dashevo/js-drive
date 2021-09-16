@@ -129,7 +129,7 @@ describe('beginBlockHandlerFactory', () => {
     }
   });
 
-  it('should throw an InternalABCIError in case version.app is not present', async () => {
+  it('should throw an InternalGrpcError in case version.app is not present', async () => {
     delete request.header.version.app;
 
     try {
