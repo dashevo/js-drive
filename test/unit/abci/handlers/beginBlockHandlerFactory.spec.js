@@ -8,12 +8,13 @@ const {
   },
 } = require('@dashevo/abci/types');
 
-const InternalGrpcError = require('@dashevo/grpc-common/lib/server/error/InternalGrpcError');
 const beginBlockHandlerFactory = require('../../../../lib/abci/handlers/beginBlockHandlerFactory');
 
 const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionStoreTransactionsMock');
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
+const NotSupportedNetworkProtocolVersionError = require('../../../../lib/abci/handlers/errors/NotSupportedProtocolVersionError');
+const NetworkProtocolVersionIsNotSetError = require('../../../../lib/abci/handlers/errors/NetworkProtocolVersionIsNotSetError');
 
 describe('beginBlockHandlerFactory', () => {
   let protocolVersion;
@@ -33,7 +34,7 @@ describe('beginBlockHandlerFactory', () => {
   let transactionalDppMock;
 
   beforeEach(function beforeEach() {
-    protocolVersion = Long.fromInt(0);
+    protocolVersion = Long.fromInt(1);
 
     blockExecutionDBTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
 
@@ -115,30 +116,29 @@ describe('beginBlockHandlerFactory', () => {
     );
   });
 
-  it('should reject not supported protocol version', async () => {
+  it('should throw NotSupportedProtocolVersionError if protocol version is not supported', async () => {
     request.header.version.app = Long.fromInt(42);
 
     try {
       await beginBlockHandler(request);
 
-      expect.fail('Expected exception to be thrown');
-    } catch (err) {
-      expect(err).to.be.an('Error');
-      expect(err.message).to.equal('Block protocol version 42 not supported. Expected to be less or equal to 0.');
-      expect(err.name).to.equal('NotSupportedProtocolVersionError');
+      expect.fail('should throw NotSupportedProtocolVersionError');
+    } catch (e) {
+      expect(e).to.be.instanceOf(NotSupportedNetworkProtocolVersionError);
+      expect(e.getNetworkProtocolVersion()).to.equal(request.header.version.app);
+      expect(e.getLatestProtocolVersion()).to.equal(protocolVersion);
     }
   });
 
-  it('should throw an InternalABCIError in case version.app is not present', async () => {
-    delete request.header.version.app;
+  it('should throw an NetworkProtocolVersionIsNotSetError if network protocol version is not set', async () => {
+    request.header.version.app = Long.fromInt(0);
 
     try {
       await beginBlockHandler(request);
 
-      expect.fail('Expected exception to be thrown');
+      expect.fail('should throw NetworkProtocolVersionIsNotSetError');
     } catch (err) {
-      expect(err).to.be.an.instanceOf(InternalGrpcError);
-      expect(err.getError().message).to.equal('app version was not present in consensus parameters');
+      expect(err).to.be.an.instanceOf(NetworkProtocolVersionIsNotSetError);
     }
   });
 
