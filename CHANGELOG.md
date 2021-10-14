@@ -5,14 +5,13 @@
 
 * support higher protocol version ([#571](https://github.com/dashevo/js-drive/issues/571))
 * set protocol version on `begin block` ([#558](https://github.com/dashevo/js-drive/issues/558))
-* use ABCI errors instead of gRPC ([#564](https://github.com/dashevo/js-drive/issues/564))
+* comprehensive error codes ([#564](https://github.com/dashevo/js-drive/issues/564), [#567](https://github.com/dashevo/js-drive/issues/567))
 * multiproof for the identity non inclusion proof root tree ([#560](https://github.com/dashevo/js-drive/issues/560))
 
 
 ### Bug Fixes
 
 * unnecessary error data sent ([#572](https://github.com/dashevo/js-drive/issues/572))
-* consensus logger wasn't set on error ([#567](https://github.com/dashevo/js-drive/issues/567))
 * previousRootTree not rebuilt on commit, resulting in a wrong proof ([#563](https://github.com/dashevo/js-drive/issues/563))
 
 
