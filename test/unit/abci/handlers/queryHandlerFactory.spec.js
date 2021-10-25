@@ -1,10 +1,9 @@
 const cbor = require('cbor');
 
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
 const queryHandlerFactory = require('../../../../lib/abci/handlers/queryHandlerFactory');
-
-const AbciError = require('../../../../lib/abci/errors/AbciError');
-const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
+const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
 
 describe('queryHandlerFactory', () => {
   let queryHandler;
@@ -52,7 +51,7 @@ describe('queryHandlerFactory', () => {
       expect.fail('should throw InvalidArgumentAbciError');
     } catch (e) {
       expect(e).to.be.instanceOf(InvalidArgumentAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
 
       expect(sanitizeUrlMock).to.be.calledOnceWith(request.path);
       expect(queryHandlerRouterMock.find).to.be.calledOnceWith('GET', sanitizedUrl);
@@ -73,7 +72,7 @@ describe('queryHandlerFactory', () => {
       expect.fail('should throw InvalidArgumentAbciError');
     } catch (e) {
       expect(e).to.be.instanceOf(InvalidArgumentAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
 
       expect(sanitizeUrlMock).to.be.calledOnceWith(request.path);
       expect(queryHandlerRouterMock.find).to.be.calledOnceWith('GET', sanitizedUrl);
@@ -94,7 +93,7 @@ describe('queryHandlerFactory', () => {
       expect.fail('should throw InvalidArgumentAbciError');
     } catch (e) {
       expect(e).to.be.instanceOf(InvalidArgumentAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
 
       expect(sanitizeUrlMock).to.be.calledOnceWith(request.path);
       expect(queryHandlerRouterMock.find).to.be.calledOnceWith('GET', sanitizedUrl);

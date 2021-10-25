@@ -1,8 +1,10 @@
+const SomeConsensusError = require('@dashevo/dpp/lib/test/mocks/SomeConsensusError');
 const wrapInErrorHandlerFactory = require('../../../../lib/abci/errors/wrapInErrorHandlerFactory');
-
+const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
 const InternalAbciError = require('../../../../lib/abci/errors/InternalAbciError');
 const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
-const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
+const VerboseInternalAbciError = require('../../../../lib/abci/errors/VerboseInternalAbciError');
+const DPPValidationAbciError = require('../../../../lib/abci/errors/DPPValidationAbciError');
 
 describe('wrapInErrorHandlerFactory', () => {
   let loggerMock;
@@ -42,8 +44,8 @@ describe('wrapInErrorHandlerFactory', () => {
 
   it('should throw en internal error if an InternalAbciError is thrown in handler', async () => {
     const originError = new Error();
-    const data = { sample: 'data' };
-    const error = new InternalAbciError(originError, data);
+    const metadata = { sample: 'data' };
+    const error = new InternalAbciError(originError, metadata);
 
     methodMock.throws(error);
 
@@ -67,15 +69,9 @@ describe('wrapInErrorHandlerFactory', () => {
 
     const response = await handler(request);
 
-    expect(response).to.deep.equal({
-      code: 1,
-      log: JSON.stringify({
-        error: {
-          message: 'Internal error',
-        },
-      }),
-      events: [],
-    });
+    const expectedError = new InternalAbciError(error);
+
+    expect(response).to.deep.equal(expectedError.getAbciResponse());
   });
 
   it('should respond with internal error code if an InternalAbciError is thrown in handler and respondWithInternalError enabled', async () => {
@@ -90,16 +86,7 @@ describe('wrapInErrorHandlerFactory', () => {
 
     const response = await handler(request);
 
-    expect(response).to.deep.equal({
-      code: error.getCode(),
-      log: JSON.stringify({
-        error: {
-          message: error.getMessage(),
-          data: error.getData(),
-        },
-      }),
-      events: [],
-    });
+    expect(response).to.deep.equal(error.getAbciResponse());
   });
 
   it('should respond with invalid argument error if it is thrown in handler', async () => {
@@ -110,33 +97,7 @@ describe('wrapInErrorHandlerFactory', () => {
 
     const response = await handler(request);
 
-    expect(response).to.deep.equal({
-      code: error.getCode(),
-      log: JSON.stringify({
-        error: {
-          message: error.getMessage(),
-          data: error.getData(),
-        },
-      }),
-      events: [],
-    });
-  });
-
-  it('should rethrow internal errors in case `rethrowInternalErrors` options is set', async () => {
-    const unknownError = new Error('Some internal error indicating a bug');
-
-    methodMock.throws(unknownError);
-
-    handler = wrapInErrorHandler(
-      methodMock, { throwNonABCIErrors: true },
-    );
-
-    try {
-      await handler(request);
-      expect.fail('Error was not re-thrown');
-    } catch (e) {
-      expect(e).to.equal(unknownError);
-    }
+    expect(response).to.deep.equal(error.getAbciResponse());
   });
 
   it('should respond with verbose error containing message and stack in debug mode', async () => {
@@ -150,24 +111,29 @@ describe('wrapInErrorHandlerFactory', () => {
       methodMock, { respondWithInternalError: true },
     );
 
-    methodMock.throws(error);
+    const response = await handler(request);
+
+    const expectedError = new VerboseInternalAbciError(
+      new InternalAbciError(error),
+    );
+
+    expect(response).to.deep.equal(expectedError.getAbciResponse());
+  });
+
+  it('should respond with error if method throws DPPValidationAbciError', async () => {
+    const dppValidationError = new DPPValidationAbciError(
+      'Some error',
+      new SomeConsensusError('Consensus error'),
+    );
+
+    methodMock.throws(dppValidationError);
+
+    handler = wrapInErrorHandler(
+      methodMock, { respondWithInternalError: true },
+    );
 
     const response = await handler(request);
 
-    const [, errorPath] = error.stack.toString().split(/\r\n|\n/);
-
-    expect(response).to.deep.equal({
-      code: 1,
-      log: JSON.stringify({
-        error: {
-          message: `${error.message} ${errorPath.trim()}`,
-          data: {
-            stack: error.stack,
-            data: undefined,
-          },
-        },
-      }),
-      events: [],
-    });
+    expect(response).to.deep.equal(dppValidationError.getAbciResponse());
   });
 });

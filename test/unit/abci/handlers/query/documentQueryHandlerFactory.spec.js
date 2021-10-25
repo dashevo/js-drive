@@ -18,13 +18,14 @@ const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRa
 
 const getDocumentsFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
 
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
 const documentQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/documentQueryHandlerFactory');
 const InvalidQueryError = require('../../../../../lib/document/errors/InvalidQueryError');
 const ValidationError = require('../../../../../lib/document/query/errors/ValidationError');
-const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
-const AbciError = require('../../../../../lib/abci/errors/AbciError');
-const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
+
 const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
+const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
+const InvalidArgumentAbciError = require('../../../../../lib/abci/errors/InvalidArgumentAbciError');
 
 describe('documentQueryHandlerFactory', () => {
   let documentQueryHandler;
@@ -49,7 +50,7 @@ describe('documentQueryHandlerFactory', () => {
     fetchPreviousDocumentsMock = this.sinon.stub();
 
     previousRootTreeMock = {
-      getFullProof: this.sinon.stub(),
+      getFullProofForOneLeaf: this.sinon.stub(),
     };
 
     previousDocumentsStoreRootTreeLeafMock = this.sinon.stub();
@@ -120,7 +121,7 @@ describe('documentQueryHandlerFactory', () => {
     expect(result.code).to.equal(0);
 
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).to.have.not.been.called();
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.have.not.been.called();
   });
 
   it('should return empty response if previousBlockExecutionContext is empty', async () => {
@@ -137,7 +138,7 @@ describe('documentQueryHandlerFactory', () => {
     expect(result.code).to.equal(0);
 
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).to.have.not.been.called();
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.have.not.been.called();
   });
 
   it('should return serialized documents', async () => {
@@ -150,7 +151,7 @@ describe('documentQueryHandlerFactory', () => {
     expect(result.code).to.equal(0);
 
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).to.be.not.called();
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.be.not.called();
     expect(containerMock.has).to.be.calledOnceWithExactly('previousBlockExecutionStoreTransactions');
   });
 
@@ -161,7 +162,7 @@ describe('documentQueryHandlerFactory', () => {
     };
 
     fetchPreviousDocumentsMock.resolves(documents);
-    previousRootTreeMock.getFullProof.returns(proof);
+    previousRootTreeMock.getFullProofForOneLeaf.returns(proof);
 
     const result = await documentQueryHandler(params, data, { prove: true });
 
@@ -172,8 +173,8 @@ describe('documentQueryHandlerFactory', () => {
     const documentIds = documents.map((document) => document.getId());
 
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).to.be.calledOnce();
-    expect(previousRootTreeMock.getFullProof.getCall(0).args).to.deep.equal([
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.be.calledOnce();
+    expect(previousRootTreeMock.getFullProofForOneLeaf.getCall(0).args).to.deep.equal([
       previousDocumentsStoreRootTreeLeafMock,
       documentIds,
     ]);
@@ -189,7 +190,7 @@ describe('documentQueryHandlerFactory', () => {
       expect.fail('should throw UnavailableAbciError');
     } catch (e) {
       expect(e).to.be.an.instanceof(UnavailableAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.UNAVAILABLE);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.UNAVAILABLE);
       expect(fetchPreviousDocumentsMock).to.not.be.called();
       expect(containerMock.has).to.be.calledOnceWithExactly('previousBlockExecutionStoreTransactions');
     }
@@ -204,7 +205,7 @@ describe('documentQueryHandlerFactory', () => {
       expect.fail('should throw UnavailableAbciError');
     } catch (e) {
       expect(e).to.be.an.instanceof(UnavailableAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.UNAVAILABLE);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.UNAVAILABLE);
       expect(fetchPreviousDocumentsMock).to.not.be.called();
       expect(containerMock.resolve).to.be.calledOnceWithExactly('previousBlockExecutionStoreTransactions');
       expect(previousBlockExecutionTransactionsMock.getTransaction).to.be.calledOnceWithExactly('dataContracts');
@@ -221,7 +222,7 @@ describe('documentQueryHandlerFactory', () => {
       expect.fail('should throw UnavailableAbciError');
     } catch (e) {
       expect(e).to.be.an.instanceof(UnavailableAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.UNAVAILABLE);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.UNAVAILABLE);
       expect(fetchPreviousDocumentsMock).to.not.be.called();
       expect(containerMock.resolve).to.be.calledOnceWithExactly('previousBlockExecutionStoreTransactions');
       expect(previousBlockExecutionTransactionsMock.getTransaction).to.be.calledOnceWithExactly('dataContracts');
@@ -241,7 +242,7 @@ describe('documentQueryHandlerFactory', () => {
       expect.fail('should throw InvalidArgumentAbciError');
     } catch (e) {
       expect(e).to.be.an.instanceof(InvalidArgumentAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
       expect(e.getData()).to.deep.equal({ errors: [error] });
       expect(fetchPreviousDocumentsMock).to.be.calledOnceWith(data.contractId, data.type, options);
       expect(containerMock.has).to.be.calledOnceWithExactly('previousBlockExecutionStoreTransactions');

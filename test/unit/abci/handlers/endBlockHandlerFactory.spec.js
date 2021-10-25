@@ -10,15 +10,17 @@ const {
   },
 } = require('@dashevo/abci/types');
 
+const Long = require('long');
+
 const generateRandomIdentifier = require('@dashevo/dpp/lib/test/utils/generateRandomIdentifier');
 
 const endBlockHandlerFactory = require('../../../../lib/abci/handlers/endBlockHandlerFactory');
 
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
-
 const NoDPNSContractFoundError = require('../../../../lib/abci/handlers/errors/NoDPNSContractFoundError');
 const NoDashpayContractFoundError = require('../../../../lib/abci/handlers/errors/NoDashpayContractFoundError');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
+const BlockExecutionDBTransactionsMock = require('../../../../lib/test/mock/BlockExecutionStoreTransactionsMock');
 
 describe('endBlockHandlerFactory', () => {
   let endBlockHandler;
@@ -35,10 +37,15 @@ describe('endBlockHandlerFactory', () => {
   let createValidatorSetUpdateMock;
   let chainLockMock;
   let validatorSetMock;
+  let getFeatureFlagForHeightMock;
+  let blockExecutionStoreTransactionsMock;
 
   beforeEach(function beforeEach() {
     headerMock = {
       coreChainLockedHeight: 2,
+      version: {
+        app: Long.fromInt(1),
+      },
     };
 
     lastCommitInfoMock = {
@@ -76,6 +83,10 @@ describe('endBlockHandlerFactory', () => {
 
     createValidatorSetUpdateMock = this.sinon.stub();
 
+    blockExecutionStoreTransactionsMock = new BlockExecutionDBTransactionsMock(this.sinon);
+
+    getFeatureFlagForHeightMock = this.sinon.stub().resolves(null);
+
     endBlockHandler = endBlockHandlerFactory(
       blockExecutionContextMock,
       dpnsContractBlockHeight,
@@ -86,6 +97,8 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
+      getFeatureFlagForHeightMock,
+      blockExecutionStoreTransactionsMock,
     );
 
     requestMock = {
@@ -104,6 +117,8 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
+      getFeatureFlagForHeightMock,
+      blockExecutionStoreTransactionsMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -125,6 +140,8 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
+      getFeatureFlagForHeightMock,
+      blockExecutionStoreTransactionsMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -149,6 +166,8 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
+      getFeatureFlagForHeightMock,
+      blockExecutionStoreTransactionsMock,
     );
 
     blockExecutionContextMock.hasDataContract.returns(false);
@@ -181,6 +200,8 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
+      getFeatureFlagForHeightMock,
+      blockExecutionStoreTransactionsMock,
     );
 
     const response = await endBlockHandler(requestMock);
@@ -205,6 +226,8 @@ describe('endBlockHandlerFactory', () => {
       validatorSetMock,
       createValidatorSetUpdateMock,
       loggerMock,
+      getFeatureFlagForHeightMock,
+      blockExecutionStoreTransactionsMock,
     );
 
     blockExecutionContextMock.hasDataContract.returns(false);
@@ -272,5 +295,48 @@ describe('endBlockHandlerFactory', () => {
     expect(createValidatorSetUpdateMock).to.be.calledOnceWithExactly(validatorSetMock);
 
     expect(response.validatorSetUpdate).to.be.equal(validatorSetUpdate);
+  });
+
+  it('should return consensusParamUpdates if request contains update consensus features flag', async function it() {
+    const getLatestFeatureFlagGetMock = this.sinon.stub();
+    getLatestFeatureFlagGetMock.withArgs('block').returns({
+      maxBytes: 1,
+      maxGas: 2,
+    });
+    getLatestFeatureFlagGetMock.withArgs('evidence').returns({
+      maxAgeNumBlocks: 1,
+      maxAgeDuration: null,
+      maxBytes: 2,
+    });
+    getLatestFeatureFlagGetMock.withArgs('version').returns({
+      appVersion: 1,
+    });
+
+    getFeatureFlagForHeightMock.resolves({
+      get: getLatestFeatureFlagGetMock,
+    });
+
+    const response = await endBlockHandler(requestMock);
+
+    expect(response).to.be.an.instanceOf(ResponseEndBlock);
+
+    expect(response.toJSON()).to.deep.equal({
+      consensusParamUpdates: {
+        block: {
+          maxBytes: '1',
+          maxGas: '2',
+        },
+        evidence: {
+          maxAgeNumBlocks: '1',
+          maxBytes: '2',
+        },
+        version: {
+          appVersion: '1',
+        },
+      },
+    });
+
+    expect(blockExecutionStoreTransactionsMock.getTransaction).to.be.calledOnce();
+    expect(getFeatureFlagForHeightMock).to.be.calledOnce();
   });
 });

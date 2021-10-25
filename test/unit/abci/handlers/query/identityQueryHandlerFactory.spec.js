@@ -15,12 +15,10 @@ const {
 
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
 
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
 const identityQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/identityQueryHandlerFactory');
-
-const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
-const AbciError = require('../../../../../lib/abci/errors/AbciError');
-const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
 const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
+const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
 
 describe('identityQueryHandlerFactory', () => {
   let identityQueryHandler;
@@ -41,7 +39,7 @@ describe('identityQueryHandlerFactory', () => {
     };
 
     previousRootTreeMock = {
-      getFullProof: this.sinon.stub(),
+      getFullProofForOneLeaf: this.sinon.stub(),
     };
 
     previousIdentitiesStoreRootTreeLeafMock = this.sinon.stub();
@@ -115,7 +113,7 @@ describe('identityQueryHandlerFactory', () => {
       expect.fail('should throw NotFoundAbciError');
     } catch (e) {
       expect(e).to.be.an.instanceof(NotFoundAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.NOT_FOUND);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.NOT_FOUND);
       expect(e.message).to.equal('Identity not found');
       expect(previousIdentityRepositoryMock.fetch).to.be.calledOnceWith(data.id);
     }
@@ -128,7 +126,7 @@ describe('identityQueryHandlerFactory', () => {
     };
 
     previousIdentityRepositoryMock.fetch.resolves(identity);
-    previousRootTreeMock.getFullProof.returns(proof);
+    previousRootTreeMock.getFullProofForOneLeaf.returns(proof);
 
     const result = await identityQueryHandler(params, data, { prove: true });
     expect(previousIdentityRepositoryMock.fetch).to.be.calledOnceWith(data.id);
@@ -136,22 +134,9 @@ describe('identityQueryHandlerFactory', () => {
     expect(result.code).to.equal(0);
 
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).to.be.calledOnceWith(
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.be.calledOnceWith(
       previousIdentitiesStoreRootTreeLeafMock,
       [identity.getId()],
     );
-  });
-
-  it('should not proceed forward if createQueryResponse throws UnavailableAbciError', async () => {
-    createQueryResponseMock.throws(new UnavailableAbciError());
-
-    try {
-      await identityQueryHandler(params, data, {});
-
-      expect.fail('should throw UnavailableAbciError');
-    } catch (e) {
-      expect(e).to.be.an.instanceof(UnavailableAbciError);
-      expect(previousIdentityRepositoryMock.fetch).to.have.not.been.called();
-    }
   });
 });

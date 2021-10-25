@@ -6,6 +6,8 @@ const chalk = require('chalk');
 
 const ZMQClient = require('../lib/core/ZmqClient');
 
+const { init: initHashFunction } = require('../lib/rootTree/hashFunction');
+
 const createDIContainer = require('../lib/createDIContainer');
 const BlockExecutionContextRepository = require('../lib/blockExecution/BlockExecutionContextRepository');
 
@@ -23,15 +25,25 @@ const banner = '\n ____       ______      ____        __  __                 ___
 console.log(chalk.hex('#008de4')(banner));
 
 (async function main() {
+  /**
+   * Initialize hashFunction module
+   *
+   * It needs to be initialized prior to anything else - createDIContainer uses hashFunction,
+   * and it won't work if left uninitialized. This is workaround to blake3 causing a segfault
+   * on node14, and init function initializes WASM build instead of NEON, which is default behaviour
+   */
+
+  await initHashFunction();
+
   const container = createDIContainer(process.env);
   const logger = container.resolve('logger');
   const dpp = container.resolve('dpp');
   const transactionalDpp = container.resolve('transactionalDpp');
   const errorHandler = container.resolve('errorHandler');
-  const protocolVersion = container.resolve('protocolVersion');
+  const latestProtocolVersion = container.resolve('latestProtocolVersion');
   const closeAbciServer = container.resolve('closeAbciServer');
 
-  logger.info(`Starting Drive ABCI application v${driveVersion} (protocol v${protocolVersion})`);
+  logger.info(`Starting Drive ABCI application v${driveVersion} (latest protocol v${latestProtocolVersion})`);
 
   /**
    * Ensure graceful shutdown

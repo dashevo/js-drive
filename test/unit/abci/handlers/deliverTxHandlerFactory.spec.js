@@ -8,21 +8,24 @@ const {
 
 const DashPlatformProtocol = require('@dashevo/dpp');
 
+const ValidationResult = require('@dashevo/dpp/lib/validation/ValidationResult');
+
 const getIdentityFixture = require('@dashevo/dpp/lib/test/fixtures/getIdentityFixture');
 
 const createDPPMock = require('@dashevo/dpp/lib/test/mocks/createDPPMock');
 const createStateRepositoryMock = require('@dashevo/dpp/lib/test/mocks/createStateRepositoryMock');
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 const getDocumentFixture = require('@dashevo/dpp/lib/test/fixtures/getDocumentsFixture');
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
+const SomeConsensusError = require('@dashevo/dpp/lib/test/mocks/SomeConsensusError');
 const BlockExecutionContextMock = require('../../../../lib/test/mock/BlockExecutionContextMock');
-const ValidationResult = require('../../../../lib/document/query/ValidationResult');
 
 const deliverTxHandlerFactory = require('../../../../lib/abci/handlers/deliverTxHandlerFactory');
 
-const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
-const AbciError = require('../../../../lib/abci/errors/AbciError');
-const ValidationError = require('../../../../lib/document/query/errors/ValidationError');
 const LoggerMock = require('../../../../lib/test/mock/LoggerMock');
+const DPPValidationAbciError = require('../../../../lib/abci/errors/DPPValidationAbciError');
+
+const InvalidArgumentAbciError = require('../../../../lib/abci/errors/InvalidArgumentAbciError');
 
 describe('deliverTxHandlerFactory', () => {
   let deliverTxHandler;
@@ -36,6 +39,7 @@ describe('deliverTxHandlerFactory', () => {
   let dpp;
   let unserializeStateTransitionMock;
   let blockExecutionContextMock;
+  let validationResult;
 
   beforeEach(async function beforeEach() {
     const dataContractFixture = getDataContractFixture();
@@ -61,12 +65,12 @@ describe('deliverTxHandlerFactory', () => {
 
     dppMock = createDPPMock(this.sinon);
 
+    validationResult = new ValidationResult();
+
     dppMock
       .stateTransition
-      .validateData
-      .resolves({
-        isValid: this.sinon.stub().returns(true),
-      });
+      .validateState
+      .resolves(validationResult);
 
     stateRepositoryMock = createStateRepositoryMock(this.sinon);
 
@@ -104,7 +108,7 @@ describe('deliverTxHandlerFactory', () => {
     expect(unserializeStateTransitionMock).to.be.calledOnceWith(
       documentsBatchTransitionFixture.toBuffer(),
     );
-    expect(dppMock.stateTransition.validateData).to.be.calledOnceWith(
+    expect(dppMock.stateTransition.validateState).to.be.calledOnceWith(
       documentsBatchTransitionFixture,
     );
     expect(dppMock.stateTransition.apply).to.be.calledOnceWith(
@@ -138,7 +142,7 @@ describe('deliverTxHandlerFactory', () => {
     expect(unserializeStateTransitionMock).to.be.calledOnceWith(
       dataContractCreateTransitionFixture.toBuffer(),
     );
-    expect(dppMock.stateTransition.validateData).to.be.calledOnceWith(
+    expect(dppMock.stateTransition.validateState).to.be.calledOnceWith(
       dataContractCreateTransitionFixture,
     );
     expect(dppMock.stateTransition.apply).to.be.calledOnceWith(
@@ -153,28 +157,28 @@ describe('deliverTxHandlerFactory', () => {
     );
   });
 
-  it('should throw InvalidArgumentAbciError if a state transition is not valid', async () => {
+  it('should throw DPPValidationAbciError if a state transition is invalid against state', async () => {
     unserializeStateTransitionMock.resolves(dataContractCreateTransitionFixture);
 
-    const error = new ValidationError('Some error');
-    const invalidResult = new ValidationResult([error]);
+    const error = new SomeConsensusError('Consensus error');
 
-    dppMock.stateTransition.validateData.resolves(invalidResult);
+    validationResult.addError(error);
 
     try {
       await deliverTxHandler(documentRequest);
 
       expect.fail('should throw InvalidArgumentAbciError error');
     } catch (e) {
-      expect(e).to.be.instanceOf(InvalidArgumentAbciError);
-      expect(e.getMessage()).to.equal('Invalid state transition');
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
-      expect(e.getData()).to.deep.equal({ errors: [error] });
+      expect(e).to.be.instanceOf(DPPValidationAbciError);
+      expect(e.getCode()).to.equal(error.getCode());
+      expect(e.getData()).to.deep.equal({
+        arguments: ['Consensus error'],
+      });
       expect(blockExecutionContextMock.incrementCumulativeFees).to.not.be.called();
     }
   });
 
-  it('should throw InvalidArgumentAbciError if a state transition structure is not valid', async () => {
+  it('should throw DPPValidationAbciError if a state transition is not valid', async () => {
     const errorMessage = 'Invalid structure';
     const error = new InvalidArgumentAbciError(errorMessage);
 
@@ -187,9 +191,9 @@ describe('deliverTxHandlerFactory', () => {
     } catch (e) {
       expect(e).to.be.instanceOf(InvalidArgumentAbciError);
       expect(e.getMessage()).to.equal(errorMessage);
-      expect(e.getCode()).to.equal(AbciError.CODES.INVALID_ARGUMENT);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.INVALID_ARGUMENT);
       expect(blockExecutionContextMock.incrementCumulativeFees).to.not.be.called();
-      expect(dppMock.stateTransition.validateData).to.not.be.called();
+      expect(dppMock.stateTransition.validate).to.not.be.called();
     }
   });
 });

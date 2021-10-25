@@ -1,5 +1,5 @@
-# syntax = docker/dockerfile:1.3
-FROM node:12-alpine as node_modules
+# syntax = docker/dockerfile:1.2
+FROM node:16-alpine as node_modules
 
 ARG TARGETARCH
 
@@ -8,10 +8,10 @@ RUN apk update && \
     apk add --no-cache linux-headers \
                        git \
                        openssh-client \
-                       python \
+                       python3 \
                        alpine-sdk \
-                       zeromq-dev \
-                       cmake
+                       cmake \
+                       zeromq-dev
 
 # Enable node-gyp cache
 # and replacing github url https://github.com/actions/setup-node/issues/214
@@ -26,7 +26,7 @@ COPY package.json package-lock.json /
 
 RUN --mount=type=cache,id=npm-${TARGETARCH},target=/root/.npm --mount=type=cache,id=gyp-${TARGETARCH},target=/root/.cache npm ci --production
 
-FROM node:12-alpine
+FROM node:16-alpine
 
 ARG NODE_ENV=production
 ENV NODE_ENV ${NODE_ENV}

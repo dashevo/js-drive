@@ -15,12 +15,11 @@ const {
 
 const getDataContractFixture = require('@dashevo/dpp/lib/test/fixtures/getDataContractFixture');
 
+const GrpcErrorCodes = require('@dashevo/grpc-common/lib/server/error/GrpcErrorCodes');
 const dataContractQueryHandlerFactory = require('../../../../../lib/abci/handlers/query/dataContractQueryHandlerFactory');
 
-const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
-const AbciError = require('../../../../../lib/abci/errors/AbciError');
-const UnavailableAbciError = require('../../../../../lib/abci/errors/UnavailableAbciError');
 const BlockExecutionContextMock = require('../../../../../lib/test/mock/BlockExecutionContextMock');
+const NotFoundAbciError = require('../../../../../lib/abci/errors/NotFoundAbciError');
 
 describe('dataContractQueryHandlerFactory', () => {
   let dataContractQueryHandler;
@@ -43,7 +42,7 @@ describe('dataContractQueryHandlerFactory', () => {
     };
 
     previousRootTreeMock = {
-      getFullProof: this.sinon.stub(),
+      getFullProofForOneLeaf: this.sinon.stub(),
     };
 
     previousDataContractsStoreRootTreeLeafMock = this.sinon.stub();
@@ -105,7 +104,7 @@ describe('dataContractQueryHandlerFactory', () => {
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).not.to.be.called();
+    expect(previousRootTreeMock.getFullProofForOneLeaf).not.to.be.called();
   });
 
   it('should return proof', async () => {
@@ -115,7 +114,7 @@ describe('dataContractQueryHandlerFactory', () => {
     };
 
     previousDataContractRepositoryMock.fetch.resolves(dataContract);
-    previousRootTreeMock.getFullProof.returns(proof);
+    previousRootTreeMock.getFullProofForOneLeaf.returns(proof);
 
     const result = await dataContractQueryHandler(params, data, { prove: true });
 
@@ -123,8 +122,8 @@ describe('dataContractQueryHandlerFactory', () => {
     expect(result).to.be.an.instanceof(ResponseQuery);
     expect(result.code).to.equal(0);
     expect(result.value).to.deep.equal(responseMock.serializeBinary());
-    expect(previousRootTreeMock.getFullProof).to.be.calledOnce();
-    expect(previousRootTreeMock.getFullProof.getCall(0).args).to.deep.equal([
+    expect(previousRootTreeMock.getFullProofForOneLeaf).to.be.calledOnce();
+    expect(previousRootTreeMock.getFullProofForOneLeaf.getCall(0).args).to.deep.equal([
       previousDataContractsStoreRootTreeLeafMock,
       [dataContract.getId()],
     ]);
@@ -137,22 +136,9 @@ describe('dataContractQueryHandlerFactory', () => {
       expect.fail('should throw NotFoundAbciError');
     } catch (e) {
       expect(e).to.be.an.instanceof(NotFoundAbciError);
-      expect(e.getCode()).to.equal(AbciError.CODES.NOT_FOUND);
+      expect(e.getCode()).to.equal(GrpcErrorCodes.NOT_FOUND);
       expect(e.message).to.equal('Data Contract not found');
       expect(previousDataContractRepositoryMock.fetch).to.be.calledOnceWith(data.id);
-    }
-  });
-
-  it('should not proceed forward if createQueryResponse throws UnavailableAbciError', async () => {
-    createQueryResponseMock.throws(new UnavailableAbciError());
-
-    try {
-      await dataContractQueryHandler(params, data, {});
-
-      expect.fail('should throw UnavailableAbciError');
-    } catch (e) {
-      expect(e).to.be.an.instanceof(UnavailableAbciError);
-      expect(previousDataContractRepositoryMock.fetch).to.have.not.been.called();
     }
   });
 });
